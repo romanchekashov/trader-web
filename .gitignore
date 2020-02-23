@@ -1,4 +1,11 @@
 node_modules
 dist
+
+### IntelliJ IDEA ###
 .idea
-*.impl
+*.iws
+*.iml
+*.ipr
+
+### VS Code ###
+.vscode/
