@@ -3,9 +3,7 @@ import {render} from "react-dom";
 import {BrowserRouter} from "react-router-dom";
 import { Provider as ReduxProvider } from "react-redux";
 import {App} from "./app/App";
-import {configureStore} from "./app/configureStore";
-
-const store = configureStore();
+import store from "./app/store";
 
 render(
     <ReduxProvider store={store}>

@@ -10,8 +10,8 @@ export const Header = () => {
                 Home
             </NavLink>
             {" / "}
-            <NavLink to="/courses" activeStyle={activeStyle}>
-                Courses
+            <NavLink to="/trade-strategy-bot-control" activeStyle={activeStyle}>
+                Trade Strategy Bot Control
             </NavLink>
             {" / "}
             <NavLink to="/about" activeStyle={activeStyle}>

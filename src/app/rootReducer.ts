@@ -1,6 +1,18 @@
-import { combineReducers } from "redux";
-import {analysisReducer} from "../features/analysis/analysisReducer";
+import {combineReducers} from "redux";
+import tradeStrategyBotControlReducer from "../features/tradestrategybotcontrol/tradeStrategyBotControlReducer";
+import {MarketBotFilterDataDto} from "../features/tradestrategybotcontrol/dto/MarketBotFilterDataDto";
 
-export const rootReducer = combineReducers({
-    analysisReducer
+export interface RootState {
+    filterData: MarketBotFilterDataDto;
+}
+
+export const initialState: RootState = {
+    filterData: null
+};
+
+const rootReducer = combineReducers({
+    // analysisReducer,
+    tradeStrategyBotControlReducer
 });
+
+export default rootReducer;
