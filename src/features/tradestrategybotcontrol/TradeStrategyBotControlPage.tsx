@@ -1,16 +1,16 @@
 import * as React from "react";
-import { connect } from "react-redux";
-import {Link} from "react-router-dom";
+import {connect} from "react-redux";
 import {MarketBotFilterDataDto} from "./dto/MarketBotFilterDataDto";
-import {bindActionCreators, Dispatch} from "redux";
+import {bindActionCreators} from "redux";
 import {loadFilterData} from "./tradeStrategyBotControlActions";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
+import Filter from "./Filter";
 
 
 function mapStateToProps(state: RootState) {
     return {
-        filterData: state.filterData
+        filterData: state.tradeStrategyBotControl
     };
 }
 
@@ -39,14 +39,12 @@ class TradeStrategyBotControlPage extends React.Component<Props, TradeStrategyBo
     }
 
     render() {
+        const { filterData } = this.props;
+
         return (
-            <div className="jumbotron">
-                <h1>TradeStrategyBotControlPage</h1>
-                <p>React, Redux and React Router for ultra-responsive web apps.</p>
-                <Link to="about" className="btn btn-primary btn-lg">
-                    Learn more
-                </Link>
-            </div>
+            <>
+                <Filter filter={filterData}/>
+            </>
         );
     }
 }

@@ -4,6 +4,9 @@ import {AnalysisPage} from "../features/analysis/AnalysisPage";
 import {Header} from "../common/Header";
 import {PageNotFound} from "./PageNotFound";
 import TradeStrategyBotControlPage from "../features/tradestrategybotcontrol/TradeStrategyBotControlPage";
+import 'primereact/resources/primereact.css';
+import 'primereact/resources/themes/nova-light/theme.css';
+import 'primeicons/primeicons.css';
 
 export const App = () => {
     return (
