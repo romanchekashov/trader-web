@@ -1,5 +1,7 @@
 export enum Interval {
-    M1 = 1,
-    M5 = 5,
-    DAY = 1440
+    M1 = 'M1',
+    M3 = 'M3',
+    M5 = 'M5',
+    M30 = 'M30',
+    DAY = 'DAY'
 }
