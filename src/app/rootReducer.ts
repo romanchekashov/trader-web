@@ -2,17 +2,19 @@ import {combineReducers} from "redux";
 import tradeStrategyBotControl from "../features/tradestrategybotcontrol/tradeStrategyBotControlReducer";
 import {MarketBotFilterDataDto} from "../features/tradestrategybotcontrol/dto/MarketBotFilterDataDto";
 
-export interface RootState {
-    tradeStrategyBotControl: MarketBotFilterDataDto;
-}
 
-export const initialState: RootState = {
-    tradeStrategyBotControl: null
+interface AsRootState {
+    filter: MarketBotFilterDataDto
+}
+export const initialState: AsRootState = {
+    filter: null
 };
 
 const rootReducer = combineReducers({
     // analysisReducer,
-    tradeStrategyBotControl
+    filter: tradeStrategyBotControl
 });
+
+export type RootState = ReturnType<typeof rootReducer>;
 
 export default rootReducer;

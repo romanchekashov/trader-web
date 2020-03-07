@@ -1,10 +1,10 @@
-import {LOAD_FILTER_DATA_SUCCESS} from "./tradeStrategyBotControlActions";
+import {LOAD_FILTER_DATA_SUCCESS, TradeStrategyBotControlActionTypes} from "./tradeStrategyBotControlActions";
 import {initialState} from "../../app/rootReducer";
 
-export default function tradeStrategyBotControlReducer(state = initialState.tradeStrategyBotControl, action: any) {
+export default function tradeStrategyBotControlReducer(state = initialState.filter, action: TradeStrategyBotControlActionTypes) {
     switch (action.type) {
         case LOAD_FILTER_DATA_SUCCESS:
-            return action.filterData;
+            return action.filter;
         default:
             return state;
     }
