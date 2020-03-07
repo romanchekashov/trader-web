@@ -6,6 +6,7 @@ import {loadFilterData} from "./tradeStrategyBotControlActions";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
 import Filter from "./Filter";
+import {MarketBotStartDto} from "./dto/MarketBotStartDto";
 
 
 function mapStateToProps(state: RootState) {
@@ -38,12 +39,16 @@ class TradeStrategyBotControlPage extends React.Component<Props, TradeStrategyBo
         }
     }
 
+    onStart(data: MarketBotStartDto): void {
+        console.log(data);
+    }
+
     render() {
         const { filterData } = this.props;
 
         return (
             <>
-                <Filter filter={filterData}/>
+                <Filter filter={filterData} onStart={this.onStart}/>
             </>
         );
     }
