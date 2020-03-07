@@ -7,6 +7,7 @@ import TradeStrategyBotControlPage from "../features/tradestrategybotcontrol/Tra
 import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/nova-light/theme.css';
 import 'primeicons/primeicons.css';
+import 'primeflex/primeflex.css';
 
 export const App = () => {
     return (
