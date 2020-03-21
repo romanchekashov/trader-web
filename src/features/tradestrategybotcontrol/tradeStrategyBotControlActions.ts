@@ -9,6 +9,10 @@ interface LoadFilterSuccessAction {
     filter: MarketBotFilterDataDto
 }
 
+export interface TradeStrategyBotControlState {
+    filter: MarketBotFilterDataDto
+}
+
 export type TradeStrategyBotControlActionTypes = LoadFilterSuccessAction
 
 export const loadFilterDataSuccess = (filter: MarketBotFilterDataDto): LoadFilterSuccessAction => ({type: LOAD_FILTER_DATA_SUCCESS, filter});

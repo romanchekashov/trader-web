@@ -11,7 +11,7 @@ import {MarketBotStartDto} from "./dto/MarketBotStartDto";
 
 function mapStateToProps(state: RootState) {
     return {
-        filterData: state.filter
+        filterData: state.tradeStrategyBotControl.filter
     };
 }
 
