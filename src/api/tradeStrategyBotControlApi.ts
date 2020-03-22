@@ -1,5 +1,5 @@
 import { handleResponse, handleError } from "./apiUtils";
-import {MarketBotFilterDataDto} from "../features/tradestrategybotcontrol/dto/MarketBotFilterDataDto";
+import {MarketBotFilterDataDto} from "./dto/MarketBotFilterDataDto";
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 
 export function getFilterData(): Promise<MarketBotFilterDataDto> {

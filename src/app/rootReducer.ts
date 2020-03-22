@@ -15,7 +15,8 @@ export const initialState: AsRootState = {
     },
     tradeStrategyAnalysis: {
         filter: null,
-        shares: []
+        shares: [],
+        premise: null
     }
 };
 

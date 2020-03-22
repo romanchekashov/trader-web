@@ -2,6 +2,7 @@ import * as React from "react";
 import {useEffect} from "react";
 import {ClassCode} from "../../../api/dto/ClassCode";
 import {SecurityShare} from "../../../api/dto/SecurityShare";
+import {TradePremise} from "../../../api/tradestrategyanalysis/dto/TradePremise";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -10,6 +11,7 @@ export interface AnalysisState {
 type Props = {
     classCode: ClassCode;
     security: any;
+    premise: TradePremise;
 };
 
 interface PrimeDropdownItem<T> {
@@ -17,7 +19,7 @@ interface PrimeDropdownItem<T> {
     value: T
 }
 
-const Analysis: React.FC<Props> = ({classCode, security}) => {
+const Analysis: React.FC<Props> = ({classCode, security, premise}) => {
     let initState: AnalysisState = {
         realDepo: false
     };
@@ -27,9 +29,16 @@ const Analysis: React.FC<Props> = ({classCode, security}) => {
     useEffect(() => {
     });
 
-    if (share) {
+    if (share && premise) {
         return (
-            <div>Analysis for {share.shortName}</div>
+            <>
+                <div>Analysis for {share.shortName}</div>
+                <div>Trend direction: {premise.analysis.trend.direction}</div>
+            </>
+        )
+    } else if (share) {
+        return (
+            <div>Analysis for {share.shortName} is loading</div>
         )
     } else {
         return (

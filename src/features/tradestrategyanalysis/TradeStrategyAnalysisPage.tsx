@@ -3,21 +3,23 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
-import {loadFilterData, loadSecurityShares} from "./tradeStrategyAnalysisActions";
-import {MarketBotFilterDataDto} from "../tradestrategybotcontrol/dto/MarketBotFilterDataDto";
-import {MarketBotStartDto} from "../tradestrategybotcontrol/dto/MarketBotStartDto";
+import {loadFilterData, loadSecurityShares, loadTradePremise} from "./tradeStrategyAnalysisActions";
+import {MarketBotFilterDataDto} from "../../api/dto/MarketBotFilterDataDto";
+import {MarketBotStartDto} from "../../api/dto/MarketBotStartDto";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import {SecurityShare} from "../../api/dto/SecurityShare";
 import Filter from "./filter/Filter";
 import {ClassCode} from "../../api/dto/ClassCode";
 import Analysis from "./analysis/Analysis";
+import {TradePremise} from "../../api/tradestrategyanalysis/dto/TradePremise";
 
 
 function mapStateToProps(state: RootState) {
     return {
         filterData: state.tradeStrategyAnalysis.filter,
-        shares: state.tradeStrategyAnalysis.shares
+        shares: state.tradeStrategyAnalysis.shares,
+        premise: state.tradeStrategyAnalysis.premise
     };
 }
 
@@ -25,7 +27,8 @@ function mapDispatchToProps(dispatch: AppDispatch) {
     return {
         actions: {
             loadFilterData: bindActionCreators(loadFilterData, dispatch),
-            loadSecurityShares: bindActionCreators(loadSecurityShares, dispatch)
+            loadSecurityShares: bindActionCreators(loadSecurityShares, dispatch),
+            loadTradePremise: bindActionCreators(loadTradePremise, dispatch)
         }
     };
 }
@@ -40,7 +43,8 @@ interface TradeStrategyAnalysisState {
 
 type Props = {
     filterData: MarketBotFilterDataDto
-    shares: SecurityShare[]
+    shares: SecurityShare[],
+    premise: TradePremise
 } & ReturnType<typeof mapDispatchToProps>;
 
 class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
@@ -78,6 +82,23 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
         }
     }
 
+    loadPremise = (share: SecurityShare) => {
+        const { filter } = this.state;
+        const { actions, premise } = this.props;
+
+        if (filter && share) {
+            actions.loadTradePremise({
+                brokerId: filter.brokerId,
+                tradingPlatform: filter.tradingPlatform,
+                classCode: filter.classCode,
+                secCode: share.secCode,
+                timeFrameHigh: filter.timeFrameHigh,
+                timeFrameTrading: filter.timeFrameTrading,
+                timeFrameLow: filter.timeFrameLow
+            });
+        }
+    };
+
     onStart = (data: MarketBotStartDto): void => {
         console.log(data);
         this.setState({filter: data});
@@ -91,6 +112,7 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
     onSelectRow = (e) => {
         const selectedShares = e.value;
         if (selectedShares && selectedShares.length > 0) {
+            this.loadPremise(selectedShares[0]);
             this.setState({selectedShares, isDetailsShown: true, selectedColumns: [
                     {field: 'secCode', header: 'secCode'},
                     {field: 'shortName', header: 'shortName'},
@@ -103,7 +125,7 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
     };
 
     render() {
-        const { filterData, shares } = this.props;
+        const { filterData, shares, premise } = this.props;
         const { selectedShares, isDetailsShown, filter } = this.state;
         let selectedSharesView = [];
         if (selectedShares) {
@@ -141,7 +163,9 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                                 </DataTable>
                             </div>
                             <div className={classDetails}>
-                                <Analysis classCode={filter ? filter.classCode : null} security={selectedShares[0]}/>
+                                <Analysis classCode={filter ? filter.classCode : null}
+                                          security={selectedShares.length === 1 ? selectedShares[0] : null}
+                                          premise={premise}/>
                             </div>
                         </div>
                     </div>

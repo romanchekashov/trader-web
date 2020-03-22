@@ -4,12 +4,12 @@ import {Toolbar} from 'primereact/toolbar';
 import {Button} from "primereact/button";
 import {Dropdown} from "primereact/dropdown";
 import {Checkbox} from "primereact/checkbox";
-import {Broker} from "../../tradestrategybotcontrol/dto/Broker";
-import {MarketBotFilterDataDto, MarketSecuritiesDto} from "../../tradestrategybotcontrol/dto/MarketBotFilterDataDto";
-import {TradingPlatform} from "../../tradestrategybotcontrol/dto/TradingPlatform";
-import {SecurityInfo} from "../../tradestrategybotcontrol/dto/SecurityInfo";
-import {Interval} from "../../tradestrategybotcontrol/dto/Interval";
-import {MarketBotStartDto} from "../../tradestrategybotcontrol/dto/MarketBotStartDto";
+import {Broker} from "../../../api/dto/Broker";
+import {MarketBotFilterDataDto, MarketSecuritiesDto} from "../../../api/dto/MarketBotFilterDataDto";
+import {TradingPlatform} from "../../../api/dto/TradingPlatform";
+import {SecurityInfo} from "../../../api/dto/SecurityInfo";
+import {Interval} from "../../../api/dto/Interval";
+import {MarketBotStartDto} from "../../../api/dto/MarketBotStartDto";
 import "./Filter.css";
 
 export interface FilterState {

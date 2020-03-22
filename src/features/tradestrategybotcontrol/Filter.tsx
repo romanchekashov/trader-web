@@ -3,14 +3,14 @@ import {useEffect, useState} from "react";
 import {Toolbar} from 'primereact/toolbar';
 import {Button} from "primereact/button";
 import {Dropdown} from "primereact/dropdown";
-import {MarketBotFilterDataDto, MarketSecuritiesDto} from "./dto/MarketBotFilterDataDto";
-import {Broker} from "./dto/Broker";
-import {TradingPlatform} from "./dto/TradingPlatform";
-import {SecurityInfo} from "./dto/SecurityInfo";
-import {Interval} from "./dto/Interval";
+import {MarketBotFilterDataDto, MarketSecuritiesDto} from "../../api/dto/MarketBotFilterDataDto";
+import {Broker} from "../../api/dto/Broker";
+import {TradingPlatform} from "../../api/dto/TradingPlatform";
+import {SecurityInfo} from "../../api/dto/SecurityInfo";
+import {Interval} from "../../api/dto/Interval";
 import "./Filter.css";
 import {Checkbox} from "primereact/checkbox";
-import {MarketBotStartDto} from "./dto/MarketBotStartDto";
+import {MarketBotStartDto} from "../../api/dto/MarketBotStartDto";
 
 export interface FilterState {
     broker: Broker

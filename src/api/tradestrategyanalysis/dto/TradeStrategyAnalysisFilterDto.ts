@@ -1,13 +1,12 @@
-import {TradingPlatform} from "./TradingPlatform";
-import {Interval} from "./Interval";
-import {ClassCode} from "../../../api/dto/ClassCode";
+import {TradingPlatform} from "../../dto/TradingPlatform";
+import {ClassCode} from "../../dto/ClassCode";
+import {Interval} from "../../dto/Interval";
 
-export class MarketBotStartDto {
+export class TradeStrategyAnalysisFilterDto {
     public brokerId: number;
     public tradingPlatform: TradingPlatform;
     public classCode: ClassCode;
     public secCode: string;
-    public realDeposit: boolean = false;
     public timeFrameHigh: Interval;
     public timeFrameTrading: Interval;
     public timeFrameLow: Interval;

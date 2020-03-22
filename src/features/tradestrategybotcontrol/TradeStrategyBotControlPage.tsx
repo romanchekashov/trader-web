@@ -1,12 +1,12 @@
 import * as React from "react";
 import {connect} from "react-redux";
-import {MarketBotFilterDataDto} from "./dto/MarketBotFilterDataDto";
+import {MarketBotFilterDataDto} from "../../api/dto/MarketBotFilterDataDto";
 import {bindActionCreators} from "redux";
 import {loadFilterData} from "./tradeStrategyBotControlActions";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
 import Filter from "./Filter";
-import {MarketBotStartDto} from "./dto/MarketBotStartDto";
+import {MarketBotStartDto} from "../../api/dto/MarketBotStartDto";
 
 
 function mapStateToProps(state: RootState) {

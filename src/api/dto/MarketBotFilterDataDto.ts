@@ -1,7 +1,7 @@
 import {Broker} from "./Broker";
 import {SecurityInfo} from "./SecurityInfo";
 import {Interval} from "./Interval";
-import {ClassCode} from "../../../api/dto/ClassCode";
+import {ClassCode} from "./ClassCode";
 
 export class MarketSecuritiesDto {
     market: string;
