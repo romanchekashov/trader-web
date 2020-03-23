@@ -3,22 +3,33 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
-import {loadFilterData, loadSecurityShares, loadTradePremise} from "./tradeStrategyAnalysisActions";
+import {
+    loadFilterData,
+    loadSecurityCurrency,
+    loadSecurityFuture,
+    loadSecurityShares,
+    loadTradePremise
+} from "./tradeStrategyAnalysisActions";
 import {MarketBotFilterDataDto} from "../../api/dto/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../api/dto/MarketBotStartDto";
-import {Column} from "primereact/column";
-import {DataTable} from "primereact/datatable";
 import {SecurityShare} from "../../api/dto/SecurityShare";
 import Filter from "./filter/Filter";
 import {ClassCode} from "../../api/dto/ClassCode";
 import Analysis from "./analysis/Analysis";
 import {TradePremise} from "../../api/tradestrategyanalysis/dto/TradePremise";
+import {SecurityCurrency} from "../../api/dto/SecurityCurrency";
+import {SecurityFuture} from "../../api/dto/SecurityFuture";
+import Shares from "./securities/Shares";
+import Currencies from "./securities/Currencies";
+import Futures from "./securities/Futures";
 
 
 function mapStateToProps(state: RootState) {
     return {
         filterData: state.tradeStrategyAnalysis.filter,
         shares: state.tradeStrategyAnalysis.shares,
+        currencies: state.tradeStrategyAnalysis.currencies,
+        futures: state.tradeStrategyAnalysis.futures,
         premise: state.tradeStrategyAnalysis.premise
     };
 }
@@ -28,48 +39,36 @@ function mapDispatchToProps(dispatch: AppDispatch) {
         actions: {
             loadFilterData: bindActionCreators(loadFilterData, dispatch),
             loadSecurityShares: bindActionCreators(loadSecurityShares, dispatch),
+            loadSecurityCurrency: bindActionCreators(loadSecurityCurrency, dispatch),
+            loadSecurityFuture: bindActionCreators(loadSecurityFuture, dispatch),
             loadTradePremise: bindActionCreators(loadTradePremise, dispatch)
         }
     };
 }
 
 interface TradeStrategyAnalysisState {
-    selectedShares: SecurityShare[]
+    selectedSecurities: any[]
     isDetailsShown: boolean
-    columns: any[]
-    selectedColumns: any[]
     filter: MarketBotStartDto
 }
 
 type Props = {
     filterData: MarketBotFilterDataDto
-    shares: SecurityShare[],
+    shares: SecurityShare[]
     premise: TradePremise
+    currencies: SecurityCurrency[]
+    futures: SecurityFuture[]
 } & ReturnType<typeof mapDispatchToProps>;
 
 class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
-    private columns = [
-        {field: 'secCode', header: 'secCode'},
-        {field: 'shortName', header: 'shortName'},
-        {field: 'lastTradePrice', header: 'lastTradePrice'},
-        {field: 'lastChange', header: 'lastChange'},
-        {field: 'lastTradeQuantity', header: 'lastTradeQuantity'},
-        {field: 'lotSize', header: 'lotSize'},
-        {field: 'issueSize', header: 'issueSize'},
-        {field: 'weightedAveragePrice', header: 'weightedAveragePrice'},
-        {field: 'todayMoneyTurnover', header: 'todayMoneyTurnover'},
-        {field: 'numberOfTradesToday', header: 'numberOfTradesToday'}
-    ];
 
     constructor(props) {
         super(props);
 
         this.state = {
-            selectedShares: [],
+            selectedSecurities: [],
             isDetailsShown: false,
-            columns: this.columns,
-            selectedColumns: this.columns,
             filter: null
         };
     }
@@ -100,45 +99,64 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
     };
 
     onStart = (data: MarketBotStartDto): void => {
-        console.log(data);
         this.setState({filter: data});
         if (data) {
-            if (data.classCode === ClassCode.TQBR) {
-                this.props.actions.loadSecurityShares();
+            switch (data.classCode) {
+                case ClassCode.CETS:
+                    this.props.actions.loadSecurityCurrency();
+                    break;
+                case ClassCode.TQBR:
+                    this.props.actions.loadSecurityShares();
+                    break;
+                case ClassCode.SPBFUT:
+                    this.props.actions.loadSecurityFuture();
+                    break;
             }
         }
     };
 
     onSelectRow = (e) => {
-        const selectedShares = e.value;
-        if (selectedShares && selectedShares.length > 0) {
-            this.loadPremise(selectedShares[0]);
-            this.setState({selectedShares, isDetailsShown: true, selectedColumns: [
-                    {field: 'secCode', header: 'secCode'},
-                    {field: 'shortName', header: 'shortName'},
-                    {field: 'lastTradePrice', header: 'lastTradePrice'},
-                    {field: 'lastChange', header: 'lastChange'}
-                ]});
+        const selectedSecurities = e.value;
+        if (selectedSecurities && selectedSecurities.length > 0) {
+            this.loadPremise(selectedSecurities[0]);
+            this.setState({selectedSecurities: selectedSecurities, isDetailsShown: true});
         } else {
-            this.setState({selectedShares, isDetailsShown: false, selectedColumns: this.columns});
+            this.setState({selectedSecurities: selectedSecurities, isDetailsShown: false});
         }
     };
 
     render() {
-        const { filterData, shares, premise } = this.props;
-        const { selectedShares, isDetailsShown, filter } = this.state;
-        let selectedSharesView = [];
-        if (selectedShares) {
-            selectedSharesView = selectedShares.map(share => (
+        const { filterData, shares, premise, currencies, futures } = this.props;
+        const { selectedSecurities, isDetailsShown, filter } = this.state;
+        let selectedSecuritiesView = [];
+        if (selectedSecurities) {
+            selectedSecuritiesView = selectedSecurities.map(share => (
                 <div key={share.secCode}>{share.secCode}</div>
             ));
         }
         const classDataTable = isDetailsShown ? 'p-col-6' : 'p-col-12';
         const classDetails = isDetailsShown ? 'p-col-6' : 'hidden';
 
-        const columnComponents = this.state.selectedColumns.map(col=> {
-            return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true} />;
-        });
+        let dataTable = <div>Select classCode</div>;
+        if (filter) {
+            switch (filter.classCode) {
+                case ClassCode.TQBR:
+                    dataTable = (
+                        <Shares shares={shares} onSelectRow={this.onSelectRow} selectedShares={selectedSecurities}/>
+                    );
+                    break;
+                case ClassCode.CETS:
+                    dataTable = (
+                        <Currencies currencies={currencies} onSelectRow={this.onSelectRow} selectedCurrencies={selectedSecurities}/>
+                    );
+                    break;
+                case ClassCode.SPBFUT:
+                    dataTable = (
+                        <Futures futures={futures} onSelectRow={this.onSelectRow} selectedFutures={selectedSecurities}/>
+                    );
+                    break;
+            }
+        }
 
         return (
             <div className="p-grid sample-layout">
@@ -150,21 +168,16 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                         Top Bar
                     </div>
                     <div className="p-col-12 p-col-nogutter">
-                        {selectedSharesView}
+                        {selectedSecuritiesView}
                     </div>
                     <div className="p-col-12">
                         <div className="p-grid">
                             <div className={classDataTable}>
-                                <DataTable value={shares} responsive
-                                           selection={selectedShares}
-                                           onSelectionChange={this.onSelectRow}>
-                                    <Column selectionMode="multiple" style={{width:'2em'}}/>
-                                    {columnComponents}
-                                </DataTable>
+                                {dataTable}
                             </div>
                             <div className={classDetails}>
                                 <Analysis classCode={filter ? filter.classCode : null}
-                                          security={selectedShares.length === 1 ? selectedShares[0] : null}
+                                          security={selectedSecurities.length === 1 ? selectedSecurities[0] : null}
                                           premise={premise}/>
                             </div>
                         </div>
