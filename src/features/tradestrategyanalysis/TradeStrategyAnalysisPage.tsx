@@ -22,6 +22,7 @@ import {SecurityFuture} from "../../api/dto/SecurityFuture";
 import Shares from "./securities/Shares";
 import Currencies from "./securities/Currencies";
 import Futures from "./securities/Futures";
+import AnalysisFutures from "./analysis/AnalysisFutures";
 
 
 function mapStateToProps(state: RootState) {
@@ -134,8 +135,8 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                 <div key={share.secCode}>{share.secCode}</div>
             ));
         }
-        const classDataTable = isDetailsShown ? 'p-col-6' : 'p-col-12';
-        const classDetails = isDetailsShown ? 'p-col-6' : 'hidden';
+        const classDataTable = isDetailsShown ? 'p-col-3' : 'p-col-12';
+        const classDetails = isDetailsShown ? 'p-col-9' : 'hidden';
 
         let dataTable = <div>Select classCode</div>;
         if (filter) {
@@ -153,6 +154,32 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                 case ClassCode.SPBFUT:
                     dataTable = (
                         <Futures futures={futures} onSelectRow={this.onSelectRow} selectedFutures={selectedSecurities}/>
+                    );
+                    break;
+            }
+        }
+
+        let analysis = <div>Select security</div>;
+        if (filter) {
+            switch (filter.classCode) {
+                case ClassCode.TQBR:
+                    analysis = (
+                        <Analysis classCode={filter ? filter.classCode : null}
+                                  security={selectedSecurities.length === 1 ? selectedSecurities[0] : null}
+                                  premise={premise}/>
+                    );
+                    break;
+                case ClassCode.CETS:
+                    analysis = (
+                        <Analysis classCode={filter ? filter.classCode : null}
+                                  security={selectedSecurities.length === 1 ? selectedSecurities[0] : null}
+                                  premise={premise}/>
+                    );
+                    break;
+                case ClassCode.SPBFUT:
+                    analysis = (
+                        <AnalysisFutures classCode={filter ? filter.classCode : null}
+                                  future={selectedSecurities.length === 1 ? selectedSecurities[0] : null}/>
                     );
                     break;
             }
@@ -176,9 +203,7 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                                 {dataTable}
                             </div>
                             <div className={classDetails}>
-                                <Analysis classCode={filter ? filter.classCode : null}
-                                          security={selectedSecurities.length === 1 ? selectedSecurities[0] : null}
-                                          premise={premise}/>
+                                {analysis}
                             </div>
                         </div>
                     </div>

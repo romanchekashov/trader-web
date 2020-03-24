@@ -2,8 +2,17 @@ import {handleError, handleResponse} from "./apiUtils";
 import {SecurityShare} from "./dto/SecurityShare";
 import {SecurityCurrency} from "./dto/SecurityCurrency";
 import {SecurityFuture} from "./dto/SecurityFuture";
+import {Candle} from "./dto/Candle";
+import {Interval} from "./dto/Interval";
 
 const baseUrl = process.env.API_URL + "/api/v1/";
+
+export function getCandles(classCode: string, securityCode: string,
+                           interval: Interval, numberOfCandles: number): Promise<Candle[]> {
+    return fetch(`${baseUrl}candles?classCode=${classCode}&securityCode=${securityCode}&interval=${interval}&numberOfCandles=${numberOfCandles}`)
+        .then(handleResponse)
+        .catch(handleError);
+}
 
 export function getSecurityShares(): Promise<SecurityShare[]> {
     return fetch(baseUrl + 'security-shares')

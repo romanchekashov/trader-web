@@ -97,9 +97,13 @@ export const loadSecurityFutureSuccess = (futures: SecurityFuture[]): LoadSecuri
 export const loadSecurityFuture = () => (dispatch: AppDispatch) => {
     getSecurityFutures()
         .then(futures => {
-            dispatch(loadSecurityFutureSuccess(futures));
+            dispatch(loadSecurityFutureSuccess(futures.sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover)));
         })
         .catch(error => {
             throw error;
         });
 };
+
+function compareNumbers(a, b) {
+    return a - b;
+}

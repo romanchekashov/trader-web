@@ -1,5 +1,7 @@
 export class SecurityFuture {
     public secCode: string;
+    public name: string;
+    public shortName: string;
     public lastTradePrice: number;
     public _lastTradeTime: string;
     public lastTradeTime: string;
