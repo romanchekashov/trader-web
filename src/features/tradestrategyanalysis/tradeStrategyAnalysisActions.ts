@@ -63,6 +63,9 @@ export const loadSecuritySharesSuccess = (shares: SecurityShare[]): LoadSecurity
 export const loadSecurityShares = () => (dispatch: AppDispatch) => {
     getSecurityShares()
         .then(shares => {
+            shares = shares
+                .filter(value => value.todayMoneyTurnover > 0)
+                .sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover);
             shares.forEach(share => share.lastTradeTime = moment(share.lastTradeTime).format("HH:mm:ss DD-MM-YY"));
             dispatch(loadSecuritySharesSuccess(shares));
         })
