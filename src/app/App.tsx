@@ -9,6 +9,7 @@ import 'primereact/resources/themes/nova-light/theme.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import TradeStrategyAnalysisPage from "../features/tradestrategyanalysis/TradeStrategyAnalysisPage";
+import TradeJournalPage from "../features/tradejournal/TradeJournalPage";
 
 export const App = () => {
     return (
@@ -18,6 +19,7 @@ export const App = () => {
                 <Route exact path="/" component={HomePage}/>
                 <Route path="/trade-strategy-analysis" component={TradeStrategyAnalysisPage}/>
                 <Route path="/trade-strategy-bot-control" component={TradeStrategyBotControlPage}/>
+                <Route path="/trade-journal" component={TradeJournalPage}/>
                 <Route component={PageNotFound}/>
             </Switch>
         </div>

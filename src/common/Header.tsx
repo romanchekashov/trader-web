@@ -18,6 +18,10 @@ export const Header = () => {
                 Trade Strategy Bot Control
             </NavLink>
             {" / "}
+            <NavLink to="/trade-journal" activeStyle={activeStyle}>
+                Trade Journal
+            </NavLink>
+            {" / "}
             <NavLink to="/about" activeStyle={activeStyle}>
                 About
             </NavLink>

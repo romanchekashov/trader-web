@@ -3,11 +3,14 @@ import tradeStrategyBotControl from "../features/tradestrategybotcontrol/tradeSt
 import tradeStrategyAnalysis from "../features/tradestrategyanalysis/tradeStrategyAnalysisReducer";
 import {TradeStrategyAnalysisState} from "../features/tradestrategyanalysis/tradeStrategyAnalysisActions";
 import {TradeStrategyBotControlState} from "../features/tradestrategybotcontrol/tradeStrategyBotControlActions";
+import {TradeJournalState} from "../features/tradejournal/tradeJournalActions";
+import tradeJournal from "../features/tradejournal/tradeJournalReducer";
 
 
 interface AsRootState {
     tradeStrategyAnalysis: TradeStrategyAnalysisState
     tradeStrategyBotControl: TradeStrategyBotControlState
+    tradeJournal: TradeJournalState
 }
 export const initialState: AsRootState = {
     tradeStrategyBotControl: {
@@ -19,12 +22,16 @@ export const initialState: AsRootState = {
         currencies: [],
         futures: [],
         premise: null
+    },
+    tradeJournal: {
+        stat: []
     }
 };
 
 const rootReducer = combineReducers({
     tradeStrategyAnalysis,
-    tradeStrategyBotControl
+    tradeStrategyBotControl,
+    tradeJournal
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
