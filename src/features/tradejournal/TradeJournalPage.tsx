@@ -14,6 +14,7 @@ import {DataTable} from "primereact/datatable";
 import {Trade} from "../../api/tradejournal/dto/Trade";
 import moment = require("moment");
 import "./TradeJournalPage.css";
+import ProfitLossChart from "./profitLossChart/ProfitLossChart";
 
 function mapStateToProps(state: RootState) {
     return {
@@ -71,30 +72,22 @@ class TradeJournalPage extends React.Component<Props, TradeJournalState> {
     }
 
     onRowToggle = (e) => {
-        console.log(e.data);
         this.setState({expandedRows: e.data});
     };
 
-    rowExpansionTemplate = (data: Trade) => {
-        return  (
-            <div className="p-grid p-fluid" style={{padding: '2em 1em 1em 1em'}}>
-                <div className="p-col-12">
-                    <div className="p-grid">
-                        <div className="p-md-2">Vin: </div>
-                        <div className="p-md-10" style={{fontWeight:'bold'}}>{data.price}</div>
-
-                        <div className="p-md-2">Year: </div>
-                        <div className="p-md-10" style={{fontWeight:'bold'}}>{data.quantity}</div>
-
-                        <div className="p-md-2">Brand: </div>
-                        <div className="p-md-10" style={{fontWeight:'bold'}}>{data.value}</div>
-
-                        <div className="p-md-2">Color: </div>
-                        <div className="p-md-10" style={{fontWeight:'bold'}}>{data.sell}</div>
-                    </div>
+    rowExpansionTemplate = (data: any) => {
+        return data.trades.map(trade => {
+            return (
+                <div className="p-grid" key={trade.id}>
+                    <div className="p-col-1">{trade.id}</div>
+                    <div className="p-col-1">{trade.sell ? 'SELL' : 'BUY'}</div>
+                    <div className="p-col-1">{trade.price}</div>
+                    <div className="p-col-1">{trade.quantity}</div>
+                    <div className="p-col-1">{trade.value}</div>
+                    <div className="p-col-1">{moment(trade.dateTime).format("DD-MM-YYYY HH:mm:ss")}</div>
                 </div>
-            </div>
-        );
+            );
+        });
     };
 
     isShortTemplate = (rowData: any, {field}) => {
@@ -113,6 +106,37 @@ class TradeJournalPage extends React.Component<Props, TradeJournalState> {
         return moment(rowData[field]).format("HH:mm:ss");
     };
 
+    timeSpent = (rowData: any) => {
+        const dates = rowData.trades.map(trade => trade.dateTime).sort((a, b) => {
+            return new Date(a).getTime() - new Date(b).getTime();
+        });
+        // console.log(dates);
+        return moment.duration(moment(dates[dates.length - 1]).diff(moment(dates[0]))).humanize();
+        // return moment(rowData[field]).format("HH:mm:ss");
+    };
+
+    rowBgColor = (t: JournalTradeDto): any => {
+        if (t.totalGainAndLoss > 0) {
+            if (t.totalGainAndLoss > 3000) {
+                return {'win-lg': true};
+            } else if (t.totalGainAndLoss > 1000) {
+                return {'win': true};
+            } else {
+                return {'win-sm': true};
+            }
+        }
+
+        if (t.totalGainAndLoss < 0) {
+            if (t.totalGainAndLoss < -3000) {
+                return {'loss-lg': true};
+            } else if (t.totalGainAndLoss < -1000) {
+                return {'loss': true};
+            } else {
+                return {'loss-sm': true};
+            }
+        }
+    };
+
     render() {
         const { stat } = this.props;
 
@@ -125,52 +149,53 @@ class TradeJournalPage extends React.Component<Props, TradeJournalState> {
         const headerGroup = (
             <ColumnGroup>
                 <Row>
-                    <Column header="" rowSpan={3} />
-                    <Column header="№" rowSpan={3} />
+                    <Column header="" rowSpan={3} style={{width: '30px'}} />
+                    <Column header="№" rowSpan={3} style={{width: '30px'}} />
                     <Column header="Тикер" rowSpan={3} />
-                    <Column header="Short/Long" rowSpan={3} />
+                    <Column header="Short / Long" rowSpan={3} style={{width: '40px'}} />
                     <Column header="Вход" rowSpan={2} colSpan={6} />
                     <Column header="Выход" rowSpan={2} colSpan={6} />
                     <Column header="Коммисия" rowSpan={2} colSpan={3} />
                     <Column header="Риск менеджмент" colSpan={10} />
-                    <Column header="Кол-во переносов через ночь(Рабочих дней в сделке)" rowSpan={3} />
+                    <Column header="Время в сделке" rowSpan={3} />
                 </Row>
                 <Row>
                     <Column header="Цели по прибыли" colSpan={3} />
                     <Column header="Цели по убыткам(Макс. стоп)" colSpan={3} />
                     <Column header="Р/П" colSpan={2} />
-                    <Column header="Прибыль/Убыток" colSpan={3} />
+                    <Column header="Прибыль/Убыток" colSpan={2} />
                 </Row>
                 <Row>
                     <Column header="Дата" />
-                    <Column header="Неделя" />
+                    <Column header="Нед." />
                     <Column header="Время" />
-                    <Column header="Позиция" />
-                    <Column header="Сумма открытия" />
+                    <Column header="Поз." />
+                    <Column header="Сумма отк." />
                     <Column header="Цена за 1шт." />
 
                     <Column header="Дата" />
-                    <Column header="Неделя" />
+                    <Column header="Нед." />
                     <Column header="Время" />
-                    <Column header="Закрыто" />
-                    <Column header="Сумма закрытия" />
+                    <Column header="Закр." />
+                    <Column header="Сумма закр." />
                     <Column header="Цена за 1шт." />
 
                     <Column header="% брокера" />
                     <Column header="Вход" />
                     <Column header="Выход" />
 
-                    <Column header="Изменение цены за 1шт" />
-                    <Column header="Сумма(руб)" />
-                    <Column header="Сумма(%)" />
+                    <Column header="Изм. цены за 1шт" />
+                    <Column header="Сумма (руб)" />
+                    <Column header="Сумма (%)" />
 
-                    <Column header="Изменение цены за 1шт" />
-                    <Column header="Сумма(руб)" />
-                    <Column header="Сумма(%)" />
+                    <Column header="Изм. цены за 1шт" />
+                    <Column header="Сумма (руб)" />
+                    <Column header="Сумма (%)" />
 
-                    <Column header="Изменение цены за 1шт" />
-                    <Column header="Сумма(%)" />
-                    <Column header="Чистая Сумма(руб)" />
+                    <Column header="Изм. цены за 1шт" />
+                    <Column header="Сумма (%)" />
+                    <Column header="Чистая сумма (руб)" />
+                    <Column header={stat[0].totalGainAndLoss} />
                 </Row>
             </ColumnGroup>
         );
@@ -178,19 +203,21 @@ class TradeJournalPage extends React.Component<Props, TradeJournalState> {
         return (
             <div className="p-grid sample-layout">
                 <div className="p-col-12">
+                    <ProfitLossChart stat={stat}/>
                 </div>
                 <div className="p-col-12 journal-trades-table">
                     <DataTable value={stat[0].trades}
                                headerColumnGroup={headerGroup}
                                expandedRows={this.state.expandedRows}
                                onRowToggle={this.onRowToggle}
+                               rowClassName={this.rowBgColor}
                                rowExpansionTemplate={this.rowExpansionTemplate} dataKey="id">
-                        <Column expander={true} style={{width: '2em'}} />
+                        <Column expander={true} />
                         <Column field="id" />
                         <Column field="security.symbol" />
                         <Column field="isShort" body={this.isShortTemplate} />
                         <Column field="open" body={this.dateTemplate} />
-                        <Column field="open" body={this.dayOfWeekTemplate} />
+                        <Column field="open" body={this.dayOfWeekTemplate} style={{width:'10%'}} />
                         <Column field="open" body={this.timeTemplate} />
                         <Column field="openPosition" />
                         <Column field="openSum" />
@@ -214,7 +241,7 @@ class TradeJournalPage extends React.Component<Props, TradeJournalState> {
                         <Column field="priceChange" />
                         <Column field="priceChangePercentage" />
                         <Column field="totalGainAndLoss" />
-                        <Column />
+                        <Column body={this.timeSpent}/>
                     </DataTable>
                 </div>
             </div>
