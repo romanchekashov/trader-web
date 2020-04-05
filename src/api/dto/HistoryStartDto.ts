@@ -1,17 +1,15 @@
 import {TradingPlatform} from "./TradingPlatform";
 import {Interval} from "./Interval";
-import {ClassCode} from "./ClassCode";
 
-export class MarketBotStartDto {
+export class HistoryStartDto {
     public brokerId: number;
     public tradingPlatform: TradingPlatform;
-    public classCode: ClassCode;
+    public classCode: string;
     public secCode: string;
-    public realDeposit?: boolean = false;
+    public realDeposit: boolean;
     public timeFrameHigh: Interval;
     public timeFrameTrading: Interval;
     public timeFrameLow: Interval;
-    public history?: boolean = false;
-    public start?: Date;
-    public end?: Date;
+    public start: Date;
+    public end: Date;
 }

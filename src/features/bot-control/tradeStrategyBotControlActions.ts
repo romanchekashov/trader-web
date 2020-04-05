@@ -1,8 +1,9 @@
 import {MarketBotFilterDataDto} from "../../api/dto/MarketBotFilterDataDto";
-import {getFilterData} from "../../api/tradeStrategyBotControlApi";
+import {getFilterData} from "../../api/bot-control/tradeStrategyBotControlApi";
 import {AppDispatch} from "../../app/store";
 
 export const LOAD_FILTER_DATA_SUCCESS = "LOAD_FILTER_DATA_SUCCESS";
+export const START_BOT_SUCCESS = "START_BOT_SUCCESS";
 
 interface LoadFilterSuccessAction {
     type: typeof LOAD_FILTER_DATA_SUCCESS

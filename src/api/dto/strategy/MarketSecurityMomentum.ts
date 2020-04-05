@@ -3,4 +3,5 @@ export class MarketSecurityMomentum {
     public bearStrengthMomentumSameDirectionCompare: number;
     public bullStrengthOverBearMomentumOppositeDirectionCompare: number;
     public avgAccelerations: number[];
+    public state?: string;
 }

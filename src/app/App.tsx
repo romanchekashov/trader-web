@@ -3,7 +3,7 @@ import {Route, Switch} from "react-router-dom";
 import {HomePage} from "../features/home/HomePage";
 import {Header} from "../common/Header";
 import {PageNotFound} from "./PageNotFound";
-import TradeStrategyBotControlPage from "../features/tradestrategybotcontrol/TradeStrategyBotControlPage";
+import TradeStrategyBotControlPage from "../features/bot-control/TradeStrategyBotControlPage";
 import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/nova-light/theme.css';
 import 'primeicons/primeicons.css';

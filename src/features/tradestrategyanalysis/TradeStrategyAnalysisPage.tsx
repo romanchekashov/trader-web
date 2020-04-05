@@ -16,7 +16,7 @@ import {SecurityShare} from "../../api/dto/SecurityShare";
 import Filter from "./filter/Filter";
 import {ClassCode} from "../../api/dto/ClassCode";
 import Analysis from "./analysis/Analysis";
-import {TradePremise} from "../../api/tradestrategyanalysis/dto/TradePremise";
+import {TradePremise} from "../../api/dto/strategy/TradePremise";
 import {SecurityCurrency} from "../../api/dto/SecurityCurrency";
 import {SecurityFuture} from "../../api/dto/SecurityFuture";
 import Shares from "./securities/Shares";

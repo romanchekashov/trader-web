@@ -29,6 +29,7 @@ type Props = {
     ratio?: any,
     type: ChartDrawType,
     htSRLevels?: ChartLevel[]
+    orders?: ChartLevel[]
 };
 
 class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}> {
@@ -48,7 +49,7 @@ class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}
     };
 
     render() {
-        const { type, data: initialData, width, ratio, htSRLevels } = this.props;
+        const { type, data: initialData, width, ratio, htSRLevels, orders } = this.props;
 
         const xScaleProvider = discontinuousTimeScaleProvider
             .inputDateAccessor(d => d.timestamp);
@@ -78,9 +79,25 @@ class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}
                 displayFormat={format(".2f")}
             />
         ));
+        const ordersView = orders.map(lvl => (
+            <PriceCoordinate
+                key={lvl.price.toString()}
+                at="right"
+                orient="right"
+                price={lvl.price}
+                stroke={lvl.appearance.stroke || 'grey'}
+                lineStroke={lvl.appearance.stroke || 'grey'}
+                lineOpacity={1}
+                strokeWidth={1}
+                fontSize={12}
+                fill={lvl.appearance.stroke || "#FFFFFF"}
+                arrowWidth={7}
+                displayFormat={format(".2f")}
+            />
+        ));
 
         return (
-            <ChartCanvas height={400}
+            <ChartCanvas height={500}
                          ratio={ratio}
                          width={width}
                          margin={{ left: 80, right: 80, top: 10, bottom: 30 }}
@@ -131,6 +148,7 @@ class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}
                     <OHLCTooltip origin={[-40, 0]} xDisplayFormat={timeFormat("%Y-%m-%d %H:%M:%S")}/>
 
                     {htSRLevelsView}
+                    {ordersView}
 
                     {/*<TrendLine type={"LINE"}
                                enabled={false}

@@ -3,11 +3,14 @@ import CandleStickChartForDiscontinuousIntraDay from "./CandleStickChartForDisco
 import {ChartDrawType} from "./data/ChartDrawType";
 import {ChartElementAppearance} from "./data/ChartElementAppearance";
 import {ChartLevel} from "./data/ChartLevel";
+import {getHistoryCandles} from "../../api/historyTraderApi";
 import {Interval} from "../../api/dto/Interval";
-import {SecurityLastInfo} from "../../api/dto/SecurityLastInfo";
-import {TradePremise} from "../../api/tradestrategyanalysis/dto/TradePremise";
 import {Candle} from "../../api/dto/Candle";
 import {getCandles} from "../../api/baseApi";
+import {SecurityLastInfo} from "../../api/dto/SecurityLastInfo";
+import {TradePremise} from "../../api/dto/strategy/TradePremise";
+import {Order} from "../../api/dto/Order";
+import {OperationType} from "../../api/dto/OperationType";
 
 type Props = {
     interval: Interval,
@@ -15,6 +18,8 @@ type Props = {
     numberOfCandles: number,
     security: SecurityLastInfo
     premise?: TradePremise
+    orders?: Order[]
+    history?: boolean
 };
 
 type States = {
@@ -37,8 +42,17 @@ export class ChartWrapper extends React.Component<Props, States> {
             fetchCandlesAttempts: 0, secCode: null };
     }
 
+    getNewCandles = (): Promise<Candle[]> => {
+        const { interval, numberOfCandles, security, history } = this.props;
+        if (history) {
+            return getHistoryCandles(security.classCode, security.secCode, interval, numberOfCandles);
+        } else {
+            return getCandles(security.classCode, security.secCode, interval, numberOfCandles);
+        }
+    };
+
     fetchCandles = () => {
-        const { interval, numberOfCandles, security } = this.props;
+        const { security } = this.props;
         const { fetchCandlesInterval, fetchCandlesCountdown, candles, fetchCandlesAttempts, secCode } = this.state;
 
         if (security) {
@@ -49,7 +63,7 @@ export class ChartWrapper extends React.Component<Props, States> {
             }
 
             if (fetchCandlesCountdown === 0) {
-                getCandles(security.classCode, security.secCode, interval, numberOfCandles)
+                this.getNewCandles()
                     .then(data => {
                         if (data && data.length > 0 && data[0].open === 0) {
                             this.setState({
@@ -93,7 +107,7 @@ export class ChartWrapper extends React.Component<Props, States> {
 
     componentDidMount = () => {
         if (this.props.interval === Interval.M1) this.setState({fetchCandlesInterval: 10, fetchCandlesCountdown: 0});
-        if (this.props.interval === Interval.M5) this.setState({fetchCandlesInterval: 60, fetchCandlesCountdown: 0});
+        if (this.props.interval === Interval.M5) this.setState({fetchCandlesInterval: 10, fetchCandlesCountdown: 0});
 
         this.setIntervalIdForFetchCandles = setInterval(() => {this.fetchCandles()}, 1000);
     };
@@ -130,7 +144,7 @@ export class ChartWrapper extends React.Component<Props, States> {
             return <div>No data</div>
         }
 
-        const { width, premise } = this.props;
+        const { width, premise, orders } = this.props;
 
         let htSRLevels: ChartLevel[] = [];
         if (premise && premise.analysis.htSRLevels) {
@@ -139,6 +153,17 @@ export class ChartWrapper extends React.Component<Props, States> {
             htSRLevels = [...ChartWrapper.mapChartSRLevels(resistanceLevels, {stroke: "red"}),
                 ...ChartWrapper.mapChartSRLevels(supportLevels, {stroke: "green"})];
         }
+        let ordersLevels: ChartLevel[] = [];
+        if (orders) {
+            ordersLevels = [
+                ...ChartWrapper.mapChartSRLevels(orders
+                    .filter(value => OperationType.SELL === value.operation)
+                    .map(value => value.price), {stroke: "red"}),
+                ...ChartWrapper.mapChartSRLevels(orders
+                    .filter(value => OperationType.SELL !== value.operation)
+                    .map(value => value.price), {stroke: "green"})
+            ];
+        }
 
         return (
             <CandleStickChartForDiscontinuousIntraDay
@@ -146,7 +171,8 @@ export class ChartWrapper extends React.Component<Props, States> {
                 data={candles}
                 width={width}
                 ratio={1}
-                htSRLevels={htSRLevels} />
+                htSRLevels={htSRLevels}
+                orders={ordersLevels} />
         )
     }
 }

@@ -1,5 +1,5 @@
-import {ClassCode} from "../../dto/ClassCode";
-import {Interval} from "../../dto/Interval";
+import {ClassCode} from "../ClassCode";
+import {Interval} from "../Interval";
 
 export class TradingStrategyConfig {
     public classCode: ClassCode;

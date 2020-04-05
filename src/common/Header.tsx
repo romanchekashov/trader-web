@@ -11,15 +11,15 @@ export const Header = () => {
             </NavLink>
             {" / "}
             <NavLink to="/trade-strategy-analysis" activeStyle={activeStyle}>
-                Trade Strategy Analysis
+                Analysis
             </NavLink>
             {" / "}
             <NavLink to="/trade-strategy-bot-control" activeStyle={activeStyle}>
-                Trade Strategy Bot Control
+                Bot Control
             </NavLink>
             {" / "}
             <NavLink to="/trade-journal" activeStyle={activeStyle}>
-                Trade Journal
+                Journal
             </NavLink>
             {" / "}
             <NavLink to="/about" activeStyle={activeStyle}>

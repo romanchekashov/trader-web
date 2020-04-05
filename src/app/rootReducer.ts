@@ -1,8 +1,8 @@
 import {combineReducers} from "redux";
-import tradeStrategyBotControl from "../features/tradestrategybotcontrol/tradeStrategyBotControlReducer";
+import tradeStrategyBotControl from "../features/bot-control/tradeStrategyBotControlReducer";
 import tradeStrategyAnalysis from "../features/tradestrategyanalysis/tradeStrategyAnalysisReducer";
 import {TradeStrategyAnalysisState} from "../features/tradestrategyanalysis/tradeStrategyAnalysisActions";
-import {TradeStrategyBotControlState} from "../features/tradestrategybotcontrol/tradeStrategyBotControlActions";
+import {TradeStrategyBotControlState} from "../features/bot-control/tradeStrategyBotControlActions";
 import {TradeJournalState} from "../features/tradejournal/tradeJournalActions";
 import tradeJournal from "../features/tradejournal/tradeJournalReducer";
 

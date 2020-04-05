@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect} from "react";
 import {ClassCode} from "../../../api/dto/ClassCode";
 import {SecurityShare} from "../../../api/dto/SecurityShare";
-import {TradePremise} from "../../../api/tradestrategyanalysis/dto/TradePremise";
+import {TradePremise} from "../../../api/dto/strategy/TradePremise";
 
 export interface AnalysisState {
     realDepo: boolean

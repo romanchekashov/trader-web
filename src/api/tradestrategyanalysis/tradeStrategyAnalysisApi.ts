@@ -1,5 +1,5 @@
 import {handleError, handleResponse} from "../apiUtils";
-import {TradePremise} from "./dto/TradePremise";
+import {TradePremise} from "../dto/strategy/TradePremise";
 import {TradeStrategyAnalysisFilterDto} from "./dto/TradeStrategyAnalysisFilterDto";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
