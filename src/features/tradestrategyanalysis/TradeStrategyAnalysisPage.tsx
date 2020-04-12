@@ -99,10 +99,10 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
         }
     };
 
-    onStart = (data: MarketBotStartDto): void => {
-        this.setState({filter: data});
-        if (data) {
-            switch (data.classCode) {
+    onStart = (filter: MarketBotStartDto): void => {
+        this.setState({filter, selectedSecurities: [], isDetailsShown: false});
+        if (filter) {
+            switch (filter.classCode) {
                 case ClassCode.CETS:
                     this.props.actions.loadSecurityCurrency();
                     break;
@@ -135,8 +135,8 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                 <div key={share.secCode}>{share.secCode}</div>
             ));
         }
-        const classDataTable = isDetailsShown ? 'p-col-3' : 'p-col-12';
-        const classDetails = isDetailsShown ? 'p-col-9' : 'hidden';
+        const classDataTable = isDetailsShown ? 'p-col-2' : 'p-col-12';
+        const classDetails = isDetailsShown ? 'p-col-10' : 'hidden';
 
         let dataTable = <div>Select classCode</div>;
         if (filter) {
@@ -179,7 +179,11 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                 case ClassCode.SPBFUT:
                     analysis = (
                         <AnalysisFutures classCode={filter ? filter.classCode : null}
-                                  future={selectedSecurities.length === 1 ? selectedSecurities[0] : null}/>
+                                         timeFrameHigh={filter ? filter.timeFrameHigh : null}
+                                         timeFrameTrading={filter ? filter.timeFrameTrading : null}
+                                         timeFrameLow={filter ? filter.timeFrameLow : null}
+                                         future={selectedSecurities.length === 1 ? selectedSecurities[0] : null}
+                                         initPremise={premise}/>
                     );
                     break;
             }

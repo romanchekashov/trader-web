@@ -41,7 +41,7 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
         security: null,
         realDepo: false,
         highTimeFrame: Interval.M30,
-        tradingTimeFrame: Interval.M3,
+        tradingTimeFrame: Interval.M5,
         lowTimeFrame: Interval.M1
     };
 
@@ -58,7 +58,7 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
 
     const [security, setSecurity] = useState(initState.security);
 
-    const intervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M3, Interval.M5, Interval.M30, Interval.DAY]
+    const intervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M3, Interval.M5, Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.DAY]
         .map(val => ({ label: val, value: val }));
     const [highTimeFrame, setHighTimeFrame] = useState(initState.highTimeFrame);
     const [tradingTimeFrame, setTradingTimeFrame] = useState(initState.tradingTimeFrame);

@@ -4,7 +4,7 @@ import {format} from "d3-format";
 import {timeFormat} from "d3-time-format";
 
 import {Chart, ChartCanvas} from "react-financial-charts";
-import {BarSeries, CandlestickSeries,} from "react-financial-charts/lib/series";
+import {BarSeries, CandlestickSeries, Circle, LineSeries, ScatterSeries} from "react-financial-charts/lib/series";
 import {XAxis, YAxis} from "react-financial-charts/lib/axes";
 import {
     CrossHairCursor,
@@ -22,14 +22,19 @@ import {last} from "react-financial-charts/lib/utils";
 import {ChartDrawType} from "./data/ChartDrawType";
 import {ChartLevel} from "./data/ChartLevel";
 import {Candle} from "../../api/dto/Candle";
+import {Annotate, buyPath, sellPath, SvgPathAnnotation} from "react-financial-charts/lib/annotation";
+import {OperationType} from "../../api/dto/OperationType";
 
 type Props = {
-    data: Candle[],
-    width?: any,
-    ratio?: any,
-    type: ChartDrawType,
+    data: Candle[]
+    width?: any
+    ratio?: any
+    type: ChartDrawType
     htSRLevels?: ChartLevel[]
     orders?: ChartLevel[]
+    swingHighsLowsMap?: any
+    showGrid?: boolean
+    tradeSetupMap?: any
 };
 
 class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}> {
@@ -49,7 +54,20 @@ class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}
     };
 
     render() {
-        const { type, data: initialData, width, ratio, htSRLevels, orders } = this.props;
+        const {
+            type, data: initialData, width, ratio, htSRLevels, orders, swingHighsLowsMap, showGrid,
+            tradeSetupMap
+        } = this.props;
+
+        const height = 600;
+        const margin = {left: 50, right: 50, top: 10, bottom: 30};
+        const gridHeight = height - margin.top - margin.bottom;
+        const xGrid = showGrid ? {
+            innerTickSize: -1 * gridHeight,
+            // tickStrokeDasharray: 'Solid',
+            tickStrokeOpacity: 0.2,
+            tickStrokeWidth: 1
+        } : {};
 
         const xScaleProvider = discontinuousTimeScaleProvider
             .inputDateAccessor(d => d.timestamp);
@@ -96,11 +114,31 @@ class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}
             />
         ));
 
+        const defaultAnnotationProps = {
+            onClick: console.log.bind(console),
+        };
+
+        const longAnnotationProps = {
+            ...defaultAnnotationProps,
+            y: ({yScale, datum}) => yScale(datum.low),
+            fill: "#006517",
+            path: buyPath,
+            tooltip: "Go long",
+        };
+
+        const shortAnnotationProps = {
+            ...defaultAnnotationProps,
+            y: ({yScale, datum}) => yScale(datum.high),
+            fill: "#FF0000",
+            path: sellPath,
+            tooltip: "Go short",
+        };
+
         return (
-            <ChartCanvas height={500}
+            <ChartCanvas height={height}
                          ratio={ratio}
                          width={width}
-                         margin={{ left: 80, right: 80, top: 10, bottom: 30 }}
+                         margin={{left: 50, right: 50, top: 10, bottom: 30}}
                          type={type}
                          seriesName="MSFT"
                          data={data}
@@ -108,6 +146,7 @@ class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}
                          xAccessor={xAccessor}
                          displayXAccessor={displayXAccessor}
                          xExtents={xExtents}>
+
                 <Chart id={2}
                        yExtents={d => [d.volume]}
                        height={150} origin={(w, h) => [0, h - 150]}>
@@ -116,32 +155,33 @@ class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}
                     <MouseCoordinateY
                         at="left"
                         orient="left"
-                        displayFormat={format(".4s")} />
+                        displayFormat={format(".4s")}/>
 
-                    <BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
+                    <BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
 
-                    <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
+                    <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47"/>
 
                     <EdgeIndicator itemType="last" orient="right" edgeAt="right"
                                    yAccessor={d => d.volume} displayFormat={format(".4s")} fill="#0F0F0F"/>
                 </Chart>
+
                 <Chart id={1}
                        yExtents={d => [d.high, d.low]}
-                       padding={{ top: 40, bottom: 20 }}>
-                    <XAxis axisAt="bottom" orient="bottom"/>
-                    <YAxis axisAt="right" orient="right" ticks={5} />
+                       padding={{top: 40, bottom: 20}}>
+                    <XAxis axisAt="bottom" orient="bottom" {...xGrid}/>
+                    <YAxis axisAt="right" orient="right" ticks={5}/>
 
                     <MouseCoordinateX
                         rectWidth={60}
                         at="bottom"
                         orient="bottom"
-                        displayFormat={timeFormat("%H:%M:%S")} />
+                        displayFormat={timeFormat("%H:%M:%S")}/>
                     <MouseCoordinateY
                         at="right"
                         orient="right"
-                        displayFormat={format(".2f")} />
+                        displayFormat={format(".2f")}/>
 
-                    <CandlestickSeries />
+                    <CandlestickSeries/>
                     <EdgeIndicator itemType="last" orient="right" edgeAt="right"
                                    yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
 
@@ -149,6 +189,41 @@ class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}
 
                     {htSRLevelsView}
                     {ordersView}
+
+                    {
+                        swingHighsLowsMap ?
+                            <LineSeries
+                                yAccessor={d => swingHighsLowsMap[d.timestamp.getTime()]}
+                                strokeDasharray="Solid" connectNulls={true}/> : null
+                    }
+
+                    {
+                        swingHighsLowsMap ?
+                            <ScatterSeries
+                                yAccessor={d => {
+                                    return swingHighsLowsMap[d.timestamp.getTime()];
+                                }}
+                                marker={Circle}
+                                markerProps={{r: 3}}/> : null
+                    }
+
+                    <Annotate with={SvgPathAnnotation}
+                              when={d => {
+                                  if (tradeSetupMap[d.timestamp.getTime()]) {
+                                      return tradeSetupMap[d.timestamp.getTime()].operation === OperationType.BUY;
+                                  }
+                                  return false;
+                              }}
+                              usingProps={longAnnotationProps}/>
+
+                    <Annotate with={SvgPathAnnotation}
+                              when={d => {
+                                  if (tradeSetupMap[d.timestamp.getTime()]) {
+                                      return tradeSetupMap[d.timestamp.getTime()].operation === OperationType.SELL;
+                                  }
+                                  return false;
+                              }}
+                              usingProps={shortAnnotationProps}/>
 
                     {/*<TrendLine type={"LINE"}
                                enabled={false}
@@ -158,7 +233,8 @@ class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}
                                onComplete={this.onTrendLineComplete}
                                trends={trends}  />*/}
                 </Chart>
-                <CrossHairCursor />
+
+                <CrossHairCursor/>
             </ChartCanvas>
         );
     }

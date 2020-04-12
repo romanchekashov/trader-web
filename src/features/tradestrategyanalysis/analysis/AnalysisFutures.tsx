@@ -10,21 +10,32 @@ import {SecurityLastInfo} from "../../../api/dto/SecurityLastInfo";
 import {TradeSetup} from "../../../api/dto/strategy/TradeSetup";
 import {TradingPlatform} from "../../../api/dto/TradingPlatform";
 import TrendView from "./TrendView";
+import {getTrend} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
 
 type Props = {
     classCode: ClassCode
+    timeFrameHigh: Interval
+    timeFrameTrading: Interval
+    timeFrameLow: Interval
     future: SecurityFuture
+    initPremise: TradePremise
 };
 
-const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
-    const [premise, setPremise] = useState(null);
+let trendLowTFLoading = false;
+
+const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, timeFrameLow, future, initPremise}) => {
+    const [premise, setPremise] = useState(initPremise);
     const [tradeSetup, setTradeSetup] = useState(null);
     const [securityLastInfo, setSecurityLastInfo] = useState(null);
-    const [chartWidth, setChartWidth] = useState(200);
-    const chartRef = useRef(null);
+    const [chart1Width, setChart1Width] = useState(200);
+    const [chart2Width, setChart2Width] = useState(200);
+    const chart1Ref = useRef(null);
+    const chart2Ref = useRef(null);
+    const [trendLowTF, setTrendLowTF] = useState(null);
 
     const updateSize = () => {
-        setChartWidth(chartRef.current ? chartRef.current.clientWidth : 200);
+        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200);
+        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : 200);
     };
 
     useEffect(() => {
@@ -32,8 +43,21 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
             WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
                 brokerId: 1, tradingPlatform: TradingPlatform.QUIK,
                 classCode: classCode, secCode: future.secCode,
-                timeFrameHigh: Interval.M30, timeFrameTrading: Interval.M5, timeFrameLow: Interval.M1});
+                timeFrameHigh, timeFrameTrading, timeFrameLow});
+            if (!trendLowTF && !trendLowTFLoading) {
+                trendLowTFLoading = true;
+                getTrend(classCode, future.secCode, timeFrameLow, 540)
+                    .then(trend => {
+                        setTrendLowTF(trend);
+                        trendLowTFLoading = false;
+                    })
+                    .catch(reason => {
+                        trendLowTFLoading = false;
+                    });
+            }
         }
+
+        setPremise(initPremise);
 
         const lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
@@ -72,10 +96,29 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
 
     if (future && premise) {
         return (
-            <div ref={chartRef}>
-                <div>Analysis for {future.secCode}</div>
-                <ChartWrapper interval={Interval.M5} numberOfCandles={168} width={chartWidth}
-                              security={securityLastInfo} premise={premise}/>
+            <div>
+                <div className="p-grid" style={{margin:'0'}}>
+                    <div className="p-col-8" ref={chart1Ref} style={{padding:'0'}}>
+                        <ChartWrapper interval={timeFrameTrading}
+                                      numberOfCandles={168}
+                                      classCode={classCode}
+                                      securityCode={future.secCode}
+                                      width={chart1Width}
+                                      security={securityLastInfo}
+                                      premise={premise}
+                                      showGrid={true}/>
+                    </div>
+                    <div className="p-col-4" ref={chart2Ref} style={{padding:'0'}}>
+                        <ChartWrapper interval={timeFrameLow}
+                                      numberOfCandles={540}
+                                      classCode={classCode}
+                                      securityCode={future.secCode}
+                                      width={chart2Width}
+                                      security={securityLastInfo}
+                                      trend={trendLowTF}
+                                      showGrid={true}/>
+                    </div>
+                </div>
                 <TrendView trend={premise.analysis.trend} />
             </div>
         )
