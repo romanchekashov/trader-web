@@ -86,10 +86,14 @@ const Alerts: React.FC<Props> = ({filter}) => {
 
     const nameTemplate = (rowData, column) => {
         let className = "alert-icon ";
+        const sInterval = rowData.interval.toString();
+        const title = `${rowData[column.field]} - Interval: ${sInterval}`;
         if (PatternName.BEARISH_REVERSAL_PATTERN_SHOOTING_STAR === rowData[column.field]) {
-            className += "shooting-star-" + rowData.interval.toString().toLowerCase();
+            className += "shooting-star-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_HANGING_MAN === rowData[column.field]) {
+            className += "hanging-man-" + sInterval.toLowerCase();
         }
-        return <div className={className} title={rowData[column.field]}></div>;
+        return <div className={className} title={title}></div>;
     };
 
     const confirmTemplate = (rowData, column) => {
