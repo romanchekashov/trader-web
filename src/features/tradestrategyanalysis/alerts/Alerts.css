@@ -4,8 +4,62 @@
     padding-bottom: 0px !important;
 }
 
-.shooting-star {
-    background-image: url("images/shooting-star.png");
+.alerts-table-col-icon {
+    width: 50px;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
+
+.alerts-table-col-confirm {
+    width: 90px;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    text-align: center;
+}
+
+.alerts-table-col-symbol {
+    width: 70px;
+    padding-left: 5px;
+    padding-right: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.alert-icon {
     width: 40px;
     height: 20px;
+}
+
+.shooting-star-m1 {
+    background-image: url("images/shooting-star/shooting-star-m1.png");
+}
+.shooting-star-m2 {
+    background-image: url("images/shooting-star/shooting-star-m2.png");
+}
+.shooting-star-m5 {
+    background-image: url("images/shooting-star/shooting-star-m5.png");
+}
+.shooting-star-m10 {
+    background-image: url("images/shooting-star/shooting-star-m10.png");
+}
+.shooting-star-m15 {
+    background-image: url("images/shooting-star/shooting-star-m15.png");
+}
+.shooting-star-m30 {
+    background-image: url("images/shooting-star/shooting-star-m30.png");
+}
+.shooting-star-m60 {
+    background-image: url("images/shooting-star/shooting-star-m60.png");
+}
+.shooting-star-h2 {
+    background-image: url("images/shooting-star/shooting-star-h2.png");
+}
+.shooting-star-h4 {
+    background-image: url("images/shooting-star/shooting-star-h4.png");
+}
+.shooting-star-day {
+    background-image: url("images/shooting-star/shooting-star-day.png");
+}
+.shooting-star-week {
+    background-image: url("images/shooting-star/shooting-star-week.png");
 }

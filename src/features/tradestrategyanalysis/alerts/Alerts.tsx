@@ -6,13 +6,14 @@ import {PatternResult} from "../../../api/dto/pattern/PatternResult";
 import {AlertsFilter} from "./AlertsFilter";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
-import moment = require("moment");
 import "./Alerts.css";
 import {PatternName} from "../../../api/dto/pattern/PatternName";
+import moment = require("moment");
 
 type Props = {
     filter: AlertsFilter
 };
+let fetchAlertsAttempt = 0;
 
 const Alerts: React.FC<Props> = ({filter}) => {
     const columns = [
@@ -20,20 +21,24 @@ const Alerts: React.FC<Props> = ({filter}) => {
         {field: 'name', header: 'Icon'},
         {field: 'candle.symbol', header: 'Symbol'},
         {field: 'strength', header: 'Strength'},
-        {field: 'interval', header: 'Interval'},
         {field: 'hasConfirmation', header: 'Confirmed'}
     ];
 
     const [alerts, setAlerts] = useState([]);
     const [selectedAlert, setSelectedAlert] = useState(null);
-    const [fetchAlertsAttempt, setFetchAlertsAttempt] = useState(0);
+    const [fetchAlertsError, setFetchAlertsError] = useState(null);
 
     const fetchAlerts = () => {
         getCandlePatterns(filter)
-            .then(setAlerts)
+            .then(alerts => {
+                setAlerts(alerts);
+                setFetchAlertsError(null);
+            })
             .catch(reason => {
+                setAlerts([]);
+                setFetchAlertsError("Cannot get alerts for " + filter.secCode);
                 if (fetchAlertsAttempt < 3) {
-                    setFetchAlertsAttempt(fetchAlertsAttempt + 1);
+                    fetchAlertsAttempt++;
                     fetchAlerts();
                 }
             });
@@ -42,6 +47,7 @@ const Alerts: React.FC<Props> = ({filter}) => {
     useEffect(() => {
         let alertsSubscription;
         if (filter) {
+            fetchAlertsAttempt = 0;
             if (filter.fetchByWS) {
                 alertsSubscription = WebsocketService.getInstance()
                     .on<PatternResult[]>(filter.history ? WSEvent.HISTORY_ALERTS : WSEvent.ALERTS)
@@ -67,6 +73,10 @@ const Alerts: React.FC<Props> = ({filter}) => {
         return (<>Filter for alerts is not set.</>);
     }
 
+    if (filter && fetchAlertsError) {
+        return (<div style={{color: "red"}}>{fetchAlertsError}</div>);
+    }
+
     const timeTemplate = (rowData, column) => {
         let data = rowData;
         column.field.split(".")
@@ -75,32 +85,37 @@ const Alerts: React.FC<Props> = ({filter}) => {
     };
 
     const nameTemplate = (rowData, column) => {
-        let className = "";
+        let className = "alert-icon ";
         if (PatternName.BEARISH_REVERSAL_PATTERN_SHOOTING_STAR === rowData[column.field]) {
-            className = "shooting-star";
+            className += "shooting-star-" + rowData.interval.toString().toLowerCase();
         }
         return <div className={className} title={rowData[column.field]}></div>;
     };
 
     const confirmTemplate = (rowData, column) => {
-        let className = "";
-        return <div className={className}>{rowData[column.field] ? "YES" : "NO"}</div>;
+        let fontWeight = 500;
+        const confirmed: boolean = rowData[column.field];
+        if (confirmed) fontWeight = 700;
+        return <div style={{fontWeight}}>{confirmed ? "YES" : "NO"}</div>;
     };
 
     const columnComponents = columns.map(col => {
         if ("name" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header}
-                           body={nameTemplate}
-                           style={{width: 40, paddingLeft: 0, paddingRight: 0}}/>;
+                           body={nameTemplate} className="alerts-table-col-icon"/>;
         }
         if ("candle.timestamp" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header}
                            body={timeTemplate}
                            style={{width: 140, paddingLeft: 5, paddingRight: 5}}/>;
         }
+        if ("candle.symbol" === col.field) {
+            return <Column key={col.field} field={col.field} header={col.header} className="alerts-table-col-symbol"/>;
+        }
         if ("hasConfirmation" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header}
-                           body={confirmTemplate}/>;
+                           body={confirmTemplate}
+                           className="alerts-table-col-confirm"/>;
         }
         return <Column key={col.field} field={col.field} header={col.header}/>;
     });

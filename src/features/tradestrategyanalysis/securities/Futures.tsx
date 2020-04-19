@@ -13,7 +13,6 @@ type Props = {
 const Futures: React.FC<Props> = ({futures, selectedFuture, onSelectRow}) => {
 
     const columns = [
-        {field: 'secCode', header: 'Код'},
         {field: 'shortName', header: 'Наз'},
         {field: 'lastChange', header: '% изм'},
         {field: 'lastTradePrice', header: 'Цен посл'},
@@ -43,7 +42,9 @@ const Futures: React.FC<Props> = ({futures, selectedFuture, onSelectRow}) => {
         <DataTable value={futures} responsive
                    selectionMode="single"
                    selection={selectedFuture}
-                   onSelectionChange={onSelectRow}>
+                   onSelectionChange={onSelectRow}
+                   scrollable={!!selectedFuture}
+                   scrollHeight="600px">
             <Column selectionMode="multiple" style={{width:'2em'}}/>
             {columnComponents}
         </DataTable>

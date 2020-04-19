@@ -6,5 +6,6 @@ export enum Interval {
     M30 = 'M30',
     M60 = 'M60',
     H2 = 'H2',
-    DAY = 'DAY'
+    DAY = 'DAY',
+    WEEK = 'WEEK'
 }
