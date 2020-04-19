@@ -5,6 +5,7 @@ import {Interval} from "../dto/Interval";
 import {Trend} from "../dto/strategy/Trend";
 import {ClassCode} from "../dto/ClassCode";
 import {PatternResult} from "../dto/pattern/PatternResult";
+import {AlertsFilter} from "../../features/tradestrategyanalysis/alerts/AlertsFilter";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -18,7 +19,7 @@ export function getTradePremise(filter: TradeStrategyAnalysisFilterDto): Promise
         .catch(handleError);
 }
 
-export function getCandlePatterns(filter: TradeStrategyAnalysisFilterDto): Promise<PatternResult[]> {
+export function getCandlePatterns(filter: AlertsFilter): Promise<PatternResult[]> {
     return fetch(baseUrl + 'candle-patterns', {
         method: "POST", // POST for create, PUT to update when id already exists.
         headers: {"content-type": "application/json"},

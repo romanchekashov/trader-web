@@ -10,9 +10,8 @@ import {SecurityLastInfo} from "../../../api/dto/SecurityLastInfo";
 import {TradeSetup} from "../../../api/dto/strategy/TradeSetup";
 import {TradingPlatform} from "../../../api/dto/TradingPlatform";
 import TrendView from "./TrendView";
-import {getCandlePatterns, getTrend} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
-import {PatternResult} from "../../../api/dto/pattern/PatternResult";
-import moment = require("moment");
+import {getTrend} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
+import Alerts from "../alerts/Alerts";
 
 type Props = {
     classCode: ClassCode
@@ -34,7 +33,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
     const chart1Ref = useRef(null);
     const chart2Ref = useRef(null);
     const [trendLowTF, setTrendLowTF] = useState(null);
-    const [patternResults, setPatternResults] = useState([]);
+    const [alertsFilter, setAlertsFilter] = useState(null);
 
     const updateSize = () => {
         setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200);
@@ -43,10 +42,13 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
 
     useEffect(() => {
         if (future) {
+            // console.log("AnalysisFutures: ", classCode, timeFrameHigh, timeFrameTrading, timeFrameLow, future, initPremise);
+
             WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
                 brokerId: 1, tradingPlatform: TradingPlatform.QUIK,
                 classCode: classCode, secCode: future.secCode,
-                timeFrameHigh, timeFrameTrading, timeFrameLow});
+                timeFrameHigh, timeFrameTrading, timeFrameLow
+            });
             if (!trendLowTF && !trendLowTFLoading) {
                 trendLowTFLoading = true;
                 getTrend(classCode, future.secCode, timeFrameLow, 540)
@@ -59,12 +61,14 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                     });
             }
 
-            getCandlePatterns({
-                brokerId: 1, tradingPlatform: TradingPlatform.QUIK,
-                classCode: classCode, secCode: future.secCode,
-                timeFrameHigh, timeFrameTrading, timeFrameLow})
-                .then(setPatternResults)
-                .catch(reason => console.log);
+            if (!alertsFilter || alertsFilter.secCode !== future.secCode) {
+                setAlertsFilter({
+                    classCode: classCode,
+                    secCode: future.secCode,
+                    fetchByWS: false,
+                    history: true
+                });
+            }
         }
 
         setPremise(initPremise);
@@ -105,25 +109,16 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
     });
 
     if (future && premise) {
-        const patternResultsView = patternResults.map(value => {
-            return (
-                <div className="p-col-12" style={{display: "flex", justifyContent: "flex-start"}}>
-                    <div style={{marginRight: 10}}>{value.name}</div>
-                    <div style={{marginRight: 10}}>{value.interval}</div>
-                    <div style={{marginRight: 10}}>{value.strength}</div>
-                    <div style={{marginRight: 10}}>{value.hasConfirmation}</div>
-                    <div>{moment(value.candle.timestamp).format("DD-MM-YYYY HH:mm")}</div>
-                </div>
-            )
-        });
 
         return (
             <div>
                 <div className="p-grid">
-                    {patternResultsView}
+                    <div className="p-col-6">
+                        <Alerts filter={alertsFilter}/>
+                    </div>
                 </div>
-                <div className="p-grid" style={{margin:'0'}}>
-                    <div className="p-col-8" ref={chart1Ref} style={{padding:'0'}}>
+                <div className="p-grid" style={{margin: '0'}}>
+                    <div className="p-col-8" ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
                                       numberOfCandles={168}
                                       classCode={classCode}
@@ -133,7 +128,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                                       premise={premise}
                                       showGrid={true}/>
                     </div>
-                    <div className="p-col-4" ref={chart2Ref} style={{padding:'0'}}>
+                    <div className="p-col-4" ref={chart2Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameLow}
                                       numberOfCandles={540}
                                       classCode={classCode}
@@ -144,7 +139,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                                       showGrid={true}/>
                     </div>
                 </div>
-                <TrendView trend={premise.analysis.trend} />
+                <TrendView trend={premise.analysis.trend}/>
             </div>
         )
     } else {
