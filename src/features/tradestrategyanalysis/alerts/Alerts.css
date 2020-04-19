@@ -101,3 +101,38 @@
 }
 
 /*------------------------------------------------*/
+.doji-m1 {
+    background-image: url("images/doji/doji-m1.png");
+}
+.doji-m2 {
+    background-image: url("images/doji/doji-m2.png");
+}
+.doji-m5 {
+    background-image: url("images/doji/doji-m5.png");
+}
+.doji-m10 {
+    background-image: url("images/doji/doji-m10.png");
+}
+.doji-m15 {
+    background-image: url("images/doji/doji-m15.png");
+}
+.doji-m30 {
+    background-image: url("images/doji/doji-m30.png");
+}
+.doji-m60 {
+    background-image: url("images/doji/doji-m60.png");
+}
+.doji-h2 {
+    background-image: url("images/doji/doji-h2.png");
+}
+.doji-h4 {
+    background-image: url("images/doji/doji-h4.png");
+}
+.doji-day {
+    background-image: url("images/doji/doji-day.png");
+}
+.doji-week {
+    background-image: url("images/doji/doji-week.png");
+}
+
+/*------------------------------------------------*/

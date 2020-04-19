@@ -92,6 +92,8 @@ const Alerts: React.FC<Props> = ({filter}) => {
             className += "shooting-star-" + sInterval.toLowerCase();
         } else if (PatternName.BEARISH_REVERSAL_PATTERN_HANGING_MAN === rowData[column.field]) {
             className += "hanging-man-" + sInterval.toLowerCase();
+        } else if (PatternName.REVERSAL_PATTERN_DOJI === rowData[column.field]) {
+            className += "doji-" + sInterval.toLowerCase();
         }
         return <div className={className} title={title}></div>;
     };
