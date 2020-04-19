@@ -48,7 +48,7 @@ function mapDispatchToProps(dispatch: AppDispatch) {
 }
 
 interface TradeStrategyAnalysisState {
-    selectedSecurities: any[]
+    selectedSecurity: any
     isDetailsShown: boolean
     filter: MarketBotStartDto
 }
@@ -68,7 +68,7 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
         super(props);
 
         this.state = {
-            selectedSecurities: [],
+            selectedSecurity: null,
             isDetailsShown: false,
             filter: null
         };
@@ -100,7 +100,7 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
     };
 
     onStart = (filter: MarketBotStartDto): void => {
-        this.setState({filter, selectedSecurities: [], isDetailsShown: false});
+        this.setState({filter, selectedSecurity: null, isDetailsShown: false});
         if (filter) {
             switch (filter.classCode) {
                 case ClassCode.CETS:
@@ -117,23 +117,23 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
     };
 
     onSelectRow = (e) => {
-        const selectedSecurities = e.value;
-        if (selectedSecurities && selectedSecurities.length > 0) {
-            this.loadPremise(selectedSecurities[0]);
-            this.setState({selectedSecurities: selectedSecurities, isDetailsShown: true});
+        const selectedSecurity = e.value;
+        if (selectedSecurity) {
+            this.loadPremise(selectedSecurity);
+            this.setState({selectedSecurity, isDetailsShown: true});
         } else {
-            this.setState({selectedSecurities: selectedSecurities, isDetailsShown: false});
+            this.setState({selectedSecurity, isDetailsShown: false});
         }
     };
 
     render() {
         const { filterData, shares, premise, currencies, futures } = this.props;
-        const { selectedSecurities, isDetailsShown, filter } = this.state;
-        let selectedSecuritiesView = [];
-        if (selectedSecurities) {
-            selectedSecuritiesView = selectedSecurities.map(share => (
-                <div key={share.secCode}>{share.secCode}</div>
-            ));
+        const { selectedSecurity, isDetailsShown, filter } = this.state;
+        let selectedSecuritiesView = null;
+        if (selectedSecurity) {
+            selectedSecuritiesView = (
+                <div key={selectedSecurity.secCode}>{selectedSecurity.secCode}</div>
+            );
         }
         const classDataTable = isDetailsShown ? 'p-col-2' : 'p-col-12';
         const classDetails = isDetailsShown ? 'p-col-10' : 'hidden';
@@ -143,17 +143,21 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
             switch (filter.classCode) {
                 case ClassCode.TQBR:
                     dataTable = (
-                        <Shares shares={shares} onSelectRow={this.onSelectRow} selectedShares={selectedSecurities}/>
+                        <Shares shares={shares}
+                                onSelectRow={this.onSelectRow}
+                                selectedShare={selectedSecurity}/>
                     );
                     break;
                 case ClassCode.CETS:
                     dataTable = (
-                        <Currencies currencies={currencies} onSelectRow={this.onSelectRow} selectedCurrencies={selectedSecurities}/>
+                        <Currencies currencies={currencies}
+                                    onSelectRow={this.onSelectRow}
+                                    selectedCurrency={selectedSecurity}/>
                     );
                     break;
                 case ClassCode.SPBFUT:
                     dataTable = (
-                        <Futures futures={futures} onSelectRow={this.onSelectRow} selectedFutures={selectedSecurities}/>
+                        <Futures futures={futures} onSelectRow={this.onSelectRow} selectedFuture={selectedSecurity}/>
                     );
                     break;
             }
@@ -165,14 +169,14 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                 case ClassCode.TQBR:
                     analysis = (
                         <Analysis classCode={filter ? filter.classCode : null}
-                                  security={selectedSecurities.length === 1 ? selectedSecurities[0] : null}
+                                  security={selectedSecurity}
                                   premise={premise}/>
                     );
                     break;
                 case ClassCode.CETS:
                     analysis = (
                         <Analysis classCode={filter ? filter.classCode : null}
-                                  security={selectedSecurities.length === 1 ? selectedSecurities[0] : null}
+                                  security={selectedSecurity}
                                   premise={premise}/>
                     );
                     break;
@@ -182,7 +186,7 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                                          timeFrameHigh={filter ? filter.timeFrameHigh : null}
                                          timeFrameTrading={filter ? filter.timeFrameTrading : null}
                                          timeFrameLow={filter ? filter.timeFrameLow : null}
-                                         future={selectedSecurities.length === 1 ? selectedSecurities[0] : null}
+                                         future={selectedSecurity}
                                          initPremise={premise}/>
                     );
                     break;

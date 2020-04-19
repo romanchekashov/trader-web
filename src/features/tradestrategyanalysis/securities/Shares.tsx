@@ -6,11 +6,11 @@ import {DataTable} from "primereact/datatable";
 
 type Props = {
     shares: SecurityShare[]
-    selectedShares: SecurityShare[]
+    selectedShare: SecurityShare
     onSelectRow: (e: any) => void
 };
 
-const Shares: React.FC<Props> = ({shares, selectedShares, onSelectRow}) => {
+const Shares: React.FC<Props> = ({shares, selectedShare, onSelectRow}) => {
 
     const columns = [
         {field: 'secCode', header: 'secCode'},
@@ -27,7 +27,7 @@ const Shares: React.FC<Props> = ({shares, selectedShares, onSelectRow}) => {
 
     const [selectedColumns, setSelectedColumns] = useState(columns);
 
-    if (selectedShares.length > 0) {
+    if (selectedShare) {
         setSelectedColumns([
             {field: 'secCode', header: 'secCode'},
             {field: 'shortName', header: 'shortName'},
@@ -45,7 +45,7 @@ const Shares: React.FC<Props> = ({shares, selectedShares, onSelectRow}) => {
 
     return (
         <DataTable value={shares} responsive
-                   selection={selectedShares}
+                   selection={selectedShare}
                    onSelectionChange={onSelectRow}>
             <Column selectionMode="multiple" style={{width:'2em'}}/>
             {columnComponents}

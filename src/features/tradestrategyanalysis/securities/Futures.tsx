@@ -6,11 +6,11 @@ import {SecurityFuture} from "../../../api/dto/SecurityFuture";
 
 type Props = {
     futures: SecurityFuture[]
-    selectedFutures: SecurityFuture[]
+    selectedFuture: SecurityFuture
     onSelectRow: (e: any) => void
 };
 
-const Futures: React.FC<Props> = ({futures, selectedFutures, onSelectRow}) => {
+const Futures: React.FC<Props> = ({futures, selectedFuture, onSelectRow}) => {
 
     const columns = [
         {field: 'secCode', header: 'Код'},
@@ -34,14 +34,15 @@ const Futures: React.FC<Props> = ({futures, selectedFutures, onSelectRow}) => {
     useEffect(() => {
     });
 
-    const selectedColumns = selectedFutures.length > 0 ? lessColumns : columns;
+    const selectedColumns = selectedFuture ? lessColumns : columns;
     const columnComponents = selectedColumns.map(col=> {
         return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true} />;
     });
 
     return (
         <DataTable value={futures} responsive
-                   selection={selectedFutures}
+                   selectionMode="single"
+                   selection={selectedFuture}
                    onSelectionChange={onSelectRow}>
             <Column selectionMode="multiple" style={{width:'2em'}}/>
             {columnComponents}

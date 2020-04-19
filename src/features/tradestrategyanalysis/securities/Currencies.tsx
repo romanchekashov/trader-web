@@ -6,11 +6,11 @@ import {SecurityCurrency} from "../../../api/dto/SecurityCurrency";
 
 type Props = {
     currencies: SecurityCurrency[]
-    selectedCurrencies: SecurityCurrency[]
+    selectedCurrency: SecurityCurrency
     onSelectRow: (e: any) => void
 };
 
-const Currencies: React.FC<Props> = ({currencies, selectedCurrencies, onSelectRow}) => {
+const Currencies: React.FC<Props> = ({currencies, selectedCurrency, onSelectRow}) => {
 
     const columns = [
         {field: 'secCode', header: 'secCode'},
@@ -26,7 +26,7 @@ const Currencies: React.FC<Props> = ({currencies, selectedCurrencies, onSelectRo
 
     const [selectedColumns, setSelectedColumns] = useState(columns);
 
-    if (selectedCurrencies.length > 0) {
+    if (selectedCurrency) {
         setSelectedColumns([
             {field: 'secCode', header: 'secCode'},
             {field: 'name', header: 'name'},
@@ -44,7 +44,7 @@ const Currencies: React.FC<Props> = ({currencies, selectedCurrencies, onSelectRo
 
     return (
         <DataTable value={currencies} responsive
-                   selection={selectedCurrencies}
+                   selection={selectedCurrency}
                    onSelectionChange={onSelectRow}>
             <Column selectionMode="multiple" style={{width:'2em'}}/>
             {columnComponents}

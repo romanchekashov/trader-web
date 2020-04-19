@@ -1,3 +1,5 @@
+import {Interval} from "./Interval";
+
 export class Candle {
     public symbol: string;
     public open: number;
@@ -6,4 +8,5 @@ export class Candle {
     public close: number;
     public volume: number;
     public timestamp: Date;
+    public interval: Interval;
 }
