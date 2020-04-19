@@ -1,4 +1,4 @@
-import {ClassCode} from "../../../api/dto/ClassCode";
+import {ClassCode} from "../../../../api/dto/ClassCode";
 
 export class AlertsFilter {
     public classCode: ClassCode;

@@ -4,8 +4,8 @@ import {TradeStrategyAnalysisFilterDto} from "./dto/TradeStrategyAnalysisFilterD
 import {Interval} from "../dto/Interval";
 import {Trend} from "../dto/strategy/Trend";
 import {ClassCode} from "../dto/ClassCode";
-import {PatternResult} from "../dto/pattern/PatternResult";
-import {AlertsFilter} from "../../features/tradestrategyanalysis/alerts/AlertsFilter";
+import {PatternResult} from "../../features/tradestrategyanalysis/alerts/data/PatternResult";
+import {AlertsFilter} from "../../features/tradestrategyanalysis/alerts/data/AlertsFilter";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 

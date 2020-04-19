@@ -2,12 +2,12 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {WebsocketService, WSEvent} from "../../../api/WebsocketService";
 import {getCandlePatterns} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
-import {PatternResult} from "../../../api/dto/pattern/PatternResult";
-import {AlertsFilter} from "./AlertsFilter";
+import {PatternResult} from "./data/PatternResult";
+import {AlertsFilter} from "./data/AlertsFilter";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import "./Alerts.css";
-import {PatternName} from "../../../api/dto/pattern/PatternName";
+import {PatternName} from "./data/PatternName";
 import moment = require("moment");
 
 type Props = {
