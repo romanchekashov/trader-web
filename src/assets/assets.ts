@@ -1,6 +1,8 @@
 const path = require('path');
 
 const getFilePath = (filePath, options?) => {
+    if (!window['process']) return filePath;
+
     if (typeof filePath !== 'string') {
         throw new TypeError(`Expected a string, got ${typeof filePath}`);
     }
