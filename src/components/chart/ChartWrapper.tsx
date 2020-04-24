@@ -4,16 +4,16 @@ import {ChartDrawType} from "./data/ChartDrawType";
 import {ChartElementAppearance} from "./data/ChartElementAppearance";
 import {ChartLevel} from "./data/ChartLevel";
 import {getHistoryCandles} from "../../api/historyTraderApi";
-import {Interval} from "../../api/dto/Interval";
-import {Candle} from "../../api/dto/Candle";
+import {Interval} from "../../data/Interval";
+import {Candle} from "../../data/Candle";
 import {getCandles} from "../../api/baseApi";
-import {SecurityLastInfo} from "../../api/dto/SecurityLastInfo";
-import {TradePremise} from "../../api/dto/strategy/TradePremise";
+import {SecurityLastInfo} from "../../data/SecurityLastInfo";
+import {TradePremise} from "../../data/strategy/TradePremise";
 import {Order} from "../../api/dto/Order";
 import {OperationType} from "../../api/dto/OperationType";
 import moment = require("moment");
-import {Trend} from "../../api/dto/strategy/Trend";
-import {TradeSetup} from "../../api/dto/strategy/TradeSetup";
+import {Trend} from "../../data/strategy/Trend";
+import {TradeSetup} from "../../data/strategy/TradeSetup";
 
 type Props = {
     interval: Interval

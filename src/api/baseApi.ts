@@ -2,8 +2,8 @@ import {handleError, handleResponse} from "./apiUtils";
 import {SecurityShare} from "./dto/SecurityShare";
 import {SecurityCurrency} from "./dto/SecurityCurrency";
 import {SecurityFuture} from "./dto/SecurityFuture";
-import {Candle} from "./dto/Candle";
-import {Interval} from "./dto/Interval";
+import {Candle} from "../data/Candle";
+import {Interval} from "../data/Interval";
 
 const baseUrl = process.env.API_URL + "/api/v1/";
 

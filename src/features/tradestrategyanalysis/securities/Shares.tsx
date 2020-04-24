@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {SecurityShare} from "../../../api/dto/SecurityShare";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
@@ -13,40 +13,38 @@ type Props = {
 const Shares: React.FC<Props> = ({shares, selectedShare, onSelectRow}) => {
 
     const columns = [
-        {field: 'secCode', header: 'secCode'},
-        {field: 'shortName', header: 'shortName'},
-        {field: 'lastTradePrice', header: 'lastTradePrice'},
-        {field: 'lastChange', header: 'lastChange'},
-        {field: 'lastTradeQuantity', header: 'lastTradeQuantity'},
+        {field: 'shortName', header: 'Наз'},
+        {field: 'lastChange', header: '% изм'},
+        {field: 'lastTradePrice', header: 'Цен посл'},
+        {field: 'lastTradeQuantity', header: 'Объем посл'},
         {field: 'lotSize', header: 'lotSize'},
         {field: 'issueSize', header: 'issueSize'},
         {field: 'weightedAveragePrice', header: 'weightedAveragePrice'},
-        {field: 'todayMoneyTurnover', header: 'todayMoneyTurnover'},
+        {field: 'todayMoneyTurnover', header: 'Оборот'},
         {field: 'numberOfTradesToday', header: 'numberOfTradesToday'}
     ];
 
-    const [selectedColumns, setSelectedColumns] = useState(columns);
-
-    if (selectedShare) {
-        setSelectedColumns([
-            {field: 'secCode', header: 'secCode'},
-            {field: 'shortName', header: 'shortName'},
-            {field: 'lastTradePrice', header: 'lastTradePrice'},
-            {field: 'lastChange', header: 'lastChange'}
-        ]);
-    }
+    const lessColumns = [
+        {field: 'shortName', header: 'Наз'},
+        {field: 'lastChange', header: '% изм'},
+        {field: 'lastTradePrice', header: 'Цен посл'}
+    ];
 
     useEffect(() => {
     });
 
+    const selectedColumns = selectedShare ? lessColumns : columns;
     const columnComponents = selectedColumns.map(col=> {
         return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true} />;
     });
 
     return (
         <DataTable value={shares} responsive
+                   selectionMode="single"
                    selection={selectedShare}
-                   onSelectionChange={onSelectRow}>
+                   onSelectionChange={onSelectRow}
+                   scrollable={!!selectedShare}
+                   scrollHeight="600px">
             <Column selectionMode="multiple" style={{width:'2em'}}/>
             {columnComponents}
         </DataTable>

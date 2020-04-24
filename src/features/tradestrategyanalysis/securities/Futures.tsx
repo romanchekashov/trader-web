@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import {SecurityFuture} from "../../../api/dto/SecurityFuture";

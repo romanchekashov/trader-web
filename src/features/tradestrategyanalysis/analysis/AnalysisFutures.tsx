@@ -1,17 +1,17 @@
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {ClassCode} from "../../../api/dto/ClassCode";
-import {TradePremise} from "../../../api/dto/strategy/TradePremise";
+import {TradePremise} from "../../../data/strategy/TradePremise";
 import {SecurityFuture} from "../../../api/dto/SecurityFuture";
-import {ChartWrapper} from "../../../common/chart/ChartWrapper";
-import {Interval} from "../../../api/dto/Interval";
+import {ChartWrapper} from "../../../components/chart/ChartWrapper";
+import {Interval} from "../../../data/Interval";
 import {WebsocketService, WSEvent} from "../../../api/WebsocketService";
-import {SecurityLastInfo} from "../../../api/dto/SecurityLastInfo";
-import {TradeSetup} from "../../../api/dto/strategy/TradeSetup";
+import {SecurityLastInfo} from "../../../data/SecurityLastInfo";
+import {TradeSetup} from "../../../data/strategy/TradeSetup";
 import {TradingPlatform} from "../../../api/dto/TradingPlatform";
 import TrendView from "./TrendView";
 import {getTrend} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
-import Alerts from "../alerts/Alerts";
+import Alerts from "../../../components/alerts/Alerts";
 
 type Props = {
     classCode: ClassCode

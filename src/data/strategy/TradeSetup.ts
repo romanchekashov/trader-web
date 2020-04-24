@@ -1,6 +1,6 @@
 import {TradePremise} from "./TradePremise";
 import {PriceActionSetup} from "./PriceActionSetup";
-import {OperationType} from "../OperationType";
+import {OperationType} from "../../api/dto/OperationType";
 
 export class TradeSetup {
     public premise: TradePremise;

@@ -1,11 +1,11 @@
 import {handleError, handleResponse} from "../apiUtils";
-import {TradePremise} from "../dto/strategy/TradePremise";
+import {TradePremise} from "../../data/strategy/TradePremise";
 import {TradeStrategyAnalysisFilterDto} from "./dto/TradeStrategyAnalysisFilterDto";
-import {Interval} from "../dto/Interval";
-import {Trend} from "../dto/strategy/Trend";
+import {Interval} from "../../data/Interval";
+import {Trend} from "../../data/strategy/Trend";
 import {ClassCode} from "../dto/ClassCode";
-import {PatternResult} from "../../features/tradestrategyanalysis/alerts/data/PatternResult";
-import {AlertsFilter} from "../../features/tradestrategyanalysis/alerts/data/AlertsFilter";
+import {PatternResult} from "../../components/alerts/data/PatternResult";
+import {AlertsFilter} from "../../components/alerts/data/AlertsFilter";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 

@@ -7,7 +7,7 @@ import {MarketBotFilterDataDto, MarketSecuritiesDto} from "../../../api/dto/Mark
 import {Broker} from "../../../api/dto/Broker";
 import {TradingPlatform} from "../../../api/dto/TradingPlatform";
 import {SecurityInfo} from "../../../api/dto/SecurityInfo";
-import {Interval} from "../../../api/dto/Interval";
+import {Interval} from "../../../data/Interval";
 import "./Filter.css";
 import {Checkbox} from "primereact/checkbox";
 import {MarketBotStartDto} from "../../../api/dto/MarketBotStartDto";

@@ -16,7 +16,7 @@ import {SecurityShare} from "../../api/dto/SecurityShare";
 import Filter from "./filter/Filter";
 import {ClassCode} from "../../api/dto/ClassCode";
 import Analysis from "./analysis/Analysis";
-import {TradePremise} from "../../api/dto/strategy/TradePremise";
+import {TradePremise} from "../../data/strategy/TradePremise";
 import {SecurityCurrency} from "../../api/dto/SecurityCurrency";
 import {SecurityFuture} from "../../api/dto/SecurityFuture";
 import Shares from "./securities/Shares";
@@ -157,7 +157,9 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                     break;
                 case ClassCode.SPBFUT:
                     dataTable = (
-                        <Futures futures={futures} onSelectRow={this.onSelectRow} selectedFuture={selectedSecurity}/>
+                        <Futures futures={futures}
+                                 onSelectRow={this.onSelectRow}
+                                 selectedFuture={selectedSecurity}/>
                     );
                     break;
             }
@@ -169,6 +171,9 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                 case ClassCode.TQBR:
                     analysis = (
                         <Analysis classCode={filter ? filter.classCode : null}
+                                  timeFrameHigh={filter ? filter.timeFrameHigh : null}
+                                  timeFrameTrading={filter ? filter.timeFrameTrading : null}
+                                  timeFrameLow={filter ? filter.timeFrameLow : null}
                                   security={selectedSecurity}
                                   premise={premise}/>
                     );
@@ -176,6 +181,9 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                 case ClassCode.CETS:
                     analysis = (
                         <Analysis classCode={filter ? filter.classCode : null}
+                                  timeFrameHigh={filter ? filter.timeFrameHigh : null}
+                                  timeFrameTrading={filter ? filter.timeFrameTrading : null}
+                                  timeFrameLow={filter ? filter.timeFrameLow : null}
                                   security={selectedSecurity}
                                   premise={premise}/>
                     );

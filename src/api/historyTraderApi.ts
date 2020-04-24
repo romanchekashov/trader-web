@@ -1,6 +1,6 @@
 import {handleError, handleResponse} from "./apiUtils";
-import {Interval} from "./dto/Interval";
-import {Candle} from "./dto/Candle";
+import {Interval} from "../data/Interval";
+import {Candle} from "../data/Candle";
 import {HistoryStartDto} from "./dto/HistoryStartDto";
 
 const baseUrl = process.env.API_URL + "/api/v1/";

@@ -2,24 +2,23 @@ import * as React from "react";
 import {useEffect} from "react";
 import {ClassCode} from "../../../api/dto/ClassCode";
 import {SecurityShare} from "../../../api/dto/SecurityShare";
-import {TradePremise} from "../../../api/dto/strategy/TradePremise";
+import {TradePremise} from "../../../data/strategy/TradePremise";
+import {Interval} from "../../../data/Interval";
 
 export interface AnalysisState {
     realDepo: boolean
 }
 
 type Props = {
-    classCode: ClassCode;
-    security: any;
-    premise: TradePremise;
-};
-
-interface PrimeDropdownItem<T> {
-    label: string
-    value: T
+    classCode: ClassCode
+    timeFrameHigh: Interval
+    timeFrameTrading: Interval
+    timeFrameLow: Interval
+    security: any
+    premise: TradePremise
 }
 
-const Analysis: React.FC<Props> = ({classCode, security, premise}) => {
+const Analysis: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, timeFrameLow, security, premise}) => {
     let initState: AnalysisState = {
         realDepo: false
     };

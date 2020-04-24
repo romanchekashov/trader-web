@@ -4,7 +4,7 @@ import {SecurityShare} from "../../api/dto/SecurityShare";
 import {getSecurityCurrencies, getSecurityFutures, getSecurityShares} from "../../api/baseApi";
 import {getFilterData} from "../../api/bot-control/tradeStrategyBotControlApi";
 import moment = require("moment");
-import {TradePremise} from "../../api/dto/strategy/TradePremise";
+import {TradePremise} from "../../data/strategy/TradePremise";
 import {getTradePremise} from "../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
 import {TradeStrategyAnalysisFilterDto} from "../../api/tradestrategyanalysis/dto/TradeStrategyAnalysisFilterDto";
 import {SecurityCurrency} from "../../api/dto/SecurityCurrency";

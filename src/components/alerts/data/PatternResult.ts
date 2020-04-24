@@ -1,7 +1,7 @@
 import {PatternName} from "./PatternName";
 import {PatternStrength} from "./PatternStrength";
-import {Candle} from "../../../../api/dto/Candle";
-import {Interval} from "../../../../api/dto/Interval";
+import {Candle} from "../../../data/Candle";
+import {Interval} from "../../../data/Interval";
 
 export class PatternResult {
     public name: PatternName;

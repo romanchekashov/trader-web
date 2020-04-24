@@ -21,7 +21,7 @@ import {OHLCTooltip} from "react-financial-charts/lib/tooltip";
 import {last} from "react-financial-charts/lib/utils";
 import {ChartDrawType} from "./data/ChartDrawType";
 import {ChartLevel} from "./data/ChartLevel";
-import {Candle} from "../../api/dto/Candle";
+import {Candle} from "../../data/Candle";
 import {Annotate, buyPath, sellPath, SvgPathAnnotation} from "react-financial-charts/lib/annotation";
 import {OperationType} from "../../api/dto/OperationType";
 

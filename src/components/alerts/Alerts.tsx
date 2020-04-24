@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {WebsocketService, WSEvent} from "../../../api/WebsocketService";
-import {getCandlePatterns} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
+import {WebsocketService, WSEvent} from "../../api/WebsocketService";
+import {getCandlePatterns} from "../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
 import {PatternResult} from "./data/PatternResult";
 import {AlertsFilter} from "./data/AlertsFilter";
 import {Column} from "primereact/column";
