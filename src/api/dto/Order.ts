@@ -1,4 +1,4 @@
-import {ClassCode} from "./ClassCode";
+import {ClassCode} from "../../data/ClassCode";
 import {OrderType} from "./OrderType";
 import {OperationType} from "./OperationType";
 

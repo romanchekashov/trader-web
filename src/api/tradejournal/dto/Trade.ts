@@ -1,4 +1,4 @@
-import {ClassCode} from "../../dto/ClassCode";
+import {ClassCode} from "../../../data/ClassCode";
 import {Broker} from "../../dto/Broker";
 
 export class Trade {

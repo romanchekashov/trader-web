@@ -9,4 +9,6 @@ export class PatternResult {
     public hasConfirmation: boolean;
     public candle: Candle;
     public interval: Interval;
+    public description: string;
+    public possibleFutureDirectionUp: boolean;
 }

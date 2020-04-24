@@ -1,138 +1,64 @@
-.alerts-table th,
-.alerts-table td {
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
+.alerts {
+    height: 200px;
+    overflow-y: scroll;
+    font-size: 0.8em;
+}
+.alerts::-webkit-scrollbar {
+    width: 0.6em;
+}
+.alerts::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+.alerts::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
 }
 
-.alerts-table-col-icon {
+.alerts-row {
+    display: table;
+    border-bottom: 1px solid gray;
+    width: 100%;
+    cursor: pointer;
+}
+.alerts-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
+.alerts-time {
+    width: 105px;
+    padding-left: 5px;
+    padding-right: 0;
+}
+
+.alerts-name {
     width: 50px;
     padding-left: 5px !important;
     padding-right: 5px !important;
 }
 
-.alerts-table-col-confirm {
-    width: 90px;
-    padding-left: 5px !important;
-    padding-right: 5px !important;
-    text-align: center;
-}
-
-.alerts-table-col-symbol {
-    width: 70px;
+.alerts-symbol {
+    width: 60px;
     padding-left: 5px;
     padding-right: 5px;
     text-align: center;
-    font-weight: bold;
 }
 
-.alert-icon {
-    width: 40px;
-    height: 20px;
+.alerts-strength {
+    width: 20px;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
 }
 
-.shooting-star-m1 {
-    background-image: url("images/shooting-star/shooting-star-m1.png");
-}
-.shooting-star-m2 {
-    background-image: url("images/shooting-star/shooting-star-m2.png");
-}
-.shooting-star-m5 {
-    background-image: url("images/shooting-star/shooting-star-m5.png");
-}
-.shooting-star-m10 {
-    background-image: url("images/shooting-star/shooting-star-m10.png");
-}
-.shooting-star-m15 {
-    background-image: url("images/shooting-star/shooting-star-m15.png");
-}
-.shooting-star-m30 {
-    background-image: url("images/shooting-star/shooting-star-m30.png");
-}
-.shooting-star-m60 {
-    background-image: url("images/shooting-star/shooting-star-m60.png");
-}
-.shooting-star-h2 {
-    background-image: url("images/shooting-star/shooting-star-h2.png");
-}
-.shooting-star-h4 {
-    background-image: url("images/shooting-star/shooting-star-h4.png");
-}
-.shooting-star-day {
-    background-image: url("images/shooting-star/shooting-star-day.png");
-}
-.shooting-star-week {
-    background-image: url("images/shooting-star/shooting-star-week.png");
+.alerts-confirm {
+    width: 20px;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
 }
 
-/*------------------------------------------------*/
-
-.hanging-man-m1 {
-    background-image: url("images/hanging-man/hanging-man-m1.png");
-}
-.hanging-man-m2 {
-    background-image: url("images/hanging-man/hanging-man-m2.png");
-}
-.hanging-man-m5 {
-    background-image: url("images/hanging-man/hanging-man-m5.png");
-}
-.hanging-man-m10 {
-    background-image: url("images/hanging-man/hanging-man-m10.png");
-}
-.hanging-man-m15 {
-    background-image: url("images/hanging-man/hanging-man-m15.png");
-}
-.hanging-man-m30 {
-    background-image: url("images/hanging-man/hanging-man-m30.png");
-}
-.hanging-man-m60 {
-    background-image: url("images/hanging-man/hanging-man-m60.png");
-}
-.hanging-man-h2 {
-    background-image: url("images/hanging-man/hanging-man-h2.png");
-}
-.hanging-man-h4 {
-    background-image: url("images/hanging-man/hanging-man-h4.png");
-}
-.hanging-man-day {
-    background-image: url("images/hanging-man/hanging-man-day.png");
-}
-.hanging-man-week {
-    background-image: url("images/hanging-man/hanging-man-week.png");
+.alerts-direction {
+    width: 20px;
 }
 
-/*------------------------------------------------*/
-.doji-m1 {
-    background-image: url("images/doji/doji-m1.png");
+.alerts-description {
+    padding-left: 5px;
 }
-.doji-m2 {
-    background-image: url("images/doji/doji-m2.png");
-}
-.doji-m5 {
-    background-image: url("images/doji/doji-m5.png");
-}
-.doji-m10 {
-    background-image: url("images/doji/doji-m10.png");
-}
-.doji-m15 {
-    background-image: url("images/doji/doji-m15.png");
-}
-.doji-m30 {
-    background-image: url("images/doji/doji-m30.png");
-}
-.doji-m60 {
-    background-image: url("images/doji/doji-m60.png");
-}
-.doji-h2 {
-    background-image: url("images/doji/doji-h2.png");
-}
-.doji-h4 {
-    background-image: url("images/doji/doji-h4.png");
-}
-.doji-day {
-    background-image: url("images/doji/doji-day.png");
-}
-.doji-week {
-    background-image: url("images/doji/doji-week.png");
-}
-
-/*------------------------------------------------*/

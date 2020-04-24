@@ -14,7 +14,7 @@ import {MarketBotFilterDataDto} from "../../api/dto/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../api/dto/MarketBotStartDto";
 import {SecurityShare} from "../../api/dto/SecurityShare";
 import Filter from "./filter/Filter";
-import {ClassCode} from "../../api/dto/ClassCode";
+import {ClassCode} from "../../data/ClassCode";
 import Analysis from "./analysis/Analysis";
 import {TradePremise} from "../../data/strategy/TradePremise";
 import {SecurityCurrency} from "../../api/dto/SecurityCurrency";

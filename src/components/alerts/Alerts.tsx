@@ -1,37 +1,31 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {WebsocketService, WSEvent} from "../../api/WebsocketService";
-import {getCandlePatterns} from "../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
 import {PatternResult} from "./data/PatternResult";
 import {AlertsFilter} from "./data/AlertsFilter";
-import {Column} from "primereact/column";
-import {DataTable} from "primereact/datatable";
 import "./Alerts.css";
+import "./CandlePattern.css";
 import {PatternName} from "./data/PatternName";
+import {WebsocketService, WSEvent} from "../../api/WebsocketService";
+import {playSound} from "../../assets/assets";
 import moment = require("moment");
+import {getCandlePatterns} from "../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
 
 type Props = {
     filter: AlertsFilter
+    onAlertSelected: (alert: PatternResult) => void
 };
 let fetchAlertsAttempt = 0;
+let previousAlertsCount = 0;
 
-const Alerts: React.FC<Props> = ({filter}) => {
-    const columns = [
-        {field: 'candle.timestamp', header: 'Time'},
-        {field: 'name', header: 'Icon'},
-        {field: 'candle.symbol', header: 'Symbol'},
-        {field: 'strength', header: 'Strength'},
-        {field: 'hasConfirmation', header: 'Confirmed'}
-    ];
+const Alerts: React.FC<Props> = ({filter, onAlertSelected}) => {
 
     const [alerts, setAlerts] = useState([]);
-    const [selectedAlert, setSelectedAlert] = useState(null);
     const [fetchAlertsError, setFetchAlertsError] = useState(null);
 
     const fetchAlerts = () => {
         getCandlePatterns(filter)
-            .then(alerts => {
-                setAlerts(alerts);
+            .then(newAlerts => {
+                setAlerts(newAlerts);
                 setFetchAlertsError(null);
             })
             .catch(reason => {
@@ -44,6 +38,13 @@ const Alerts: React.FC<Props> = ({filter}) => {
             });
     };
 
+    const notifyOnNewAlert = (newAlerts: PatternResult[]): void => {
+        if (newAlerts && newAlerts.length !== previousAlertsCount) {
+            playSound(4);
+            previousAlertsCount = newAlerts.length;
+        }
+    };
+
     useEffect(() => {
         let alertsSubscription;
         if (filter) {
@@ -51,8 +52,9 @@ const Alerts: React.FC<Props> = ({filter}) => {
             if (filter.fetchByWS) {
                 alertsSubscription = WebsocketService.getInstance()
                     .on<PatternResult[]>(filter.history ? WSEvent.HISTORY_ALERTS : WSEvent.ALERTS)
-                    .subscribe(alerts => {
-                        setAlerts(alerts);
+                    .subscribe(newAlerts => {
+                        setAlerts(newAlerts);
+                        notifyOnNewAlert(newAlerts);
                     });
             } else {
                 fetchAlerts();
@@ -65,10 +67,6 @@ const Alerts: React.FC<Props> = ({filter}) => {
         };
     }, [filter]);
 
-    const onAlertSelected = (e: any) => {
-        setSelectedAlert(e.value);
-    };
-
     if (!filter) {
         return (<>Filter for alerts is not set.</>);
     }
@@ -77,65 +75,95 @@ const Alerts: React.FC<Props> = ({filter}) => {
         return (<div style={{color: "red"}}>{fetchAlertsError}</div>);
     }
 
-    const timeTemplate = (rowData, column) => {
-        let data = rowData;
-        column.field.split(".")
-            .forEach(field => data = data[field]);
-        return <>{moment(data).format("HH:mm - DD MMM YYYY")}</>;
+    const timeTemplate = (alert: PatternResult) => {
+        return <>{moment(alert.candle.timestamp).format("HH:mm - DD MMM YY")}</>;
     };
 
-    const nameTemplate = (rowData, column) => {
+    const nameTemplate = (alert: PatternResult) => {
         let className = "alert-icon ";
-        const sInterval = rowData.interval.toString();
-        const title = `${rowData[column.field]} - Interval: ${sInterval}`;
-        if (PatternName.BEARISH_REVERSAL_PATTERN_SHOOTING_STAR === rowData[column.field]) {
-            className += "shooting-star-" + sInterval.toLowerCase();
-        } else if (PatternName.BEARISH_REVERSAL_PATTERN_HANGING_MAN === rowData[column.field]) {
-            className += "hanging-man-" + sInterval.toLowerCase();
-        } else if (PatternName.REVERSAL_PATTERN_DOJI === rowData[column.field]) {
-            className += "doji-" + sInterval.toLowerCase();
+        const sInterval = alert.interval.toString();
+        const title = `${alert.name} - Interval: ${sInterval}`;
+
+        if (PatternName.BEARISH_REVERSAL_PATTERN_DARK_CLOUD_COVER === alert.name) {
+            className += "bearish-reversal-pattern-dark-cloud-cover-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_ENGULFING === alert.name) {
+            className += "bearish-reversal-pattern-engulfing-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_EVENING_STAR === alert.name) {
+            className += "bearish-reversal-pattern-evening-star-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_HANGING_MAN === alert.name) {
+            className += "bearish-reversal-pattern-hanging-man-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_HARAMI === alert.name) {
+            className += "bearish-reversal-pattern-harami-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_SHOOTING_STAR === alert.name) {
+            className += "bearish-reversal-pattern-shooting-star-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_ENGULFING === alert.name) {
+            className += "bullish-reversal-pattern-engulfing-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_HAMMER === alert.name) {
+            className += "bullish-reversal-pattern-hammer-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_HARAMI === alert.name) {
+            className += "bullish-reversal-pattern-harami-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_INVERTED_HAMMER === alert.name) {
+            className += "bullish-reversal-pattern-inverted-hammer-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_MORNING_STAR === alert.name) {
+            className += "bullish-reversal-pattern-morning-star-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_PIERCING === alert.name) {
+            className += "bullish-reversal-pattern-piercing-" + sInterval.toLowerCase();
+        } else if (PatternName.REVERSAL_PATTERN_DOJI === alert.name) {
+            className += "reversal-pattern-doji-" + sInterval.toLowerCase();
         }
         return <div className={className} title={title}></div>;
     };
 
-    const confirmTemplate = (rowData, column) => {
-        let fontWeight = 500;
-        const confirmed: boolean = rowData[column.field];
-        if (confirmed) fontWeight = 700;
-        return <div style={{fontWeight}}>{confirmed ? "YES" : "NO"}</div>;
+    const confirmTemplate = (alert: PatternResult) => {
+        const className = alert.hasConfirmation ? "confirm" : "";
+        return <div className={className}></div>;
     };
 
-    const columnComponents = columns.map(col => {
-        if ("name" === col.field) {
-            return <Column key={col.field} field={col.field} header={col.header}
-                           body={nameTemplate} className="alerts-table-col-icon"/>;
-        }
-        if ("candle.timestamp" === col.field) {
-            return <Column key={col.field} field={col.field} header={col.header}
-                           body={timeTemplate}
-                           style={{width: 140, paddingLeft: 5, paddingRight: 5}}/>;
-        }
-        if ("candle.symbol" === col.field) {
-            return <Column key={col.field} field={col.field} header={col.header} className="alerts-table-col-symbol"/>;
-        }
-        if ("hasConfirmation" === col.field) {
-            return <Column key={col.field} field={col.field} header={col.header}
-                           body={confirmTemplate}
-                           className="alerts-table-col-confirm"/>;
-        }
-        return <Column key={col.field} field={col.field} header={col.header}/>;
-    });
+    const possibleFutureDirectionUpTemplate = (alert: PatternResult) => {
+        const className = alert.possibleFutureDirectionUp ? "direction-up" : "direction-down";
+        return <div className={className}></div>;
+    };
+
+    const strengthTemplate = (alert: PatternResult) => {
+        const className = "strength-icon strength-" + alert.strength.toString().toLowerCase();
+        return <div className={className} title={alert.strength}></div>;
+    };
+
+    const descriptionTemplate = (alert: PatternResult) => {
+        return <div title={alert.description}>{alert.description}</div>;
+    };
 
     return (
-        <DataTable value={alerts} responsive
-                   tableClassName="alerts-table"
-                   selectionMode="single"
-                   selection={selectedAlert}
-                   onSelectionChange={onAlertSelected}
-                   scrollable={true}
-                   scrollHeight="200px">
-            {columnComponents}
-        </DataTable>
+        <div className="p-grid alerts">
+            {alerts.map(alert => {
+                return (
+                    <div key={alert.candle.timestamp + alert.interval} className="alerts-row"
+                         onClick={() => onAlertSelected(alert)}>
+                        <div className="alerts-cell alerts-time">
+                            {timeTemplate(alert)}
+                        </div>
+                        <div className="alerts-cell alerts-name">
+                            {nameTemplate(alert)}
+                        </div>
+                        <div className="alerts-cell alerts-symbol">
+                            {alert.candle.symbol}
+                        </div>
+                        <div className="alerts-cell alerts-strength">
+                            {strengthTemplate(alert)}
+                        </div>
+                        <div className="alerts-cell alerts-confirm">
+                            {confirmTemplate(alert)}
+                        </div>
+                        <div className="alerts-cell alerts-direction">
+                            {possibleFutureDirectionUpTemplate(alert)}
+                        </div>
+                        <div className="alerts-cell alerts-description">
+                            {descriptionTemplate(alert)}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
     )
 };
 

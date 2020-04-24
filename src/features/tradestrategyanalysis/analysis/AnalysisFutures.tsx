@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
-import {ClassCode} from "../../../api/dto/ClassCode";
+import {ClassCode} from "../../../data/ClassCode";
 import {TradePremise} from "../../../data/strategy/TradePremise";
 import {SecurityFuture} from "../../../api/dto/SecurityFuture";
 import {ChartWrapper} from "../../../components/chart/ChartWrapper";
@@ -12,6 +12,7 @@ import {TradingPlatform} from "../../../api/dto/TradingPlatform";
 import TrendView from "./TrendView";
 import {getTrend} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
 import Alerts from "../../../components/alerts/Alerts";
+import {PatternResult} from "../../../components/alerts/data/PatternResult";
 
 type Props = {
     classCode: ClassCode
@@ -108,13 +109,17 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
         };
     });
 
+    const onAlertSelected = (alert: PatternResult) => {
+        console.log(alert);
+    };
+
     if (future && premise) {
 
         return (
             <div>
                 <div className="p-grid">
                     <div className="p-col-6">
-                        <Alerts filter={alertsFilter}/>
+                        <Alerts filter={alertsFilter} onAlertSelected={onAlertSelected}/>
                     </div>
                 </div>
                 <div className="p-grid" style={{margin: '0'}}>

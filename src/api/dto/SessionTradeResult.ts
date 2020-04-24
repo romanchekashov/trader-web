@@ -1,4 +1,4 @@
-import {ClassCode} from "./ClassCode";
+import {ClassCode} from "../../data/ClassCode";
 
 export class SessionTradeResult {
     public trades: any[];
