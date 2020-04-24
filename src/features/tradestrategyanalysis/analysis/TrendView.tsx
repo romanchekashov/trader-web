@@ -16,7 +16,19 @@ const TrendView: React.FC<Props> = ({trend}) => {
     const [innerTrend, setInnerTrend] = useState(null);
 
     useEffect(() => {
-    });
+        if (trend) {
+            if (prevTrend && trend.swingHighsLows.length === prevTrend.swingHighsLows.length) {
+                for (let i = 0; i < trend.swingHighsLows.length; i++) {
+                    if (trend.swingHighsLows[i].swingHL !== prevTrend.swingHighsLows[i].swingHL) {
+                        setData(trend);
+                        break;
+                    }
+                }
+            } else {
+                setData(trend);
+            }
+        }
+    }, [trend]);
 
     const setData = (trend: Trend) => {
         prevTrend = trend;
@@ -33,7 +45,7 @@ const TrendView: React.FC<Props> = ({trend}) => {
             labels: trend.swingHighsLows.map(value => moment(value.dateTime).format("HH:mm DD-MM")),
             datasets: [
                 {
-                    label: 'Trend direction: ' + trend.direction,
+                    label: `${trend.interval} - Trend ${trend.direction}`,
                     data: trend.swingHighsLows.map(value => value.swingHL),
                     fill: false,
                     backgroundColor: color,
@@ -44,21 +56,10 @@ const TrendView: React.FC<Props> = ({trend}) => {
     };
 
     if (trend) {
-        if (prevTrend && trend.swingHighsLows.length === prevTrend.swingHighsLows.length) {
-            for (let i = 0; i < trend.swingHighsLows.length; i++) {
-                if (trend.swingHighsLows[i].swingHL !== prevTrend.swingHighsLows[i].swingHL) {
-                    setData(trend);
-                    break;
-                }
-            }
-        } else {
-            setData(trend);
-        }
-
         return (
-            <>
+            <div className="p-col-3">
                 <Chart type="line" data={data} width={'300px'} height={'300px'} />
-            </>
+            </div>
         )
     } else {
         return (

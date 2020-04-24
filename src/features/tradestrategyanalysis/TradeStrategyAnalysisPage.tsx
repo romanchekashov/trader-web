@@ -116,8 +116,7 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
         }
     };
 
-    onSelectRow = (e) => {
-        const selectedSecurity = e.value;
+    onSelectRow = (selectedSecurity) => {
         if (selectedSecurity) {
             this.loadPremise(selectedSecurity);
             this.setState({selectedSecurity, isDetailsShown: true});

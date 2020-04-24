@@ -45,7 +45,7 @@ const Currencies: React.FC<Props> = ({currencies, selectedCurrency, onSelectRow}
     return (
         <DataTable value={currencies} responsive
                    selection={selectedCurrency}
-                   onSelectionChange={onSelectRow}>
+                   onSelectionChange={(e) => onSelectRow(e.value[0])}>
             <Column selectionMode="multiple" style={{width:'2em'}}/>
             {columnComponents}
         </DataTable>

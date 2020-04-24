@@ -10,6 +10,7 @@ export class MarketSecurityAnalysisInfo {
     public tradingStrategyConfig: TradingStrategyConfig;
     public htSRLevels: SRLevels;
     public srZones: SRZone[];
+    public trends: Trend[];
     public trend: Trend;
     public tfLowTrend: Trend;
     public tfHighTrend: Trend;

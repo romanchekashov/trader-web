@@ -45,11 +45,11 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
         if (future) {
             // console.log("AnalysisFutures: ", classCode, timeFrameHigh, timeFrameTrading, timeFrameLow, future, initPremise);
 
-            WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
-                brokerId: 1, tradingPlatform: TradingPlatform.QUIK,
-                classCode: classCode, secCode: future.secCode,
-                timeFrameHigh, timeFrameTrading, timeFrameLow
-            });
+            // WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
+            //     brokerId: 1, tradingPlatform: TradingPlatform.QUIK,
+            //     classCode: classCode, secCode: future.secCode,
+            //     timeFrameHigh, timeFrameTrading, timeFrameLow
+            // });
             if (!trendLowTF && !trendLowTFLoading) {
                 trendLowTFLoading = true;
                 getTrend(classCode, future.secCode, timeFrameLow, 540)
@@ -100,6 +100,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
 
         updateSize();
         window.addEventListener('resize', updateSize);
+
         // Specify how to clean up after this effect:
         return function cleanup() {
             lastSecuritiesSubscription.unsubscribe();
@@ -107,13 +108,14 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
             tradeSetupSubscription.unsubscribe();
             window.removeEventListener('resize', updateSize);
         };
-    });
+    }, [future]);
 
     const onAlertSelected = (alert: PatternResult) => {
         console.log(alert);
     };
 
     if (future && premise) {
+        const {trends} = premise.analysis;
 
         return (
             <div>
@@ -140,7 +142,11 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                                       showGrid={true}/>
                     </div>
                 </div>
-                <TrendView trend={premise.analysis.trend}/>
+                <div className="p-grid">
+                    {
+                        trends ? trends.map(trend => <TrendView trend={trend}/>) : null
+                    }
+                </div>
             </div>
         )
     } else {

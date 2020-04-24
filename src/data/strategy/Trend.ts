@@ -1,4 +1,5 @@
 import {TrendDirection} from "./TrendDirection";
+import {Interval} from "../Interval";
 
 export class TrendPoint {
     public swingHL: number;
@@ -8,4 +9,5 @@ export class TrendPoint {
 export class Trend {
     public direction: TrendDirection;
     public swingHighsLows: TrendPoint[];
+    public interval: Interval;
 }

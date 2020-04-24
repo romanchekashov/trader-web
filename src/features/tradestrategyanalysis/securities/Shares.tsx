@@ -42,7 +42,7 @@ const Shares: React.FC<Props> = ({shares, selectedShare, onSelectRow}) => {
         <DataTable value={shares} responsive
                    selectionMode="single"
                    selection={selectedShare}
-                   onSelectionChange={onSelectRow}
+                   onSelectionChange={(e) => onSelectRow(e.value[0])}
                    scrollable={!!selectedShare}
                    scrollHeight="600px">
             <Column selectionMode="multiple" style={{width:'2em'}}/>
