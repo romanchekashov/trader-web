@@ -1,6 +1,7 @@
-import {Trade} from "./Trade";
-import {ClassCode} from "../../data/ClassCode";
+import {ClassCode} from "./ClassCode";
 import {OperationType} from "./OperationType";
+import {Trade} from "./Trade";
+import {StopOrder} from "./StopOrder";
 
 export class ActiveTrade {
     public classCode: ClassCode;
@@ -13,4 +14,5 @@ export class ActiveTrade {
     public operation: OperationType;
     public start: Date;
     public trades: Trade[];
+    public stopOrder: StopOrder;
 }

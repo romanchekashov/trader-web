@@ -11,9 +11,9 @@ import {BotControlAnalysis} from "./BotControlAnalysis";
 import {SecurityLastInfo} from "../../../data/SecurityLastInfo";
 import {TradingStrategyState} from "../../../data/strategy/TradingStrategyState";
 import {TradeSetup} from "../../../data/strategy/TradeSetup";
-import {Order} from "../../../api/dto/Order";
+import {Order} from "../../../data/Order";
 import {TradingPlatform} from "../../../api/dto/TradingPlatform";
-import {ActiveTrade} from "../../../api/dto/ActiveTrade";
+import {ActiveTrade} from "../../../data/ActiveTrade";
 import {SessionTradeResult} from "../../../api/dto/SessionTradeResult";
 import moment = require("moment");
 

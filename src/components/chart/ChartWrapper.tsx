@@ -1,33 +1,31 @@
 import * as React from "react";
-import CandleStickChartForDiscontinuousIntraDay from "./CandleStickChartForDiscontinuousIntraDay";
-import {ChartDrawType} from "./data/ChartDrawType";
-import {ChartElementAppearance} from "./data/ChartElementAppearance";
-import {ChartLevel} from "./data/ChartLevel";
-import {getHistoryCandles} from "../../api/historyTraderApi";
 import {Interval} from "../../data/Interval";
+import {CandleStickChartForDiscontinuousIntraDay} from "./CandleStickChartForDiscontinuousIntraDay";
+import {ChartDrawType} from "./data/ChartDrawType";
 import {Candle} from "../../data/Candle";
-import {getCandles} from "../../api/baseApi";
 import {SecurityLastInfo} from "../../data/SecurityLastInfo";
 import {TradePremise} from "../../data/strategy/TradePremise";
-import {Order} from "../../api/dto/Order";
-import {OperationType} from "../../api/dto/OperationType";
-import moment = require("moment");
+import {ChartElementAppearance} from "./data/ChartElementAppearance";
+import {ChartLevel} from "./data/ChartLevel";
+import {Order} from "../../data/Order";
+import {OperationType} from "../../data/OperationType";
+import {getHistoryCandles} from "../../api/historyTraderApi";
 import {Trend} from "../../data/strategy/Trend";
-import {TradeSetup} from "../../data/strategy/TradeSetup";
+import {ActiveTrade} from "../../data/ActiveTrade";
+import moment = require("moment");
+import {getCandles} from "../../api/baseApi";
 
 type Props = {
-    interval: Interval
-    width: number
-    numberOfCandles: number
+    interval: Interval,
+    width: number,
+    numberOfCandles: number,
     security: SecurityLastInfo
-    classCode?: string
-    securityCode?: string
     premise?: TradePremise
-    tradeSetups?: TradeSetup[]
     orders?: Order[]
     history?: boolean
     trend?: Trend
     showGrid?: boolean
+    activeTrade?: ActiveTrade
 };
 
 type States = {
@@ -46,60 +44,62 @@ export class ChartWrapper extends React.Component<Props, States> {
 
     constructor(props) {
         super(props);
-        this.state = { candles: [], nodata: false, fetchCandlesInterval: 1, fetchCandlesCountdown: 0,
-            fetchCandlesAttempts: 0, secCode: null };
+        this.state = {
+            candles: [], nodata: false, fetchCandlesInterval: 1, fetchCandlesCountdown: 0,
+            fetchCandlesAttempts: 0, secCode: null
+        };
     }
 
     getNewCandles = (): Promise<Candle[]> => {
-        const { interval, numberOfCandles, history, classCode, securityCode } = this.props;
+        const {interval, numberOfCandles, security, history} = this.props;
         if (history) {
-            return getHistoryCandles(classCode, securityCode, interval, numberOfCandles);
+            return getHistoryCandles(security.classCode, security.secCode, interval, numberOfCandles);
         } else {
-            return getCandles(classCode, securityCode, interval, numberOfCandles);
+            return getCandles(security.classCode, security.secCode, interval, numberOfCandles);
         }
     };
 
-    fetchCandlesInner = (fetchCandlesInterval, fetchCandlesAttempts) => {
-        this.getNewCandles()
-            .then(data => {
-                if (data && data.length > 0 && data[0].open === 0) {
-                    this.setState({
-                        candles: [],
-                        nodata: true,
-                        fetchCandlesCountdown: fetchCandlesInterval,
-                        fetchCandlesAttempts: 0 })
-                } else {
-                    this.setState({
-                        candles: data.map(c => {
-                            c.timestamp = moment(c.timestamp).toDate();
-                            return c;
-                        }),
-                        nodata: false,
-                        fetchCandlesCountdown: fetchCandlesInterval, fetchCandlesAttempts: 0 })
-                }
-            })
-            .catch(reason => {
-                if (fetchCandlesAttempts === ChartWrapper.FETCH_CANDLES_ATTEMPTS) {
-                    this.setState({ fetchCandlesCountdown: fetchCandlesInterval, fetchCandlesAttempts: 0 });
-                } else {
-                    this.setState({fetchCandlesAttempts: fetchCandlesAttempts + 1});
-                }
-            });
-    };
-
     fetchCandles = () => {
-        const { security } = this.props;
-        const { fetchCandlesInterval, fetchCandlesCountdown, candles, fetchCandlesAttempts, secCode } = this.state;
+        const {security} = this.props;
+        const {fetchCandlesInterval, fetchCandlesCountdown, candles, fetchCandlesAttempts, secCode} = this.state;
 
         if (security) {
             if (secCode !== security.secCode) {
-                this.setState({ fetchCandlesCountdown: 0, fetchCandlesAttempts: 0, candles: [], nodata: false,
-                    secCode: security.secCode });
+                this.setState({
+                    fetchCandlesCountdown: 0, fetchCandlesAttempts: 0, candles: [], nodata: false,
+                    secCode: security.secCode
+                });
                 return;
             }
 
             if (fetchCandlesCountdown === 0) {
-                this.fetchCandlesInner(fetchCandlesInterval, fetchCandlesAttempts);
+                this.getNewCandles()
+                    .then(data => {
+                        if (data && data.length > 0 && data[0].open === 0) {
+                            this.setState({
+                                candles: [],
+                                nodata: true,
+                                fetchCandlesCountdown: fetchCandlesInterval,
+                                fetchCandlesAttempts: 0
+                            })
+                        } else {
+                            this.setState({
+                                candles: data.map(c => {
+                                    c.timestamp = new Date(c.timestamp);
+                                    return c;
+                                }),
+                                nodata: false,
+                                fetchCandlesCountdown: fetchCandlesInterval, fetchCandlesAttempts: 0
+                            })
+                        }
+                    })
+                    .catch(reason => {
+                        if (fetchCandlesAttempts === ChartWrapper.FETCH_CANDLES_ATTEMPTS) {
+                            this.setState({fetchCandlesCountdown: fetchCandlesInterval, fetchCandlesAttempts: 0});
+                        } else {
+                            this.setState({fetchCandlesAttempts: fetchCandlesAttempts + 1});
+                        }
+                    });
             } else {
                 this.setState({fetchCandlesCountdown: fetchCandlesCountdown - 1});
                 const lastCandle = candles[candles.length - 1];
@@ -111,23 +111,31 @@ export class ChartWrapper extends React.Component<Props, States> {
                     }
                     lastCandle.close = security.priceLastTrade;
                     lastCandle.volume += security.quantityLastTrade;
-                    this.setState({ candles: [...candles], nodata: false });
+                    this.setState({candles: [...candles], nodata: false});
                 }
-            }
-        } else {
-            if (fetchCandlesCountdown === 0) {
-                this.fetchCandlesInner(fetchCandlesInterval, fetchCandlesAttempts);
-            } else {
-                this.setState({fetchCandlesCountdown: fetchCandlesCountdown - 1});
             }
         }
     };
 
     componentDidMount = () => {
-        if (this.props.interval === Interval.M1) this.setState({fetchCandlesInterval: 10, fetchCandlesCountdown: 0});
-        if (this.props.interval === Interval.M5) this.setState({fetchCandlesInterval: 10, fetchCandlesCountdown: 0});
+        const {history} = this.props;
 
-        this.setIntervalIdForFetchCandles = setInterval(() => {this.fetchCandles()}, 1000);
+        if (this.props.interval === Interval.M1) {
+            this.setState({
+                fetchCandlesInterval: history ? 1 : 10,
+                fetchCandlesCountdown: 0
+            });
+        }
+        if (this.props.interval === Interval.M5) {
+            this.setState({
+                fetchCandlesInterval: history ? 1 : 10,
+                fetchCandlesCountdown: 0
+            });
+        }
+
+        this.setIntervalIdForFetchCandles = setInterval(() => {
+            this.fetchCandles()
+        }, 1000);
     };
 
     componentWillUnmount = (): void => {
@@ -151,29 +159,25 @@ export class ChartWrapper extends React.Component<Props, States> {
         return lines;
     };
 
-    render() {
-        const { candles, nodata } = this.state;
+    getHighTimeFrameSRLevels = () => {
+        const {premise} = this.props;
 
-        if (candles.length === 0 && !nodata) {
-            return <div>Loading...</div>
-        }
-
-        if (nodata) {
-            return <div>No data</div>
-        }
-
-        const { width, premise, orders, trend, showGrid } = this.props;
-
-        let htSRLevels: ChartLevel[] = [];
         if (premise && premise.analysis.htSRLevels) {
             const resistanceLevels = premise.analysis.htSRLevels.resistanceLevels;
             const supportLevels = premise.analysis.htSRLevels.supportLevels;
-            htSRLevels = [...ChartWrapper.mapChartSRLevels(resistanceLevels, {stroke: "red"}),
-                ...ChartWrapper.mapChartSRLevels(supportLevels, {stroke: "green"})];
+            return [
+                ...ChartWrapper.mapChartSRLevels(resistanceLevels, {stroke: "red"}),
+                ...ChartWrapper.mapChartSRLevels(supportLevels, {stroke: "green"})
+            ];
         }
-        let ordersLevels: ChartLevel[] = [];
+        return [];
+    };
+
+    getOrdersLevels = () => {
+        const {orders} = this.props;
+
         if (orders) {
-            ordersLevels = [
+            return [
                 ...ChartWrapper.mapChartSRLevels(orders
                     .filter(value => OperationType.SELL === value.operation)
                     .map(value => value.price), {stroke: "red"}),
@@ -182,6 +186,11 @@ export class ChartWrapper extends React.Component<Props, States> {
                     .map(value => value.price), {stroke: "green"})
             ];
         }
+        return [];
+    };
+
+    getSwingHighsLowsMap = () => {
+        const {premise, trend} = this.props;
 
         let swingHighsLowsMap = null;
         if (premise && premise.analysis.trend) {
@@ -196,13 +205,32 @@ export class ChartWrapper extends React.Component<Props, States> {
                 .forEach(value => swingHighsLowsMap[moment(value.dateTime).toDate().getTime()] = value.swingHL);
         }
 
-        let tradeSetupMap = {};
-        tradeSetupMap[candles[50].timestamp.getTime()] = {
-            operation: OperationType.BUY
-        };
-        tradeSetupMap[candles[150].timestamp.getTime()] = {
-            operation: OperationType.SELL
-        };
+        return swingHighsLowsMap;
+    };
+
+    getStops = () => {
+        const {activeTrade} = this.props;
+
+        if (activeTrade && activeTrade.stopOrder) {
+            return [
+                ...ChartWrapper.mapChartSRLevels([activeTrade.stopOrder.price], {stroke: "#3498db"})
+            ];
+        }
+        return [];
+    };
+
+    render() {
+        const {candles, nodata} = this.state;
+
+        if (candles.length === 0 && !nodata) {
+            return <div>Loading...</div>
+        }
+
+        if (nodata) {
+            return <div>No data</div>
+        }
+
+        const {width, showGrid, premise} = this.props;
 
         return (
             <CandleStickChartForDiscontinuousIntraDay
@@ -210,11 +238,12 @@ export class ChartWrapper extends React.Component<Props, States> {
                 data={candles}
                 width={width}
                 ratio={1}
-                htSRLevels={htSRLevels}
-                orders={ordersLevels}
-                swingHighsLowsMap={swingHighsLowsMap}
+                htSRLevels={this.getHighTimeFrameSRLevels()}
+                orders={this.getOrdersLevels()}
+                swingHighsLowsMap={this.getSwingHighsLowsMap()}
                 showGrid={showGrid}
-                tradeSetupMap={tradeSetupMap} />
+                stops={this.getStops()}
+                zones={premise ? premise.analysis.srZones : []}/>
         )
     }
 }

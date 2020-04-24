@@ -126,8 +126,6 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                     <div className="p-col-8" ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
                                       numberOfCandles={168}
-                                      classCode={classCode}
-                                      securityCode={future.secCode}
                                       width={chart1Width}
                                       security={securityLastInfo}
                                       premise={premise}
@@ -136,8 +134,6 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                     <div className="p-col-4" ref={chart2Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameLow}
                                       numberOfCandles={540}
-                                      classCode={classCode}
-                                      securityCode={future.secCode}
                                       width={chart2Width}
                                       security={securityLastInfo}
                                       trend={trendLowTF}

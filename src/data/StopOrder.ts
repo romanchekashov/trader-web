@@ -1,18 +1,15 @@
-import {ClassCode} from "../../data/ClassCode";
-import {OrderType} from "./OrderType";
+import {ClassCode} from "./ClassCode";
 import {OperationType} from "./OperationType";
 
-export class Order {
-    public id?: number;
+export class StopOrder {
     public transId?: number;
     public orderNum?: number;
     public classCode: ClassCode;
     public secCode: string;
     public price: number;
+    public conditionPrice: number;
     public quantity: number;
-    public type: OrderType;
     public operation: OperationType;
-    public balance?: number;
-    public value?: number;
     public dateTime?: Date;
+    public active: boolean;
 }

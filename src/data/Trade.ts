@@ -1,4 +1,4 @@
-import {ClassCode} from "../../data/ClassCode";
+import {ClassCode} from "./ClassCode";
 import {OperationType} from "./OperationType";
 
 export class Trade {
