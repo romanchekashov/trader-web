@@ -14,6 +14,9 @@
     outline: 1px solid slategrey;
 }
 
+.alerts-row-selected {
+    background-color: #b3e5fc;
+}
 .alerts-row {
     display: table;
     border-bottom: 1px solid gray;

@@ -14,6 +14,7 @@ import {Trend} from "../../data/strategy/Trend";
 import {ActiveTrade} from "../../data/ActiveTrade";
 import moment = require("moment");
 import {getCandles} from "../../api/baseApi";
+import {PatternResult} from "../alerts/data/PatternResult";
 
 type Props = {
     interval: Interval,
@@ -26,6 +27,8 @@ type Props = {
     trend?: Trend
     showGrid?: boolean
     activeTrade?: ActiveTrade
+    alert?: PatternResult
+    fetchCandlesIntervalInMilliseconds?: number
 };
 
 type States = {
@@ -118,7 +121,7 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     componentDidMount = () => {
-        const {history} = this.props;
+        const {history, fetchCandlesIntervalInMilliseconds} = this.props;
 
         if (this.props.interval === Interval.M1) {
             this.setState({
@@ -133,9 +136,8 @@ export class ChartWrapper extends React.Component<Props, States> {
             });
         }
 
-        this.setIntervalIdForFetchCandles = setInterval(() => {
-            this.fetchCandles()
-        }, 1000);
+        this.fetchCandles();
+        this.setIntervalIdForFetchCandles = setInterval(this.fetchCandles, fetchCandlesIntervalInMilliseconds || 1000);
     };
 
     componentWillUnmount = (): void => {
@@ -219,6 +221,30 @@ export class ChartWrapper extends React.Component<Props, States> {
         return [];
     };
 
+    getCandlePatternsUp = () => {
+        const {alert} = this.props;
+
+        let map = null;
+        if (alert && alert.possibleFutureDirectionUp) {
+            map = {};
+            map[moment(alert.candle.timestamp).toDate().getTime()] = alert.candle.low;
+        }
+
+        return map;
+    };
+
+    getCandlePatternsDown = () => {
+        const {alert} = this.props;
+
+        let map = null;
+        if (alert && !alert.possibleFutureDirectionUp) {
+            map = {};
+            map[moment(alert.candle.timestamp).toDate().getTime()] = alert.candle.high;
+        }
+
+        return map;
+    };
+
     render() {
         const {candles, nodata} = this.state;
 
@@ -243,7 +269,9 @@ export class ChartWrapper extends React.Component<Props, States> {
                 swingHighsLowsMap={this.getSwingHighsLowsMap()}
                 showGrid={showGrid}
                 stops={this.getStops()}
-                zones={premise ? premise.analysis.srZones : []}/>
+                zones={premise ? premise.analysis.srZones : []}
+                candlePatternsUp={this.getCandlePatternsUp()}
+                candlePatternsDown={this.getCandlePatternsDown()}/>
         )
     }
 }

@@ -9,7 +9,7 @@ import {
     CandlestickSeries,
     Circle,
     LineSeries,
-    ScatterSeries,
+    ScatterSeries, Square, Triangle,
 } from "react-financial-charts/lib/series";
 import {XAxis, YAxis} from "react-financial-charts/lib/axes";
 import {
@@ -30,6 +30,7 @@ import {Candle} from "../../data/Candle";
 import {ChartLevel} from "./data/ChartLevel";
 import {SRZone} from "../../data/strategy/SRZone";
 import ChartZones from "./ChartZones";
+import "./Chart.css";
 
 type Props = {
     data: Candle[]
@@ -40,6 +41,8 @@ type Props = {
     orders?: ChartLevel[]
     stops?: ChartLevel[]
     zones?: SRZone[]
+    candlePatternsUp?: any
+    candlePatternsDown?: any
     swingHighsLowsMap?: any
     showGrid?: boolean
 };
@@ -64,7 +67,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     render() {
         const {
             type, data: initialData, width, ratio, htSRLevels, orders, stops,
-            swingHighsLowsMap, showGrid, zones
+            swingHighsLowsMap, showGrid, zones, candlePatternsUp, candlePatternsDown
         } = this.props;
 
         const height = 500;
@@ -218,6 +221,26 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                                 }}
                                 marker={Circle}
                                 markerProps={{r: 3}}/> : null
+                    }
+
+                    {
+                        candlePatternsUp ?
+                            <ScatterSeries
+                                yAccessor={d => {
+                                    return candlePatternsUp[d.timestamp.getTime()];
+                                }}
+                                marker={Square}
+                                markerProps={{width: 16, stroke: "#43a047", fill: "#43a047"}}/> : null
+                    }
+
+                    {
+                        candlePatternsDown ?
+                            <ScatterSeries
+                                yAccessor={d => {
+                                    return candlePatternsDown[d.timestamp.getTime()];
+                                }}
+                                marker={Square}
+                                markerProps={{width: 16, stroke: "#e53935", fill: "#e53935"}}/> : null
                     }
 
                     {/*<TrendLine type={"LINE"}

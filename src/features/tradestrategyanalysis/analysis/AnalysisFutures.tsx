@@ -32,14 +32,18 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
     const [securityLastInfo, setSecurityLastInfo] = useState(null);
     const [chart1Width, setChart1Width] = useState(200);
     const [chart2Width, setChart2Width] = useState(200);
+    const [chartAlertsWidth, setChartAlertsWidth] = useState(200);
     const chart1Ref = useRef(null);
     const chart2Ref = useRef(null);
+    const chartAlertsRef = useRef(null);
     const [trendLowTF, setTrendLowTF] = useState(null);
     const [alertsFilter, setAlertsFilter] = useState(null);
+    const [alert, setAlert] = useState(null);
 
     const updateSize = () => {
         setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200);
         setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : 200);
+        setChartAlertsWidth(chartAlertsRef.current ? chartAlertsRef.current.clientWidth : 200);
     };
 
     useEffect(() => {
@@ -113,6 +117,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
 
     const onAlertSelected = (alert: PatternResult) => {
         console.log(alert);
+        setAlert(alert);
     };
 
     if (future && premise) {
@@ -121,8 +126,22 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
         return (
             <div>
                 <div className="p-grid">
-                    <div className="p-col-6">
-                        <Alerts filter={alertsFilter} onAlertSelected={onAlertSelected}/>
+                    <div className="p-col-4">
+                        <Alerts filter={alertsFilter}
+                                onAlertSelected={onAlertSelected}/>
+                    </div>
+                    <div className="p-col-8" ref={chartAlertsRef} style={{padding: '0'}}>
+                        {
+                            alert ?
+                                <ChartWrapper interval={alert.interval}
+                                              alert={alert}
+                                              numberOfCandles={168}
+                                              width={chartAlertsWidth}
+                                              security={securityLastInfo}
+                                              premise={premise}
+                                              showGrid={true}
+                                              fetchCandlesIntervalInMilliseconds={1000}/> : null
+                        }
                     </div>
                 </div>
                 <div className="p-grid" style={{margin: '0'}}>

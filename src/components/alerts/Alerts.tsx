@@ -21,6 +21,7 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected}) => {
 
     const [alerts, setAlerts] = useState([]);
     const [fetchAlertsError, setFetchAlertsError] = useState(null);
+    const [selectedAlert, setSelectedAlert] = useState(null);
 
     const fetchAlerts = () => {
         getCandlePatterns(filter)
@@ -136,9 +137,13 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected}) => {
     return (
         <div className="p-grid alerts">
             {alerts.map(alert => {
+                const className = "alerts-row " + (selectedAlert === alert ? "alerts-row-selected" : "") ;
                 return (
-                    <div key={alert.candle.timestamp + alert.interval} className="alerts-row"
-                         onClick={() => onAlertSelected(alert)}>
+                    <div key={alert.candle.timestamp + alert.interval} className={className}
+                         onClick={() => {
+                             setSelectedAlert(alert);
+                             onAlertSelected(alert);
+                         }}>
                         <div className="alerts-cell alerts-time">
                             {timeTemplate(alert)}
                         </div>
