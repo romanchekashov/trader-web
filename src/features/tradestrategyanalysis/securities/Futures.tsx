@@ -3,6 +3,7 @@ import {useEffect} from "react";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import {SecurityFuture} from "../../../api/dto/SecurityFuture";
+import {useState} from "react";
 
 type Props = {
     futures: SecurityFuture[]
@@ -38,11 +39,18 @@ const Futures: React.FC<Props> = ({futures, selectedFuture, onSelectRow}) => {
         return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true} />;
     });
 
+    const onSelect = (e) => {
+        if (!Array.isArray(e.value)) {
+            console.log(e.value);
+            onSelectRow(e.value);
+        }
+    };
+
     return (
         <DataTable value={futures} responsive
                    selectionMode="single"
                    selection={selectedFuture}
-                   onSelectionChange={(e) => onSelectRow(e.value[0])}
+                   onSelectionChange={onSelect}
                    scrollable={!!selectedFuture}
                    scrollHeight="600px">
             <Column selectionMode="multiple" style={{width:'2em'}}/>

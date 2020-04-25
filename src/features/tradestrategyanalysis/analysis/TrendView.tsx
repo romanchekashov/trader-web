@@ -9,29 +9,28 @@ import {TrendDirection} from "../../../data/strategy/TrendDirection";
 type Props = {
     trend: Trend
 };
-let data = null;
-let prevTrend = null;
 
 const TrendView: React.FC<Props> = ({trend}) => {
     const [innerTrend, setInnerTrend] = useState(null);
+    const [data, setData] = useState(null);
 
     useEffect(() => {
         if (trend) {
-            if (prevTrend && trend.swingHighsLows.length === prevTrend.swingHighsLows.length) {
+            if (innerTrend && trend.swingHighsLows.length === innerTrend.swingHighsLows.length) {
                 for (let i = 0; i < trend.swingHighsLows.length; i++) {
-                    if (trend.swingHighsLows[i].swingHL !== prevTrend.swingHighsLows[i].swingHL) {
-                        setData(trend);
+                    if (trend.swingHighsLows[i].swingHL !== innerTrend.swingHighsLows[i].swingHL) {
+                        updateData(trend);
                         break;
                     }
                 }
             } else {
-                setData(trend);
+                updateData(trend);
             }
         }
     }, [trend]);
 
-    const setData = (trend: Trend) => {
-        prevTrend = trend;
+    const updateData = (trend: Trend) => {
+        setInnerTrend(trend);
         let color = '#42A5F5';
         switch (trend.direction) {
             case TrendDirection.DOWN:
@@ -41,7 +40,7 @@ const TrendView: React.FC<Props> = ({trend}) => {
                 color = '#27ae60';
                 break;
         }
-        data = {
+        setData({
             labels: trend.swingHighsLows.map(value => moment(value.dateTime).format("HH:mm DD-MM")),
             datasets: [
                 {
@@ -52,7 +51,7 @@ const TrendView: React.FC<Props> = ({trend}) => {
                     borderColor: color
                 }
             ]
-        };
+        });
     };
 
     if (trend) {

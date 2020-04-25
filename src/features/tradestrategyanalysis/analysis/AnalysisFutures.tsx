@@ -13,6 +13,7 @@ import TrendView from "./TrendView";
 import {getTrend} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
 import Alerts from "../../../components/alerts/Alerts";
 import {PatternResult} from "../../../components/alerts/data/PatternResult";
+import {timeout} from "rxjs/operators";
 
 type Props = {
     classCode: ClassCode
@@ -98,7 +99,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
             });
 
 
-        updateSize();
+        setTimeout(updateSize, 1000);
         window.addEventListener('resize', updateSize);
 
         // Specify how to clean up after this effect:
@@ -108,7 +109,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
             tradeSetupSubscription.unsubscribe();
             window.removeEventListener('resize', updateSize);
         };
-    }, [future]);
+    }, [future, initPremise, timeFrameTrading, timeFrameLow]);
 
     const onAlertSelected = (alert: PatternResult) => {
         console.log(alert);
@@ -144,7 +145,9 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                 </div>
                 <div className="p-grid">
                     {
-                        trends ? trends.map(trend => <TrendView trend={trend}/>) : null
+                        trends ? trends.map(trend => {
+                            return (<TrendView key={trend.interval} trend={trend}/>)
+                        }) : null
                     }
                 </div>
             </div>

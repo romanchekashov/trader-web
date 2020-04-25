@@ -13,6 +13,7 @@ import {SecurityFuture} from "../../api/dto/SecurityFuture";
 export const LOAD_FILTER_DATA_SUCCESS = "LOAD_FILTER_DATA_SUCCESS";
 export const LOAD_SECURITY_SHARES = "LOAD_SECURITY_SHARES";
 export const LOAD_TRADE_PREMISE_SUCCESS = "LOAD_TRADE_PREMISE_SUCCESS";
+export const LOAD_TRADE_PREMISE_FAIL = "LOAD_TRADE_PREMISE_FAIL";
 export const LOAD_SECURITY_CURRENCY_SUCCESS = "LOAD_SECURITY_CURRENCY_SUCCESS";
 export const LOAD_SECURITY_FUTURE_SUCCESS = "LOAD_SECURITY_FUTURE_SUCCESS";
 
@@ -26,6 +27,10 @@ interface LoadSecuritySharesAction {
 }
 interface LoadTradePremiseSuccessAction {
     type: typeof LOAD_TRADE_PREMISE_SUCCESS
+    premise: TradePremise
+}
+interface LoadTradePremiseFailAction {
+    type: typeof LOAD_TRADE_PREMISE_FAIL
     premise: TradePremise
 }
 interface LoadSecurityCurrencySuccessAction {
@@ -75,12 +80,20 @@ export const loadSecurityShares = () => (dispatch: AppDispatch) => {
 };
 
 export const loadTradePremiseSuccess = (premise: TradePremise): LoadTradePremiseSuccessAction => ({type: LOAD_TRADE_PREMISE_SUCCESS, premise});
+export const loadTradePremiseFail = (premise: TradePremise): LoadTradePremiseFailAction => ({type: LOAD_TRADE_PREMISE_FAIL, premise});
+let loadTradePremiseAttempts = 3;
 export const loadTradePremise = (filter: TradeStrategyAnalysisFilterDto) => (dispatch: AppDispatch) => {
     getTradePremise(filter)
         .then(premise => {
+            loadTradePremiseAttempts = 3;
             dispatch(loadTradePremiseSuccess(premise));
         })
         .catch(error => {
+            if (loadTradePremiseAttempts-- > 0) {
+                loadTradePremise(filter);
+            } else {
+                loadTradePremiseAttempts = 3;
+            }
             throw error;
         });
 };
