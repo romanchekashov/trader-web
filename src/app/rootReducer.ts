@@ -3,8 +3,8 @@ import tradeStrategyBotControl from "../features/bot-control/tradeStrategyBotCon
 import tradeStrategyAnalysis from "../features/tradestrategyanalysis/tradeStrategyAnalysisReducer";
 import {TradeStrategyAnalysisState} from "../features/tradestrategyanalysis/tradeStrategyAnalysisActions";
 import {TradeStrategyBotControlState} from "../features/bot-control/tradeStrategyBotControlActions";
-import {TradeJournalState} from "../features/tradejournal/tradeJournalActions";
-import tradeJournal from "../features/tradejournal/tradeJournalReducer";
+import {TradeJournalState} from "../features/trade-journal/tradeJournalActions";
+import tradeJournal from "../features/trade-journal/tradeJournalReducer";
 
 
 interface AsRootState {

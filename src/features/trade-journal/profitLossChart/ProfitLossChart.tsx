@@ -4,15 +4,15 @@ import {ResultDto} from "../../../api/tradejournal/dto/ResultDto";
 import moment = require("moment");
 
 type Props = {
-    stat: ResultDto[]
+    stat: ResultDto
 };
 let data = null;
 
 const ProfitLossChart: React.FC<Props> = ({stat}) => {
 
-    const setData = (result: ResultDto[]) => {
+    const setData = (result: ResultDto) => {
         let color = '#42A5F5';
-        const labelData = result[0].trades
+        const labelData = result.trades
             .map(trade => {
                 const dates = trade.trades.map(trade => trade.dateTime).sort((a, b) => {
                     return new Date(a).getTime() - new Date(b).getTime();
@@ -33,11 +33,11 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
                 }
             });
 
-        const totalTrades = result[0].trades.length;
+        const totalTrades = result.trades.length;
         let wins = 0;
         let winsSum = 0;
         let lossSum = 0;
-        result[0].trades.forEach(value => {
+        result.trades.forEach(value => {
             if (value.totalGainAndLoss > 0) {
                 wins++;
                 winsSum += value.totalGainAndLoss;
@@ -75,7 +75,7 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
         };
     };
 
-    if (stat && stat.length > 0) {
+    if (stat) {
         setData(stat);
 
         return (

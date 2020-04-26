@@ -18,11 +18,11 @@ export type TradeJournalActionTypes = LoadStatSuccessAction
 export const loadStatSuccess = (stat: ResultDto[]): LoadStatSuccessAction => ({type: LOAD_STAT_SUCCESS, stat});
 
 export const loadStat = () => (dispatch: AppDispatch) => {
-    getStat()
-        .then(stat => {
-            dispatch(loadStatSuccess(stat));
-        })
-        .catch(error => {
-            throw error;
-        });
+    // getStat()
+    //     .then(stat => {
+    //         dispatch(loadStatSuccess(stat));
+    //     })
+    //     .catch(error => {
+    //         throw error;
+    //     });
 };
