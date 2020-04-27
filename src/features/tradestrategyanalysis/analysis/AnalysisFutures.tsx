@@ -9,12 +9,12 @@ import {WebsocketService, WSEvent} from "../../../api/WebsocketService";
 import {SecurityLastInfo} from "../../../data/SecurityLastInfo";
 import {TradeSetup} from "../../../data/strategy/TradeSetup";
 import {TradingPlatform} from "../../../api/dto/TradingPlatform";
-import TrendView from "../trend/TrendView";
+import TrendView from "../../../components/trend/TrendView";
 import {getTrend} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
 import Alerts from "../../../components/alerts/Alerts";
 import {PatternResult} from "../../../components/alerts/data/PatternResult";
 import {timeout} from "rxjs/operators";
-import {TrendsView} from "../trend/TrendsView";
+import {TrendsView} from "../../../components/trend/TrendsView";
 
 type Props = {
     classCode: ClassCode

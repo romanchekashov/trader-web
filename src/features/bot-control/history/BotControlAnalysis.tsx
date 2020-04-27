@@ -1,7 +1,7 @@
 import * as React from "react";
 import {TradePremise} from "../../../data/strategy/TradePremise";
 import {TradeSetup} from "../../../data/strategy/TradeSetup";
-import TrendView from "../../tradestrategyanalysis/trend/TrendView";
+import TrendView from "../../../components/trend/TrendView";
 
 type Props = {
     premise: TradePremise
