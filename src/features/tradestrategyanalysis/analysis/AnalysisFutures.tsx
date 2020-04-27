@@ -9,11 +9,12 @@ import {WebsocketService, WSEvent} from "../../../api/WebsocketService";
 import {SecurityLastInfo} from "../../../data/SecurityLastInfo";
 import {TradeSetup} from "../../../data/strategy/TradeSetup";
 import {TradingPlatform} from "../../../api/dto/TradingPlatform";
-import TrendView from "./TrendView";
+import TrendView from "../trend/TrendView";
 import {getTrend} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
 import Alerts from "../../../components/alerts/Alerts";
 import {PatternResult} from "../../../components/alerts/data/PatternResult";
 import {timeout} from "rxjs/operators";
+import {TrendsView} from "../trend/TrendsView";
 
 type Props = {
     classCode: ClassCode
@@ -144,6 +145,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                         }
                     </div>
                 </div>
+                <TrendsView trends={trends}/>
                 <div className="p-grid" style={{margin: '0'}}>
                     <div className="p-col-8" ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
@@ -161,13 +163,6 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                                       trend={trendLowTF}
                                       showGrid={true}/>
                     </div>
-                </div>
-                <div className="p-grid">
-                    {
-                        trends ? trends.map(trend => {
-                            return (<TrendView key={trend.interval} trend={trend}/>)
-                        }) : null
-                    }
                 </div>
             </div>
         )

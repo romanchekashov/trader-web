@@ -5,12 +5,14 @@ import {Trend} from "../../../data/strategy/Trend";
 import {useState} from "react";
 import moment = require("moment");
 import {TrendDirection} from "../../../data/strategy/TrendDirection";
+import "./TrendView.css";
 
 type Props = {
     trend: Trend
+    position?: number
 };
 
-const TrendView: React.FC<Props> = ({trend}) => {
+const TrendView: React.FC<Props> = ({trend, position}) => {
     const [innerTrend, setInnerTrend] = useState(null);
     const [data, setData] = useState(null);
 
@@ -29,8 +31,7 @@ const TrendView: React.FC<Props> = ({trend}) => {
         }
     }, [trend]);
 
-    const updateData = (trend: Trend) => {
-        setInnerTrend(trend);
+    const getColor = (direction: TrendDirection) => {
         let color = '#42A5F5';
         switch (trend.direction) {
             case TrendDirection.DOWN:
@@ -40,6 +41,12 @@ const TrendView: React.FC<Props> = ({trend}) => {
                 color = '#27ae60';
                 break;
         }
+        return color;
+    };
+
+    const updateData = (trend: Trend) => {
+        setInnerTrend(trend);
+        const color = getColor(trend.direction);
         setData({
             labels: trend.swingHighsLows.map(value => moment(value.dateTime).format("HH:mm DD-MM")),
             datasets: [
@@ -55,11 +62,25 @@ const TrendView: React.FC<Props> = ({trend}) => {
     };
 
     if (trend) {
-        return (
-            <div className="p-col-3">
-                <Chart type="line" data={data} width={'300px'} height={'300px'} />
-            </div>
-        )
+        if (position === 3) {
+            return (
+                <div className="p-col-12 trend-position-3" style={{backgroundColor: getColor(trend.direction)}}>
+                    {`${trend.interval} - Trend ${trend.direction}`}
+                </div>
+            )
+        } else if (position === 2) {
+            return (
+                <div className="p-col-1 trend-position-2" style={{backgroundColor: getColor(trend.direction)}}>
+                    {`${trend.interval} - Trend ${trend.direction}`}
+                </div>
+            )
+        } else {
+            return (
+                <div className="p-col-3">
+                    <Chart type="line" data={data} width={'300px'} height={'300px'} />
+                </div>
+            )
+        }
     } else {
         return (
             <div>Select security for trend analysis</div>
