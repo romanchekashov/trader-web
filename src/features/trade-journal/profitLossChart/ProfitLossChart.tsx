@@ -2,6 +2,7 @@ import * as React from "react";
 import {Chart} from "primereact/chart";
 import {ResultDto} from "../../../api/tradejournal/dto/ResultDto";
 import moment = require("moment");
+import {useEffect, useState} from "react";
 
 type Props = {
     stat: ResultDto
@@ -10,7 +11,14 @@ let data = null;
 
 const ProfitLossChart: React.FC<Props> = ({stat}) => {
 
-    const setData = (result: ResultDto) => {
+    const [title, setTitle] = useState(null);
+    const [data, setData] = useState(null);
+
+    useEffect(() => {
+        updateData(stat);
+    }, [stat]);
+
+    const updateData = (result: ResultDto) => {
         let color = '#42A5F5';
         const labelData = result.trades
             .map(trade => {
@@ -62,25 +70,30 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
         averageWin = Math.round(averageWin * 100) / 100;
         averageLoss = Math.round(averageLoss * 100) / 100;
 
-        data = {
+        const newTitle = 'P/L ratio: ' + profitLossRatio + ', Win %: ' + winPercentage + '%, Expectancy: ' + expectancy
+            + ', Avg Win: ' + averageWin + ', Avg Loss: ' + averageLoss;
+
+        setTitle(newTitle);
+        setData({
             labels: labelData.map(value => value.label),
             datasets: [{
-                    label: 'P/L ratio: ' + profitLossRatio + ', Win %: ' + winPercentage + '%, Expectancy: ' + expectancy
-                        + ', Avg Win: ' + averageWin + ', Avg Loss: ' + averageLoss,
+                    label: 'P/L',
                     data: labelData.map(value => value.data),
                     fill: false,
                     backgroundColor: color,
                     borderColor: color
             }]
-        };
+        });
     };
 
-    if (stat) {
-        setData(stat);
-
+    if (data) {
         return (
             <>
-                <Chart type="bar" data={data} width={'600px'} height={'300px'} />
+                {title ? <h5 style={{textAlign: "center"}}>{title}</h5> : null}
+                <Chart type="bar"
+                       data={data}
+                       width={'600px'}
+                       height={'300px'} />
             </>
         )
     } else {
