@@ -121,8 +121,20 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
         setAlert(alert);
     };
 
-    if (future && premise) {
-        const {trends} = premise.analysis;
+    if (future) {
+        let security: SecurityLastInfo = securityLastInfo;
+        if (!security) {
+            security = {
+                secCode: future.secCode,
+                classCode: ClassCode.SPBFUT,
+                priceLastTrade: future.lastTradePrice,
+                timeLastTrade: null,
+                quantityLastTrade: null,
+                numTrades: null,
+                valueLastTrade: null,
+                valueToday: null
+            };
+        }
 
         return (
             <div>
@@ -136,30 +148,30 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                             alert ?
                                 <ChartWrapper interval={alert.interval}
                                               alert={alert}
-                                              numberOfCandles={168}
+                                              numberOfCandles={600}
                                               width={chartAlertsWidth}
-                                              security={securityLastInfo}
+                                              security={security}
                                               premise={premise}
                                               showGrid={true}
                                               fetchCandlesIntervalInMilliseconds={1000}/> : null
                         }
                     </div>
                 </div>
-                <TrendsView trends={trends}/>
+                <TrendsView trends={premise ? premise.analysis.trends : []}/>
                 <div className="p-grid" style={{margin: '0'}}>
-                    <div className="p-col-8" ref={chart1Ref} style={{padding: '0'}}>
+                    <div className="p-col-7" ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
-                                      numberOfCandles={168}
+                                      numberOfCandles={1000}
                                       width={chart1Width}
-                                      security={securityLastInfo}
+                                      security={security}
                                       premise={premise}
                                       showGrid={true}/>
                     </div>
-                    <div className="p-col-4" ref={chart2Ref} style={{padding: '0'}}>
+                    <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameLow}
-                                      numberOfCandles={540}
+                                      numberOfCandles={2400}
                                       width={chart2Width}
-                                      security={securityLastInfo}
+                                      security={security}
                                       trend={trendLowTF}
                                       showGrid={true}/>
                     </div>
