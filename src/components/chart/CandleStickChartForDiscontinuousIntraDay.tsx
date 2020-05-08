@@ -30,7 +30,6 @@ import {Candle} from "../../data/Candle";
 import {ChartLevel} from "./data/ChartLevel";
 import {SRZone} from "../../data/strategy/SRZone";
 import ChartZones from "./ChartZones";
-import "./Chart.css";
 
 type Props = {
     data: Candle[]
@@ -92,9 +91,10 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         const start = xAccessor(last(data));
         const end = xAccessor(data[Math.max(0, data.length - 150)]);
         const xExtents = [start, end];
+        let key = 0;
         const htSRLevelsView = htSRLevels.map(lvl => (
             <PriceCoordinate
-                key={lvl.price.toString()}
+                key={lvl.price.toString() + key++}
                 at="left"
                 orient="left"
                 price={lvl.price}
@@ -110,7 +110,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         ));
         const ordersView = orders.map(lvl => (
             <PriceCoordinate
-                key={lvl.price.toString()}
+                key={lvl.price.toString() + key++}
                 at="right"
                 orient="right"
                 price={lvl.price}
@@ -126,7 +126,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         ));
         const stopsView = stops.map(lvl => (
             <PriceCoordinate
-                key={lvl.price.toString()}
+                key={lvl.price.toString() + key++}
                 at="right"
                 orient="right"
                 price={lvl.price}

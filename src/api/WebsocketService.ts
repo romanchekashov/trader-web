@@ -20,8 +20,14 @@ export enum WSEvent {
     VOLUMES = 'VOLUMES',
     TERMINATE_POSITION = 'TERMINATE_POSITION',
     REVERSE_POSITION = 'REVERSE_POSITION',
+    CANCEL_STOP_ORDERS = 'CANCEL_STOP_ORDERS',
+    TREND = 'TREND',
+    STACK = 'STACK',
     ALERTS = 'ALERTS',
+    GET_CANDLES = 'GET_CANDLES',
+    CANDLES = 'CANDLES',
 
+    // history
     HISTORY_LAST_SECURITIES = 'HISTORY_LAST_SECURITIES',
     HISTORY_GET_TRADE_PREMISE_AND_SETUP = 'HISTORY_GET_TRADE_PREMISE_AND_SETUP',
     HISTORY_TRADE_PREMISE = 'HISTORY_TRADE_PREMISE',
@@ -34,8 +40,12 @@ export enum WSEvent {
     HISTORY_VOLUMES = 'HISTORY_VOLUMES',
     HISTORY_TERMINATE_POSITION = 'HISTORY_TERMINATE_POSITION',
     HISTORY_REVERSE_POSITION = 'HISTORY_REVERSE_POSITION',
-    HISTORY_TRADING_STRATEGY_STATE = 'HISTORY_TRADING_STRATEGY_STATE',
-    HISTORY_ALERTS = 'HISTORY_ALERTS'
+    HISTORY_CANCEL_STOP_ORDERS = 'HISTORY_CANCEL_STOP_ORDERS',
+    HISTORY_TREND = 'HISTORY_TREND',
+    HISTORY_ALERTS = 'HISTORY_ALERTS',
+    GET_HISTORY_CANDLES = 'GET_HISTORY_CANDLES',
+    HISTORY_CANDLES = 'HISTORY_CANDLES',
+    HISTORY_TRADING_STRATEGY_STATE = 'HISTORY_TRADING_STRATEGY_STATE'
 }
 
 export interface WsMessage<T> {
@@ -71,7 +81,7 @@ export class WebsocketService {
             .subscribe((isConnected) => {
                 this.isConnected = isConnected;
 
-                if (!this.reconnection$ && typeof(isConnected) === 'boolean' && !isConnected) {
+                if (!this.reconnection$ && typeof (isConnected) === 'boolean' && !isConnected) {
                     this.reconnect();
                 }
             });
@@ -102,10 +112,14 @@ export class WebsocketService {
 
     public send(event: WSEvent, data: any = {}): void {
         if (event && this.isConnected) {
-            this.sock.send(JSON.stringify({ event, data }));
+            this.sock.send(JSON.stringify({event, data}));
         } else {
             console.error('Send error!');
         }
+    }
+
+    public connectionStatus(): Observable<boolean> {
+        return this.status;
     }
 
     private connect(): void {

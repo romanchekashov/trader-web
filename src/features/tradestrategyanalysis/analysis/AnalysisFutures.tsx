@@ -152,8 +152,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                                               width={chartAlertsWidth}
                                               security={security}
                                               premise={premise}
-                                              showGrid={true}
-                                              fetchCandlesIntervalInMilliseconds={1000}/> : null
+                                              showGrid={true}/> : null
                         }
                     </div>
                 </div>
