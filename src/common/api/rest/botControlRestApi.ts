@@ -1,6 +1,6 @@
 import {handleError, handleResponse} from "../apiUtils";
-import {MarketBotFilterDataDto} from "../dto/MarketBotFilterDataDto";
-import {MarketBotStartDto} from "../dto/MarketBotStartDto";
+import {MarketBotFilterDataDto} from "../data/MarketBotFilterDataDto";
+import {MarketBotStartDto} from "../data/MarketBotStartDto";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 

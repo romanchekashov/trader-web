@@ -1,6 +1,6 @@
 import {AppDispatch} from "../../app/store";
-import {ResultDto} from "../../common/api/tradejournal/dto/ResultDto";
-import {getStat} from "../../common/api/tradejournal/tradeJournalApi";
+import {ResultDto} from "../../common/data/journal/ResultDto";
+import {getStat} from "../../common/api/rest/journalRestApi";
 
 export const LOAD_STAT_SUCCESS = "LOAD_STAT_SUCCESS";
 

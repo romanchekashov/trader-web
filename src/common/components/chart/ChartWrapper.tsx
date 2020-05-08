@@ -9,13 +9,13 @@ import {ChartElementAppearance} from "./data/ChartElementAppearance";
 import {ChartLevel} from "./data/ChartLevel";
 import {Order} from "../../data/Order";
 import {OperationType} from "../../data/OperationType";
-import {getHistoryCandles} from "../../api/historyTraderApi";
+import {getHistoryCandles} from "../../api/rest/historyRestApi";
 import {Trend} from "../../data/strategy/Trend";
 import {ActiveTrade} from "../../data/ActiveTrade";
 import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {SubscriptionLike} from "rxjs";
 import moment = require("moment");
-import {getCandles} from "../../api/baseApi";
+import {getCandles} from "../../api/rest/traderRestApi";
 import {PatternResult} from "../alerts/data/PatternResult";
 
 type Props = {

@@ -6,9 +6,9 @@ import {Calendar} from "primereact/calendar";
 import {TradeJournalFilterDto} from "./TradeJournalFilterDto";
 import {ClassCode} from "../../../common/data/ClassCode";
 import {Dropdown} from "primereact/dropdown";
-import {getFilterData} from "../../../common/api/bot-control/tradeStrategyBotControlApi";
-import {MarketSecuritiesDto} from "../../../common/api/dto/MarketBotFilterDataDto";
-import {SecurityInfo} from "../../../common/api/dto/SecurityInfo";
+import {getFilterData} from "../../../common/api/rest/botControlRestApi";
+import {MarketSecuritiesDto} from "../../../common/api/data/MarketBotFilterDataDto";
+import {SecurityInfo} from "../../../common/api/data/SecurityInfo";
 import moment = require("moment");
 
 export interface TradeJournalFilterState {

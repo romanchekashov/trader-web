@@ -1,4 +1,4 @@
-import {ResultDto} from "./dto/ResultDto";
+import {ResultDto} from "../../data/journal/ResultDto";
 import {handleError, handleResponse} from "../apiUtils";
 import {TradeJournalFilterDto} from "../../../features/trade-journal/filter/TradeJournalFilterDto";
 const baseUrl = process.env.API_URL + "/api/v1/trade-journal/";

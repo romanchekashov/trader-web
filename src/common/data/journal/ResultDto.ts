@@ -1,5 +1,5 @@
 import {JournalTradeDto} from "./JournalTradeDto";
-import {Broker} from "../../dto/Broker";
+import {Broker} from "../../api/data/Broker";
 
 export class ResultDto {
   public trades: JournalTradeDto[];

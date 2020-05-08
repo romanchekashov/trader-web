@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useEffect} from "react";
-import {SecurityShare} from "../../../common/api/dto/SecurityShare";
+import {SecurityShare} from "../../../common/api/data/SecurityShare";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 

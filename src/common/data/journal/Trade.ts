@@ -1,5 +1,5 @@
-import {ClassCode} from "../../../data/ClassCode";
-import {Broker} from "../../dto/Broker";
+import {ClassCode} from "../ClassCode";
+import {Broker} from "../../api/data/Broker";
 
 export class Trade {
   public id: number;

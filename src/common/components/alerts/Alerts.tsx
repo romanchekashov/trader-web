@@ -8,7 +8,7 @@ import {PatternName} from "./data/PatternName";
 import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {playSound} from "../../assets/assets";
 import moment = require("moment");
-import {getCandlePatterns} from "../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
+import {getCandlePatterns} from "../../api/rest/analysisRestApi";
 
 type Props = {
     filter: AlertsFilter

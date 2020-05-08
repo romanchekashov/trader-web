@@ -1,13 +1,13 @@
 import * as React from "react";
 import {connect} from "react-redux";
-import {MarketBotFilterDataDto} from "../../common/api/dto/MarketBotFilterDataDto";
+import {MarketBotFilterDataDto} from "../../common/api/data/MarketBotFilterDataDto";
 import {bindActionCreators} from "redux";
 import {loadFilterData} from "./tradeStrategyBotControlActions";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
 import Filter from "./filter/Filter";
-import {MarketBotStartDto} from "../../common/api/dto/MarketBotStartDto";
-import {runHistory, startBot, stopHistory} from "../../common/api/bot-control/tradeStrategyBotControlApi";
+import {MarketBotStartDto} from "../../common/api/data/MarketBotStartDto";
+import {runHistory, startBot, stopHistory} from "../../common/api/rest/botControlRestApi";
 import {BotControlHistory} from "./history/BotControlHistory";
 
 

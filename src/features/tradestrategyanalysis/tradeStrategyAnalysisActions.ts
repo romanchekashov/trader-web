@@ -1,14 +1,14 @@
 import {AppDispatch} from "../../app/store";
-import {MarketBotFilterDataDto} from "../../common/api/dto/MarketBotFilterDataDto";
-import {SecurityShare} from "../../common/api/dto/SecurityShare";
-import {getSecurityCurrencies, getSecurityFutures, getSecurityShares} from "../../common/api/baseApi";
-import {getFilterData} from "../../common/api/bot-control/tradeStrategyBotControlApi";
+import {MarketBotFilterDataDto} from "../../common/api/data/MarketBotFilterDataDto";
+import {SecurityShare} from "../../common/api/data/SecurityShare";
+import {getSecurityCurrencies, getSecurityFutures, getSecurityShares} from "../../common/api/rest/traderRestApi";
+import {getFilterData} from "../../common/api/rest/botControlRestApi";
 import moment = require("moment");
 import {TradePremise} from "../../common/data/strategy/TradePremise";
-import {getTradePremise} from "../../common/api/tradestrategyanalysis/tradeStrategyAnalysisApi";
-import {TradeStrategyAnalysisFilterDto} from "../../common/api/tradestrategyanalysis/dto/TradeStrategyAnalysisFilterDto";
-import {SecurityCurrency} from "../../common/api/dto/SecurityCurrency";
-import {SecurityFuture} from "../../common/api/dto/SecurityFuture";
+import {getTradePremise} from "../../common/api/rest/analysisRestApi";
+import {TradeStrategyAnalysisFilterDto} from "../../common/api/data/TradeStrategyAnalysisFilterDto";
+import {SecurityCurrency} from "../../common/api/data/SecurityCurrency";
+import {SecurityFuture} from "../../common/api/data/SecurityFuture";
 
 export const LOAD_FILTER_DATA_SUCCESS = "LOAD_FILTER_DATA_SUCCESS";
 export const LOAD_SECURITY_SHARES = "LOAD_SECURITY_SHARES";
