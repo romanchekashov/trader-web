@@ -1,6 +1,6 @@
 .alerts {
     height: 200px;
-    overflow-y: scroll;
+    overflow-x: hidden;
     font-size: 0.8em;
 }
 .alerts::-webkit-scrollbar {
@@ -14,14 +14,14 @@
     outline: 1px solid slategrey;
 }
 
-.alerts-row-selected {
-    background-color: #b3e5fc;
-}
 .alerts-row {
     display: table;
     border-bottom: 1px solid gray;
     width: 100%;
     cursor: pointer;
+}
+.alerts-row-selected {
+    background-color: #b3e5fc;
 }
 .alerts-cell {
     display: table-cell;
@@ -64,4 +64,19 @@
 
 .alerts-description {
     padding-left: 5px;
+}
+
+.List {
+    border: 1px solid #d9dddd;
+}
+
+.ListItemEven,
+.ListItemOdd {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ListItemEven {
+    background-color: #f8f8f0;
 }

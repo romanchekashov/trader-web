@@ -1,14 +1,16 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useEffect, useState, memo} from "react";
 import {PatternResult} from "./data/PatternResult";
 import {AlertsFilter} from "./data/AlertsFilter";
 import "./Alerts.css";
 import "./CandlePattern.css";
 import {PatternName} from "./data/PatternName";
-import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {playSound} from "../../assets/assets";
 import moment = require("moment");
 import {getCandlePatterns} from "../../api/rest/analysisRestApi";
+import {WebsocketService, WSEvent} from "../../api/WebsocketService";
+import {FixedSizeList as List} from "react-window";
+import AutoSizer from "react-virtualized-auto-sizer";
 
 type Props = {
     filter: AlertsFilter
@@ -134,42 +136,61 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected}) => {
         return <div title={alert.description}>{alert.description}</div>;
     };
 
+    const Row = ({index, style}) => {
+        const alert = alerts[index];
+        const className = "alerts-row " + (selectedAlert === alert ? "alerts-row-selected" : "");
+
+        return (
+            <div className={index % 2 ? "ListItemOdd" : "ListItemEven"} style={style}>
+                <div key={alert.name + alert.interval + alert.candle.timestamp}
+                     className={className}
+                     onClick={() => {
+                         setSelectedAlert(alert);
+                         onAlertSelected(alert);
+                     }}>
+                    <div className="alerts-cell alerts-time">
+                        {timeTemplate(alert)}
+                    </div>
+                    <div className="alerts-cell alerts-name">
+                        {nameTemplate(alert)}
+                    </div>
+                    <div className="alerts-cell alerts-symbol">
+                        {alert.candle.symbol}
+                    </div>
+                    <div className="alerts-cell alerts-strength">
+                        {strengthTemplate(alert)}
+                    </div>
+                    <div className="alerts-cell alerts-confirm">
+                        {confirmTemplate(alert)}
+                    </div>
+                    <div className="alerts-cell alerts-direction">
+                        {possibleFutureDirectionUpTemplate(alert)}
+                    </div>
+                    <div className="alerts-cell alerts-description">
+                        {descriptionTemplate(alert)}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="p-grid alerts">
-            {alerts.map(alert => {
-                const className = "alerts-row " + (selectedAlert === alert ? "alerts-row-selected" : "") ;
-                return (
-                    <div key={alert.candle.timestamp + alert.interval} className={className}
-                         onClick={() => {
-                             setSelectedAlert(alert);
-                             onAlertSelected(alert);
-                         }}>
-                        <div className="alerts-cell alerts-time">
-                            {timeTemplate(alert)}
-                        </div>
-                        <div className="alerts-cell alerts-name">
-                            {nameTemplate(alert)}
-                        </div>
-                        <div className="alerts-cell alerts-symbol">
-                            {alert.candle.symbol}
-                        </div>
-                        <div className="alerts-cell alerts-strength">
-                            {strengthTemplate(alert)}
-                        </div>
-                        <div className="alerts-cell alerts-confirm">
-                            {confirmTemplate(alert)}
-                        </div>
-                        <div className="alerts-cell alerts-direction">
-                            {possibleFutureDirectionUpTemplate(alert)}
-                        </div>
-                        <div className="alerts-cell alerts-description">
-                            {descriptionTemplate(alert)}
-                        </div>
-                    </div>
-                );
-            })}
+            <AutoSizer>
+                {({height, width}) => (
+                    <List
+                        className="List"
+                        height={height}
+                        itemCount={alerts.length}
+                        itemSize={35}
+                        width={width}
+                    >
+                        {Row}
+                    </List>
+                )}
+            </AutoSizer>
         </div>
     )
 };
 
-export default Alerts;
+export default memo(Alerts);

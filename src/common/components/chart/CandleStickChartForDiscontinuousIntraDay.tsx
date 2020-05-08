@@ -9,7 +9,7 @@ import {
     CandlestickSeries,
     Circle,
     LineSeries,
-    ScatterSeries, Square, Triangle,
+    ScatterSeries, Square,
 } from "react-financial-charts/lib/series";
 import {XAxis, YAxis} from "react-financial-charts/lib/axes";
 import {

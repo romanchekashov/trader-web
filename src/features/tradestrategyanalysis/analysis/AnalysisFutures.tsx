@@ -139,16 +139,18 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
         return (
             <div>
                 <div className="p-grid">
-                    <div className="p-col-4">
+                    <div className="p-col-12">{future.todayMoneyTurnover}</div>
+                </div>
+                <div className="p-grid">
+                    <div className="p-col-5">
                         <Alerts filter={alertsFilter}
                                 onAlertSelected={onAlertSelected}/>
                     </div>
-                    <div className="p-col-8" ref={chartAlertsRef} style={{padding: '0'}}>
+                    <div className="p-col-7" ref={chartAlertsRef} style={{padding: '0'}}>
                         {
                             alert ?
                                 <ChartWrapper interval={alert.interval}
                                               alert={alert}
-                                              numberOfCandles={600}
                                               width={chartAlertsWidth}
                                               security={security}
                                               premise={premise}
@@ -160,7 +162,6 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                 <div className="p-grid" style={{margin: '0'}}>
                     <div className="p-col-7" ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
-                                      numberOfCandles={1000}
                                       width={chart1Width}
                                       security={security}
                                       premise={premise}
@@ -168,7 +169,6 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                     </div>
                     <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameLow}
-                                      numberOfCandles={2400}
                                       width={chart2Width}
                                       security={security}
                                       trend={trendLowTF}

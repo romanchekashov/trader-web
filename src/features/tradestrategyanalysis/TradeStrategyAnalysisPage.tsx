@@ -206,12 +206,9 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                     <Filter filter={filterData} onStart={this.onStart}/>
                 </div>
                 <div className="p-col-12">
-                    <div className="p-col-12 p-col-nogutter">
+                    {/*<div className="p-col-12 p-col-nogutter">
                         Top Bar
-                    </div>
-                    <div className="p-col-12 p-col-nogutter">
-                        {selectedSecuritiesView}
-                    </div>
+                    </div>*/}
                     <div className="p-col-12">
                         <div className="p-grid">
                             <div className={classDataTable}>

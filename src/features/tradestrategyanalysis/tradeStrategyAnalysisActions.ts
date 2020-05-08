@@ -86,6 +86,11 @@ export const loadTradePremise = (filter: TradeStrategyAnalysisFilterDto) => (dis
     getTradePremise(filter)
         .then(premise => {
             loadTradePremiseAttempts = 3;
+            if (premise && premise.analysis.srZones) {
+                for (const srZone of premise.analysis.srZones) {
+                    srZone.timestamp = new Date(srZone.timestamp)
+                }
+            }
             dispatch(loadTradePremiseSuccess(premise));
         })
         .catch(error => {

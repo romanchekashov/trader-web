@@ -42,7 +42,7 @@ const ChartZones: React.FC<Props> = ({zones}) => {
     const getArrowWidth = (zoneIntersects: number) => {
         if (zoneIntersects > max) return 7;
         const diff = zoneIntersects / max;
-        if (diff > 0.2) return 7;
+        if (diff > 0.1) return 7;
         return 2;
     };
 

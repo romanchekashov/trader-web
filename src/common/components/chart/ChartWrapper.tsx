@@ -1,4 +1,5 @@
 import * as React from "react";
+import {getCandles} from "../../api/rest/traderRestApi";
 import {Interval} from "../../data/Interval";
 import {CandleStickChartForDiscontinuousIntraDay} from "./CandleStickChartForDiscontinuousIntraDay";
 import {ChartDrawType} from "./data/ChartDrawType";
@@ -15,7 +16,6 @@ import {ActiveTrade} from "../../data/ActiveTrade";
 import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {SubscriptionLike} from "rxjs";
 import moment = require("moment");
-import {getCandles} from "../../api/rest/traderRestApi";
 import {PatternResult} from "../alerts/data/PatternResult";
 
 type Props = {
@@ -136,9 +136,10 @@ export class ChartWrapper extends React.Component<Props, States> {
 
     componentWillReceiveProps = (nextProps) => {
         const {security} = this.props;
+        const {candles} = this.state;
         if (nextProps.security) {
             if (security) {
-                if (security.secCode !== nextProps.security.secCode) {
+                if (candles.length === 0 || security.secCode !== nextProps.security.secCode) {
                     this.fetchCandles(nextProps.security);
                 }
                 if (security.priceLastTrade !== nextProps.security.priceLastTrade) {
