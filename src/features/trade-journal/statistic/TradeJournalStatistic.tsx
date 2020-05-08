@@ -2,9 +2,9 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import "./TradeJournalStatistic.css";
 import {ClassCode} from "../../../common/data/ClassCode";
-import {ResultDto} from "../../../api/tradejournal/dto/ResultDto";
+import {ResultDto} from "../../../common/api/tradejournal/dto/ResultDto";
 import moment = require("moment");
-import {round100} from "../../../utils/utils";
+import {round100} from "../../../common/utils/utils";
 
 export interface TradeJournalStatisticState {
     start: Date

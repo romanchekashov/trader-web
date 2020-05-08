@@ -4,12 +4,12 @@ import {bindActionCreators} from "redux";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
 import {loadStat} from "./tradeJournalActions";
-import {ResultDto} from "../../api/tradejournal/dto/ResultDto";
-import {Trade} from "../../api/tradejournal/dto/Trade";
+import {ResultDto} from "../../common/api/tradejournal/dto/ResultDto";
+import {Trade} from "../../common/api/tradejournal/dto/Trade";
 import ProfitLossChart from "./profitLossChart/ProfitLossChart";
 import {TradeJournalFilter} from "./filter/TradeJournalFilter";
 import {TradeJournalFilterDto} from "./filter/TradeJournalFilterDto";
-import {getStat} from "../../api/tradejournal/tradeJournalApi";
+import {getStat} from "../../common/api/tradejournal/tradeJournalApi";
 import {TradeJournalTable} from "./table/TradeJournalTable";
 import {TradeJournalStatistic} from "./statistic/TradeJournalStatistic";
 

@@ -1,6 +1,6 @@
 import {ResultDto} from "./dto/ResultDto";
 import {handleError, handleResponse} from "../apiUtils";
-import {TradeJournalFilterDto} from "../../features/trade-journal/filter/TradeJournalFilterDto";
+import {TradeJournalFilterDto} from "../../../features/trade-journal/filter/TradeJournalFilterDto";
 const baseUrl = process.env.API_URL + "/api/v1/trade-journal/";
 
 export function getStat(filter: TradeJournalFilterDto): Promise<ResultDto[]> {

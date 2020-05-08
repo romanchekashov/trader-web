@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Chart} from "primereact/chart";
-import {ResultDto} from "../../../api/tradejournal/dto/ResultDto";
+import {ResultDto} from "../../../common/api/tradejournal/dto/ResultDto";
 import moment = require("moment");
 import {useEffect, useState} from "react";
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {Trend} from "../../common/data/strategy/Trend";
+import {Trend} from "../../data/strategy/Trend";
 import TrendView from "./TrendView";
 import "./TrendView.css";
 

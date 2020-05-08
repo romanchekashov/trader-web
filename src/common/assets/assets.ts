@@ -1,4 +1,4 @@
-const path = require('path');
+import path = require("path");
 
 const getFilePath = (filePath, options?) => {
     if (!window['process']) return filePath;
@@ -30,14 +30,16 @@ const getFilePath = (filePath, options?) => {
     return encodeURI(`file://${pathName}`).replace(/[?#]/g, encodeURIComponent);
 };
 
+const soundPath = 'src/common/assets/sounds/';
+
 const audioMap = {
-    1: new Audio(getFilePath("src/assets/sounds/434611__jens-enk__pauseoff.ogg")),
-    2: new Audio(getFilePath("src/assets/sounds/458651__jorgerosa__alarm-2.ogg")),
-    3: new Audio(getFilePath("src/assets/sounds/251894__shift560__loopedbell.ogg")),
-    4: new Audio(getFilePath("src/assets/sounds/72128__kizilsungur__sweetalertsound4.wav"))
+    1: new Audio(getFilePath(soundPath + "434611__jens-enk__pauseoff.ogg")),
+    2: new Audio(getFilePath(soundPath + "458651__jorgerosa__alarm-2.ogg")),
+    3: new Audio(getFilePath(soundPath + "251894__shift560__loopedbell.ogg")),
+    4: new Audio(getFilePath(soundPath + "72128__kizilsungur__sweetalertsound4.wav"))
 };
 
 export function playSound(num: number): void {
-    const audio = audioMap[num];
-    if (audio) audio.play();
+    const audioFile = audioMap[num];
+    if (audioFile) audioFile.play();
 }

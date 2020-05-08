@@ -6,9 +6,9 @@ import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import {ColumnGroup} from "primereact/columngroup";
 import {Row} from "primereact/row";
-import {ResultDto} from "../../../api/tradejournal/dto/ResultDto";
-import {Trade} from "../../../api/tradejournal/dto/Trade";
-import {JournalTradeDto} from "../../../api/tradejournal/dto/JournalTradeDto";
+import {ResultDto} from "../../../common/api/tradejournal/dto/ResultDto";
+import {Trade} from "../../../common/api/tradejournal/dto/Trade";
+import {JournalTradeDto} from "../../../common/api/tradejournal/dto/JournalTradeDto";
 import TreeNode from "primereact/components/treenode/TreeNode";
 import moment = require("moment");
 

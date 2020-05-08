@@ -2,19 +2,19 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {ClassCode} from "../../../common/data/ClassCode";
 import {TradePremise} from "../../../common/data/strategy/TradePremise";
-import {SecurityFuture} from "../../../api/dto/SecurityFuture";
-import {ChartWrapper} from "../../../components/chart/ChartWrapper";
+import {SecurityFuture} from "../../../common/api/dto/SecurityFuture";
+import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Interval} from "../../../common/data/Interval";
-import {WebsocketService, WSEvent} from "../../../api/WebsocketService";
+import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
-import {TradingPlatform} from "../../../api/dto/TradingPlatform";
-import TrendView from "../../../components/trend/TrendView";
-import {getTrend} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";
-import Alerts from "../../../components/alerts/Alerts";
-import {PatternResult} from "../../../components/alerts/data/PatternResult";
+import {TradingPlatform} from "../../../common/api/dto/TradingPlatform";
+import TrendView from "../../../common/components/trend/TrendView";
+import {getTrend} from "../../../common/api/tradestrategyanalysis/tradeStrategyAnalysisApi";
+import Alerts from "../../../common/components/alerts/Alerts";
+import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
 import {timeout} from "rxjs/operators";
-import {TrendsView} from "../../../components/trend/TrendsView";
+import {TrendsView} from "../../../common/components/trend/TrendsView";
 
 type Props = {
     classCode: ClassCode

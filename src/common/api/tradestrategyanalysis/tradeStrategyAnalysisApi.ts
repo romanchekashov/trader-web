@@ -1,9 +1,9 @@
 import {handleError, handleResponse} from "../apiUtils";
-import {TradePremise} from "../../common/data/strategy/TradePremise";
+import {TradePremise} from "../../data/strategy/TradePremise";
 import {TradeStrategyAnalysisFilterDto} from "./dto/TradeStrategyAnalysisFilterDto";
-import {Interval} from "../../common/data/Interval";
-import {Trend} from "../../common/data/strategy/Trend";
-import {ClassCode} from "../../common/data/ClassCode";
+import {Interval} from "../../data/Interval";
+import {Trend} from "../../data/strategy/Trend";
+import {ClassCode} from "../../data/ClassCode";
 import {PatternResult} from "../../components/alerts/data/PatternResult";
 import {AlertsFilter} from "../../components/alerts/data/AlertsFilter";
 

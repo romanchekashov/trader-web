@@ -1,6 +1,6 @@
 import {TradingPlatform} from "./TradingPlatform";
-import {Interval} from "../../common/data/Interval";
-import {ClassCode} from "../../common/data/ClassCode";
+import {Interval} from "../../data/Interval";
+import {ClassCode} from "../../data/ClassCode";
 
 export class MarketBotStartDto {
     public brokerId: number;

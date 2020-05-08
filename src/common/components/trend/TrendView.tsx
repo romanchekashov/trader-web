@@ -1,10 +1,10 @@
 import * as React from "react";
 import {useEffect} from "react";
 import {Chart} from "primereact/chart";
-import {Trend} from "../../common/data/strategy/Trend";
+import {Trend} from "../../data/strategy/Trend";
 import {useState} from "react";
 import moment = require("moment");
-import {TrendDirection} from "../../common/data/strategy/TrendDirection";
+import {TrendDirection} from "../../data/strategy/TrendDirection";
 import "./TrendView.css";
 
 type Props = {

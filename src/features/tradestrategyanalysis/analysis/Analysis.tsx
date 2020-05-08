@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useEffect} from "react";
 import {ClassCode} from "../../../common/data/ClassCode";
-import {SecurityShare} from "../../../api/dto/SecurityShare";
+import {SecurityShare} from "../../../common/api/dto/SecurityShare";
 import {TradePremise} from "../../../common/data/strategy/TradePremise";
 import {Interval} from "../../../common/data/Interval";
 
