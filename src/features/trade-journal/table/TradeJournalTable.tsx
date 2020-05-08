@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import "./TradeJournalTable.css";
-import {ClassCode} from "../../../data/ClassCode";
+import {ClassCode} from "../../../common/data/ClassCode";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import {ColumnGroup} from "primereact/columngroup";

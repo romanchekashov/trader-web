@@ -1,6 +1,6 @@
 import * as React from "react";
-import {TradePremise} from "../../../data/strategy/TradePremise";
-import {TradeSetup} from "../../../data/strategy/TradeSetup";
+import {TradePremise} from "../../../common/data/strategy/TradePremise";
+import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
 import TrendView from "../../../components/trend/TrendView";
 
 type Props = {

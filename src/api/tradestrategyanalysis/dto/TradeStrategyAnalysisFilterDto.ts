@@ -1,6 +1,6 @@
 import {TradingPlatform} from "../../dto/TradingPlatform";
-import {ClassCode} from "../../../data/ClassCode";
-import {Interval} from "../../../data/Interval";
+import {ClassCode} from "../../../common/data/ClassCode";
+import {Interval} from "../../../common/data/Interval";
 
 export class TradeStrategyAnalysisFilterDto {
     public brokerId: number;

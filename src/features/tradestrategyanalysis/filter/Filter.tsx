@@ -8,7 +8,7 @@ import {Broker} from "../../../api/dto/Broker";
 import {MarketBotFilterDataDto, MarketSecuritiesDto} from "../../../api/dto/MarketBotFilterDataDto";
 import {TradingPlatform} from "../../../api/dto/TradingPlatform";
 import {SecurityInfo} from "../../../api/dto/SecurityInfo";
-import {Interval} from "../../../data/Interval";
+import {Interval} from "../../../common/data/Interval";
 import {MarketBotStartDto} from "../../../api/dto/MarketBotStartDto";
 import "./Filter.css";
 

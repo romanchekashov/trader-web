@@ -1,13 +1,13 @@
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
-import {ClassCode} from "../../../data/ClassCode";
-import {TradePremise} from "../../../data/strategy/TradePremise";
+import {ClassCode} from "../../../common/data/ClassCode";
+import {TradePremise} from "../../../common/data/strategy/TradePremise";
 import {SecurityFuture} from "../../../api/dto/SecurityFuture";
 import {ChartWrapper} from "../../../components/chart/ChartWrapper";
-import {Interval} from "../../../data/Interval";
+import {Interval} from "../../../common/data/Interval";
 import {WebsocketService, WSEvent} from "../../../api/WebsocketService";
-import {SecurityLastInfo} from "../../../data/SecurityLastInfo";
-import {TradeSetup} from "../../../data/strategy/TradeSetup";
+import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
 import {TradingPlatform} from "../../../api/dto/TradingPlatform";
 import TrendView from "../../../components/trend/TrendView";
 import {getTrend} from "../../../api/tradestrategyanalysis/tradeStrategyAnalysisApi";

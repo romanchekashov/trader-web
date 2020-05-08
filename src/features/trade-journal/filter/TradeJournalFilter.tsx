@@ -4,7 +4,7 @@ import {Button} from "primereact/button";
 import "./TradeJournalFilter.css";
 import {Calendar} from "primereact/calendar";
 import {TradeJournalFilterDto} from "./TradeJournalFilterDto";
-import {ClassCode} from "../../../data/ClassCode";
+import {ClassCode} from "../../../common/data/ClassCode";
 import {Dropdown} from "primereact/dropdown";
 import {getFilterData} from "../../../api/bot-control/tradeStrategyBotControlApi";
 import {MarketSecuritiesDto} from "../../../api/dto/MarketBotFilterDataDto";

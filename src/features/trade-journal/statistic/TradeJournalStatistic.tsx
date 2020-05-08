@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import "./TradeJournalStatistic.css";
-import {ClassCode} from "../../../data/ClassCode";
+import {ClassCode} from "../../../common/data/ClassCode";
 import {ResultDto} from "../../../api/tradejournal/dto/ResultDto";
 import moment = require("moment");
 import {round100} from "../../../utils/utils";

@@ -26,9 +26,9 @@ import {OHLCTooltip} from "react-financial-charts/lib/tooltip";
 // import { fitWidth } from "react-financial-charts/lib/helper";
 import {last} from "react-financial-charts/lib/utils";
 import {ChartDrawType} from "./data/ChartDrawType";
-import {Candle} from "../../data/Candle";
+import {Candle} from "../../common/data/Candle";
 import {ChartLevel} from "./data/ChartLevel";
-import {SRZone} from "../../data/strategy/SRZone";
+import {SRZone} from "../../common/data/strategy/SRZone";
 import ChartZones from "./ChartZones";
 
 type Props = {

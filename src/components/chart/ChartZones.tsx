@@ -1,5 +1,5 @@
 import * as React from "react";
-import {SRZone} from "../../data/strategy/SRZone";
+import {SRZone} from "../../common/data/strategy/SRZone";
 import {AreaOnlySeries} from "react-financial-charts/lib/series";
 import {PriceCoordinate} from "react-financial-charts/lib/coordinates";
 import {format} from "d3-format";

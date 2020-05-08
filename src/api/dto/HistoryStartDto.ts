@@ -1,5 +1,5 @@
 import {TradingPlatform} from "./TradingPlatform";
-import {Interval} from "../../data/Interval";
+import {Interval} from "../../common/data/Interval";
 
 export class HistoryStartDto {
     public brokerId: number;

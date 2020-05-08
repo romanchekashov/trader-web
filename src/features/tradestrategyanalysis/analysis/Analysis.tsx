@@ -1,9 +1,9 @@
 import * as React from "react";
 import {useEffect} from "react";
-import {ClassCode} from "../../../data/ClassCode";
+import {ClassCode} from "../../../common/data/ClassCode";
 import {SecurityShare} from "../../../api/dto/SecurityShare";
-import {TradePremise} from "../../../data/strategy/TradePremise";
-import {Interval} from "../../../data/Interval";
+import {TradePremise} from "../../../common/data/strategy/TradePremise";
+import {Interval} from "../../../common/data/Interval";
 
 export interface AnalysisState {
     realDepo: boolean
