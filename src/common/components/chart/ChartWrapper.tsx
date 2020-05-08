@@ -42,6 +42,7 @@ export class ChartWrapper extends React.Component<Props, States> {
 
     private candlesSetupSubscription: SubscriptionLike = null;
     private wsStatusSub: SubscriptionLike = null;
+    private fetchingCandles: boolean = false;
 
     constructor(props) {
         super(props);
@@ -79,14 +80,17 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     fetchCandles = (security: SecurityLastInfo) => {
-        if (security) {
+        if (security && !this.fetchingCandles) {
             let setIntervalIdForFetchCandles: NodeJS.Timeout = null;
+            console.log("fetchCandles: ", security)
+            this.fetchingCandles = true;
 
             setIntervalIdForFetchCandles = setInterval(() => {
                 this.getNewCandles(security)
                     .then(data => {
                         if (data && data.length > 0) clearInterval(setIntervalIdForFetchCandles);
                         this.updateCandles(data, security);
+                        this.fetchingCandles = false;
                     })
                     .catch(console.error);
             }, 2000);
@@ -127,6 +131,9 @@ export class ChartWrapper extends React.Component<Props, States> {
                     this.requestCandles(security);
                 }
             });
+
+        const {security} = this.props;
+        this.fetchCandles(security);
     };
 
     componentWillUnmount = (): void => {
