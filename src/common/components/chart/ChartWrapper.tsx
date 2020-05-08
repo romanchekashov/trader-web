@@ -82,7 +82,6 @@ export class ChartWrapper extends React.Component<Props, States> {
     fetchCandles = (security: SecurityLastInfo) => {
         if (security && !this.fetchingCandles) {
             let setIntervalIdForFetchCandles: NodeJS.Timeout = null;
-            console.log("fetchCandles: ", security)
             this.fetchingCandles = true;
 
             setIntervalIdForFetchCandles = setInterval(() => {
