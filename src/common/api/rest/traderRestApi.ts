@@ -1,7 +1,7 @@
 import {handleError, handleResponse} from "../apiUtils";
-import {SecurityShare} from "../data/SecurityShare";
-import {SecurityCurrency} from "../data/SecurityCurrency";
-import {SecurityFuture} from "../data/SecurityFuture";
+import {SecurityShare} from "../../data/SecurityShare";
+import {SecurityCurrency} from "../../data/SecurityCurrency";
+import {SecurityFuture} from "../../data/SecurityFuture";
 import {Candle} from "../../data/Candle";
 import {Interval} from "../../data/Interval";
 

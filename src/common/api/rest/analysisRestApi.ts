@@ -1,6 +1,6 @@
 import {handleError, handleResponse} from "../apiUtils";
 import {TradePremise} from "../../data/strategy/TradePremise";
-import {TradeStrategyAnalysisFilterDto} from "../data/TradeStrategyAnalysisFilterDto";
+import {TradeStrategyAnalysisFilterDto} from "../../data/TradeStrategyAnalysisFilterDto";
 import {Interval} from "../../data/Interval";
 import {Trend} from "../../data/strategy/Trend";
 import {ClassCode} from "../../data/ClassCode";

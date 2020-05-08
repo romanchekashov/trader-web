@@ -10,15 +10,15 @@ import {
     loadSecurityShares,
     loadTradePremise
 } from "./tradeStrategyAnalysisActions";
-import {MarketBotFilterDataDto} from "../../common/api/data/MarketBotFilterDataDto";
-import {MarketBotStartDto} from "../../common/api/data/MarketBotStartDto";
-import {SecurityShare} from "../../common/api/data/SecurityShare";
+import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
+import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
+import {SecurityShare} from "../../common/data/SecurityShare";
 import Filter from "./filter/Filter";
 import {ClassCode} from "../../common/data/ClassCode";
 import Analysis from "./analysis/Analysis";
 import {TradePremise} from "../../common/data/strategy/TradePremise";
-import {SecurityCurrency} from "../../common/api/data/SecurityCurrency";
-import {SecurityFuture} from "../../common/api/data/SecurityFuture";
+import {SecurityCurrency} from "../../common/data/SecurityCurrency";
+import {SecurityFuture} from "../../common/data/SecurityFuture";
 import Shares from "./securities/Shares";
 import Currencies from "./securities/Currencies";
 import Futures from "./securities/Futures";

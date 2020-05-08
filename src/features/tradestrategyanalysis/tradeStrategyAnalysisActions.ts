@@ -1,14 +1,14 @@
 import {AppDispatch} from "../../app/store";
-import {MarketBotFilterDataDto} from "../../common/api/data/MarketBotFilterDataDto";
-import {SecurityShare} from "../../common/api/data/SecurityShare";
+import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
+import {SecurityShare} from "../../common/data/SecurityShare";
 import {getSecurityCurrencies, getSecurityFutures, getSecurityShares} from "../../common/api/rest/traderRestApi";
 import {getFilterData} from "../../common/api/rest/botControlRestApi";
 import moment = require("moment");
 import {TradePremise} from "../../common/data/strategy/TradePremise";
 import {getTradePremise} from "../../common/api/rest/analysisRestApi";
-import {TradeStrategyAnalysisFilterDto} from "../../common/api/data/TradeStrategyAnalysisFilterDto";
-import {SecurityCurrency} from "../../common/api/data/SecurityCurrency";
-import {SecurityFuture} from "../../common/api/data/SecurityFuture";
+import {TradeStrategyAnalysisFilterDto} from "../../common/data/TradeStrategyAnalysisFilterDto";
+import {SecurityCurrency} from "../../common/data/SecurityCurrency";
+import {SecurityFuture} from "../../common/data/SecurityFuture";
 
 export const LOAD_FILTER_DATA_SUCCESS = "LOAD_FILTER_DATA_SUCCESS";
 export const LOAD_SECURITY_SHARES = "LOAD_SECURITY_SHARES";

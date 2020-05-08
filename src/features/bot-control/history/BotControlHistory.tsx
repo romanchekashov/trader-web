@@ -12,9 +12,9 @@ import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {TradingStrategyState} from "../../../common/data/strategy/TradingStrategyState";
 import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
 import {Order} from "../../../common/data/Order";
-import {TradingPlatform} from "../../../common/api/data/TradingPlatform";
+import {TradingPlatform} from "../../../common/data/TradingPlatform";
 import {ActiveTrade} from "../../../common/data/ActiveTrade";
-import {SessionTradeResult} from "../../../common/api/data/SessionTradeResult";
+import {SessionTradeResult} from "../../../common/data/SessionTradeResult";
 import moment = require("moment");
 
 type Props = {};

@@ -1,4 +1,4 @@
-import {MarketBotFilterDataDto} from "../../common/api/data/MarketBotFilterDataDto";
+import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
 import {getFilterData} from "../../common/api/rest/botControlRestApi";
 import {AppDispatch} from "../../app/store";
 

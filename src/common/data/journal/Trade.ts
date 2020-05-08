@@ -1,5 +1,5 @@
 import {ClassCode} from "../ClassCode";
-import {Broker} from "../../api/data/Broker";
+import {Broker} from "../Broker";
 
 export class Trade {
   public id: number;
