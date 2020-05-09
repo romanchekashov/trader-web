@@ -15,6 +15,11 @@ type Props = {
 const TrendView: React.FC<Props> = ({trend, position}) => {
     const [innerTrend, setInnerTrend] = useState(null);
     const [data, setData] = useState(null);
+    const intervalShortName = {
+        MONTH: 'MN',
+        WEEK: 'W',
+        DAY: 'D'
+    };
 
     useEffect(() => {
         if (trend) {
@@ -32,13 +37,13 @@ const TrendView: React.FC<Props> = ({trend, position}) => {
     }, [trend]);
 
     const getColor = (direction: TrendDirection) => {
-        let color = '#42A5F5';
+        let color = '#3f51b5';
         switch (trend.direction) {
             case TrendDirection.DOWN:
-                color = '#e74c3c';
+                color = '#f44336';
                 break;
             case TrendDirection.UP:
-                color = '#27ae60';
+                color = '#4caf50';
                 break;
         }
         return color;
@@ -62,16 +67,18 @@ const TrendView: React.FC<Props> = ({trend, position}) => {
     };
 
     if (trend) {
+        const interval = intervalShortName[trend.interval] || trend.interval;
+
         if (position === 3) {
             return (
                 <div className="p-col-12 trend-position-3" style={{backgroundColor: getColor(trend.direction)}}>
-                    {`${trend.interval} - Trend ${trend.direction}`}
+                    {`${interval} - ${trend.direction}`}
                 </div>
             )
         } else if (position === 2) {
             return (
                 <div className="p-col-1 trend-position-2" style={{backgroundColor: getColor(trend.direction)}}>
-                    {`${trend.interval} - Trend ${trend.direction}`}
+                    {`${interval} - ${trend.direction}`}
                 </div>
             )
         } else {
