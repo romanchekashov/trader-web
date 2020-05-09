@@ -20,6 +20,11 @@ const TrendView: React.FC<Props> = ({trend, position}) => {
         WEEK: 'W',
         DAY: 'D'
     };
+    const intervalDateTimeFormat = {
+        MONTH: "DD-MM-YYYY",
+        WEEK: "DD-MM-YYYY",
+        DAY: "DD-MM-YYYY"
+    };
 
     useEffect(() => {
         if (trend) {
@@ -52,8 +57,10 @@ const TrendView: React.FC<Props> = ({trend, position}) => {
     const updateData = (trend: Trend) => {
         setInnerTrend(trend);
         const color = getColor(trend.direction);
+        const dateTimeFormat = intervalDateTimeFormat[trend.interval] || "HH:mm DD-MM";
+
         setData({
-            labels: trend.swingHighsLows.map(value => moment(value.dateTime).format("HH:mm DD-MM")),
+            labels: trend.swingHighsLows.map(value => moment(value.dateTime).format(dateTimeFormat)),
             datasets: [
                 {
                     label: `${trend.interval} - Trend ${trend.direction}`,

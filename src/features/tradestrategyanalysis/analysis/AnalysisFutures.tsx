@@ -139,24 +139,12 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
         return (
             <div>
                 <div className="p-grid">
-                    <div className="p-col-12">{future.todayMoneyTurnover}</div>
-                </div>
-                <div className="p-grid">
-                    <div className="p-col-5">
-                        <Alerts filter={alertsFilter}
-                                onAlertSelected={onAlertSelected}/>
-                    </div>
-                    <div className="p-col-7" ref={chartAlertsRef} style={{padding: '0'}}>
-                        {
-                            alert ?
-                                <ChartWrapper interval={alert.interval}
-                                              alert={alert}
-                                              width={chartAlertsWidth}
-                                              security={security}
-                                              premise={premise}
-                                              showGrid={true}/> : null
-                        }
-                    </div>
+                    <div className="p-col-2">Общ спрос: {future.totalDemand}</div>
+                    <div className="p-col-2">Общ предл: {future.totalSupply}</div>
+                    <div className="p-col-2">ГО прод: {future.sellDepoPerContract}</div>
+                    <div className="p-col-2">ГО покуп: {future.buyDepoPerContract}</div>
+                    <div className="p-col-2">Оборот: {future.todayMoneyTurnover}</div>
+                    <div className="p-col-2">Кол-во сделок: {future.numberOfTradesToday}</div>
                 </div>
                 <TrendsView trends={premise ? premise.analysis.trends : []}/>
                 <div className="p-grid" style={{margin: '0'}}>
@@ -173,6 +161,23 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                                       security={security}
                                       trend={trendLowTF}
                                       showGrid={true}/>
+                    </div>
+                </div>
+                <div className="p-grid">
+                    <div className="p-col-5">
+                        <Alerts filter={alertsFilter}
+                                onAlertSelected={onAlertSelected}/>
+                    </div>
+                    <div className="p-col-7" ref={chartAlertsRef} style={{padding: '0'}}>
+                        {
+                            alert ?
+                                <ChartWrapper interval={alert.interval}
+                                              alert={alert}
+                                              width={chartAlertsWidth}
+                                              security={security}
+                                              premise={premise}
+                                              showGrid={true}/> : null
+                        }
                     </div>
                 </div>
             </div>
