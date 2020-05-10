@@ -107,7 +107,7 @@ export const loadSecurityCurrencySuccess = (currencies: SecurityCurrency[]): Loa
 export const loadSecurityCurrency = () => (dispatch: AppDispatch) => {
     getSecurityCurrencies()
         .then(currencies => {
-            dispatch(loadSecurityCurrencySuccess(currencies));
+            dispatch(loadSecurityCurrencySuccess(currencies.sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover)));
         })
         .catch(error => {
             throw error;

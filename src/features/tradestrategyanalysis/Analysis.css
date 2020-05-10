@@ -6,11 +6,19 @@
     padding: 2px;
     font-size: 12px;
 }
+.analysis-securities .p-datatable .p-datatable-thead > tr > th:first-child {
+    width: 100px;
+}
+
 .analysis-securities .p-datatable .p-datatable-thead .p-inputtext {
     padding: 2px;
     font-size: 12px;
 }
+
 .analysis-securities .p-datatable .p-datatable-tbody td {
     padding: 2px 5px;
     font-size: 13px;
+}
+.analysis-securities .p-datatable .p-datatable-tbody td:first-child {
+    width: 100px;
 }

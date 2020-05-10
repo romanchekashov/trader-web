@@ -22,13 +22,13 @@ const Futures: React.FC<Props> = ({futures, selectedFuture, onSelectRow}) => {
         {field: 'sellDepoPerContract', header: 'ГО прод'},
         {field: 'buyDepoPerContract', header: 'ГО покуп'},
         {field: 'todayMoneyTurnover', header: 'Оборот'},
-        {field: 'numberOfTradesToday', header: 'numberOfTradesToday'}
+        {field: 'numberOfTradesToday', header: 'Кол-во сделок'}
     ];
 
     const lessColumns = [
         {field: 'shortName', header: 'Наз'},
         {field: 'lastChange', header: '% изм'},
-        {field: 'lastTradePrice', header: 'Цен посл'}
+        {field: 'numberOfTradesToday', header: 'Кол-во сделок'}
     ];
 
     useEffect(() => {

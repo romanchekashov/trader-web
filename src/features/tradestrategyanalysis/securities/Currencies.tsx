@@ -13,40 +13,45 @@ type Props = {
 const Currencies: React.FC<Props> = ({currencies, selectedCurrency, onSelectRow}) => {
 
     const columns = [
-        {field: 'secCode', header: 'secCode'},
-        {field: 'name', header: 'name'},
-        {field: 'lastTradePrice', header: 'lastTradePrice'},
-        {field: 'lastChange', header: 'lastChange'},
-        {field: 'lastTradeQuantity', header: 'lastTradeQuantity'},
-        {field: 'lotSize', header: 'lotSize'},
-        {field: 'weightedAveragePrice', header: 'weightedAveragePrice'},
-        {field: 'todayMoneyTurnover', header: 'todayMoneyTurnover'},
-        {field: 'numberOfTradesToday', header: 'numberOfTradesToday'}
+        {field: 'shortName', header: 'Наз'},
+        {field: 'lastChange', header: '% изм'},
+        {field: 'lastTradePrice', header: 'Цен посл'},
+        {field: 'lastTradeQuantity', header: 'Кол-во посл'},
+        {field: 'lotSize', header: 'Лот'},
+        {field: 'issueSize', header: 'Объем обр.'},
+        {field: 'weightedAveragePrice', header: 'Ср. взв. цена'},
+        {field: 'todayMoneyTurnover', header: 'Оборот'},
+        {field: 'numberOfTradesToday', header: 'Кол-во сделок'}
     ];
 
-    const [selectedColumns, setSelectedColumns] = useState(columns);
-
-    if (selectedCurrency) {
-        setSelectedColumns([
-            {field: 'secCode', header: 'secCode'},
-            {field: 'name', header: 'name'},
-            {field: 'lastTradePrice', header: 'lastTradePrice'},
-            {field: 'lastChange', header: 'lastChange'}
-        ]);
-    }
+    const lessColumns = [
+        {field: 'shortName', header: 'Наз'},
+        {field: 'lastChange', header: '% изм'},
+        {field: 'numberOfTradesToday', header: 'Кол-во сделок'}
+    ];
 
     useEffect(() => {
     });
 
+    const selectedColumns = selectedCurrency ? lessColumns : columns;
     const columnComponents = selectedColumns.map(col=> {
         return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true} />;
     });
 
+    const onSelect = (e) => {
+        if (!Array.isArray(e.value)) {
+            console.log(e.value);
+            onSelectRow(e.value);
+        }
+    };
+
     return (
         <DataTable value={currencies} responsive
+                   selectionMode="single"
                    selection={selectedCurrency}
-                   onSelectionChange={(e) => onSelectRow(e.value[0])}>
-            <Column selectionMode="multiple" style={{width:'2em'}}/>
+                   onSelectionChange={onSelect}
+                   scrollable={!!selectedCurrency}
+                   scrollHeight="600px">
             {columnComponents}
         </DataTable>
     )

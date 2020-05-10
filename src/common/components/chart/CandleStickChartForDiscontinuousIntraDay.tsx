@@ -44,6 +44,7 @@ type Props = {
     candlePatternsDown?: any
     swingHighsLowsMap?: any
     showGrid?: boolean
+    scale: number
 };
 
 export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, {}> {
@@ -66,7 +67,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     render() {
         const {
             type, data: initialData, width, ratio, htSRLevels, orders, stops,
-            swingHighsLowsMap, showGrid, zones, candlePatternsUp, candlePatternsDown
+            swingHighsLowsMap, showGrid, zones, candlePatternsUp, candlePatternsDown, scale
         } = this.props;
 
         const height = 500;
@@ -92,6 +93,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         const end = xAccessor(data[Math.max(0, data.length - 150)]);
         const xExtents = [start, end];
         let key = 0;
+        const formatInput = `.${scale}f`;
         const htSRLevelsView = htSRLevels.map(lvl => (
             <PriceCoordinate
                 key={lvl.price.toString() + key++}
@@ -105,7 +107,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                 fontSize={12}
                 fill={lvl.appearance.stroke || "#FFFFFF"}
                 arrowWidth={7}
-                displayFormat={format(".2f")}
+                displayFormat={format(formatInput)}
             />
         ));
         const ordersView = orders.map(lvl => (
@@ -121,7 +123,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                 fontSize={12}
                 fill={lvl.appearance.stroke || "#FFFFFF"}
                 arrowWidth={7}
-                displayFormat={format(".2f")}
+                displayFormat={format(formatInput)}
             />
         ));
         const stopsView = stops.map(lvl => (
@@ -137,7 +139,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                 fontSize={12}
                 fill={lvl.appearance.stroke || "#FFFFFF"}
                 arrowWidth={7}
-                displayFormat={format(".2f")}
+                displayFormat={format(formatInput)}
             />
         ));
 
@@ -186,9 +188,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                     <MouseCoordinateY
                         at="right"
                         orient="right"
-                        displayFormat={format(".2f")}/>
-
-
+                        displayFormat={format(formatInput)}/>
 
                     {
                         zones ? <ChartZones zones={zones}/> : null

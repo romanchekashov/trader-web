@@ -194,7 +194,7 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                                          timeFrameTrading={filter ? filter.timeFrameTrading : null}
                                          timeFrameLow={filter ? filter.timeFrameLow : null}
                                          future={selectedSecurity}
-                                         initPremise={premise}/>
+                                         premise={premise}/>
                     );
                     break;
             }

@@ -16,18 +16,18 @@ const Shares: React.FC<Props> = ({shares, selectedShare, onSelectRow}) => {
         {field: 'shortName', header: 'Наз'},
         {field: 'lastChange', header: '% изм'},
         {field: 'lastTradePrice', header: 'Цен посл'},
-        {field: 'lastTradeQuantity', header: 'Объем посл'},
-        {field: 'lotSize', header: 'lotSize'},
-        {field: 'issueSize', header: 'issueSize'},
-        {field: 'weightedAveragePrice', header: 'weightedAveragePrice'},
+        {field: 'lastTradeQuantity', header: 'Кол-во посл'},
+        {field: 'lotSize', header: 'Лот'},
+        {field: 'issueSize', header: 'Объем обр.'},
+        {field: 'weightedAveragePrice', header: 'Ср. взв. цена'},
         {field: 'todayMoneyTurnover', header: 'Оборот'},
-        {field: 'numberOfTradesToday', header: 'numberOfTradesToday'}
+        {field: 'numberOfTradesToday', header: 'Кол-во сделок'}
     ];
 
     const lessColumns = [
         {field: 'shortName', header: 'Наз'},
         {field: 'lastChange', header: '% изм'},
-        {field: 'lastTradePrice', header: 'Цен посл'}
+        {field: 'numberOfTradesToday', header: 'Кол-во сделок'}
     ];
 
     useEffect(() => {
@@ -38,14 +38,20 @@ const Shares: React.FC<Props> = ({shares, selectedShare, onSelectRow}) => {
         return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true} />;
     });
 
+    const onSelect = (e) => {
+        if (!Array.isArray(e.value)) {
+            console.log(e.value);
+            onSelectRow(e.value);
+        }
+    };
+
     return (
         <DataTable value={shares} responsive
                    selectionMode="single"
                    selection={selectedShare}
-                   onSelectionChange={(e) => onSelectRow(e.value[0])}
+                   onSelectionChange={onSelect}
                    scrollable={!!selectedShare}
                    scrollHeight="600px">
-            <Column selectionMode="multiple" style={{width:'2em'}}/>
             {columnComponents}
         </DataTable>
     )

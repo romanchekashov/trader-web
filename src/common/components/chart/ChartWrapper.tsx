@@ -19,12 +19,14 @@ import {PatternResult} from "../alerts/data/PatternResult";
 import moment = require("moment");
 import "./ChartWrapper.css";
 import {Dropdown} from "primereact/dropdown";
+import {Security} from "../../data/Security";
 
 type Props = {
     interval: Interval,
     width: number,
     numberOfCandles?: number,
     security: SecurityLastInfo
+    securityInfo: Security
     premise?: TradePremise
     orders?: Order[]
     history?: boolean
@@ -97,6 +99,9 @@ export class ChartWrapper extends React.Component<Props, States> {
         if (security && !this.fetchingCandles) {
             let setIntervalIdForFetchCandles: NodeJS.Timeout = null;
             this.fetchingCandles = true;
+            this.setState({
+                candles: []
+            });
 
             setIntervalIdForFetchCandles = setInterval(() => {
                 this.getNewCandles(security)
@@ -106,7 +111,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                         this.fetchingCandles = false;
                     })
                     .catch(console.error);
-            }, 1500);
+            }, 2000);
         }
     };
 
@@ -322,15 +327,15 @@ export class ChartWrapper extends React.Component<Props, States> {
     render() {
         const {candles, nodata, innerInterval} = this.state;
 
-        if (candles.length === 0 && !nodata) {
-            return <div>Loading...</div>
-        }
-
         if (nodata) {
             return <div>No data</div>
         }
 
-        const {width, showGrid, premise, security, interval} = this.props;
+        if (candles.length === 0) {
+            return <div>Loading...</div>
+        }
+
+        const {width, showGrid, premise, security, securityInfo} = this.props;
 
         return (
             <>
@@ -353,7 +358,8 @@ export class ChartWrapper extends React.Component<Props, States> {
                     stops={this.getStops()}
                     zones={premise ? premise.analysis.srZones : null}
                     candlePatternsUp={this.getCandlePatternsUp()}
-                    candlePatternsDown={this.getCandlePatternsDown()}/>
+                    candlePatternsDown={this.getCandlePatternsDown()}
+                    scale={securityInfo ? securityInfo.scale : 0}/>
             </>
         )
     }

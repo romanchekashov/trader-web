@@ -2,12 +2,8 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {ClassCode} from "../../../common/data/ClassCode";
 import {TradePremise} from "../../../common/data/strategy/TradePremise";
-import {SecurityFuture} from "../../../common/data/SecurityFuture";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Interval} from "../../../common/data/Interval";
-import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
-import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
-import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
 import {getTrend} from "../../../common/api/rest/analysisRestApi";
 import Alerts from "../../../common/components/alerts/Alerts";
 import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
@@ -18,14 +14,13 @@ type Props = {
     timeFrameHigh: Interval
     timeFrameTrading: Interval
     timeFrameLow: Interval
-    future: SecurityFuture
-    initPremise: TradePremise
+    future: any
+    premise: TradePremise
 };
 
 let trendLowTFLoading = false;
 
-const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, timeFrameLow, future, initPremise}) => {
-    const [premise, setPremise] = useState(initPremise);
+const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, timeFrameLow, future, premise}) => {
     const [tradeSetup, setTradeSetup] = useState(null);
     const [securityLastInfo, setSecurityLastInfo] = useState(null);
     const [chart1Width, setChart1Width] = useState(200);
@@ -75,43 +70,15 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
             }
         }
 
-        setPremise(initPremise);
-
-        const lastSecuritiesSubscription = WebsocketService.getInstance()
-            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-            .subscribe(value => {
-                const securities = value.map(c => {
-                    c.timeLastTrade = new Date(c.timeLastTrade);
-                    return c;
-                });
-                if (future) {
-                    let security = securities.find(o => o.secCode === future.secCode);
-                    setSecurityLastInfo(security);
-                }
-            });
-
-        const tradePremiseSubscription = WebsocketService.getInstance()
-            .on<TradePremise>(WSEvent.TRADE_PREMISE).subscribe(premise => {
-                setPremise(premise);
-            });
-
-        const tradeSetupSubscription = WebsocketService.getInstance()
-            .on<TradeSetup>(WSEvent.TRADE_SETUP).subscribe(setup => {
-                setTradeSetup(setup);
-            });
-
 
         setTimeout(updateSize, 1000);
         window.addEventListener('resize', updateSize);
 
         // Specify how to clean up after this effect:
         return function cleanup() {
-            lastSecuritiesSubscription.unsubscribe();
-            tradePremiseSubscription.unsubscribe();
-            tradeSetupSubscription.unsubscribe();
             window.removeEventListener('resize', updateSize);
         };
-    }, [future, initPremise, timeFrameTrading, timeFrameLow]);
+    }, [future, premise, timeFrameTrading, timeFrameLow]);
 
     const onAlertSelected = (alert: PatternResult) => {
         console.log(alert);
@@ -119,19 +86,6 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
     };
 
     if (future) {
-        let security: SecurityLastInfo = securityLastInfo;
-        if (!security) {
-            security = {
-                secCode: future.secCode,
-                classCode: ClassCode.SPBFUT,
-                priceLastTrade: future.lastTradePrice,
-                timeLastTrade: null,
-                quantityLastTrade: null,
-                numTrades: null,
-                valueLastTrade: null,
-                valueToday: null
-            };
-        }
 
         return (
             <div>
@@ -148,16 +102,18 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                     <div className="p-col-7" ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
                                       width={chart1Width}
-                                      security={security}
+                                      security={future}
                                       premise={premise}
-                                      showGrid={true}/>
+                                      showGrid={true}
+                                      securityInfo={future}/>
                     </div>
                     <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameLow}
                                       width={chart2Width}
-                                      security={security}
+                                      security={future}
                                       trend={trendLowTF}
-                                      showGrid={true}/>
+                                      showGrid={true}
+                                      securityInfo={future}/>
                     </div>
                 </div>
                 <div className="p-grid">
@@ -171,9 +127,10 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                                 <ChartWrapper interval={alert.interval}
                                               alert={alert}
                                               width={chartAlertsWidth}
-                                              security={security}
+                                              security={future}
                                               premise={premise}
-                                              showGrid={true}/> : null
+                                              showGrid={true}
+                                              securityInfo={future}/> : null
                         }
                     </div>
                 </div>
