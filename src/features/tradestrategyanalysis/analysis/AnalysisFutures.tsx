@@ -8,12 +8,9 @@ import {Interval} from "../../../common/data/Interval";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
-import {TradingPlatform} from "../../../common/data/TradingPlatform";
-import TrendView from "../../../common/components/trend/TrendView";
 import {getTrend} from "../../../common/api/rest/analysisRestApi";
 import Alerts from "../../../common/components/alerts/Alerts";
 import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
-import {timeout} from "rxjs/operators";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
 
 type Props = {

@@ -53,7 +53,6 @@ const Futures: React.FC<Props> = ({futures, selectedFuture, onSelectRow}) => {
                    onSelectionChange={onSelect}
                    scrollable={!!selectedFuture}
                    scrollHeight="600px">
-            <Column selectionMode="multiple" style={{width:'2em'}}/>
             {columnComponents}
         </DataTable>
     )

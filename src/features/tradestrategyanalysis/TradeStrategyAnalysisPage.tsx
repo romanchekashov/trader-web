@@ -23,7 +23,7 @@ import Shares from "./securities/Shares";
 import Currencies from "./securities/Currencies";
 import Futures from "./securities/Futures";
 import AnalysisFutures from "./analysis/AnalysisFutures";
-
+import "./Analysis.css";
 
 function mapStateToProps(state: RootState) {
     return {
@@ -201,7 +201,7 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
         }
 
         return (
-            <div className="p-grid sample-layout">
+            <div className="p-grid sample-layout analysis">
                 <div className="p-col-12">
                     <Filter filter={filterData} onStart={this.onStart}/>
                 </div>
@@ -212,7 +212,9 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
                     <div className="p-col-12">
                         <div className="p-grid">
                             <div className={classDataTable}>
-                                {dataTable}
+                                <div className="p-grid analysis-securities">
+                                    {dataTable}
+                                </div>
                             </div>
                             <div className={classDetails}>
                                 {analysis}

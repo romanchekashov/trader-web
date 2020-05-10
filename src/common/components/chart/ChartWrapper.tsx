@@ -15,8 +15,10 @@ import {Trend} from "../../data/strategy/Trend";
 import {ActiveTrade} from "../../data/ActiveTrade";
 import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {SubscriptionLike} from "rxjs";
-import moment = require("moment");
 import {PatternResult} from "../alerts/data/PatternResult";
+import moment = require("moment");
+import "./ChartWrapper.css";
+import {Dropdown} from "primereact/dropdown";
 
 type Props = {
     interval: Interval,
@@ -36,28 +38,40 @@ type States = {
     candles: Candle[],
     nodata: boolean
     secCode: string
+    innerInterval: Interval
 };
+
+interface PrimeDropdownItem<T> {
+    label: string
+    value: T
+}
 
 export class ChartWrapper extends React.Component<Props, States> {
 
     private candlesSetupSubscription: SubscriptionLike = null;
     private wsStatusSub: SubscriptionLike = null;
     private fetchingCandles: boolean = false;
+    private intervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M2, Interval.M3, Interval.M5, Interval.M10,
+        Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY, Interval.WEEK, Interval.MONTH]
+        .map(val => ({ label: val, value: val }));
 
     constructor(props) {
         super(props);
+        const {interval} = props;
+
         this.state = {
-            candles: [], nodata: false, secCode: null
+            candles: [], nodata: false, secCode: null, innerInterval: interval
         };
     }
 
     getNewCandles = (security: SecurityLastInfo): Promise<Candle[]> => {
-        const {interval, history} = this.props;
+        const {history} = this.props;
+        const {innerInterval} = this.state;
         const numberOfCandles = 500;
         if (history) {
-            return getHistoryCandles(security.classCode, security.secCode, interval, numberOfCandles);
+            return getHistoryCandles(security.classCode, security.secCode, innerInterval, numberOfCandles);
         } else {
-            return getCandles(security.classCode, security.secCode, interval, numberOfCandles);
+            return getCandles(security.classCode, security.secCode, innerInterval, numberOfCandles);
         }
     };
 
@@ -92,7 +106,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                         this.fetchingCandles = false;
                     })
                     .catch(console.error);
-            }, 2000);
+            }, 1500);
         }
     };
 
@@ -100,8 +114,8 @@ export class ChartWrapper extends React.Component<Props, States> {
 
         this.candlesSetupSubscription = WebsocketService.getInstance()
             .on<Candle[]>(WSEvent.CANDLES).subscribe(lastCandles => {
-                const {interval} = this.props;
-                if (lastCandles && lastCandles.length > 0 && interval === lastCandles[0].interval) {
+                const {innerInterval} = this.state;
+                if (lastCandles && lastCandles.length > 0 && innerInterval === lastCandles[0].interval) {
                     const {candles} = this.state;
                     const candlesIndexMap = {};
                     let newCandles = null;
@@ -142,7 +156,7 @@ export class ChartWrapper extends React.Component<Props, States> {
 
     componentWillReceiveProps = (nextProps) => {
         const {security} = this.props;
-        const {candles} = this.state;
+        const {candles, innerInterval} = this.state;
         if (nextProps.security) {
             if (security) {
                 if (candles.length === 0 || security.secCode !== nextProps.security.secCode) {
@@ -153,6 +167,11 @@ export class ChartWrapper extends React.Component<Props, States> {
                 }
             } else {
                 this.fetchCandles(nextProps.security);
+            }
+        }
+        if (nextProps.interval) {
+            if (nextProps.interval !== innerInterval) {
+                this.setState({innerInterval: nextProps.interval});
             }
         }
     };
@@ -175,13 +194,13 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     requestCandles = (security: SecurityLastInfo): void => {
-        const {interval} = this.props;
+        const {innerInterval} = this.state;
 
-        if (security && interval) {
+        if (security && innerInterval) {
             WebsocketService.getInstance().send(WSEvent.GET_CANDLES, {
                 classCode: security.classCode,
                 secCode: security.secCode,
-                interval,
+                interval: innerInterval,
                 numberOfCandles: 2
             });
         }
@@ -294,8 +313,14 @@ export class ChartWrapper extends React.Component<Props, States> {
         return map;
     };
 
+    onIntervalChanged = (innerInterval: Interval) => {
+        this.setState({innerInterval});
+        const {security} = this.props;
+        this.fetchCandles(security);
+    };
+
     render() {
-        const {candles, nodata} = this.state;
+        const {candles, nodata, innerInterval} = this.state;
 
         if (candles.length === 0 && !nodata) {
             return <div>Loading...</div>
@@ -305,22 +330,31 @@ export class ChartWrapper extends React.Component<Props, States> {
             return <div>No data</div>
         }
 
-        const {width, showGrid, premise} = this.props;
+        const {width, showGrid, premise, security, interval} = this.props;
 
         return (
-            <CandleStickChartForDiscontinuousIntraDay
-                type={ChartDrawType.CANVAS_SVG}
-                data={candles}
-                width={width}
-                ratio={1}
-                htSRLevels={this.getHighTimeFrameSRLevels()}
-                orders={this.getOrdersLevels()}
-                swingHighsLowsMap={this.getSwingHighsLowsMap()}
-                showGrid={showGrid}
-                stops={this.getStops()}
-                zones={premise ? premise.analysis.srZones : null}
-                candlePatternsUp={this.getCandlePatternsUp()}
-                candlePatternsDown={this.getCandlePatternsDown()}/>
+            <>
+                <div className="chart-wrapper-head">
+                    <div className="chart-wrapper-head-security">{security.secCode}</div>
+                    <div className="chart-wrapper-head-interval">
+                        <Dropdown value={innerInterval} options={this.intervals}
+                                  onChange={(e) => {this.onIntervalChanged(e.value);}}/>
+                    </div>
+                </div>
+                <CandleStickChartForDiscontinuousIntraDay
+                    type={ChartDrawType.CANVAS_SVG}
+                    data={candles}
+                    width={width}
+                    ratio={1}
+                    htSRLevels={this.getHighTimeFrameSRLevels()}
+                    orders={this.getOrdersLevels()}
+                    swingHighsLowsMap={this.getSwingHighsLowsMap()}
+                    showGrid={showGrid}
+                    stops={this.getStops()}
+                    zones={premise ? premise.analysis.srZones : null}
+                    candlePatternsUp={this.getCandlePatternsUp()}
+                    candlePatternsDown={this.getCandlePatternsDown()}/>
+            </>
         )
     }
 }

@@ -1,0 +1,16 @@
+.analysis {
+
+}
+
+.analysis-securities .p-datatable .p-datatable-thead > tr > th {
+    padding: 2px;
+    font-size: 12px;
+}
+.analysis-securities .p-datatable .p-datatable-thead .p-inputtext {
+    padding: 2px;
+    font-size: 12px;
+}
+.analysis-securities .p-datatable .p-datatable-tbody td {
+    padding: 2px 5px;
+    font-size: 13px;
+}
