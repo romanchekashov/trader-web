@@ -11,6 +11,7 @@ import Alerts from "../../../common/components/alerts/Alerts";
 import {useState} from "react";
 import {useRef} from "react";
 import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
+import {AlertsSize} from "../../../common/components/alerts/data/AlertsSize";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -57,7 +58,9 @@ const Analysis: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, 
                     classCode: security.classCode,
                     secCode: security.secCode,
                     fetchByWS: false,
-                    history: true
+                    history: true,
+                    size: AlertsSize.MID,
+                    all: false
                 });
             }
         }

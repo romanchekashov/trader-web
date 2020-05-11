@@ -8,6 +8,7 @@ import {getTrend} from "../../../common/api/rest/analysisRestApi";
 import Alerts from "../../../common/components/alerts/Alerts";
 import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
+import {AlertsSize} from "../../../common/components/alerts/data/AlertsSize";
 
 type Props = {
     classCode: ClassCode
@@ -65,7 +66,9 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                     classCode: classCode,
                     secCode: future.secCode,
                     fetchByWS: false,
-                    history: true
+                    history: true,
+                    size: AlertsSize.MID,
+                    all: false
                 });
             }
         }

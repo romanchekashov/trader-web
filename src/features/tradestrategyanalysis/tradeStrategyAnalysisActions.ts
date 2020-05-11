@@ -3,12 +3,12 @@ import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataD
 import {SecurityShare} from "../../common/data/SecurityShare";
 import {getSecurityCurrencies, getSecurityFutures, getSecurityShares} from "../../common/api/rest/traderRestApi";
 import {getFilterData} from "../../common/api/rest/botControlRestApi";
-import moment = require("moment");
 import {TradePremise} from "../../common/data/strategy/TradePremise";
 import {getTradePremise} from "../../common/api/rest/analysisRestApi";
 import {TradeStrategyAnalysisFilterDto} from "../../common/data/TradeStrategyAnalysisFilterDto";
 import {SecurityCurrency} from "../../common/data/SecurityCurrency";
 import {SecurityFuture} from "../../common/data/SecurityFuture";
+import moment = require("moment");
 
 export const LOAD_FILTER_DATA_SUCCESS = "LOAD_FILTER_DATA_SUCCESS";
 export const LOAD_SECURITY_SHARES = "LOAD_SECURITY_SHARES";
@@ -21,22 +21,27 @@ interface LoadFilterSuccessAction {
     type: typeof LOAD_FILTER_DATA_SUCCESS
     filter: MarketBotFilterDataDto
 }
+
 interface LoadSecuritySharesAction {
     type: typeof LOAD_SECURITY_SHARES
     shares: SecurityShare[]
 }
+
 interface LoadTradePremiseSuccessAction {
     type: typeof LOAD_TRADE_PREMISE_SUCCESS
     premise: TradePremise
 }
+
 interface LoadTradePremiseFailAction {
     type: typeof LOAD_TRADE_PREMISE_FAIL
     premise: TradePremise
 }
+
 interface LoadSecurityCurrencySuccessAction {
     type: typeof LOAD_SECURITY_CURRENCY_SUCCESS
     currencies: SecurityCurrency[]
 }
+
 interface LoadSecurityFutureSuccessAction {
     type: typeof LOAD_SECURITY_FUTURE_SUCCESS
     futures: SecurityFuture[]
@@ -50,10 +55,17 @@ export interface TradeStrategyAnalysisState {
     premise: TradePremise
 }
 
-export type TradeStrategyAnalysisActionTypes = LoadFilterSuccessAction | LoadSecuritySharesAction | LoadTradePremiseSuccessAction
-    | LoadSecurityCurrencySuccessAction | LoadSecurityFutureSuccessAction
+export type TradeStrategyAnalysisActionTypes =
+    LoadFilterSuccessAction
+    | LoadSecuritySharesAction
+    | LoadTradePremiseSuccessAction
+    | LoadSecurityCurrencySuccessAction
+    | LoadSecurityFutureSuccessAction
 
-export const loadFilterDataSuccess = (filter: MarketBotFilterDataDto): LoadFilterSuccessAction => ({type: LOAD_FILTER_DATA_SUCCESS, filter});
+export const loadFilterDataSuccess = (filter: MarketBotFilterDataDto): LoadFilterSuccessAction => ({
+    type: LOAD_FILTER_DATA_SUCCESS,
+    filter
+});
 export const loadFilterData = () => (dispatch: AppDispatch) => {
     getFilterData()
         .then(filter => {
@@ -64,14 +76,31 @@ export const loadFilterData = () => (dispatch: AppDispatch) => {
         });
 };
 
-export const loadSecuritySharesSuccess = (shares: SecurityShare[]): LoadSecuritySharesAction => ({type: LOAD_SECURITY_SHARES, shares});
+export const loadSecuritySharesSuccess = (shares: SecurityShare[]): LoadSecuritySharesAction => ({
+    type: LOAD_SECURITY_SHARES,
+    shares
+});
 export const loadSecurityShares = () => (dispatch: AppDispatch) => {
     getSecurityShares()
         .then(shares => {
-            shares = shares
-                .filter(value => value.todayMoneyTurnover > 0)
-                .sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover);
-            shares.forEach(share => share.lastTradeTime = moment(share.lastTradeTime).format("HH:mm:ss DD-MM-YY"));
+            if (shares.length > 0) {
+                if (shares[0].todayMoneyTurnover !== null) {
+                    shares = shares
+                        .filter(value => value.todayMoneyTurnover > 0)
+                        .sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover);
+                    shares.forEach(share => share.lastTradeTime = moment(share.lastTradeTime).format("HH:mm:ss DD-MM-YY"));
+                } else {
+                    shares = shares.sort((a, b) => {
+                        if (a.secCode < b.secCode) {
+                            return -1;
+                        }
+                        if (a.secCode > b.secCode) {
+                            return 1;
+                        }
+                        return 0;
+                    });
+                }
+            }
             dispatch(loadSecuritySharesSuccess(shares));
         })
         .catch(error => {
@@ -79,8 +108,14 @@ export const loadSecurityShares = () => (dispatch: AppDispatch) => {
         });
 };
 
-export const loadTradePremiseSuccess = (premise: TradePremise): LoadTradePremiseSuccessAction => ({type: LOAD_TRADE_PREMISE_SUCCESS, premise});
-export const loadTradePremiseFail = (premise: TradePremise): LoadTradePremiseFailAction => ({type: LOAD_TRADE_PREMISE_FAIL, premise});
+export const loadTradePremiseSuccess = (premise: TradePremise): LoadTradePremiseSuccessAction => ({
+    type: LOAD_TRADE_PREMISE_SUCCESS,
+    premise
+});
+export const loadTradePremiseFail = (premise: TradePremise): LoadTradePremiseFailAction => ({
+    type: LOAD_TRADE_PREMISE_FAIL,
+    premise
+});
 let loadTradePremiseAttempts = 3;
 export const loadTradePremise = (filter: TradeStrategyAnalysisFilterDto) => (dispatch: AppDispatch) => {
     getTradePremise(filter)
@@ -103,7 +138,10 @@ export const loadTradePremise = (filter: TradeStrategyAnalysisFilterDto) => (dis
         });
 };
 
-export const loadSecurityCurrencySuccess = (currencies: SecurityCurrency[]): LoadSecurityCurrencySuccessAction => ({type: LOAD_SECURITY_CURRENCY_SUCCESS, currencies});
+export const loadSecurityCurrencySuccess = (currencies: SecurityCurrency[]): LoadSecurityCurrencySuccessAction => ({
+    type: LOAD_SECURITY_CURRENCY_SUCCESS,
+    currencies
+});
 export const loadSecurityCurrency = () => (dispatch: AppDispatch) => {
     getSecurityCurrencies()
         .then(currencies => {
@@ -114,7 +152,10 @@ export const loadSecurityCurrency = () => (dispatch: AppDispatch) => {
         });
 };
 
-export const loadSecurityFutureSuccess = (futures: SecurityFuture[]): LoadSecurityFutureSuccessAction => ({type: LOAD_SECURITY_FUTURE_SUCCESS, futures});
+export const loadSecurityFutureSuccess = (futures: SecurityFuture[]): LoadSecurityFutureSuccessAction => ({
+    type: LOAD_SECURITY_FUTURE_SUCCESS,
+    futures
+});
 export const loadSecurityFuture = () => (dispatch: AppDispatch) => {
     getSecurityFutures()
         .then(futures => {
