@@ -149,13 +149,20 @@ export class BotControlHistory extends React.Component<Props, States> {
                     <div className="p-col-7" style={{padding:'0', minWidth:'600px'}}>
                         <div className="p-grid" style={{margin:'0'}}>
                             <div className="p-col-7" ref={this.chart1Ref} style={{padding:'0'}}>
-                                <ChartWrapper interval={Interval.M5} numberOfCandles={168} width={chart1Width}
-                                              security={security} premise={tradingStrategyState ? tradingStrategyState.currentPremise : null}
-                                              orders={orders} history={true} securityInfo={null}/>
+                                <ChartWrapper interval={Interval.M5}
+                                              numberOfCandles={168}
+                                              width={chart1Width}
+                                              security={security}
+                                              premise={tradingStrategyState ? tradingStrategyState.currentPremise : null}
+                                              orders={orders}
+                                              history={true}/>
                             </div>
                             <div className="p-col-5" ref={this.chart2Ref} style={{padding:'0'}}>
-                                <ChartWrapper interval={Interval.M1} numberOfCandles={50} width={chart2Width}
-                                              security={security} history={true} securityInfo={null}/>
+                                <ChartWrapper interval={Interval.M1}
+                                              numberOfCandles={50}
+                                              width={chart2Width}
+                                              security={security}
+                                              history={true}/>
                             </div>
                         </div>
                     </div>

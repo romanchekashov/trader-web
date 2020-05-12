@@ -95,16 +95,14 @@ const Analysis: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, 
                                       width={chart1Width}
                                       security={security}
                                       premise={premise}
-                                      showGrid={true}
-                                      securityInfo={security}/>
+                                      showGrid={true}/>
                     </div>
                     <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameLow}
                                       width={chart2Width}
                                       security={security}
                                       trend={trendLowTF}
-                                      showGrid={true}
-                                      securityInfo={security}/>
+                                      showGrid={true}/>
                     </div>
                 </div>
                 <div className="p-grid">
@@ -120,8 +118,7 @@ const Analysis: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, 
                                               width={chartAlertsWidth}
                                               security={security}
                                               premise={premise}
-                                              showGrid={true}
-                                              securityInfo={security}/> : null
+                                              showGrid={true}/> : null
                         }
                     </div>
                 </div>

@@ -11,28 +11,50 @@ import {getCandlePatterns} from "../../api/rest/analysisRestApi";
 import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {FixedSizeList as List} from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
+import {Dropdown} from "primereact/components/dropdown/Dropdown";
+import {PrimeDropdownItem} from "../../utils/utils";
+import {Interval} from "../../data/Interval";
+import {ClassCode} from "../../data/ClassCode";
+import {getSecuritiesByClassCode, getSecurity} from "../../utils/Cache";
+import {Security} from "../../data/Security";
 
 type Props = {
     filter: AlertsFilter
     onAlertSelected: (alert: PatternResult) => void
+    alertsHeight?: number
 };
 let fetchAlertsAttempt = 0;
 let previousAlertsCount = 0;
 
-const Alerts: React.FC<Props> = ({filter, onAlertSelected}) => {
+const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
 
+    const [interval, setInterval] = useState(null);
+    const [classCode, setClassCode] = useState(null);
+    const [secCode, setSecCode] = useState(null);
+    const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}]);
+
+    const [visibleAlerts, setVisibleAlerts] = useState([]);
     const [alerts, setAlerts] = useState([]);
     const [fetchAlertsError, setFetchAlertsError] = useState(null);
     const [selectedAlert, setSelectedAlert] = useState(null);
+
+    const intervals: PrimeDropdownItem<Interval>[] = [null, Interval.M1, Interval.M2, Interval.M3, Interval.M5,
+        Interval.M10, Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY,
+        Interval.WEEK, Interval.MONTH]
+        .map(val => ({label: val || "ALL", value: val}));
+    const classCodes: PrimeDropdownItem<ClassCode>[] = [null, ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
+        .map(val => ({label: val || "ALL", value: val}));
 
     const fetchAlerts = () => {
         getCandlePatterns(filter)
             .then(newAlerts => {
                 setAlerts(newAlerts);
+                setVisibleAlerts(newAlerts);
                 setFetchAlertsError(null);
             })
             .catch(reason => {
                 setAlerts([]);
+                setVisibleAlerts([]);
                 setFetchAlertsError("Cannot get alerts for " + filter.secCode);
                 if (fetchAlertsAttempt < 3) {
                     fetchAlertsAttempt++;
@@ -52,11 +74,14 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected}) => {
         let alertsSubscription;
         if (filter) {
             fetchAlertsAttempt = 0;
+            onClassCodeChanged(filter.classCode);
+            onSecCodeChanged(filter.secCode);
             if (filter.fetchByWS) {
                 alertsSubscription = WebsocketService.getInstance()
                     .on<PatternResult[]>(filter.history ? WSEvent.HISTORY_ALERTS : WSEvent.ALERTS)
                     .subscribe(newAlerts => {
                         setAlerts(newAlerts);
+                        setVisibleAlerts(newAlerts);
                         notifyOnNewAlert(newAlerts);
                     });
             } else {
@@ -79,7 +104,7 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected}) => {
     }
 
     const timeTemplate = (alert: PatternResult) => {
-        return <>{moment(alert.candle.timestamp).format("HH:mm - DD MMM YY")}</>;
+        return <>{moment(alert.candle.timestamp).format("HH:mm/DD MMM YY")}</>;
     };
 
     const nameTemplate = (alert: PatternResult) => {
@@ -136,8 +161,52 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected}) => {
         return <div title={alert.description}>{alert.description}</div>;
     };
 
+    const onIntervalChanged = (newInterval: Interval) => {
+        console.log(newInterval);
+        setInterval(newInterval);
+        setFilteredAlerts(classCode, secCode, newInterval);
+    };
+
+    const onClassCodeChanged = (newClassCode: ClassCode) => {
+        console.log(newClassCode);
+        const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}];
+        if (newClassCode) {
+            const securities: Security[] = getSecuritiesByClassCode(newClassCode);
+            for (const sec of securities) {
+                newSecCodes.push({label: sec.secCode, value: sec.secCode});
+            }
+        } else {
+            setSecCode(null);
+        }
+        setClassCode(newClassCode);
+        setSecCodes(newSecCodes);
+        setSecCode(null);
+        setFilteredAlerts(newClassCode, null, interval);
+    };
+
+    const onSecCodeChanged = (newSecCode: string) => {
+        console.log(newSecCode);
+        setSecCode(newSecCode);
+        setFilteredAlerts(classCode, newSecCode, interval);
+    };
+
+    const setFilteredAlerts = (newClassCode: ClassCode, newSecCode: string, newInterval: Interval) => {
+        let filtered = alerts;
+        if (newClassCode) {
+            filtered = filtered.filter(value => value.classCode === newClassCode);
+        }
+        if (newSecCode) {
+            filtered = filtered.filter(value => value.candle.symbol === newSecCode);
+        }
+        if (newInterval) {
+            filtered = filtered.filter(value => value.interval === newInterval);
+        }
+
+        setVisibleAlerts(filtered);
+    };
+
     const Row = ({index, style}) => {
-        const alert = alerts[index];
+        const alert = visibleAlerts[index];
         const className = "alerts-row " + (selectedAlert === alert ? "alerts-row-selected" : "");
 
         return (
@@ -154,8 +223,8 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected}) => {
                     <div className="alerts-cell alerts-name">
                         {nameTemplate(alert)}
                     </div>
-                    <div className="alerts-cell alerts-symbol">
-                        {alert.candle.symbol}
+                    <div className="alerts-cell alerts-symbol" title={alert.candle.symbol}>
+                        {alert.candle.symbol.substr(0, 8)}
                     </div>
                     <div className="alerts-cell alerts-strength">
                         {strengthTemplate(alert)}
@@ -175,20 +244,42 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected}) => {
     };
 
     return (
-        <div className="p-grid alerts">
-            <AutoSizer>
-                {({height, width}) => (
-                    <List
-                        className="List"
-                        height={height}
-                        itemCount={alerts.length}
-                        itemSize={35}
-                        width={width}
-                    >
-                        {Row}
-                    </List>
-                )}
-            </AutoSizer>
+        <div className="p-grid alerts" style={{height: alertsHeight || 200}}>
+            <div className="p-col-12 alerts-head">
+                <div className="alerts-head-dropdown alerts-head-class-code">
+                    <Dropdown value={classCode} options={classCodes}
+                              onChange={(e) => {
+                                  onClassCodeChanged(e.value);
+                              }}/>
+                </div>
+                <div className="alerts-head-dropdown alerts-head-security">
+                    <Dropdown value={secCode} options={secCodes}
+                              onChange={(e) => {
+                                  onSecCodeChanged(e.value);
+                              }}/>
+                </div>
+                <div className="alerts-head-dropdown alerts-head-interval">
+                    <Dropdown value={interval} options={intervals}
+                              onChange={(e) => {
+                                  onIntervalChanged(e.value);
+                              }}/>
+                </div>
+            </div>
+            <div className="p-col-12 alerts-body" style={{height: (alertsHeight || 200) - 20}}>
+                <AutoSizer>
+                    {({height, width}) => (
+                        <List
+                            className="List"
+                            height={height}
+                            itemCount={visibleAlerts.length}
+                            itemSize={35}
+                            width={width}
+                        >
+                            {Row}
+                        </List>
+                    )}
+                </AutoSizer>
+            </div>
         </div>
     )
 };

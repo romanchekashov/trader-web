@@ -1,5 +1,7 @@
+import {ClassCode} from "./ClassCode";
+
 export class SecurityLastInfo {
-    public classCode: string;
+    public classCode: ClassCode;
     public secCode: string;
     public valueToday: number;
     public priceLastTrade: number;

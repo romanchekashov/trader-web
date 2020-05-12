@@ -10,3 +10,8 @@ export function calcMultiplier(num: number): number {
     const precision = ("" + num).split(".")[1].length;
     return Math.pow(10, precision);
 }
+
+export interface PrimeDropdownItem<T> {
+    label: string
+    value: T
+}

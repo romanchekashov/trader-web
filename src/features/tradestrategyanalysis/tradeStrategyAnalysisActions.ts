@@ -1,7 +1,6 @@
 import {AppDispatch} from "../../app/store";
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
 import {SecurityShare} from "../../common/data/SecurityShare";
-import {getSecurityCurrencies, getSecurityFutures, getSecurityShares} from "../../common/api/rest/traderRestApi";
 import {getFilterData} from "../../common/api/rest/botControlRestApi";
 import {TradePremise} from "../../common/data/strategy/TradePremise";
 import {getTradePremise} from "../../common/api/rest/analysisRestApi";
@@ -9,6 +8,11 @@ import {TradeStrategyAnalysisFilterDto} from "../../common/data/TradeStrategyAna
 import {SecurityCurrency} from "../../common/data/SecurityCurrency";
 import {SecurityFuture} from "../../common/data/SecurityFuture";
 import moment = require("moment");
+import {
+    getAllSecurityCurrencies,
+    getAllSecurityFutures,
+    getAllSecurityShares
+} from "../../common/api/rest/traderRestApi";
 
 export const LOAD_FILTER_DATA_SUCCESS = "LOAD_FILTER_DATA_SUCCESS";
 export const LOAD_SECURITY_SHARES = "LOAD_SECURITY_SHARES";
@@ -81,14 +85,14 @@ export const loadSecuritySharesSuccess = (shares: SecurityShare[]): LoadSecurity
     shares
 });
 export const loadSecurityShares = () => (dispatch: AppDispatch) => {
-    getSecurityShares()
+    getAllSecurityShares()
         .then(shares => {
             if (shares.length > 0) {
                 if (shares[0].todayMoneyTurnover !== null) {
                     shares = shares
                         .filter(value => value.todayMoneyTurnover > 0)
                         .sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover);
-                    shares.forEach(share => share.lastTradeTime = moment(share.lastTradeTime).format("HH:mm:ss DD-MM-YY"));
+                    // shares.forEach(share => share.lastTradeTime = moment(share.lastTradeTime).format("HH:mm:ss DD-MM-YY"));
                 } else {
                     shares = shares.sort((a, b) => {
                         if (a.secCode < b.secCode) {
@@ -143,7 +147,7 @@ export const loadSecurityCurrencySuccess = (currencies: SecurityCurrency[]): Loa
     currencies
 });
 export const loadSecurityCurrency = () => (dispatch: AppDispatch) => {
-    getSecurityCurrencies()
+    getAllSecurityCurrencies()
         .then(currencies => {
             dispatch(loadSecurityCurrencySuccess(currencies.sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover)));
         })
@@ -157,7 +161,7 @@ export const loadSecurityFutureSuccess = (futures: SecurityFuture[]): LoadSecuri
     futures
 });
 export const loadSecurityFuture = () => (dispatch: AppDispatch) => {
-    getSecurityFutures()
+    getAllSecurityFutures()
         .then(futures => {
             dispatch(loadSecurityFutureSuccess(futures.sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover)));
         })

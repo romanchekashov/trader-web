@@ -30,6 +30,7 @@ import {Candle} from "../../data/Candle";
 import {ChartLevel} from "./data/ChartLevel";
 import {SRZone} from "../../data/strategy/SRZone";
 import ChartZones from "./ChartZones";
+import {Interval} from "../../data/Interval";
 
 type Props = {
     data: Candle[]
@@ -94,6 +95,13 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         const xExtents = [start, end];
         let key = 0;
         const formatInput = `.${scale}f`;
+        let timeFormatInput = "%H:%M:%S";
+        if (initialData && initialData.length > 0 && initialData[0]) {
+            const interval = initialData[0].interval;
+            if (Interval.MONTH === interval || Interval.WEEK === interval || Interval.DAY === interval) {
+                timeFormatInput = "%d.%m.%Y";
+            }
+        }
         const htSRLevelsView = htSRLevels.map(lvl => (
             <PriceCoordinate
                 key={lvl.price.toString() + key++}
@@ -184,7 +192,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                         rectWidth={60}
                         at="bottom"
                         orient="bottom"
-                        displayFormat={timeFormat("%H:%M:%S")}/>
+                        displayFormat={timeFormat(timeFormatInput)}/>
                     <MouseCoordinateY
                         at="right"
                         orient="right"

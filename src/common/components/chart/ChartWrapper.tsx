@@ -20,13 +20,14 @@ import moment = require("moment");
 import "./ChartWrapper.css";
 import {Dropdown} from "primereact/dropdown";
 import {Security} from "../../data/Security";
+import {getSecurity} from "../../utils/Cache";
+import {PrimeDropdownItem} from "../../utils/utils";
 
 type Props = {
     interval: Interval,
     width: number,
     numberOfCandles?: number,
     security: SecurityLastInfo
-    securityInfo: Security
     premise?: TradePremise
     orders?: Order[]
     history?: boolean
@@ -43,19 +44,16 @@ type States = {
     innerInterval: Interval
 };
 
-interface PrimeDropdownItem<T> {
-    label: string
-    value: T
-}
-
 export class ChartWrapper extends React.Component<Props, States> {
 
     private candlesSetupSubscription: SubscriptionLike = null;
     private wsStatusSub: SubscriptionLike = null;
     private fetchingCandles: boolean = false;
-    private intervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M2, Interval.M3, Interval.M5, Interval.M10,
-        Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY, Interval.WEEK, Interval.MONTH]
+    private intervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M2, Interval.M3, Interval.M5,
+        Interval.M10, Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY,
+        Interval.WEEK, Interval.MONTH]
         .map(val => ({ label: val, value: val }));
+    private securityInfo: Security;
 
     constructor(props) {
         super(props);
@@ -78,7 +76,7 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     updateCandles = (data: Candle[], security: SecurityLastInfo) => {
-        if (data && data.length > 0 && data[0].open === 0) {
+        if (data && data.length === 1) {
             this.setState({
                 candles: [],
                 nodata: true
@@ -102,6 +100,7 @@ export class ChartWrapper extends React.Component<Props, States> {
             this.setState({
                 candles: []
             });
+            this.securityInfo = getSecurity(security.classCode, security.secCode);
 
             setIntervalIdForFetchCandles = setInterval(() => {
                 this.getNewCandles(security)
@@ -145,8 +144,7 @@ export class ChartWrapper extends React.Component<Props, States> {
         this.wsStatusSub = WebsocketService.getInstance().connectionStatus()
             .subscribe(isConnected => {
                 if (isConnected) {
-                    const {security} = this.props;
-                    this.requestCandles(security);
+                    this.requestCandles(this.props.security);
                 }
             });
 
@@ -335,7 +333,7 @@ export class ChartWrapper extends React.Component<Props, States> {
             return <div>Loading...</div>
         }
 
-        const {width, showGrid, premise, security, securityInfo} = this.props;
+        const {width, showGrid, premise, security} = this.props;
 
         return (
             <>
@@ -359,7 +357,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                     zones={premise ? premise.analysis.srZones : null}
                     candlePatternsUp={this.getCandlePatternsUp()}
                     candlePatternsDown={this.getCandlePatternsDown()}
-                    scale={securityInfo ? securityInfo.scale : 0}/>
+                    scale={this.securityInfo ? this.securityInfo.scale : 0}/>
             </>
         )
     }
