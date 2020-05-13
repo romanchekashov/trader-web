@@ -12,6 +12,10 @@ import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
 import {ToggleButton} from "primereact/togglebutton";
 import {BotControlFilterHistory} from "./BotControlFilterHistory";
 import {PrimeDropdownItem} from "../../../common/utils/utils";
+import {ClassCode} from "../../../common/data/ClassCode";
+import {Security} from "../../../common/data/Security";
+import {getSecuritiesByClassCode} from "../../../common/utils/Cache";
+import {InputText} from "primereact/inputtext";
 
 export interface BotControlFilterState {
     broker: Broker
@@ -56,29 +60,23 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
     const platforms = filter ? [filter.broker.tradingPlatform].map(val => ({label: val, value: val})) : [];
     const [platform, setPlatform] = useState(initState.platform);
 
-    const markets = filter ? filter.marketSecurities : [];
-    const [market, setMarket] = useState(initState.market);
+    const [interval, setInterval] = useState(null);
+    const [classCode, setClassCode] = useState(null);
+    const [secCode, setSecCode] = useState(null);
+    const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}]);
+    const [stop, setStop] = useState(500);
+    const [strategy, setStrategy] = useState(null);
 
-    const [securities, setSecurities] = useState([]);
-
-    const [security, setSecurity] = useState(initState.security);
-
-    const intervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M3, Interval.M5, Interval.M30, Interval.DAY]
-        .map(val => ({label: val, value: val}));
-    const [highTimeFrame, setHighTimeFrame] = useState(initState.highTimeFrame);
-    const [tradingTimeFrame, setTradingTimeFrame] = useState(initState.tradingTimeFrame);
-    const [lowTimeFrame, setLowTimeFrame] = useState(initState.lowTimeFrame);
+    const intervals: PrimeDropdownItem<Interval>[] = [null, Interval.M1, Interval.M2, Interval.M3, Interval.M5,
+        Interval.M10, Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY,
+        Interval.WEEK, Interval.MONTH]
+        .map(val => ({label: val || "ALL", value: val}));
+    const classCodes: PrimeDropdownItem<ClassCode>[] = [null, ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
+        .map(val => ({label: val || "ALL", value: val}));
+    const strategies: PrimeDropdownItem<string>[] = [null, "TREND_LINE_BREAKOUT", "TREND_CHANGE"]
+        .map(val => ({label: val || "ALL", value: val}));
 
     const [realDepo, setRealDepo] = useState(initState.realDepo);
-
-    const onMarketChange = (val: MarketSecuritiesDto) => {
-        setMarket(val);
-        setSecurity(null);
-        setSecurities(val.securities.map((security): PrimeDropdownItem<SecurityInfo> => ({
-            label: `${security.name}(${security.code})`,
-            value: security
-        })));
-    };
 
     useEffect(() => {
         if (brokers.length === 1) {
@@ -92,12 +90,12 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
         onStart({
             brokerId: broker.id,
             tradingPlatform: platform,
-            classCode: market.classCode,
-            secCode: security["code"],
+            classCode: classCode,
+            secCode: secCode,
             realDeposit: realDepo,
-            timeFrameHigh: highTimeFrame,
-            timeFrameTrading: tradingTimeFrame,
-            timeFrameLow: lowTimeFrame,
+            timeFrameHigh: interval,
+            timeFrameTrading: interval,
+            timeFrameLow: interval,
             history: history,
             start: history ? start : null,
             end: history ? end : null
@@ -118,16 +116,47 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
         onStopHistory({
             brokerId: broker.id,
             tradingPlatform: platform,
-            classCode: market.classCode,
-            secCode: security["code"],
+            classCode: classCode,
+            secCode: secCode,
             realDeposit: realDepo,
-            timeFrameHigh: highTimeFrame,
-            timeFrameTrading: tradingTimeFrame,
-            timeFrameLow: lowTimeFrame,
+            timeFrameHigh: interval,
+            timeFrameTrading: interval,
+            timeFrameLow: interval,
             history: history,
             start: history ? start : null,
             end: history ? end : null
         });
+    };
+
+    const onIntervalChanged = (newInterval: Interval) => {
+        console.log(newInterval);
+        setInterval(newInterval);
+    };
+
+    const onClassCodeChanged = (newClassCode: ClassCode) => {
+        console.log(newClassCode);
+        const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}];
+        if (newClassCode) {
+            const securities: Security[] = getSecuritiesByClassCode(newClassCode);
+            for (const sec of securities) {
+                newSecCodes.push({label: sec.secCode, value: sec.secCode});
+            }
+        } else {
+            setSecCode(null);
+        }
+        setClassCode(newClassCode);
+        setSecCodes(newSecCodes);
+        setSecCode(null);
+    };
+
+    const onSecCodeChanged = (newSecCode: string) => {
+        console.log(newSecCode);
+        setSecCode(newSecCode);
+    };
+
+    const onStrategyChanged = (newStrategy: string) => {
+        console.log(newStrategy);
+        setStrategy(newStrategy);
     };
 
     return (
@@ -139,21 +168,29 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
                 <Dropdown value={platform} options={platforms} onChange={(e) => {
                     setPlatform(e.value)
                 }} placeholder="Select a platform" style={{width: '80px'}}/>
-                <Dropdown optionLabel="market" value={market} options={markets}
-                          onChange={(e) => onMarketChange(e.value)} placeholder="Select a market"
-                          style={{width: '120px'}}/>
-                <Dropdown value={security} options={securities} onChange={(e) => {
-                    setSecurity(e.value)
-                }} filter={true} filterPlaceholder="Sec. name" filterBy="label" placeholder="Select a security"/>
-                <Dropdown value={highTimeFrame} options={intervals} onChange={(e) => {
-                    setHighTimeFrame(e.value)
-                }} style={{width: '80px'}}/>
-                <Dropdown value={tradingTimeFrame} options={intervals} onChange={(e) => {
-                    setTradingTimeFrame(e.value)
-                }} style={{width: '80px'}}/>
-                <Dropdown value={lowTimeFrame} options={intervals} onChange={(e) => {
-                    setLowTimeFrame(e.value)
-                }} style={{width: '80px'}}/>
+
+                <Dropdown value={classCode} options={classCodes}
+                          onChange={(e) => {
+                              onClassCodeChanged(e.value);
+                          }} style={{width: '90px'}}/>
+                <Dropdown value={secCode} options={secCodes}
+                          onChange={(e) => {
+                              onSecCodeChanged(e.value);
+                          }} filter={true} style={{width: '90px'}}/>
+                <Dropdown value={interval} options={intervals}
+                          onChange={(e) => {
+                              onIntervalChanged(e.value);
+                          }} style={{width: '80px'}}/>
+                <Dropdown value={strategy} options={strategies}
+                          onChange={(e) => {
+                              onStrategyChanged(e.value);
+                          }} filter={true}/>
+
+                <InputText type="number"
+                           min={0}
+                           value={stop}
+                           onChange={(e) => setStop(e.target['value'])}
+                           style={{width: '80px'}}/>
             </div>
             <div className="p-toolbar-group-right" style={{display: "flex"}}>
                 <BotControlFilterHistory onEnabled={onHistory} onStartDate={setStart} onEndDate={setEnd}

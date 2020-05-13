@@ -1,6 +1,7 @@
 import {ClassCode} from "../data/ClassCode";
 import {getAllSecurityCurrencies, getAllSecurityFutures, getAllSecurityShares} from "../api/rest/traderRestApi";
 import {Security} from "../data/Security";
+import {sortAlphabetically} from "./utils";
 
 const securityMap = {};
 let futures = [];
@@ -10,7 +11,7 @@ let currencies = [];
 const fetchSecurities = () => {
     getAllSecurityFutures()
         .then(securities => {
-            futures = securities;
+            futures = sortAlphabetically(securities, "secCode");
             for (const security of securities) {
                 securityMap[security.classCode + security.secCode] = security;
             }
@@ -18,7 +19,7 @@ const fetchSecurities = () => {
         .catch(console.error);
     getAllSecurityShares()
         .then(securities => {
-            shares = securities;
+            shares = sortAlphabetically(securities, "secCode");
             for (const security of securities) {
                 securityMap[security.classCode + security.secCode] = security;
             }
@@ -26,7 +27,7 @@ const fetchSecurities = () => {
         .catch(console.error);
     getAllSecurityCurrencies()
         .then(securities => {
-            currencies = securities;
+            currencies = sortAlphabetically(securities, "secCode");
             for (const security of securities) {
                 securityMap[security.classCode + security.secCode] = security;
             }
