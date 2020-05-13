@@ -8,7 +8,7 @@ import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/nova-light/theme.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
-import TradeStrategyAnalysisPage from "../features/tradestrategyanalysis/AnalysisPage";
+import TradeStrategyAnalysisPage from "../features/analysis/AnalysisPage";
 import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
 
 export const App = () => {

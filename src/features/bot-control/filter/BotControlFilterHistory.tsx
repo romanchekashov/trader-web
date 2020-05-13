@@ -5,7 +5,7 @@ import {Calendar} from "primereact/calendar";
 import moment = require("moment");
 import {Button} from "primereact/button";
 
-export interface FilterHistoryState {
+export interface BotControlFilterHistoryState {
     history: boolean
     start: Date
     end: Date
@@ -20,8 +20,8 @@ type Props = {
     onStop: () => void
 };
 
-const FilterHistory: React.FC<Props> = ({onEnabled, onStartDate, onEndDate, onDebug, onStop}) => {
-    let initState: FilterHistoryState = {
+export const BotControlFilterHistory: React.FC<Props> = ({onEnabled, onStartDate, onEndDate, onDebug, onStop}) => {
+    let initState: BotControlFilterHistoryState = {
         history: false,
         start: moment().hours(10).minutes(0).seconds(0).toDate(),
         end: moment().hours(23).minutes(50).seconds(0).toDate(),
@@ -83,5 +83,3 @@ const FilterHistory: React.FC<Props> = ({onEnabled, onStartDate, onEndDate, onDe
         </>
     )
 };
-
-export default FilterHistory;

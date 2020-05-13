@@ -5,7 +5,7 @@ import {bindActionCreators} from "redux";
 import {loadFilterData} from "./BotControlActions";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
-import Filter from "./filter/Filter";
+import {BotControlFilter} from "./filter/BotControlFilter";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
 import {runHistory, startBot, stopHistory} from "../../common/api/rest/botControlRestApi";
 import {BotControlHistory} from "./history/BotControlHistory";
@@ -67,7 +67,7 @@ class BotControlPage extends React.Component<Props, TradeStrategyBotControlState
         return (
             <div className="p-grid sample-layout">
                 <div className="p-col-12" style={{backgroundColor: "aliceblue"}}>
-                    <Filter filter={filterData} onStart={this.onStart} onStopHistory={this.onStopHistory}/>
+                    <BotControlFilter filter={filterData} onStart={this.onStart} onStopHistory={this.onStopHistory}/>
                 </div>
                 <div className="p-col-12 p-md-1">
                     Menu
