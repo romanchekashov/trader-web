@@ -5,10 +5,10 @@ import {
     LOAD_SECURITY_SHARES,
     LOAD_TRADE_PREMISE_SUCCESS,
     TradeStrategyAnalysisActionTypes
-} from "./tradeStrategyAnalysisActions";
+} from "./AnalysisActions";
 import {initialState} from "../../app/rootReducer";
 
-export default function tradeStrategyAnalysisReducer(state = initialState.tradeStrategyAnalysis, action: TradeStrategyAnalysisActionTypes) {
+export default function AnalysisReducer(state = initialState.tradeStrategyAnalysis, action: TradeStrategyAnalysisActionTypes) {
     switch (action.type) {
         case LOAD_FILTER_DATA_SUCCESS:
             return {...state, filter: action.filter};

@@ -1,10 +1,10 @@
 import {combineReducers} from "redux";
-import tradeStrategyBotControl from "../features/bot-control/tradeStrategyBotControlReducer";
-import tradeStrategyAnalysis from "../features/tradestrategyanalysis/tradeStrategyAnalysisReducer";
-import {TradeStrategyAnalysisState} from "../features/tradestrategyanalysis/tradeStrategyAnalysisActions";
-import {TradeStrategyBotControlState} from "../features/bot-control/tradeStrategyBotControlActions";
-import {TradeJournalState} from "../features/trade-journal/tradeJournalActions";
-import tradeJournal from "../features/trade-journal/tradeJournalReducer";
+import tradeStrategyBotControl from "../features/bot-control/BotControlReducer";
+import tradeStrategyAnalysis from "../features/tradestrategyanalysis/AnalysisReducer";
+import {TradeStrategyAnalysisState} from "../features/tradestrategyanalysis/AnalysisActions";
+import {TradeStrategyBotControlState} from "../features/bot-control/BotControlActions";
+import {TradeJournalState} from "../features/trade-journal/TradeJournalActions";
+import tradeJournal from "../features/trade-journal/TradeJournalReducer";
 
 
 interface AsRootState {

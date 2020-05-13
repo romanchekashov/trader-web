@@ -2,7 +2,7 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
 import {bindActionCreators} from "redux";
-import {loadFilterData} from "./tradeStrategyBotControlActions";
+import {loadFilterData} from "./BotControlActions";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
 import Filter from "./filter/Filter";
@@ -32,7 +32,7 @@ interface TradeStrategyBotControlState {
 type Props = ReturnType<typeof mapStateToProps> &
     ReturnType<typeof mapDispatchToProps>;
 
-class TradeStrategyBotControlPage extends React.Component<Props, TradeStrategyBotControlState> {
+class BotControlPage extends React.Component<Props, TradeStrategyBotControlState> {
     componentDidMount(): void {
         const { actions, filterData } = this.props;
 
@@ -66,7 +66,7 @@ class TradeStrategyBotControlPage extends React.Component<Props, TradeStrategyBo
 
         return (
             <div className="p-grid sample-layout">
-                <div className="p-col-12">
+                <div className="p-col-12" style={{backgroundColor: "aliceblue"}}>
                     <Filter filter={filterData} onStart={this.onStart} onStopHistory={this.onStopHistory}/>
                 </div>
                 <div className="p-col-12 p-md-1">
@@ -95,4 +95,4 @@ class TradeStrategyBotControlPage extends React.Component<Props, TradeStrategyBo
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(TradeStrategyBotControlPage);
+)(BotControlPage);

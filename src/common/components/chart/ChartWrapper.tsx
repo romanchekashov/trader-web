@@ -355,6 +355,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                     showGrid={showGrid}
                     stops={this.getStops()}
                     zones={premise ? premise.analysis.srZones : null}
+                    srLevels={premise ? premise.analysis.srLevels : null}
                     candlePatternsUp={this.getCandlePatternsUp()}
                     candlePatternsDown={this.getCandlePatternsDown()}
                     scale={this.securityInfo ? this.securityInfo.scale : 0}/>

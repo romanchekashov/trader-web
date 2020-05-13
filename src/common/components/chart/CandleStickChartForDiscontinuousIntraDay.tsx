@@ -31,6 +31,8 @@ import {ChartLevel} from "./data/ChartLevel";
 import {SRZone} from "../../data/strategy/SRZone";
 import ChartZones from "./ChartZones";
 import {Interval} from "../../data/Interval";
+import {SRLevel} from "../../data/strategy/SRLevel";
+import {ChartLevels} from "./ChartLevels";
 
 type Props = {
     data: Candle[]
@@ -41,6 +43,7 @@ type Props = {
     orders?: ChartLevel[]
     stops?: ChartLevel[]
     zones?: SRZone[]
+    srLevels?: SRLevel[]
     candlePatternsUp?: any
     candlePatternsDown?: any
     swingHighsLowsMap?: any
@@ -68,7 +71,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     render() {
         const {
             type, data: initialData, width, ratio, htSRLevels, orders, stops,
-            swingHighsLowsMap, showGrid, zones, candlePatternsUp, candlePatternsDown, scale
+            swingHighsLowsMap, showGrid, zones, candlePatternsUp, candlePatternsDown, scale, srLevels
         } = this.props;
 
         const height = 500;
@@ -200,6 +203,10 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
                     {
                         zones ? <ChartZones zones={zones}/> : null
+                    }
+
+                    {
+                        srLevels ? <ChartLevels srLevels={srLevels}/> : null
                     }
 
                     <CandlestickSeries fill={(d) => d.close > d.open ? "#ecf0f1" : "#000"}

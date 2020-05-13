@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
-import {loadStat} from "./tradeJournalActions";
+import {loadStat} from "./TradeJournalActions";
 import {ResultDto} from "../../common/data/journal/ResultDto";
 import {Trade} from "../../common/data/journal/Trade";
 import ProfitLossChart from "./profitLossChart/ProfitLossChart";

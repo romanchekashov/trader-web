@@ -9,7 +9,7 @@ import {
     loadSecurityFuture,
     loadSecurityShares,
     loadTradePremise
-} from "./tradeStrategyAnalysisActions";
+} from "./AnalysisActions";
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
 import {SecurityShare} from "../../common/data/SecurityShare";
@@ -61,7 +61,7 @@ type Props = {
     futures: SecurityFuture[]
 } & ReturnType<typeof mapDispatchToProps>;
 
-class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
+class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
 
     constructor(props) {
@@ -233,4 +233,4 @@ class TradeStrategyAnalysisPage extends React.Component<Props, TradeStrategyAnal
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(TradeStrategyAnalysisPage);
+)(AnalysisPage);
