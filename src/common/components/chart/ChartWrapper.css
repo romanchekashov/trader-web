@@ -34,3 +34,18 @@
     font-size: 12px;
     padding: 0 3px;
 }
+
+.chart-wrapper-head-legends {
+    font-size: 12px;
+    padding: 0;
+    color: white;
+    display: flex;
+    justify-content: flex-start;
+    height: 18px;
+    line-height: 16px;
+}
+
+.chart-wrapper-head-legends div {
+    padding: 0 2px;
+    margin-left: 2px;
+}

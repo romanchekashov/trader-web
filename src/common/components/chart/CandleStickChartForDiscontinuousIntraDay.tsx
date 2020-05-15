@@ -396,18 +396,6 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                             srLevels ? <ChartLevels srLevels={srLevels}/> : null
                         }
 
-                        <CandlestickSeries fill={(d) => d.close > d.open ? "#ecf0f1" : "#000"}
-                                           stroke="#000"
-                                           wickStroke="#000"/>
-                        <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-                                       yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
-
-                        <OHLCTooltip origin={[-40, 0]} xDisplayFormat={timeFormat("%Y-%m-%d %H:%M:%S")}/>
-
-                        {htSRLevelsView}
-                        {ordersView}
-                        {stopsView}
-
                         {
                             swingHighsLowsMap ?
                                 <LineSeries
@@ -422,8 +410,20 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                                         return swingHighsLowsMap[d.timestamp.getTime()];
                                     }}
                                     marker={Circle}
-                                    markerProps={{r: 3}}/> : null
+                                    markerProps={{r: 2}}/> : null
                         }
+
+                        <CandlestickSeries fill={(d) => d.close > d.open ? "#ecf0f1" : "#000"}
+                                           stroke="#000"
+                                           wickStroke="#000"/>
+                        <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+                                       yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
+
+                        <OHLCTooltip origin={[-40, 0]} xDisplayFormat={timeFormat("%Y-%m-%d %H:%M:%S")}/>
+
+                        {htSRLevelsView}
+                        {ordersView}
+                        {stopsView}
 
                         {
                             candlePatternsUp ?

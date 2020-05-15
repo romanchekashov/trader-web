@@ -2,6 +2,7 @@ import * as React from "react";
 import {PriceCoordinate} from "react-financial-charts/lib/coordinates";
 import {format} from "d3-format";
 import {SRLevel} from "../../data/strategy/SRLevel";
+import {IntervalColor} from "../../utils/utils";
 
 type Props = {
     srLevels: SRLevel[]
@@ -9,26 +10,20 @@ type Props = {
 
 export const ChartLevels: React.FC<Props> = ({srLevels}) => {
 
-    const colorMap = {
-        DAY: "#212121",
-        H4: "#424242",
-        H2: "#616161",
-        M60: "#757575",
-        M30: "#9e9e9e"
-    };
     const lineTypeMap = {
-        DAY: "LongDashDot",
-        H4: "Dash",
-        H2: "ShortDash",
-        M60: "LongDash",
-        M30: "Solid"
+        MONTH: "LongDashDotDot",
+        WEEK: "LongDashDot",
+        DAY: "Solid",
+        H4: "LongDash",
+        H2: "DashDot",
+        M60: "Dot"
     };
 
     return (
         <>
             {
                 srLevels.map(level => {
-                    const color = colorMap[level.interval];
+                    const color = IntervalColor[level.interval];
                     return (
                         <PriceCoordinate
                             key={"start-" + level.interval + level.swingHL + level.dateTime}

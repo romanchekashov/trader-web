@@ -36,3 +36,13 @@ export const sortAlphabetically = (arr: any[], field?: string): any[] => {
         });
     }
 };
+
+export const IntervalColor = {
+    MONTH: "#4a148c",
+    WEEK: "#880e4f",
+    DAY: "#ff0000", // "#b71c1c"
+    H4: "#e65100",
+    H2: "#fbc02d",
+    M60: "#00796b",
+    M30: "#212121"
+};
