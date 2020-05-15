@@ -25,3 +25,12 @@
     padding-top: 0;
     padding-bottom: 0;
 }
+
+.chart-wrapper-head-trendline {
+    margin-left: 5px;
+}
+
+.chart-wrapper-head-trendline .p-button.p-button-text-only .p-button-text {
+    font-size: 12px;
+    padding: 0 3px;
+}

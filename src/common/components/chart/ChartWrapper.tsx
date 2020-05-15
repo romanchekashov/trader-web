@@ -16,12 +16,18 @@ import {ActiveTrade} from "../../data/ActiveTrade";
 import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {SubscriptionLike} from "rxjs";
 import {PatternResult} from "../alerts/data/PatternResult";
-import moment = require("moment");
 import "./ChartWrapper.css";
 import {Dropdown} from "primereact/dropdown";
 import {Security} from "../../data/Security";
 import {getSecurity} from "../../utils/Cache";
-import {PrimeDropdownItem} from "../../utils/utils";
+import {PrimeDropdownItem, StoreData} from "../../utils/utils";
+import {ToggleButton} from "primereact/togglebutton";
+import {TrendLineDto} from "../../data/TrendLineDto";
+import {getTrendLines, saveTrendLines} from "../../api/rest/TrendLineRestApi";
+import {Button} from "primereact/button";
+import {ChartTrendLine} from "./data/ChartTrendLine";
+import {ChartTrendLineType} from "./data/ChartTrendLineType";
+import moment = require("moment");
 
 type Props = {
     interval: Interval,
@@ -42,6 +48,11 @@ type States = {
     nodata: boolean
     secCode: string
     innerInterval: Interval
+    enableTrendLine: boolean
+    needSave: boolean
+    storeData: StoreData<TrendLineDto[]>
+    trendLines: TrendLineDto[]
+    trends_1: ChartTrendLine[]
 };
 
 export class ChartWrapper extends React.Component<Props, States> {
@@ -52,15 +63,27 @@ export class ChartWrapper extends React.Component<Props, States> {
     private intervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M2, Interval.M3, Interval.M5,
         Interval.M10, Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY,
         Interval.WEEK, Interval.MONTH]
-        .map(val => ({ label: val, value: val }));
+        .map(val => ({label: val, value: val}));
     private securityInfo: Security;
+    private initialStateTrendLines: TrendLineDto[] = [];
+    private chartTrendLineDefaultAppearance: ChartElementAppearance = {
+        edgeFill: "#FFFFFF",
+        edgeStroke: "#000000",
+        edgeStrokeWidth: 1,
+        r: 6,
+        stroke: "#000000",
+        strokeDasharray: "Solid",
+        strokeOpacity: 1,
+        strokeWidth: 1
+    };
 
     constructor(props) {
         super(props);
         const {interval} = props;
 
         this.state = {
-            candles: [], nodata: false, secCode: null, innerInterval: interval
+            candles: [], nodata: false, secCode: null, innerInterval: interval, enableTrendLine: false, needSave: false,
+            storeData: null, trendLines: [], trends_1: []
         };
     }
 
@@ -75,19 +98,19 @@ export class ChartWrapper extends React.Component<Props, States> {
         }
     };
 
-    updateCandles = (data: Candle[], security: SecurityLastInfo) => {
-        if (data && data.length === 1) {
+    updateCandles = (candles: Candle[], security: SecurityLastInfo) => {
+        if (candles && candles.length === 1) {
             this.setState({
                 candles: [],
                 nodata: true
             })
         } else {
+            const {trendLines} = this.state;
+
             this.setState({
-                candles: data.map(c => {
-                    c.timestamp = new Date(c.timestamp);
-                    return c;
-                }),
-                nodata: false
+                candles,
+                nodata: false,
+                trends_1: this.mapTrendLinesFromPropsToState(trendLines, candles)
             });
             this.requestCandles(security);
         }
@@ -102,15 +125,19 @@ export class ChartWrapper extends React.Component<Props, States> {
             });
             this.securityInfo = getSecurity(security.classCode, security.secCode);
 
-            setIntervalIdForFetchCandles = setInterval(() => {
-                this.getNewCandles(security)
-                    .then(data => {
-                        if (data && data.length > 0) clearInterval(setIntervalIdForFetchCandles);
-                        this.updateCandles(data, security);
-                        this.fetchingCandles = false;
-                    })
-                    .catch(console.error);
-            }, 2000);
+            this.getNewCandles(security)
+                .then(data => {
+                    this.updateCandles(
+                        data.map(c => {
+                            c.timestamp = new Date(c.timestamp);
+                            return c;
+                        }), security);
+                    this.fetchingCandles = false;
+                })
+                .catch(reason => {
+                    this.fetchingCandles = false;
+                    this.fetchCandles(security);
+                });
         }
     };
 
@@ -118,11 +145,11 @@ export class ChartWrapper extends React.Component<Props, States> {
 
         this.candlesSetupSubscription = WebsocketService.getInstance()
             .on<Candle[]>(WSEvent.CANDLES).subscribe(lastCandles => {
-                const {innerInterval} = this.state;
-                if (lastCandles && lastCandles.length > 0 && innerInterval === lastCandles[0].interval) {
-                    const {candles} = this.state;
+                const {innerInterval, candles, trendLines} = this.state;
+                if (candles.length > 2 && lastCandles.length > 0 && innerInterval === lastCandles[0].interval) {
                     const candlesIndexMap = {};
                     let newCandles = null;
+                    let needUpdateTrendLines = false;
                     candlesIndexMap[candles[candles.length - 2].timestamp.getTime()] = candles.length - 2;
                     candlesIndexMap[candles[candles.length - 1].timestamp.getTime()] = candles.length - 1;
 
@@ -134,10 +161,19 @@ export class ChartWrapper extends React.Component<Props, States> {
                         } else {
                             newCandles = candles.slice(1);
                             newCandles.push(candle);
+                            needUpdateTrendLines = true;
                         }
                     }
 
-                    this.setState({candles: newCandles ? newCandles : [...candles]});
+                    newCandles = newCandles ? newCandles : [...candles];
+
+                    if (needUpdateTrendLines) {
+                        this.setState({
+                            candles: newCandles,
+                            trends_1: this.mapTrendLinesFromPropsToState(trendLines, newCandles)});
+                    } else {
+                        this.setState({candles: newCandles});
+                    }
                 }
             });
 
@@ -148,8 +184,46 @@ export class ChartWrapper extends React.Component<Props, States> {
                 }
             });
 
-        const {security} = this.props;
+        const {security, interval} = this.props;
         this.fetchCandles(security);
+
+        getTrendLines({
+            classCode: security.classCode,
+            secCode: security.secCode,
+            interval
+        }).then(this.setTrendLinesFromServer).catch(console.error);
+    };
+
+    setTrendLinesFromServer = (trendLines: TrendLineDto[]): void => {
+        const {candles} = this.state;
+        for (const t of trendLines) {
+            t.startTimestamp = new Date(t.startTimestamp);
+            t.endTimestamp = new Date(t.endTimestamp);
+        }
+        this.initialStateTrendLines = trendLines;
+        this.setState({
+            trendLines,
+            trends_1: this.mapTrendLinesFromPropsToState(trendLines, candles)});
+    };
+
+    mapTrendLinesFromPropsToState = (trendLines: TrendLineDto[], candles: Candle[]): ChartTrendLine[] => {
+        const newTrends: ChartTrendLine[] = [];
+
+        for (const t of trendLines) {
+            const startIndex = candles.findIndex(value => value.timestamp.getTime() === t.startTimestamp.getTime());
+            const endIndex = candles.findIndex(value => value.timestamp.getTime() === t.endTimestamp.getTime());
+            if (startIndex > -1 && endIndex > -1) {
+                newTrends.push({
+                    start: [startIndex, t.start],
+                    end: [endIndex, t.end],
+                    selected: false,
+                    type: ChartTrendLineType.RAY,
+                    appearance: this.chartTrendLineDefaultAppearance,
+                    id: t.id
+                });
+            }
+        }
+        return newTrends;
     };
 
     componentWillUnmount = (): void => {
@@ -160,7 +234,7 @@ export class ChartWrapper extends React.Component<Props, States> {
     componentWillReceiveProps = (nextProps) => {
         const {security} = this.props;
         const {candles, innerInterval} = this.state;
-        if (nextProps.security) {
+        if (nextProps.security && !this.fetchingCandles) {
             if (security) {
                 if (candles.length === 0 || security.secCode !== nextProps.security.secCode) {
                     this.fetchCandles(nextProps.security);
@@ -322,8 +396,69 @@ export class ChartWrapper extends React.Component<Props, States> {
         this.fetchCandles(security);
     };
 
+    onEnableTrendLine = (enableTrendLine: boolean) => {
+        this.setState({enableTrendLine});
+    };
+
+    onSave = () => {
+        const {security} = this.props;
+        const {storeData} = this.state;
+        if (storeData) {
+            console.log(storeData);
+            const saving = [];
+            if (storeData.save && storeData.save.length > 0) {
+                for (const trendLine of storeData.save) {
+                    trendLine.classCode = security.classCode;
+                    saving.push(trendLine);
+                }
+            }
+            if (storeData.delete && storeData.delete.length > 0) {
+                for (const trendLine of storeData.delete) {
+                    trendLine.classCode = security.classCode;
+                    trendLine.deleted = new Date();
+                    saving.push(trendLine);
+                }
+            }
+            if (saving.length > 0) {
+                saveTrendLines(saving)
+                    .then(this.setTrendLinesFromServer)
+                    .catch(console.error);
+            }
+        }
+        this.setState({needSave: false});
+    };
+
+    onCancel = () => {
+        const {candles} = this.state;
+
+        this.setState({
+            needSave: false,
+            storeData: null,
+            trendLines: this.initialStateTrendLines,
+            trends_1: this.mapTrendLinesFromPropsToState(this.initialStateTrendLines, candles)
+        });
+    };
+
+    onNeedSave = (storeData: StoreData<TrendLineDto[]>): void => {
+        const {candles} = this.state;
+
+        const newTrendLines = [];
+        if (storeData.save && storeData.save.length > 0) {
+            for (const trendLine of storeData.save) {
+                newTrendLines.push(trendLine);
+            }
+        }
+
+        this.setState({
+            storeData,
+            needSave: true,
+            trendLines: newTrendLines,
+            trends_1: this.mapTrendLinesFromPropsToState(newTrendLines, candles)
+        });
+    };
+
     render() {
-        const {candles, nodata, innerInterval} = this.state;
+        const {candles, nodata, innerInterval, enableTrendLine, needSave, trends_1} = this.state;
 
         if (nodata) {
             return <div>No data</div>
@@ -341,8 +476,33 @@ export class ChartWrapper extends React.Component<Props, States> {
                     <div className="chart-wrapper-head-security">{security.secCode}</div>
                     <div className="chart-wrapper-head-interval">
                         <Dropdown value={innerInterval} options={this.intervals}
-                                  onChange={(e) => {this.onIntervalChanged(e.value);}}/>
+                                  onChange={(e) => {
+                                      this.onIntervalChanged(e.value);
+                                  }}/>
                     </div>
+                    <div className="chart-wrapper-head-trendline">
+                        <ToggleButton onLabel="Drawing"
+                                      offLabel="Draw Line"
+                                      checked={enableTrendLine}
+                                      onChange={(e) => this.onEnableTrendLine(e.value)}/>
+                    </div>
+
+                    {
+                        needSave ?
+                            <div className="chart-wrapper-head-trendline">
+                                <Button label="Save"
+                                        onClick={(e) => this.onSave()}/>
+                            </div> : null
+                    }
+
+                    {
+                        needSave ?
+                            <div className="chart-wrapper-head-trendline">
+                                <Button label="Cancel" className="p-button-secondary"
+                                        onClick={(e) => this.onCancel()}/>
+                            </div> : null
+                    }
+
                 </div>
                 <CandleStickChartForDiscontinuousIntraDay
                     type={ChartDrawType.CANVAS_SVG}
@@ -358,7 +518,11 @@ export class ChartWrapper extends React.Component<Props, States> {
                     srLevels={premise ? premise.analysis.srLevels : null}
                     candlePatternsUp={this.getCandlePatternsUp()}
                     candlePatternsDown={this.getCandlePatternsDown()}
-                    scale={this.securityInfo ? this.securityInfo.scale : 0}/>
+                    scale={this.securityInfo ? this.securityInfo.scale : 0}
+                    enableTrendLine={enableTrendLine}
+                    onEnableTrendLine={this.onEnableTrendLine}
+                    needSave={this.onNeedSave}
+                    trends={trends_1}/>
             </>
         )
     }

@@ -8,4 +8,5 @@ export class ChartElementAppearance {
     public edgeStrokeWidth?: number;
     public edgeFill?: string;
     public edgeStroke?: string;
+    public r?: number;
 }

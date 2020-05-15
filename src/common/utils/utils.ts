@@ -16,6 +16,11 @@ export interface PrimeDropdownItem<T> {
     value: T
 }
 
+export interface StoreData<T> {
+    save?: T
+    delete?: T
+}
+
 export const sortAlphabetically = (arr: any[], field?: string): any[] => {
     if (field) {
         return arr.sort((a, b) => {
