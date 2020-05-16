@@ -200,10 +200,10 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
         return (
             <div className="p-grid sample-layout analysis">
-                <div className="p-col-12">
+                <div className="p-col-12" style={{padding: 0}}>
                     <Filter filter={filterData} onStart={this.onStart}/>
                 </div>
-                <div className="p-col-12">
+                <div className="p-col-12" style={{padding: 0}}>
                     {/*<div className="p-col-12 p-col-nogutter">
                         Top Bar
                     </div>*/}
@@ -220,7 +220,7 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                         </div>
                     </div>
                 </div>
-                <div className="p-col-12">
+                <div className="p-col-12" style={{padding: 0}}>
                     Footer
                 </div>
             </div>

@@ -10,6 +10,10 @@ import {PatternResult} from "../../../common/components/alerts/data/PatternResul
 import {TrendsView} from "../../../common/components/trend/TrendsView";
 import {AlertsSize} from "../../../common/components/alerts/data/AlertsSize";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
+import {Dropdown} from "primereact/dropdown";
+import {Intervals, PrimeDropdownItem} from "../../../common/utils/utils";
+import {Column} from "primereact/column";
+import {DataTable} from "primereact/datatable";
 
 type Props = {
     classCode: ClassCode
@@ -23,6 +27,9 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
     const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
     const [timeFrameLow, setTimeFrameLow] = useState(Interval.M1);
     const [premise, setPremise] = useState(null);
+
+    const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
+    const [chartNumber, setChartNumber] = useState(1);
 
     const [tradeSetup, setTradeSetup] = useState(null);
     const [securityLastInfo, setSecurityLastInfo] = useState(null);
@@ -99,6 +106,11 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
         }).then(setPremise).catch(reason => {})
     };
 
+    const onChartNumberChanged = (num: number) => {
+        setChartNumber(num);
+        setTimeout(updateSize, 1000);
+    };
+
     const onAlertSelected = (alert: PatternResult) => {
         console.log(alert);
         setAlert(alert);
@@ -113,33 +125,48 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
     if (future) {
 
         return (
-            <div>
-                <div className="p-grid">
-                    <div className="p-col-2">Общ спрос: {future.totalDemand}</div>
-                    <div className="p-col-2">Общ предл: {future.totalSupply}</div>
-                    <div className="p-col-2">ГО прод: {future.sellDepoPerContract}</div>
-                    <div className="p-col-2">ГО покуп: {future.buyDepoPerContract}</div>
-                    <div className="p-col-2">Оборот: {future.todayMoneyTurnover}</div>
-                    <div className="p-col-2">Кол-во сделок: {future.numberOfTradesToday}</div>
+            <>
+                <div className="p-grid analysis-head">
+                    <div className="p-col-12">
+                        <div className="analysis-head-chart-number">
+                            <Dropdown value={chartNumber} options={chartNumbers}
+                                      onChange={(e) => onChartNumberChanged(e.value)}/>
+                        </div>
+                    </div>
+                    <div className="p-col-12">
+                        <DataTable value={[future]}>
+                            <Column field="totalDemand" header="Общ спрос" />
+                            <Column field="totalSupply" header="Общ предл" />
+                            <Column field="sellDepoPerContract" header="ГО прод" />
+                            <Column field="buyDepoPerContract" header="ГО покуп" />
+                            <Column field="todayMoneyTurnover" header="Оборот" />
+                            <Column field="numberOfTradesToday" header="Кол-во сделок" />
+                        </DataTable>
+                    </div>
                 </div>
                 <TrendsView trends={premise ? premise.analysis.trends : []}/>
                 <div className="p-grid" style={{margin: '0'}}>
-                    <div className="p-col-7" ref={chart1Ref} style={{padding: '0'}}>
+                    <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
+                                      initialNumberOfCandles={1000}
                                       onIntervalChanged={onTradingIntervalChanged}
                                       width={chart1Width}
                                       security={future}
                                       premise={premise}
                                       showGrid={true}/>
                     </div>
-                    <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
-                        <ChartWrapper interval={timeFrameLow}
-                                      onIntervalChanged={interval => {}}
-                                      width={chart2Width}
-                                      security={future}
-                                      trend={trendLowTF}
-                                      showGrid={true}/>
-                    </div>
+                    {
+                        chartNumber === 2 ? (
+                            <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
+                                <ChartWrapper interval={timeFrameLow}
+                                              onIntervalChanged={interval => {}}
+                                              width={chart2Width}
+                                              security={future}
+                                              trend={trendLowTF}
+                                              showGrid={true}/>
+                            </div>
+                        ) : null
+                    }
                 </div>
                 <div className="p-grid">
                     <div className="p-col-5">
@@ -159,7 +186,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
                         }
                     </div>
                 </div>
-            </div>
+            </>
         )
     } else {
         return (

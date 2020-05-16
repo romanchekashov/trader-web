@@ -239,7 +239,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         } = this.props;
         const {trends_1} = this.state;
 
-        const height = 500;
+        const height = 600;
         const margin = {left: 50, right: 50, top: 10, bottom: 30};
         const gridHeight = height - margin.top - margin.bottom;
         const xGrid = showGrid ? {

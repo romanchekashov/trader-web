@@ -22,3 +22,30 @@
 .analysis-securities .p-datatable .p-datatable-tbody td:first-child {
     width: 100px;
 }
+
+.analysis-head {
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+.analysis-head .p-datatable-wrapper .p-datatable-thead > tr > th {
+    font-size: 12px;
+    padding: 0;
+}
+.analysis-head .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0 2px;
+    text-align: center;
+}
+
+.analysis-head .p-dropdown {
+    font-size: 12px;
+}
+.analysis-head .p-dropdown-label {
+    font-size: 12px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.analysis-head .p-col-1,
+.analysis-head .p-col-11,
+.analysis-head .p-col-12 {
+    padding: 0;
+}

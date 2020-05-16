@@ -33,7 +33,7 @@ type Props = {
     interval: Interval,
     onIntervalChanged: (interval: Interval) => void
     width: number,
-    numberOfCandles?: number,
+    initialNumberOfCandles?: number,
     security: SecurityLastInfo
     premise?: TradePremise
     orders?: Order[]
@@ -46,6 +46,7 @@ type Props = {
 
 type States = {
     candles: Candle[],
+    numberOfCandles: number,
     nodata: boolean
     secCode: string
     innerInterval: Interval
@@ -79,20 +80,18 @@ export class ChartWrapper extends React.Component<Props, States> {
 
     constructor(props) {
         super(props);
-        const {interval} = props;
-
-        this.chartTrendLineDefaultAppearance.stroke = IntervalColor[interval] || "#000000";
-        this.chartTrendLineDefaultAppearance.edgeStroke = IntervalColor[interval] || "#000000";
+        const {interval, initialNumberOfCandles} = props;
 
         this.state = {
             candles: [], nodata: false, secCode: null, innerInterval: interval, enableTrendLine: false, needSave: false,
-            storeData: null, trendLines: [], trends_1: [], showSRLevels: true, showSRZones: true
+            storeData: null, trendLines: [], trends_1: [], showSRLevels: true, showSRZones: true,
+            numberOfCandles: initialNumberOfCandles || 500
         };
     }
 
     getNewCandles = (security: SecurityLastInfo, interval: Interval): Promise<Candle[]> => {
         const {history} = this.props;
-        const numberOfCandles = 500;
+        const {numberOfCandles} = this.state;
         if (history) {
             return getHistoryCandles(security.classCode, security.secCode, interval, numberOfCandles);
         } else {
@@ -215,6 +214,10 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     mapTrendLinesFromPropsToState = (trendLines: TrendLineDto[], candles: Candle[]): ChartTrendLine[] => {
+        const {innerInterval} = this.state;
+        this.chartTrendLineDefaultAppearance.stroke = IntervalColor[innerInterval] || "#000000";
+        this.chartTrendLineDefaultAppearance.edgeStroke = IntervalColor[innerInterval] || "#000000";
+
         const newTrends: ChartTrendLine[] = [];
 
         for (const t of trendLines) {
@@ -256,9 +259,6 @@ export class ChartWrapper extends React.Component<Props, States> {
         }
         if (nextProps.interval) {
             if (nextProps.interval !== innerInterval) {
-                this.chartTrendLineDefaultAppearance.stroke = IntervalColor[nextProps.interval] || "#000000";
-                this.chartTrendLineDefaultAppearance.edgeStroke = IntervalColor[nextProps.interval] || "#000000";
-
                 this.setState({innerInterval: nextProps.interval});
             }
         }
@@ -402,8 +402,6 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     onIntervalChanged = (innerInterval: Interval) => {
-        this.chartTrendLineDefaultAppearance.stroke = IntervalColor[innerInterval] || "#000000";
-        this.chartTrendLineDefaultAppearance.edgeStroke = IntervalColor[innerInterval] || "#000000";
         this.fetchTrendLines(innerInterval);
         this.setState({innerInterval});
         this.props.onIntervalChanged(innerInterval);
