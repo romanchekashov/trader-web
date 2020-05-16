@@ -1,8 +1,8 @@
 import * as React from "react";
 import {PriceCoordinate} from "react-financial-charts/lib/coordinates";
 import {format} from "d3-format";
-import {SRLevel} from "../../data/strategy/SRLevel";
-import {IntervalColor} from "../../utils/utils";
+import {SRLevel} from "../../../data/strategy/SRLevel";
+import {IntervalColor} from "../../../utils/utils";
 
 type Props = {
     srLevels: SRLevel[]

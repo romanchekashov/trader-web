@@ -29,10 +29,10 @@ import {ChartDrawType} from "./data/ChartDrawType";
 import {Candle} from "../../data/Candle";
 import {ChartLevel} from "./data/ChartLevel";
 import {SRZone} from "../../data/strategy/SRZone";
-import ChartZones from "./ChartZones";
+import ChartZones from "./components/ChartZones";
 import {Interval} from "../../data/Interval";
 import {SRLevel} from "../../data/strategy/SRLevel";
-import {ChartLevels} from "./ChartLevels";
+import {ChartLevels} from "./components/ChartLevels";
 import {DrawingObjectSelector, TrendLine} from "react-financial-charts/lib/interactive";
 import {ema} from "react-financial-charts/lib/indicator";
 import {
@@ -40,10 +40,11 @@ import {
     isCurrentChartInteractingId,
     saveInteractiveNodes,
     setCurrentChartInteractingId,
-} from "./interactiveutils";
+} from "./utils/interactiveutils";
 import {TrendLineDto} from "../../data/TrendLineDto";
 import {StoreData} from "../../utils/utils";
 import {ChartTrendLine} from "./data/ChartTrendLine";
+import {ChartSwingHighsLows} from "./components/ChartSwingHighsLows";
 
 const _ = require("lodash");
 
@@ -390,23 +391,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
                         <ChartZones zones={zones}/>
                         <ChartLevels srLevels={srLevels}/>
-
-                        {
-                            swingHighsLowsMap ?
-                                <LineSeries
-                                    yAccessor={d => swingHighsLowsMap[d.timestamp.getTime()]}
-                                    strokeDasharray="Solid" connectNulls={true}/> : null
-                        }
-
-                        {
-                            swingHighsLowsMap ?
-                                <ScatterSeries
-                                    yAccessor={d => {
-                                        return swingHighsLowsMap[d.timestamp.getTime()];
-                                    }}
-                                    marker={Circle}
-                                    markerProps={{r: 2}}/> : null
-                        }
+                        <ChartSwingHighsLows swingHighsLowsMap={swingHighsLowsMap}/>
 
                         <CandlestickSeries fill={(d) => d.close > d.open ? "#ecf0f1" : "#000"}
                                            stroke="#000"
