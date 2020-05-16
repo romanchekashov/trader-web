@@ -52,3 +52,9 @@ export const IntervalColor = {
     M60: "#00796b",
     M30: "#212121"
 };
+
+export const TrendDirectionColor = {
+    UP: "#4caf50",
+    DOWN: "#f44336",
+    SIDE: "#2196f3" // "#3f51b5"
+};

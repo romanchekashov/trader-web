@@ -45,6 +45,7 @@ import {TrendLineDto} from "../../data/TrendLineDto";
 import {StoreData} from "../../utils/utils";
 import {ChartTrendLine} from "./data/ChartTrendLine";
 import {ChartSwingHighsLows} from "./components/ChartSwingHighsLows";
+import {TrendPoint} from "../../data/strategy/TrendPoint";
 
 const _ = require("lodash");
 
@@ -60,7 +61,7 @@ type Props = {
     srLevels?: SRLevel[]
     candlePatternsUp?: any
     candlePatternsDown?: any
-    swingHighsLowsMap?: any
+    swingHighsLows?: TrendPoint[]
     showGrid?: boolean
     scale: number
     enableTrendLine: boolean
@@ -236,7 +237,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     render() {
         const {
             type, data: initialData, width, ratio, htSRLevels, orders, stops,
-            swingHighsLowsMap, showGrid, zones, candlePatternsUp, candlePatternsDown, scale, srLevels
+            swingHighsLows, showGrid, zones, candlePatternsUp, candlePatternsDown, scale, srLevels
         } = this.props;
         const {trends_1} = this.state;
 
@@ -391,7 +392,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
                         <ChartZones zones={zones}/>
                         <ChartLevels srLevels={srLevels}/>
-                        <ChartSwingHighsLows swingHighsLowsMap={swingHighsLowsMap}/>
+                        <ChartSwingHighsLows swingHighsLows={swingHighsLows}/>
 
                         <CandlestickSeries fill={(d) => d.close > d.open ? "#ecf0f1" : "#000"}
                                            stroke="#000"

@@ -28,6 +28,7 @@ import {Button} from "primereact/button";
 import {ChartTrendLine} from "./data/ChartTrendLine";
 import {ChartTrendLineType} from "./data/ChartTrendLineType";
 import moment = require("moment");
+import {TrendPoint} from "../../data/strategy/TrendPoint";
 
 type Props = {
     interval: Interval,
@@ -344,26 +345,23 @@ export class ChartWrapper extends React.Component<Props, States> {
     getSwingHighsLowsMap = () => {
         const {premise, trend} = this.props;
 
-        let swingHighsLowsMap = null;
-        let swingHighsLows = null;
+        let swingHighsLows: TrendPoint[] = null;
 
         if (premise && premise.analysis.trend) {
-            swingHighsLowsMap = {};
             swingHighsLows = premise.analysis.trend.swingHighsLows;
         }
 
         if (trend) {
-            swingHighsLowsMap = {};
             swingHighsLows = trend.swingHighsLows;
         }
 
         if (swingHighsLows) {
-            for (const value of swingHighsLows) {
-                swingHighsLowsMap[moment(value.dateTime).toDate().getTime()] = value.swingHL;
+            for (const trendPoint of swingHighsLows) {
+                trendPoint.dateTime = moment(trendPoint.dateTime).toDate();
             }
         }
 
-        return swingHighsLowsMap;
+        return swingHighsLows;
     };
 
     getStops = () => {
@@ -550,7 +548,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                     ratio={1}
                     htSRLevels={this.getHighTimeFrameSRLevels()}
                     orders={this.getOrdersLevels()}
-                    swingHighsLowsMap={this.getSwingHighsLowsMap()}
+                    swingHighsLows={this.getSwingHighsLowsMap()}
                     showGrid={showGrid}
                     stops={this.getStops()}
                     zones={premise && showSRZones ? premise.analysis.srZones : null}

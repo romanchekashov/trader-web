@@ -1,10 +1,6 @@
 import {TrendDirection} from "./TrendDirection";
 import {Interval} from "../Interval";
-
-export class TrendPoint {
-    public swingHL: number;
-    public dateTime: string;
-}
+import {TrendPoint} from "./TrendPoint";
 
 export class Trend {
     public direction: TrendDirection;

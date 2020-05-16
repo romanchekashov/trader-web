@@ -6,6 +6,7 @@ import {useState} from "react";
 import moment = require("moment");
 import {TrendDirection} from "../../data/strategy/TrendDirection";
 import "./TrendView.css";
+import {TrendDirectionColor} from "../../utils/utils";
 
 type Props = {
     trend: Trend
@@ -42,16 +43,7 @@ const TrendView: React.FC<Props> = ({trend, position}) => {
     }, [trend]);
 
     const getColor = (direction: TrendDirection) => {
-        let color = '#3f51b5';
-        switch (trend.direction) {
-            case TrendDirection.DOWN:
-                color = '#f44336';
-                break;
-            case TrendDirection.UP:
-                color = '#4caf50';
-                break;
-        }
-        return color;
+        return TrendDirectionColor[direction] || '#3f51b5';
     };
 
     const updateData = (trend: Trend) => {
