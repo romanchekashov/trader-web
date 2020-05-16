@@ -87,15 +87,17 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
         const { actions, premise } = this.props;
 
         if (filter && share) {
-            actions.loadTradePremise({
-                brokerId: filter.brokerId,
-                tradingPlatform: filter.tradingPlatform,
-                classCode: filter.classCode,
-                secCode: share.secCode,
-                timeFrameHigh: filter.timeFrameHigh,
-                timeFrameTrading: filter.timeFrameTrading,
-                timeFrameLow: filter.timeFrameLow
-            });
+            if (ClassCode.SPBFUT !== filter.classCode) {
+                actions.loadTradePremise({
+                    brokerId: filter.brokerId,
+                    tradingPlatform: filter.tradingPlatform,
+                    classCode: filter.classCode,
+                    secCode: share.secCode,
+                    timeFrameHigh: filter.timeFrameHigh,
+                    timeFrameTrading: filter.timeFrameTrading,
+                    timeFrameLow: filter.timeFrameLow
+                });
+            }
         }
     };
 
@@ -190,11 +192,7 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                 case ClassCode.SPBFUT:
                     analysis = (
                         <AnalysisFutures classCode={filter ? filter.classCode : null}
-                                         timeFrameHigh={filter ? filter.timeFrameHigh : null}
-                                         timeFrameTrading={filter ? filter.timeFrameTrading : null}
-                                         timeFrameLow={filter ? filter.timeFrameLow : null}
-                                         future={selectedSecurity}
-                                         premise={premise}/>
+                                         future={selectedSecurity} />
                     );
                     break;
             }

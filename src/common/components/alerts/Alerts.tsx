@@ -12,7 +12,7 @@ import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {FixedSizeList as List} from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import {Dropdown} from "primereact/components/dropdown/Dropdown";
-import {PrimeDropdownItem} from "../../utils/utils";
+import {Intervals, PrimeDropdownItem} from "../../utils/utils";
 import {Interval} from "../../data/Interval";
 import {ClassCode} from "../../data/ClassCode";
 import {getSecuritiesByClassCode, getSecurity} from "../../utils/Cache";
@@ -38,9 +38,7 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
     const [fetchAlertsError, setFetchAlertsError] = useState(null);
     const [selectedAlert, setSelectedAlert] = useState(null);
 
-    const intervals: PrimeDropdownItem<Interval>[] = [null, Interval.M1, Interval.M2, Interval.M3, Interval.M5,
-        Interval.M10, Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY,
-        Interval.WEEK, Interval.MONTH]
+    const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals]
         .map(val => ({label: val || "ALL", value: val}));
     const classCodes: PrimeDropdownItem<ClassCode>[] = [null, ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
         .map(val => ({label: val || "ALL", value: val}));

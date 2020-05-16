@@ -132,7 +132,7 @@ export class BotControlHistory extends React.Component<Props, States> {
             WebsocketService.getInstance().send(WSEvent.HISTORY_GET_TRADE_PREMISE_AND_SETUP, {
                 brokerId: 1, tradingPlatform: TradingPlatform.QUIK,
                 classCode: security.classCode, secCode: security.secCode,
-                timeFrameHigh: Interval.M30, timeFrameTrading: Interval.M5, timeFrameLow: Interval.M1});
+                timeFrameHigh: Interval.M30, timeFrameTrading: Interval.M3, timeFrameLow: Interval.M1});
             WebsocketService.getInstance().send(WSEvent.HISTORY_GET_TRADES_AND_ORDERS, security.secCode)
         }
     };
@@ -149,7 +149,8 @@ export class BotControlHistory extends React.Component<Props, States> {
                     <div className="p-col-7" style={{padding:'0', minWidth:'600px'}}>
                         <div className="p-grid" style={{margin:'0'}}>
                             <div className="p-col-7" ref={this.chart1Ref} style={{padding:'0'}}>
-                                <ChartWrapper interval={Interval.M5}
+                                <ChartWrapper interval={Interval.M3}
+                                              onIntervalChanged={interval => {}}
                                               numberOfCandles={168}
                                               width={chart1Width}
                                               security={security}
@@ -159,6 +160,7 @@ export class BotControlHistory extends React.Component<Props, States> {
                             </div>
                             <div className="p-col-5" ref={this.chart2Ref} style={{padding:'0'}}>
                                 <ChartWrapper interval={Interval.M1}
+                                              onIntervalChanged={interval => {}}
                                               numberOfCandles={50}
                                               width={chart2Width}
                                               security={security}

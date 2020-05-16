@@ -15,7 +15,15 @@ export function getTradePremise(filter: TradeStrategyAnalysisFilterDto): Promise
         headers: {"content-type": "application/json"},
         body: JSON.stringify(filter)
     })
-        .then(handleResponse)
+        .then(response => handleResponse(response)
+            .then(premise => {
+                if (premise && premise.analysis.srZones) {
+                    for (const srZone of premise.analysis.srZones) {
+                        srZone.timestamp = new Date(srZone.timestamp)
+                    }
+                }
+                return premise;
+            }))
         .catch(handleError);
 }
 

@@ -20,7 +20,7 @@ import "./ChartWrapper.css";
 import {Dropdown} from "primereact/dropdown";
 import {Security} from "../../data/Security";
 import {getSecurity} from "../../utils/Cache";
-import {IntervalColor, PrimeDropdownItem, StoreData} from "../../utils/utils";
+import {IntervalColor, Intervals, PrimeDropdownItem, StoreData} from "../../utils/utils";
 import {ToggleButton} from "primereact/togglebutton";
 import {TrendLineDto} from "../../data/TrendLineDto";
 import {getTrendLines, saveTrendLines} from "../../api/rest/TrendLineRestApi";
@@ -31,6 +31,7 @@ import moment = require("moment");
 
 type Props = {
     interval: Interval,
+    onIntervalChanged: (interval: Interval) => void
     width: number,
     numberOfCandles?: number,
     security: SecurityLastInfo
@@ -62,10 +63,7 @@ export class ChartWrapper extends React.Component<Props, States> {
     private candlesSetupSubscription: SubscriptionLike = null;
     private wsStatusSub: SubscriptionLike = null;
     private fetchingCandles: boolean = false;
-    private intervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M2, Interval.M3, Interval.M5,
-        Interval.M10, Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY,
-        Interval.WEEK, Interval.MONTH]
-        .map(val => ({label: val, value: val}));
+    private intervals: PrimeDropdownItem<Interval>[] = Intervals.map(val => ({label: val, value: val}));
     private securityInfo: Security;
     private initialStateTrendLines: TrendLineDto[] = [];
     private chartTrendLineDefaultAppearance: ChartElementAppearance = {
@@ -191,7 +189,11 @@ export class ChartWrapper extends React.Component<Props, States> {
 
         const {security, interval} = this.props;
         this.fetchCandles(security, interval);
+        this.fetchTrendLines(interval);
+    };
 
+    fetchTrendLines = (interval: Interval): void => {
+        const {security} = this.props;
         getTrendLines({
             classCode: security.classCode,
             secCode: security.secCode,
@@ -402,7 +404,9 @@ export class ChartWrapper extends React.Component<Props, States> {
     onIntervalChanged = (innerInterval: Interval) => {
         this.chartTrendLineDefaultAppearance.stroke = IntervalColor[innerInterval] || "#000000";
         this.chartTrendLineDefaultAppearance.edgeStroke = IntervalColor[innerInterval] || "#000000";
+        this.fetchTrendLines(innerInterval);
         this.setState({innerInterval});
+        this.props.onIntervalChanged(innerInterval);
         const {security} = this.props;
         this.fetchCandles(security, innerInterval);
     };

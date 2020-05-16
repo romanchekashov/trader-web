@@ -1,3 +1,5 @@
+import {Interval} from "../data/Interval";
+
 export function round100(num: any): number {
     return Math.round(num * 100) / 100;
 }
@@ -36,6 +38,10 @@ export const sortAlphabetically = (arr: any[], field?: string): any[] => {
         });
     }
 };
+
+export const Intervals: Interval[] = [Interval.M1, Interval.M3, Interval.M5,
+    Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY,
+    Interval.WEEK, Interval.MONTH];
 
 export const IntervalColor = {
     MONTH: "#4a148c",

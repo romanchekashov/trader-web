@@ -92,6 +92,7 @@ const Analysis: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, 
                 <div className="p-grid" style={{margin: '0'}}>
                     <div className="p-col-7" ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
+                                      onIntervalChanged={interval => {}}
                                       width={chart1Width}
                                       security={security}
                                       premise={premise}
@@ -99,6 +100,7 @@ const Analysis: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, 
                     </div>
                     <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameLow}
+                                      onIntervalChanged={interval => {}}
                                       width={chart2Width}
                                       security={security}
                                       trend={trendLowTF}
@@ -114,6 +116,7 @@ const Analysis: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, 
                         {
                             alert ?
                                 <ChartWrapper interval={alert.interval}
+                                              onIntervalChanged={interval => {}}
                                               alert={alert}
                                               width={chartAlertsWidth}
                                               security={security}

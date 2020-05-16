@@ -11,7 +11,7 @@ import "./BotControlFilter.css";
 import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
 import {ToggleButton} from "primereact/togglebutton";
 import {BotControlFilterHistory} from "./BotControlFilterHistory";
-import {PrimeDropdownItem} from "../../../common/utils/utils";
+import {Intervals, PrimeDropdownItem} from "../../../common/utils/utils";
 import {ClassCode} from "../../../common/data/ClassCode";
 import {Security} from "../../../common/data/Security";
 import {getSecuritiesByClassCode} from "../../../common/utils/Cache";
@@ -67,10 +67,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
     const [stop, setStop] = useState(500);
     const [strategy, setStrategy] = useState(null);
 
-    const intervals: PrimeDropdownItem<Interval>[] = [null, Interval.M1, Interval.M2, Interval.M3, Interval.M5,
-        Interval.M10, Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY,
-        Interval.WEEK, Interval.MONTH]
-        .map(val => ({label: val || "ALL", value: val}));
+    const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals].map(val => ({label: val || "ALL", value: val}));
     const classCodes: PrimeDropdownItem<ClassCode>[] = [null, ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
         .map(val => ({label: val || "ALL", value: val}));
     const strategies: PrimeDropdownItem<string>[] = [null, "TREND_LINE_BREAKOUT", "TREND_CHANGE"]

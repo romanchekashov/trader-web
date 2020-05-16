@@ -11,6 +11,7 @@ import {SecurityInfo} from "../../../common/data/SecurityInfo";
 import {Interval} from "../../../common/data/Interval";
 import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
 import "./Filter.css";
+import {Intervals} from "../../../common/utils/utils";
 
 export interface FilterState {
     broker: Broker
@@ -41,7 +42,7 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
         security: null,
         realDepo: false,
         highTimeFrame: Interval.M30,
-        tradingTimeFrame: Interval.M5,
+        tradingTimeFrame: Interval.M3,
         lowTimeFrame: Interval.M1
     };
 
@@ -58,9 +59,7 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
 
     const [security, setSecurity] = useState(initState.security);
 
-    const intervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M2, Interval.M3, Interval.M5, Interval.M10,
-        Interval.M15, Interval.M30, Interval.M60, Interval.H2, Interval.H4, Interval.DAY, Interval.WEEK, Interval.MONTH]
-        .map(val => ({ label: val, value: val }));
+    const intervals: PrimeDropdownItem<Interval>[] = Intervals.map(val => ({ label: val, value: val }));
     const [highTimeFrame, setHighTimeFrame] = useState(initState.highTimeFrame);
     const [tradingTimeFrame, setTradingTimeFrame] = useState(initState.tradingTimeFrame);
     const [lowTimeFrame, setLowTimeFrame] = useState(initState.lowTimeFrame);

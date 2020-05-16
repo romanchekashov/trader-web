@@ -4,24 +4,26 @@ import {ClassCode} from "../../../common/data/ClassCode";
 import {TradePremise} from "../../../common/data/strategy/TradePremise";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Interval} from "../../../common/data/Interval";
-import {getTrend} from "../../../common/api/rest/analysisRestApi";
+import {getTradePremise, getTrend} from "../../../common/api/rest/analysisRestApi";
 import Alerts from "../../../common/components/alerts/Alerts";
 import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
 import {AlertsSize} from "../../../common/components/alerts/data/AlertsSize";
+import {TradingPlatform} from "../../../common/data/TradingPlatform";
 
 type Props = {
     classCode: ClassCode
-    timeFrameHigh: Interval
-    timeFrameTrading: Interval
-    timeFrameLow: Interval
     future: any
-    premise: TradePremise
 };
 
 let trendLowTFLoading = false;
 
-const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, timeFrameLow, future, premise}) => {
+const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
+    const [timeFrameHigh, setTimeFrameHigh] = useState(Interval.M30);
+    const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
+    const [timeFrameLow, setTimeFrameLow] = useState(Interval.M1);
+    const [premise, setPremise] = useState(null);
+
     const [tradeSetup, setTradeSetup] = useState(null);
     const [securityLastInfo, setSecurityLastInfo] = useState(null);
     const [chart1Width, setChart1Width] = useState(200);
@@ -42,7 +44,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
 
     useEffect(() => {
         if (future) {
-            // console.log("AnalysisFutures: ", classCode, timeFrameHigh, timeFrameTrading, timeFrameLow, future, initPremise);
+            console.log("AnalysisFutures: ", future);
 
             // WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
             //     brokerId: 1, tradingPlatform: TradingPlatform.QUIK,
@@ -71,6 +73,8 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                     all: false
                 });
             }
+
+            fetchPremise(timeFrameTrading);
         }
 
 
@@ -81,11 +85,29 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
         return function cleanup() {
             window.removeEventListener('resize', updateSize);
         };
-    }, [future, premise, timeFrameTrading, timeFrameLow]);
+    }, [future]);
+
+    const fetchPremise = (timeFrameTrading: Interval) => {
+        getTradePremise({
+            brokerId: 1,
+            tradingPlatform: TradingPlatform.QUIK,
+            classCode: future.classCode,
+            secCode: future.secCode,
+            timeFrameHigh,
+            timeFrameTrading,
+            timeFrameLow
+        }).then(setPremise).catch(reason => {})
+    };
 
     const onAlertSelected = (alert: PatternResult) => {
         console.log(alert);
         setAlert(alert);
+    };
+
+    const onTradingIntervalChanged = (interval: Interval) => {
+        console.log(interval);
+        setTimeFrameTrading(interval);
+        fetchPremise(interval);
     };
 
     if (future) {
@@ -104,6 +126,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                 <div className="p-grid" style={{margin: '0'}}>
                     <div className="p-col-7" ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
+                                      onIntervalChanged={onTradingIntervalChanged}
                                       width={chart1Width}
                                       security={future}
                                       premise={premise}
@@ -111,6 +134,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                     </div>
                     <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameLow}
+                                      onIntervalChanged={interval => {}}
                                       width={chart2Width}
                                       security={future}
                                       trend={trendLowTF}
@@ -126,6 +150,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTr
                         {
                             alert ?
                                 <ChartWrapper interval={alert.interval}
+                                              onIntervalChanged={interval => {}}
                                               alert={alert}
                                               width={chartAlertsWidth}
                                               security={future}
