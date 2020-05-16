@@ -10,6 +10,8 @@ type Props = {
 
 const ChartZones: React.FC<Props> = ({zones}) => {
 
+    if (!zones || zones.length === 0) return null;
+
     const zoneYAccessor = (d, zone) => zone.end;
     const zoneYAccessorBase = (scale, d, zone) => {
         const diff = zone.start - zone.end;

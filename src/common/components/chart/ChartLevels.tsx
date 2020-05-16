@@ -10,6 +10,8 @@ type Props = {
 
 export const ChartLevels: React.FC<Props> = ({srLevels}) => {
 
+    if (!srLevels || srLevels.length === 0) return null;
+
     const lineTypeMap = {
         MONTH: "LongDashDotDot",
         WEEK: "LongDashDot",

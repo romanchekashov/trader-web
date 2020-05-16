@@ -388,13 +388,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                             orient="right"
                             displayFormat={format(formatInput)}/>
 
-                        {
-                            zones ? <ChartZones zones={zones}/> : null
-                        }
-
-                        {
-                            srLevels ? <ChartLevels srLevels={srLevels}/> : null
-                        }
+                        <ChartZones zones={zones}/>
+                        <ChartLevels srLevels={srLevels}/>
 
                         {
                             swingHighsLowsMap ?
