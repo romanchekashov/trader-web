@@ -103,7 +103,9 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
             timeFrameHigh,
             timeFrameTrading,
             timeFrameLow
-        }).then(setPremise).catch(reason => {})
+        }).then(setPremise).catch(reason => {
+            fetchPremise(timeFrameTrading);
+        })
     };
 
     const onChartNumberChanged = (num: number) => {

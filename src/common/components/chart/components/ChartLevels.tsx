@@ -18,7 +18,7 @@ export const ChartLevels: React.FC<Props> = ({srLevels}) => {
         DAY: "Solid",
         H4: "LongDash",
         H2: "DashDot",
-        M60: "Dot"
+        M60: "Dash"
     };
 
     return (

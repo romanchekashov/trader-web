@@ -79,7 +79,7 @@ class BotControlPage extends React.Component<Props, TradeStrategyBotControlState
                     <div className="p-col-12">
                         <div className="p-grid">
                             <div className="p-col-12 p-md-12">
-                                <BotControlHistory />
+                                {/*<BotControlHistory />*/}
                             </div>
                         </div>
                     </div>
