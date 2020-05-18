@@ -7,6 +7,7 @@ export class FilterDto {
     public interval?: Interval;
     public numberOfCandles?: number;
     public all?: boolean = false;
+    public fetchByWS?: boolean = false;
     public history?: boolean = false;
     public start?: Date;
     public end?: Date;

@@ -14,6 +14,7 @@ import {Dropdown} from "primereact/dropdown";
 import {Intervals, PrimeDropdownItem} from "../../../common/utils/utils";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
+import Notifications from "../../../common/components/notifications/Notifications";
 
 type Props = {
     classCode: ClassCode
@@ -41,6 +42,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
     const chartAlertsRef = useRef(null);
     const [trendLowTF, setTrendLowTF] = useState(null);
     const [alertsFilter, setAlertsFilter] = useState(null);
+    const [filterDto, setFilterDto] = useState(null);
     const [alert, setAlert] = useState(null);
 
     const updateSize = () => {
@@ -77,6 +79,13 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
                     fetchByWS: false,
                     history: true,
                     size: AlertsSize.MID,
+                    all: false
+                });
+                setFilterDto({
+                    classCode: classCode,
+                    secCode: future.secCode,
+                    fetchByWS: false,
+                    history: true,
                     all: false
                 });
             }
@@ -172,8 +181,16 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
                 </div>
                 <div className="p-grid">
                     <div className="p-col-5">
-                        <Alerts filter={alertsFilter}
-                                onAlertSelected={onAlertSelected}/>
+                        <div className="p-grid">
+                            <div className="p-col-12">
+                                <Alerts filter={alertsFilter}
+                                        onAlertSelected={onAlertSelected}/>
+                            </div>
+                            <div className="p-col-12">
+                                <Notifications filter={filterDto}
+                                               onNotificationSelected={(n) => {console.log(n)}}/>
+                            </div>
+                        </div>
                     </div>
                     <div className="p-col-7" ref={chartAlertsRef} style={{padding: '0'}}>
                         {

@@ -6,6 +6,8 @@ import {Trend} from "../../data/strategy/Trend";
 import {ClassCode} from "../../data/ClassCode";
 import {PatternResult} from "../../components/alerts/data/PatternResult";
 import {AlertsFilter} from "../../components/alerts/data/AlertsFilter";
+import {FilterDto} from "../../data/FilterDto";
+import {NotificationDto} from "../../components/notifications/data/NotificationDto";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -47,6 +49,25 @@ export function getCandlePatterns(filter: AlertsFilter): Promise<PatternResult[]
                     }
                 }
                 return patternResults;
+            }))
+        .catch(handleError);
+}
+
+export function getNotifications(filter: FilterDto): Promise<NotificationDto[]> {
+    return fetch(baseUrl + 'notifications', {
+        method: "POST", // POST for create, PUT to update when id already exists.
+        headers: {"content-type": "application/json"},
+        body: JSON.stringify(filter)
+    })
+        .then(response => handleResponse(response)
+            .then(notifications => {
+                if (notifications && notifications.length > 0) {
+                    for (const notification of notifications) {
+                        notification.created = new Date(notification.created);
+                        notification.notified = new Date(notification.notified);
+                    }
+                }
+                return notifications;
             }))
         .catch(handleError);
 }
