@@ -39,6 +39,14 @@ export function getCandlePatterns(filter: AlertsFilter): Promise<PatternResult[]
         headers: {"content-type": "application/json"},
         body: JSON.stringify(filter)
     })
-        .then(handleResponse)
+        .then(response => handleResponse(response)
+            .then(patternResults => {
+                if (patternResults && patternResults.length > 0) {
+                    for (const result of patternResults) {
+                        result.candle.timestamp = new Date(result.candle.timestamp)
+                    }
+                }
+                return patternResults;
+            }))
         .catch(handleError);
 }

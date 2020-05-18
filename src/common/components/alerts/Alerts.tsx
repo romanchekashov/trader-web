@@ -1,12 +1,11 @@
 import * as React from "react";
-import {useEffect, useState, memo} from "react";
+import {memo, useEffect, useState} from "react";
 import {PatternResult} from "./data/PatternResult";
 import {AlertsFilter} from "./data/AlertsFilter";
 import "./Alerts.css";
 import "./CandlePattern.css";
 import {PatternName} from "./data/PatternName";
 import {playSound} from "../../assets/assets";
-import moment = require("moment");
 import {getCandlePatterns} from "../../api/rest/analysisRestApi";
 import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {FixedSizeList as List} from "react-window";
@@ -15,8 +14,10 @@ import {Dropdown} from "primereact/components/dropdown/Dropdown";
 import {Intervals, PrimeDropdownItem} from "../../utils/utils";
 import {Interval} from "../../data/Interval";
 import {ClassCode} from "../../data/ClassCode";
-import {getSecuritiesByClassCode, getSecurity} from "../../utils/Cache";
+import {getSecuritiesByClassCode} from "../../utils/Cache";
 import {Security} from "../../data/Security";
+import {Calendar} from "primereact/calendar";
+import moment = require("moment");
 
 type Props = {
     filter: AlertsFilter
@@ -32,6 +33,7 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
     const [classCode, setClassCode] = useState(null);
     const [secCode, setSecCode] = useState(null);
     const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}]);
+    const [start, setStart] = useState(moment().hours(0).minutes(0).seconds(0).toDate());
 
     const [visibleAlerts, setVisibleAlerts] = useState([]);
     const [alerts, setAlerts] = useState([]);
@@ -43,11 +45,10 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
     const classCodes: PrimeDropdownItem<ClassCode>[] = [null, ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
         .map(val => ({label: val || "ALL", value: val}));
 
-    const fetchAlerts = () => {
+    const fetchAlerts = (newClassCode: ClassCode, newSecCode: string, newInterval: Interval, newStart: Date) => {
         getCandlePatterns(filter)
             .then(newAlerts => {
-                setAlerts(newAlerts);
-                setVisibleAlerts(newAlerts);
+                setAlertsReceivedFromServer(newAlerts, newClassCode, newSecCode, newInterval, newStart);
                 setFetchAlertsError(null);
             })
             .catch(reason => {
@@ -56,7 +57,7 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
                 setFetchAlertsError("Cannot get alerts for " + filter.secCode);
                 if (fetchAlertsAttempt < 3) {
                     fetchAlertsAttempt++;
-                    fetchAlerts();
+                    fetchAlerts(newClassCode, newSecCode, newInterval, newStart);
                 }
             });
     };
@@ -72,18 +73,19 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
         let alertsSubscription;
         if (filter) {
             fetchAlertsAttempt = 0;
+
             onClassCodeChanged(filter.classCode);
             onSecCodeChanged(filter.secCode);
+            onIntervalChanged(null);
+
             if (filter.fetchByWS) {
                 alertsSubscription = WebsocketService.getInstance()
                     .on<PatternResult[]>(filter.history ? WSEvent.HISTORY_ALERTS : WSEvent.ALERTS)
                     .subscribe(newAlerts => {
-                        setAlerts(newAlerts);
-                        setVisibleAlerts(newAlerts);
-                        notifyOnNewAlert(newAlerts);
+                        setAlertsReceivedFromServer(newAlerts, classCode, secCode, interval, start);
                     });
             } else {
-                fetchAlerts();
+                fetchAlerts(filter.classCode, filter.secCode, null, start);
             }
         }
 
@@ -92,6 +94,13 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
             if (alertsSubscription) alertsSubscription.unsubscribe();
         };
     }, [filter]);
+
+    const setAlertsReceivedFromServer = (newAlerts: PatternResult[], newClassCode: ClassCode, newSecCode: string,
+                                         newInterval: Interval, newStart: Date): void => {
+        setAlerts(newAlerts);
+        setFilteredAlerts(newAlerts, newClassCode, newSecCode, newInterval, newStart);
+        notifyOnNewAlert(newAlerts);
+    };
 
     if (!filter) {
         return (<>Filter for alerts is not set.</>);
@@ -162,7 +171,7 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
     const onIntervalChanged = (newInterval: Interval) => {
         console.log(newInterval);
         setInterval(newInterval);
-        setFilteredAlerts(classCode, secCode, newInterval);
+        setFilteredAlerts(alerts, classCode, secCode, newInterval, start);
     };
 
     const onClassCodeChanged = (newClassCode: ClassCode) => {
@@ -179,16 +188,22 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
         setClassCode(newClassCode);
         setSecCodes(newSecCodes);
         setSecCode(null);
-        setFilteredAlerts(newClassCode, null, interval);
+        setFilteredAlerts(alerts, newClassCode, null, interval, start);
     };
 
     const onSecCodeChanged = (newSecCode: string) => {
         console.log(newSecCode);
         setSecCode(newSecCode);
-        setFilteredAlerts(classCode, newSecCode, interval);
+        setFilteredAlerts(alerts, classCode, newSecCode, interval, start);
     };
 
-    const setFilteredAlerts = (newClassCode: ClassCode, newSecCode: string, newInterval: Interval) => {
+    const onStartDateChanged = (newStart: Date) => {
+        console.log(newStart);
+        setStart(newStart);
+        setFilteredAlerts(alerts, classCode, secCode, interval, newStart);
+    };
+
+    const setFilteredAlerts = (alerts: PatternResult[], newClassCode: ClassCode, newSecCode: string, newInterval: Interval, newStart: Date) => {
         let filtered = alerts;
         if (newClassCode) {
             filtered = filtered.filter(value => value.classCode === newClassCode);
@@ -198,6 +213,9 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
         }
         if (newInterval) {
             filtered = filtered.filter(value => value.interval === newInterval);
+        }
+        if (newStart) {
+            filtered = filtered.filter(value => newStart.getTime() <= value.candle.timestamp.getTime());
         }
 
         setVisibleAlerts(filtered);
@@ -261,6 +279,10 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
                               onChange={(e) => {
                                   onIntervalChanged(e.value);
                               }}/>
+                </div>
+                <div className="alerts-head-start-date">
+                    <Calendar value={start}
+                              onChange={(e) => onStartDateChanged(e.value as Date)}/>
                 </div>
             </div>
             <div className="p-col-12 alerts-body" style={{height: (alertsHeight || 200) - 20}}>
