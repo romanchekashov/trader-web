@@ -87,13 +87,13 @@ export class FastBtn extends React.Component<Props, States> {
         const {terminatePositionDialogVisible, reversePositionDialogVisible} = this.state;
 
         return (
-            <div className="p-grid">
-                <div className="p-col-2">
-                    <Button label="Cancel Active Orders" style={{width: '100%'}}
+            <div className="p-grid fast-btn">
+                <div className="p-col-1">
+                    <Button label="Cancel Active Orders" style={{width: '100%', height: '100%'}}
                             onClick={this.cancelActiveOrders}/>
                 </div>
-                <div className="p-col-2">
-                    <Button label="Terminate Position" style={{width: '100%'}}
+                <div className="p-col-1">
+                    <Button label="Terminate Position" style={{width: '100%', height: '100%'}}
                             className="p-button-danger"
                             onClick={() => this.setState({terminatePositionDialogVisible: true})}/>
                     <Dialog header="Terminate Position" visible={terminatePositionDialogVisible}
@@ -103,8 +103,8 @@ export class FastBtn extends React.Component<Props, States> {
                         <p>Are you sure to Terminate Position on Market price?</p>
                     </Dialog>
                 </div>
-                <div className="p-col-2">
-                    <Button label="Reverse Position" className="p-button-warning" style={{width: '100%'}}
+                <div className="p-col-1">
+                    <Button label="Reverse Position" className="p-button-warning" style={{width: '100%', height: '100%'}}
                             onClick={() => this.setState({reversePositionDialogVisible: true})}/>
                     <Dialog header="Reverse Position" visible={reversePositionDialogVisible}
                             style={{width: '50vw'}} position="top"
@@ -113,9 +113,57 @@ export class FastBtn extends React.Component<Props, States> {
                         <p>Are you sure to Reverse Position on Market price?</p>
                     </Dialog>
                 </div>
-                <div className="p-col-2">
-                    <Button label="Cancel Stop Orders" style={{width: '100%'}}
+                <div className="p-col-1">
+                    <Button label="Cancel Stop Orders" style={{width: '100%', height: '100%'}}
                             onClick={this.cancelStopOrders}/>
+                </div>
+                <div className="p-col-1">
+                    <Button label="Btn 5"
+                            className="p-button-success"
+                            style={{width: '100%', height: '100%'}}
+                            onClick={console.log}/>
+                </div>
+                <div className="p-col-1">
+                    <Button label="Btn 6"
+                            className="p-button-secondary"
+                            style={{width: '100%', height: '100%'}}
+                            onClick={console.log}/>
+                </div>
+                <div className="p-col-1">
+                    <Button label="Btn 7"
+                            className="p-button-secondary"
+                            style={{width: '100%', height: '100%'}}
+                            onClick={console.log}/>
+                </div>
+                <div className="p-col-1">
+                    <Button label="Btn 8"
+                            className="p-button-secondary"
+                            style={{width: '100%', height: '100%'}}
+                            onClick={console.log}/>
+                </div>
+                <div className="p-col-1">
+                    <Button label="Btn 9"
+                            className="p-button-secondary"
+                            style={{width: '100%', height: '100%'}}
+                            onClick={console.log}/>
+                </div>
+                <div className="p-col-1">
+                    <Button label="Btn 10"
+                            className="p-button-secondary"
+                            style={{width: '100%', height: '100%'}}
+                            onClick={console.log}/>
+                </div>
+                <div className="p-col-1">
+                    <Button label="Btn 11"
+                            className="p-button-secondary"
+                            style={{width: '100%', height: '100%'}}
+                            onClick={console.log}/>
+                </div>
+                <div className="p-col-1">
+                    <Button label="Btn 12"
+                            className="p-button-secondary"
+                            style={{width: '100%', height: '100%'}}
+                            onClick={console.log}/>
                 </div>
             </div>
         )

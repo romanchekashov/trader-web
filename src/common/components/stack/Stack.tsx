@@ -1,12 +1,10 @@
 import * as React from "react";
-import {Button} from "primereact/components/button/Button";
 import "./Stack.css";
 import StackVolumes from "./volumes/StackVolumes";
 import {SubscriptionLike} from "rxjs";
 import {StackItemView} from "./StackItemView";
 import {StackItemWrapper} from "./data/StackItemWrapper";
 import {StackSwitcher} from "./StackSwitcher";
-import {StopCalc} from "./stop-calc/StopCalc";
 import {SecurityLastInfo} from "../../data/SecurityLastInfo";
 import {Order} from "../../data/Order";
 import {SecurityVolume} from "./volumes/data/SecurityVolume";
@@ -15,7 +13,6 @@ import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {OperationType} from "../../data/OperationType";
 import {createStop} from "../../api/rest/traderRestApi";
 import {OrderType} from "../../data/OrderType";
-import {roundByMultiplier} from "../../utils/utils";
 import {ActiveTrade} from "../../data/ActiveTrade";
 import {Security} from "../../data/Security";
 import {getSecurity} from "../../utils/Cache";
@@ -287,7 +284,6 @@ export class Stack extends React.Component<Props, States> {
     };
 
     render() {
-        const {securityLastInfo} = this.props;
         const {volumes, stackItemsHeight} = this.state;
         const stackItemWrappers = this.createStackViewNew();
 
@@ -298,7 +294,6 @@ export class Stack extends React.Component<Props, States> {
                 }}/>
                 <div className="td__stack-main">
                     <StackVolumes volumes={volumes}/>
-                    <StopCalc securityLastInfo={securityLastInfo}/>
                     <div className="p-grid stack-items-wrap">
                         <div className="p-col-12 stack-items" style={{height: stackItemsHeight}}>
                             {

@@ -42,7 +42,8 @@ const ActiveTradeView: React.FC<Props> = ({trade}) => {
         return (
             <DataTable value={[trade]} responsive
                        headerColumnGroup={headerGroup}
-                       rowClassName={rowClassName}>
+                       rowClassName={rowClassName}
+                       virtualRowHeight={24}>
                 <Column field="quantity" body={quantityTemplate}/>
                 <Column field="avgPrice"/>
                 <Column field="plPrice"/>

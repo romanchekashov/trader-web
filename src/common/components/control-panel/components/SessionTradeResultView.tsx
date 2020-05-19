@@ -10,7 +10,8 @@ type Props = {
 const SessionTradeResultView: React.FC<Props> = ({result}) => {
     if (result) {
         return (
-            <DataTable value={[result]} responsive>
+            <DataTable value={[result]} responsive
+                       virtualRowHeight={24}>
                 <Column field="plPrice" header="P&L"/>
                 <Column field="plStop" header="Stop P&L"/>
                 <Column field="plTarget" header="Target P&L"/>

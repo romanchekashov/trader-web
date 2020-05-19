@@ -118,7 +118,8 @@ export class GeneralBtn extends React.Component<Props, States> {
         return (
             <div className="p-grid">
                 <div className="p-col-2">
-                    <Button label="Buy" className="p-button-success" style={{width: '100%'}}
+                    <Button label="Buy" className="p-button-success"
+                            style={{width: '100%', paddingTop: 4, paddingBottom: 4}}
                             onClick={() => {
                                 this.createOrder(OperationType.BUY);
                             }}/>
@@ -126,6 +127,7 @@ export class GeneralBtn extends React.Component<Props, States> {
                 <div className="p-col-2" style={{padding: '0.5em 0'}}>
                     <span className="p-float-label">
                                 <InputText id="td__control-panel-price"
+                                           style={{width: '100px'}}
                                            value={price}
                                            onChange={(e) => this.setState({price: e.target['value']})}/>
                                 <label htmlFor="td__control-panel-price">Price</label>
@@ -134,29 +136,34 @@ export class GeneralBtn extends React.Component<Props, States> {
                 <div className="p-col-2">
                             <span className="p-float-label">
                                 <InputText id="td__control-panel-quantity"
+                                           style={{width: '100px'}}
                                            value={quantity}
                                            onKeyDown={this.quantityChangeByKeydown}
                                            onChange={(e) => this.setState({quantity: e.target['value']})}/>
                                 <label htmlFor="td__control-panel-quantity">Quantity</label>
                             </span>
                 </div>
-                <div className="p-col-1">
+                <div className="p-col-2">
                             <span className="p-float-label">
                                 <InputText id="steps"
+                                           style={{width: '100px'}}
                                            value={steps}
                                            onChange={(e) => this.setState({steps: e.target['value']})}/>
                                 <label htmlFor="steps">Steps</label>
                             </span>
                 </div>
                 <div className="p-col-2">
-                    <Dropdown value={multiplier} options={this.multipliers}
+                    <Dropdown value={multiplier}
+                              options={this.multipliers}
                               onChange={(e) => {
                                   this.setState({multiplier: e.value})
                               }}
+                              style={{width: '100px'}}
                               placeholder="Select a multiplier"/>
                 </div>
                 <div className="p-col-2">
-                    <Button label="Sell" className="p-button-danger" style={{width: '100%'}}
+                    <Button label="Sell" className="p-button-danger"
+                            style={{width: '100%', paddingTop: 4, paddingBottom: 4}}
                             onClick={() => {
                                 this.createOrder(OperationType.SELL);
                             }}/>

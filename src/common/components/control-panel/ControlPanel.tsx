@@ -6,13 +6,15 @@ import {ToggleButton} from "primereact/components/togglebutton/ToggleButton";
 import {FastBtn} from "./btn/FastBtn";
 import {GeneralBtn} from "./btn/GeneralBtn";
 import {CatchBtn} from "./btn/CatchBtn";
-import {InputText} from "primereact/components/inputtext/InputText";
 import StrategyBtn from "./btn/StrategyBtn";
 import {SecurityLastInfo} from "../../data/SecurityLastInfo";
 import {ActiveTrade} from "../../data/ActiveTrade";
 import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {SubscriptionLike} from "rxjs";
 import "./ControlPanel.css";
+import {StopCalc} from "../stack/stop-calc/StopCalc";
+import {SessionTradeResult} from "../../data/SessionTradeResult";
+import SessionTradeResultView from "./components/SessionTradeResultView";
 
 type Props = {};
 
@@ -27,14 +29,31 @@ type States = {
     stop: number
     security: SecurityLastInfo
     activeTrade: ActiveTrade
-    notVisible: boolean
-    viewTop: number
+    sessionResult: SessionTradeResult
+    visible: string
 };
 
 export class ControlPanel extends React.Component<Props, States> {
 
     private lastSecuritiesSubscription: SubscriptionLike = null;
     private activeTradeSubscription: SubscriptionLike = null;
+    private VisibleType = {
+        HIDE: 'HIDE',
+        VISIBLE: 'VISIBLE',
+        VISIBLE_PART: 'VISIBLE_PART'
+    };
+
+    private ToggleVisibleType = {
+        HIDE: -24,
+        VISIBLE: -16,
+        VISIBLE_PART: -17
+    };
+
+    private VisibleTypeViewTop = {
+        HIDE: -180,
+        VISIBLE: 8,
+        VISIBLE_PART: -85
+    };
 
     growl: any;
     btnSets = [
@@ -48,7 +67,9 @@ export class ControlPanel extends React.Component<Props, States> {
         super(props);
         this.state = {
             price: 0, quantity: 1, steps: 2, multiplier: 1, btnSet: 'general', isMarket: false,
-            hasStop: true, stop: 0.05, security: null, activeTrade: null, notVisible: true, viewTop: -140
+            hasStop: true, stop: 0.05, security: null, activeTrade: null,
+            visible: this.VisibleType.HIDE,
+            sessionResult: null
         };
     }
 
@@ -78,46 +99,38 @@ export class ControlPanel extends React.Component<Props, States> {
         this.activeTradeSubscription.unsubscribe();
     };
 
-    stopChangeByKeydown = (e) => {
-        let {stop} = this.state;
-
-        if (e.key === 'ArrowUp') {
-            stop += 0.01;
-        } else if (e.key === 'ArrowDown' && stop > 0.01) {
-            stop -= 0.01;
-        }
-
-        this.setState({stop});
+    toggleView = (toggle: boolean) => {
+        this.setState({
+            visible: !toggle ? this.VisibleType.VISIBLE : this.VisibleType.HIDE
+        });
     };
 
-    toggleView = (notVisible: boolean) => {
-        this.setState({notVisible, viewTop: notVisible ? -140 : 0});
+    toggleViewPart = (toggle: boolean) => {
+        this.setState({
+            visible: !toggle ? this.VisibleType.VISIBLE_PART : this.VisibleType.HIDE
+        });
     };
 
     render() {
-        const {stop, btnSet, isMarket, hasStop, security, activeTrade, notVisible, viewTop} = this.state;
+        const {stop, btnSet, isMarket, hasStop, security, activeTrade, visible, sessionResult} = this.state;
 
         return (
-            <div id="control-panel" className="p-grid" style={{top: viewTop}}>
+            <div id="control-panel" className="p-grid" style={{top: this.VisibleTypeViewTop[visible]}}>
                 <Growl ref={(el) => this.growl = el}/>
-                <div className="p-col-12">
-                    <div className="p-grid">
-                        <div className="p-col-12">
+                <div className="p-col-fixed"
+                     style={{
+                         width: '100px',
+                         padding: 0,
+                         paddingTop: visible === this.VisibleType.VISIBLE_PART ? 73 : 0
+                     }}>
+                    <StopCalc securityLastInfo={security}
+                              showSmall={visible === this.VisibleType.VISIBLE_PART}/>
+                </div>
+                <div className="p-col" style={{padding: 0}}>
+                    <div className="p-grid" style={{marginTop: 0, marginRight: 0}}>
+                        <div className="p-col-12" style={{paddingBottom: 0, paddingTop: 0, height: 90}}>
                             <div className="p-grid">
-                                <div className="p-col-2">
-                                    <ToggleButton style={{width: '100%'}} checked={hasStop}
-                                                  onLabel="Stop" offLabel="Stop"
-                                                  onChange={(e) => this.setState({hasStop: e.value})}/>
-                                </div>
-                                <div className="p-col-1"
-                                     style={{paddingLeft: 0, paddingRight: 0}}>
-                                    <InputText id="td__control-panel-stops"
-                                               value={stop}
-                                               onKeyDown={this.stopChangeByKeydown}
-                                               onChange={(e) => this.setState({stop: e.target['value']})}
-                                               disabled={!hasStop}/>
-                                </div>
-                                <div className="p-col-7">
+                                <div className="p-col-5">
                                     <SelectButton value={btnSet}
                                                   options={this.btnSets}
                                                   onChange={(e) => this.setState({btnSet: e.value})}/>
@@ -139,23 +152,24 @@ export class ControlPanel extends React.Component<Props, States> {
                             {btnSet === 'strategy' ?
                                 <StrategyBtn onSelectStrategy={console.log}/> : null}
                         </div>
-                        <div className="p-col-12">
-                            <div className="p-grid">
-                                <div className="p-col-12">
-                                    {/*<SessionTradeResultView result={result}/>*/}
-                                </div>
-                                <div className="p-col-12">
-                                    <ActiveTradeView trade={activeTrade}/>
-                                </div>
-                            </div>
+                        <div className="p-col-12" style={{paddingBottom: 0}}>
+                            <SessionTradeResultView result={sessionResult}/>
+                            <ActiveTradeView trade={activeTrade}/>
                         </div>
                     </div>
                 </div>
                 <ToggleButton id="control-panel-toggle-btn"
-                              checked={notVisible}
+                              checked={visible !== this.VisibleType.VISIBLE}
                               onChange={(e) => this.toggleView(e.value)}
+                              style={{bottom: this.ToggleVisibleType[visible]}}
                               onLabel="Show controls"
-                              offLabel="Hide"/>
+                              offLabel="Hide controls"/>
+                <ToggleButton id="control-panel-toggle-btn-2"
+                              checked={visible !== this.VisibleType.VISIBLE_PART}
+                              onChange={(e) => this.toggleViewPart(e.value)}
+                              style={{bottom: this.ToggleVisibleType[visible]}}
+                              onLabel="Show part"
+                              offLabel="Hide part"/>
             </div>
         )
     }

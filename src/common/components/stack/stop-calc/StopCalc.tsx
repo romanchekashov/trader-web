@@ -9,9 +9,10 @@ import {getSecurity} from "../../../utils/Cache";
 
 type Props = {
     securityLastInfo: SecurityLastInfo
+    showSmall?: boolean
 };
 
-export const StopCalc: React.FC<Props> = ({securityLastInfo}) => {
+export const StopCalc: React.FC<Props> = ({securityLastInfo, showSmall}) => {
 
     const [stop, setStop] = useState(500);
 
@@ -59,6 +60,18 @@ export const StopCalc: React.FC<Props> = ({securityLastInfo}) => {
         return Math.abs(current - enter);
     };
 
+    const stopChangeByKeydown = (e) => {
+        let {stop} = this.state;
+
+        if (e.key === 'ArrowUp') {
+            stop += 0.01;
+        } else if (e.key === 'ArrowDown' && stop > 0.01) {
+            stop -= 0.01;
+        }
+
+        setStop(stop);
+    };
+
     return (
         <div className="td__stop-calc">
             <div>
@@ -66,20 +79,23 @@ export const StopCalc: React.FC<Props> = ({securityLastInfo}) => {
                 <InputText id="td__stop-calc-stop"
                            type="number"
                            value={stop}
+                           onKeyDown={stopChangeByKeydown}
                            onChange={(e) => setStop(e.target['value'])}/>
             </div>
             {calcStopPriceView(1, true)}
-            {calcStopPriceView(2, true)}
+            {!showSmall ? calcStopPriceView(2, true) : null}
             {calcStopPriceView(5, true)}
-            {calcStopPriceView(10, true)}
+            {!showSmall ? calcStopPriceView(10, true) : null}
             {calcStopPriceView(15, true)}
-            {calcStopPriceView(20, true)}
-            <div className="td__stop-calc-price">{securityLastInfo ? securityLastInfo.priceLastTrade : null}</div>
-            {calcStopPriceView(20, false)}
+            {!showSmall ? calcStopPriceView(20, true) : null}
+            <div className="td__stop-calc-price">
+                {securityLastInfo ? securityLastInfo.priceLastTrade : 0}
+            </div>
+            {!showSmall ? calcStopPriceView(20, false) : null}
             {calcStopPriceView(15, false)}
-            {calcStopPriceView(10, false)}
+            {!showSmall ? calcStopPriceView(10, false) : null}
             {calcStopPriceView(5, false)}
-            {calcStopPriceView(2, false)}
+            {!showSmall ? calcStopPriceView(2, false) : null}
             {calcStopPriceView(1, false)}
         </div>
     )

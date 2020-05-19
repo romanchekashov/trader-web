@@ -21,3 +21,11 @@
 .td__stop-calc-price {
     text-align: center;
 }
+
+.td__stop-calc .p-inputtext {
+    padding: 0 2px !important;
+}
+
+.td__stop-calc div:first-child {
+    padding: 0 4px;
+}

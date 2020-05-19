@@ -113,11 +113,25 @@ export class CatchBtn extends React.Component<Props, States> {
         const {price, quantity} = this.state;
 
         return (
-            <div className="p-grid">
-                <div className="p-col-12">
+            <div className="p-grid catch-btn">
+                <div className="p-col-2">
+                    <Button label="Buy" className="p-button-success"
+                            style={{width: '100%', paddingTop: 4, paddingBottom: 4}}
+                            onClick={() => {
+                                this.createOrder(OperationType.BUY);
+                            }}/>
+                </div>
+                <div className="p-col-8">
                     <SelectButton value={quantity}
                                   options={this.quantitySets}
                                   onChange={(e) => this.setState({quantity: e.value})}/>
+                </div>
+                <div className="p-col-2">
+                    <Button label="Sell" className="p-button-danger"
+                            style={{width: '100%', paddingTop: 4, paddingBottom: 4}}
+                            onClick={() => {
+                                this.createOrder(OperationType.SELL);
+                            }}/>
                 </div>
 
                 {/*<div className="p-col-12">
@@ -131,25 +145,6 @@ export class CatchBtn extends React.Component<Props, States> {
                                   onChange={(e) => this.setState({buyPrice: e.value, price: e.value})} />
                 </div>*/}
 
-                <div className="p-col-12">
-                    <div className="p-grid">
-                        <div className="p-col-3">
-                            <Button label="Buy" className="p-button-success" style={{width: '100%'}}
-                                    onClick={() => {
-                                        this.createOrder(OperationType.BUY);
-                                    }}/>
-                        </div>
-                        <div className="p-col-3">
-                            <Button label="Sell" className="p-button-danger" style={{width: '100%'}}
-                                    onClick={() => {
-                                        this.createOrder(OperationType.SELL);
-                                    }}/>
-                        </div>
-                        <div className="p-col-3">
-                            Price: {price}
-                        </div>
-                    </div>
-                </div>
             </div>
         )
     }

@@ -1,14 +1,16 @@
 #control-panel {
+    height: 180px;
+    width: 1000px;
     position: fixed;
-    right: 0;
+    right: 8px;
     background-color: #dadada;
-    z-index: 1;
+    z-index: 9999;
     transition: top 0.2s;
 }
 
 #control-panel-toggle-btn {
     position: absolute;
-    bottom: -18px;
+    transition: bottom 0.2s;
 }
 
 #control-panel-toggle-btn .p-button-text {
@@ -16,4 +18,48 @@
     padding-top: 2px;
     padding-bottom: 0;
     line-height: 16px;
+}
+
+#control-panel-toggle-btn-2 {
+    position: absolute;
+    left: 100px;
+    transition: bottom 0.2s;
+}
+
+#control-panel-toggle-btn-2 .p-button-text {
+    font-size: 10px;
+    padding-top: 2px;
+    padding-bottom: 0;
+    line-height: 16px;
+}
+
+#control-panel .p-inputtext {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+#control-panel .p-datatable .p-datatable-thead > tr > th {
+    font-size: 10px;
+    padding: 0;
+}
+
+#control-panel .p-datatable .p-datatable-tbody > tr > td {
+    padding: 2px 0;
+    text-align: center;
+}
+
+#control-panel .p-button-text {
+    font-size: 12px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#control-panel .fast-btn .p-button-text {
+    padding: 0;
+}
+
+#control-panel .catch-btn .p-selectbutton .p-button-text {
+    font-size: 12px;
+    padding-top: 3px;
+    padding-bottom: 3px;
 }
