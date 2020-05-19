@@ -46,6 +46,7 @@
     "react-financial-charts": "^0.5.1",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",
+    "react-transition-group": "^4.4.1",
     "react-virtualized-auto-sizer": "^1.0.2",
     "react-window": "^1.8.5",
     "redux": "^4.0.5",

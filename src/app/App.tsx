@@ -10,10 +10,12 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import TradeStrategyAnalysisPage from "../features/analysis/AnalysisPage";
 import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
+import {ControlPanel} from "../common/components/control-panel/ControlPanel";
 
 export const App = () => {
     return (
         <div className="container-fluid">
+            <ControlPanel />
             <Header/>
             <Switch>
                 <Route exact path="/" component={HomePage}/>

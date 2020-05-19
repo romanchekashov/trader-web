@@ -1,0 +1,19 @@
+#control-panel {
+    position: fixed;
+    right: 0;
+    background-color: #dadada;
+    z-index: 1;
+    transition: top 0.2s;
+}
+
+#control-panel-toggle-btn {
+    position: absolute;
+    bottom: -18px;
+}
+
+#control-panel-toggle-btn .p-button-text {
+    font-size: 10px;
+    padding-top: 2px;
+    padding-bottom: 0;
+    line-height: 16px;
+}
