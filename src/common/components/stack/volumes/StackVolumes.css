@@ -1,0 +1,42 @@
+.td__stack .volumes {
+    margin: 0;
+    /* z-index: -3; */
+    /* position: absolute; */
+    /* top: 20px; */
+    /* bottom: 0px; */
+    width: 100px;
+    height: 100%;
+    overflow: hidden;
+    padding-top: 180px;
+}
+
+.volume {
+    line-height: 10px;
+    display: flex;
+}
+
+.volume-price {
+    margin: 0;
+    width: 30px;
+    display: inline-block;
+}
+
+.volume-volume {
+    width: 70px;
+    /*background-color: #bdc3c7;*/
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.volume-value {
+    position: absolute;
+}
+
+.volume-buy {
+    background-color: #16a08566
+}
+
+.volume-sell {
+    background-color: #e74c3c66
+}
