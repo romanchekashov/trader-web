@@ -19,7 +19,7 @@
 
 .alerts-row {
     display: table;
-    border-bottom: 1px solid gray;
+    /*border-bottom: 1px solid gray;*/
     width: 100%;
     cursor: pointer;
 }

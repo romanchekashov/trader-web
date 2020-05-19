@@ -1,9 +1,9 @@
 import * as React from "react";
 import {memo, useEffect, useState} from "react";
 import "./Notifications.css";
+import "./Signals.css";
 import {playSound} from "../../assets/assets";
 import {getNotifications} from "../../api/rest/analysisRestApi";
-import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {FixedSizeList as List} from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import {Dropdown} from "primereact/components/dropdown/Dropdown";
@@ -15,8 +15,10 @@ import {Security} from "../../data/Security";
 import {Calendar} from "primereact/calendar";
 import {FilterDto} from "../../data/FilterDto";
 import {NotificationDto} from "./data/NotificationDto";
-import moment = require("moment");
 import {InputText} from "primereact/inputtext";
+import {PatternName} from "../alerts/data/PatternName";
+import moment = require("moment");
+import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 
 type Props = {
     filter: FilterDto
@@ -69,8 +71,17 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
         }
     };
 
+    const getWSNotifications = (filter: FilterDto): void => {
+        WebsocketService.getInstance().send(WSEvent.GET_NOTIFICATIONS, {
+            classCode: filter.classCode,
+            secCode: filter.secCode
+        });
+    };
+
     useEffect(() => {
         let alertsSubscription;
+        let wsStatusSub;
+
         if (filter) {
             fetchAlertsAttempt = 0;
 
@@ -79,20 +90,34 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
             onIntervalChanged(null);
             onTextPatternChanged("");
 
+            fetchAlerts(filter.classCode, filter.secCode, null, start, "");
+
             if (filter.fetchByWS) {
+                setTimeout(() => getWSNotifications(filter), 500);
+
                 alertsSubscription = WebsocketService.getInstance()
-                    .on<NotificationDto[]>(filter.history ? WSEvent.HISTORY_ALERTS : WSEvent.ALERTS)
-                    .subscribe(newAlerts => {
-                        setAlertsReceivedFromServer(newAlerts, classCode, secCode, interval, start, textPattern);
+                    .on<NotificationDto[]>(filter.history ? WSEvent.HISTORY_NOTIFICATIONS : WSEvent.NOTIFICATIONS)
+                    .subscribe(notifications => {
+                        for (const notification of notifications) {
+                            notification.created = new Date(notification.created);
+                            notification.notified = new Date(notification.notified);
+                        }
+                        setAlertsReceivedFromServer(notifications, classCode, secCode, interval, start, textPattern);
                     });
-            } else {
-                fetchAlerts(filter.classCode, filter.secCode, null, start, "");
+
+                wsStatusSub = WebsocketService.getInstance().connectionStatus()
+                    .subscribe(isConnected => {
+                        if (isConnected && filter) {
+                            getWSNotifications(filter);
+                        }
+                    });
             }
         }
 
         // Specify how to clean up after this effect:
         return function cleanup() {
             if (alertsSubscription) alertsSubscription.unsubscribe();
+            if (wsStatusSub) wsStatusSub.unsubscribe();
         };
     }, [filter]);
 
@@ -117,10 +142,58 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
 
     const nameTemplate = (alert: NotificationDto) => {
         let className = "alert-icon ";
-        // const sInterval = alert.interval.toString();
-        // const title = `${alert.name} - Interval: ${sInterval}`;
+        const sInterval = alert.timeInterval.toString();
+        const title = `${alert.title} - Interval: ${sInterval}`;
+        const sArr = alert.title.split("-");
 
-        return <div className={className} title={alert.title}></div>;
+        if (sArr.length > 1) {
+            if ("CANDLE_PATTERN" === sArr[0]) {
+                className += getCandlePatternClassName(alert);
+            } else if ("PRICE_CLOSE_TO_SR_LEVEL" === sArr[0]) {
+                const cls = alert.title.replace("PRICE_CLOSE_TO_SR_LEVEL", "sr_level_cross");
+                className += cls.toLowerCase() + "-" + sInterval.toLowerCase();
+            } else {
+                className += alert.title.toLowerCase() + "-" + sInterval.toLowerCase();
+            }
+        }
+
+        return <div className={className} title={title}></div>;
+    };
+
+
+    const getCandlePatternClassName = (alert: NotificationDto) => {
+        let className = "";
+        const name = alert.title.split("-")[1];
+        const sInterval = alert.timeInterval.toString();
+
+        if (PatternName.BEARISH_REVERSAL_PATTERN_DARK_CLOUD_COVER === name) {
+            className += "bearish-reversal-pattern-dark-cloud-cover-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_ENGULFING === name) {
+            className += "bearish-reversal-pattern-engulfing-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_EVENING_STAR === name) {
+            className += "bearish-reversal-pattern-evening-star-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_HANGING_MAN === name) {
+            className += "bearish-reversal-pattern-hanging-man-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_HARAMI === name) {
+            className += "bearish-reversal-pattern-harami-" + sInterval.toLowerCase();
+        } else if (PatternName.BEARISH_REVERSAL_PATTERN_SHOOTING_STAR === name) {
+            className += "bearish-reversal-pattern-shooting-star-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_ENGULFING === name) {
+            className += "bullish-reversal-pattern-engulfing-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_HAMMER === name) {
+            className += "bullish-reversal-pattern-hammer-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_HARAMI === name) {
+            className += "bullish-reversal-pattern-harami-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_INVERTED_HAMMER === name) {
+            className += "bullish-reversal-pattern-inverted-hammer-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_MORNING_STAR === name) {
+            className += "bullish-reversal-pattern-morning-star-" + sInterval.toLowerCase();
+        } else if (PatternName.BULLISH_REVERSAL_PATTERN_PIERCING === name) {
+            className += "bullish-reversal-pattern-piercing-" + sInterval.toLowerCase();
+        } else if (PatternName.REVERSAL_PATTERN_DOJI === name) {
+            className += "reversal-pattern-doji-" + sInterval.toLowerCase();
+        }
+        return className;
     };
 
     const confirmTemplate = (alert: NotificationDto) => {
@@ -138,8 +211,11 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
         return <div className={className} title={alert.title}></div>;
     };
 
-    const descriptionTemplate = (alert: NotificationDto) => {
-        return <div title={alert.text}>{alert.text}</div>;
+    const descriptionTemplate = (dto: NotificationDto) => {
+        let index = dto.text.indexOf("[");
+        const description = (index !== -1) ? dto.text.substr(index) : dto.text;
+
+        return <div title={dto.text}>{description.replace("CANDLE_PATTERN - ", "")}</div>;
     };
 
     const onIntervalChanged = (newInterval: Interval) => {
@@ -226,7 +302,7 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
                     <div className="alerts-cell alerts-symbol" title={alert.securityCode}>
                         {alert.securityCode.substr(0, 8)}
                     </div>
-                    <div className="alerts-cell alerts-strength">
+                    {/*<div className="alerts-cell alerts-strength">
                         {strengthTemplate(alert)}
                     </div>
                     <div className="alerts-cell alerts-confirm">
@@ -234,7 +310,7 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
                     </div>
                     <div className="alerts-cell alerts-direction">
                         {possibleFutureDirectionUpTemplate(alert)}
-                    </div>
+                    </div>*/}
                     <div className="alerts-cell alerts-description">
                         {descriptionTemplate(alert)}
                     </div>
@@ -247,16 +323,26 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
         <div className="p-grid alerts" style={{height: viewHeight || 200}}>
             <div className="p-col-12 alerts-head">
                 <div className="alerts-head-dropdown alerts-head-class-code">
-                    <Dropdown value={classCode} options={classCodes}
-                              onChange={(e) => {
-                                  onClassCodeChanged(e.value);
-                              }}/>
+                    {
+                        filter ?
+                            classCode
+                            :
+                            <Dropdown value={classCode} options={classCodes}
+                                      onChange={(e) => {
+                                          onClassCodeChanged(e.value);
+                                      }}/>
+                    }
                 </div>
                 <div className="alerts-head-dropdown alerts-head-security">
-                    <Dropdown value={secCode} options={secCodes}
-                              onChange={(e) => {
-                                  onSecCodeChanged(e.value);
-                              }}/>
+                    {
+                        filter ?
+                            secCode
+                            :
+                            <Dropdown value={secCode} options={secCodes}
+                                      onChange={(e) => {
+                                          onSecCodeChanged(e.value);
+                                      }}/>
+                    }
                 </div>
                 <div className="alerts-head-dropdown alerts-head-interval">
                     <Dropdown value={interval} options={intervals}
@@ -270,7 +356,7 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
                 </div>
                 <div className="alerts-head-start-date">
                     <InputText value={textPattern}
-                               onChange={(e) => onTextPatternChanged(e.target['value'])} />
+                               onChange={(e) => onTextPatternChanged(e.target['value'])}/>
                 </div>
             </div>
             <div className="p-col-12 alerts-body" style={{height: (viewHeight || 200) - 20}}>
@@ -280,7 +366,7 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
                             className="List"
                             height={height}
                             itemCount={visibleAlerts.length}
-                            itemSize={90}
+                            itemSize={50}
                             width={width}
                         >
                             {Row}

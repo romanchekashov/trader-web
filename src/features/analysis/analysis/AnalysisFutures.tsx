@@ -41,7 +41,6 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
     const chart2Ref = useRef(null);
     const chartAlertsRef = useRef(null);
     const [trendLowTF, setTrendLowTF] = useState(null);
-    const [alertsFilter, setAlertsFilter] = useState(null);
     const [filterDto, setFilterDto] = useState(null);
     const [alert, setAlert] = useState(null);
 
@@ -72,20 +71,12 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
                     });
             }
 
-            if (!alertsFilter || alertsFilter.secCode !== future.secCode) {
-                setAlertsFilter({
-                    classCode: classCode,
-                    secCode: future.secCode,
-                    fetchByWS: false,
-                    history: true,
-                    size: AlertsSize.MID,
-                    all: false
-                });
+            if (!filterDto || filterDto.secCode !== future.secCode) {
                 setFilterDto({
                     classCode: classCode,
                     secCode: future.secCode,
-                    fetchByWS: false,
-                    history: true,
+                    fetchByWS: true,
+                    history: false,
                     all: false
                 });
             }
@@ -173,6 +164,7 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
                                               onIntervalChanged={interval => {}}
                                               width={chart2Width}
                                               security={future}
+                                              premise={premise}
                                               trend={trendLowTF}
                                               showGrid={true}/>
                             </div>
@@ -183,12 +175,9 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
                     <div className="p-col-5">
                         <div className="p-grid">
                             <div className="p-col-12">
-                                <Alerts filter={alertsFilter}
-                                        onAlertSelected={onAlertSelected}/>
-                            </div>
-                            <div className="p-col-12">
                                 <Notifications filter={filterDto}
-                                               onNotificationSelected={(n) => {console.log(n)}}/>
+                                               onNotificationSelected={(n) => {console.log(n)}}
+                                               viewHeight={400}/>
                             </div>
                         </div>
                     </div>
