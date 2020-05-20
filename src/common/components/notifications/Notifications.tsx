@@ -129,7 +129,7 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
     };
 
     if (!filter) {
-        return (<>Filter for alerts is not set.</>);
+        return (<>Filter for notifications is not set.</>);
     }
 
     if (filter && fetchAlertsError) {
@@ -219,13 +219,11 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
     };
 
     const onIntervalChanged = (newInterval: Interval) => {
-        console.log(newInterval);
         setInterval(newInterval);
         setFilteredAlerts(alerts, classCode, secCode, newInterval, start, textPattern);
     };
 
     const onClassCodeChanged = (newClassCode: ClassCode) => {
-        console.log(newClassCode);
         const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}];
         if (newClassCode) {
             const securities: Security[] = getSecuritiesByClassCode(newClassCode);
@@ -242,19 +240,16 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
     };
 
     const onSecCodeChanged = (newSecCode: string) => {
-        console.log(newSecCode);
         setSecCode(newSecCode);
         setFilteredAlerts(alerts, classCode, newSecCode, interval, start, textPattern);
     };
 
     const onStartDateChanged = (newStart: Date) => {
-        console.log(newStart);
         setStart(newStart);
         setFilteredAlerts(alerts, classCode, secCode, interval, newStart, textPattern);
     };
 
     const onTextPatternChanged = (newTextPattern: string) => {
-        console.log(newTextPattern);
         setTextPattern(newTextPattern);
         setFilteredAlerts(alerts, classCode, secCode, interval, start, newTextPattern);
     };

@@ -14,8 +14,6 @@ import {OperationType} from "../../data/OperationType";
 import {createStop} from "../../api/rest/traderRestApi";
 import {OrderType} from "../../data/OrderType";
 import {ActiveTrade} from "../../data/ActiveTrade";
-import {Security} from "../../data/Security";
-import {getSecurity} from "../../utils/Cache";
 
 type Props = {
     history?: boolean
@@ -31,7 +29,6 @@ type States = {
     orders: Order[]
     volumes: SecurityVolume[]
     activeTrade: ActiveTrade
-    securityInfo: Security
 };
 
 export class Stack extends React.Component<Props, States> {
@@ -51,7 +48,7 @@ export class Stack extends React.Component<Props, States> {
         super(props);
         this.state = {
             stackItemsHeight: 400, items: [], stackItems: [], ordersMap: {}, position: 1, orders: [],
-            volumes: [], activeTrade: null, securityInfo: null
+            volumes: [], activeTrade: null
         };
     }
 
@@ -61,8 +58,14 @@ export class Stack extends React.Component<Props, States> {
         });
     };
 
+    blockContextMenu = (evt) => {
+        evt.preventDefault();
+    };
+
     componentDidMount = (): void => {
         window.addEventListener('resize', this.updateSize);
+
+        document.getElementById("stack-items-wrap-id").addEventListener('contextmenu', this.blockContextMenu);
 
         this.stackItemsSubscription = WebsocketService.getInstance()
             .on<StackItem[]>(WSEvent.STACK).subscribe(stackItems => {
@@ -71,7 +74,7 @@ export class Stack extends React.Component<Props, States> {
 
         this.ordersSetupSubscription = WebsocketService.getInstance()
             .on<Order[]>(WSEvent.ORDERS).subscribe(orders => {
-                this.setState({orders});
+                this.setState({orders, ordersMap: this.ordersMap(orders)});
             });
 
         this.volumesSubscription = WebsocketService.getInstance()
@@ -91,21 +94,7 @@ export class Stack extends React.Component<Props, States> {
         this.volumesSubscription.unsubscribe();
         this.activeTradeSubscription.unsubscribe();
         window.removeEventListener('resize', this.updateSize);
-    };
-
-    componentWillReceiveProps = (nextProps) => {
-        if (nextProps.orders) {
-            this.setState({ordersMap: this.ordersMap()});
-        }
-
-        if (nextProps.securityLastInfo) {
-            const {securityInfo} = this.state;
-            if (!securityInfo || nextProps.securityLastInfo.secCode !== securityInfo.secCode) {
-                this.setState({
-                    securityInfo: getSecurity(nextProps.securityLastInfo.classCode, nextProps.securityLastInfo.secCode)
-                });
-            }
-        }
+        document.getElementById("stack-items-wrap-id").removeEventListener('contextmenu', this.blockContextMenu);
     };
 
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<States>, nextContext: any): boolean {
@@ -130,22 +119,17 @@ export class Stack extends React.Component<Props, States> {
                 break;
             case this.MOUSE_BTN_RIGHT:
                 mouseBtn = "right";
-                const order = this.ordersMap()[val.price];
-                if (order) {
-                    this.cancelOrder(order);
+                if (e.ctrlKey) {
+                    this.createStopOrder(val);
                 } else {
-                    this.createOrder(val);
+                    const {ordersMap} = this.state;
+                    const order = ordersMap[val.price];
+                    if (order) {
+                        this.cancelOrder(order);
+                    } else {
+                        this.createOrder(val);
+                    }
                 }
-                break;
-            case this.MOUSE_BTN_BACKWARD:
-                mouseBtn = "backward";
-                this.createStopOrder(val);
-                break;
-            case this.MOUSE_BTN_FORWARD:
-                mouseBtn = "forward";
-                break;
-            case this.MOUSE_BTN_WHEEL:
-                mouseBtn = "wheel";
                 break;
         }
         console.log("clicked: " + mouseBtn, e, val);
@@ -186,8 +170,7 @@ export class Stack extends React.Component<Props, States> {
         WebsocketService.getInstance().send(history ? WSEvent.HISTORY_CANCEL_ORDERS : WSEvent.CANCEL_ORDERS, [order])
     };
 
-    ordersMap = () => {
-        const {orders} = this.state;
+    ordersMap = (orders: Order[]): any => {
         const map = {};
         for (let i = 0, len = orders.length; i < len; i++) {
             const order = orders[i];
@@ -201,7 +184,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     createStackViewNew = (): StackItemWrapper[] => {
-        const {ordersMap, stackItems, activeTrade, securityInfo} = this.state;
+        const {ordersMap, stackItems, activeTrade} = this.state;
 
         if (stackItems.length === 0) return [];
         const stackItemMap = {};
@@ -288,13 +271,13 @@ export class Stack extends React.Component<Props, States> {
         const stackItemWrappers = this.createStackViewNew();
 
         return (
-            <div className="td__stack">
+            <div id="stack" className="td__stack">
                 <StackSwitcher onSelectedPosition={(pos) => {
                     this.setState({position: pos})
                 }}/>
                 <div className="td__stack-main">
                     <StackVolumes volumes={volumes}/>
-                    <div className="p-grid stack-items-wrap">
+                    <div id="stack-items-wrap-id" className="p-grid stack-items-wrap">
                         <div className="p-col-12 stack-items" style={{height: stackItemsHeight}}>
                             {
                                 stackItemWrappers.map(value =>

@@ -1,33 +1,36 @@
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
-import {ClassCode} from "../../../common/data/ClassCode";
-import {TradePremise} from "../../../common/data/strategy/TradePremise";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Interval} from "../../../common/data/Interval";
 import {getTradePremise, getTrend} from "../../../common/api/rest/analysisRestApi";
-import Alerts from "../../../common/components/alerts/Alerts";
 import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
-import {AlertsSize} from "../../../common/components/alerts/data/AlertsSize";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
 import {Dropdown} from "primereact/dropdown";
-import {Intervals, PrimeDropdownItem} from "../../../common/utils/utils";
+import {PrimeDropdownItem} from "../../../common/utils/utils";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import Notifications from "../../../common/components/notifications/Notifications";
+import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
+import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import {TradePremise} from "../../../common/data/strategy/TradePremise";
+import {ClassCode} from "../../../common/data/ClassCode";
+import {Order} from "../../../common/data/Order";
+import {ActiveTrade} from "../../../common/data/ActiveTrade";
 
 type Props = {
-    classCode: ClassCode
     future: any
 };
 
 let trendLowTFLoading = false;
 
-const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
+const AnalysisFutures: React.FC<Props> = ({future}) => {
     const [timeFrameHigh, setTimeFrameHigh] = useState(Interval.M30);
     const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
     const [timeFrameLow, setTimeFrameLow] = useState(Interval.M1);
     const [premise, setPremise] = useState(null);
+    const [orders, setOrders] = useState(null);
+    const [activeTrade, setActiveTrade] = useState(null);
 
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [chartNumber, setChartNumber] = useState(1);
@@ -52,37 +55,70 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
 
     useEffect(() => {
         if (future) {
-            console.log("AnalysisFutures: ", future);
+            // console.log("AnalysisFutures: ", future);
+            informServerAboutRequiredData(future.classCode, future.secCode);
 
-            // WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
-            //     brokerId: 1, tradingPlatform: TradingPlatform.QUIK,
-            //     classCode: classCode, secCode: future.secCode,
-            //     timeFrameHigh, timeFrameTrading, timeFrameLow
-            // });
-            if (!trendLowTF && !trendLowTFLoading) {
-                trendLowTFLoading = true;
-                getTrend(classCode, future.secCode, timeFrameLow, 540)
-                    .then(trend => {
-                        setTrendLowTF(trend);
-                        trendLowTFLoading = false;
-                    })
-                    .catch(reason => {
-                        trendLowTFLoading = false;
-                    });
-            }
-
+            // if (!trendLowTF && !trendLowTFLoading) {
+            //     trendLowTFLoading = true;
+            //     getTrend(future.classCode, future.secCode, timeFrameLow, 540)
+            //         .then(trend => {
+            //             setTrendLowTF(trend);
+            //             trendLowTFLoading = false;
+            //         })
+            //         .catch(reason => {
+            //             trendLowTFLoading = false;
+            //         });
+            // }
+            //
             if (!filterDto || filterDto.secCode !== future.secCode) {
                 setFilterDto({
-                    classCode: classCode,
+                    classCode: future.classCode,
                     secCode: future.secCode,
                     fetchByWS: true,
                     history: false,
                     all: false
                 });
             }
-
-            fetchPremise(timeFrameTrading);
+            //
+            // fetchPremise(timeFrameTrading);
         }
+
+        const wsStatusSub = WebsocketService.getInstance()
+            .connectionStatus()
+            .subscribe(isConnected => {
+                if (isConnected && future) {
+                    informServerAboutRequiredData(future.classCode, future.secCode);
+                }
+            });
+
+        const lastSecuritiesSubscription = WebsocketService.getInstance()
+            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+            .subscribe(securities => {
+                if (future) {
+                    const newSecurityLastInfo = securities.find(o => o.secCode === future.secCode);
+                    if (newSecurityLastInfo) {
+                        newSecurityLastInfo.timeLastTrade = new Date(newSecurityLastInfo.timeLastTrade);
+                        setSecurityLastInfo(newSecurityLastInfo);
+                    }
+                }
+            });
+
+        const tradePremiseSubscription = WebsocketService.getInstance()
+            .on<TradePremise>(WSEvent.TRADE_PREMISE)
+            .subscribe(newPremise => {
+                for (const srZone of newPremise.analysis.srZones) {
+                    srZone.timestamp = new Date(srZone.timestamp)
+                }
+                setPremise(newPremise);
+            });
+
+        const ordersSetupSubscription = WebsocketService.getInstance()
+            .on<Order[]>(WSEvent.ORDERS)
+            .subscribe(setOrders);
+
+        const activeTradeSubscription = WebsocketService.getInstance()
+            .on<ActiveTrade>(WSEvent.ACTIVE_TRADE)
+            .subscribe(setActiveTrade);
 
 
         setTimeout(updateSize, 1000);
@@ -91,8 +127,30 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
         // Specify how to clean up after this effect:
         return function cleanup() {
             window.removeEventListener('resize', updateSize);
+            wsStatusSub.unsubscribe();
+            lastSecuritiesSubscription.unsubscribe();
+            tradePremiseSubscription.unsubscribe();
+            ordersSetupSubscription.unsubscribe();
+            activeTradeSubscription.unsubscribe();
         };
     }, [future]);
+
+
+
+    const informServerAboutRequiredData = (classCode: ClassCode, secCode: string): void => {
+        if (classCode && secCode) {
+            WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
+                brokerId: 1,
+                tradingPlatform: TradingPlatform.QUIK,
+                classCode,
+                secCode,
+                timeFrameHigh: Interval.M30,
+                timeFrameTrading: Interval.M5,
+                timeFrameLow: Interval.M1
+            });
+            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, secCode);
+        }
+    };
 
     const fetchPremise = (timeFrameTrading: Interval) => {
         getTradePremise({
@@ -137,12 +195,12 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
                     </div>
                     <div className="p-col-12">
                         <DataTable value={[future]}>
-                            <Column field="totalDemand" header="Общ спрос" />
-                            <Column field="totalSupply" header="Общ предл" />
-                            <Column field="sellDepoPerContract" header="ГО прод" />
-                            <Column field="buyDepoPerContract" header="ГО покуп" />
-                            <Column field="todayMoneyTurnover" header="Оборот" />
-                            <Column field="numberOfTradesToday" header="Кол-во сделок" />
+                            <Column field="totalDemand" header="Общ спрос"/>
+                            <Column field="totalSupply" header="Общ предл"/>
+                            <Column field="sellDepoPerContract" header="ГО прод"/>
+                            <Column field="buyDepoPerContract" header="ГО покуп"/>
+                            <Column field="todayMoneyTurnover" header="Оборот"/>
+                            <Column field="numberOfTradesToday" header="Кол-во сделок"/>
                         </DataTable>
                     </div>
                 </div>
@@ -150,18 +208,21 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
                 <div className="p-grid" style={{margin: '0'}}>
                     <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
-                                      initialNumberOfCandles={1000}
+                                      initialNumberOfCandles={500}
                                       onIntervalChanged={onTradingIntervalChanged}
                                       width={chart1Width}
                                       security={future}
                                       premise={premise}
+                                      orders={orders}
+                                      activeTrade={activeTrade}
                                       showGrid={true}/>
                     </div>
                     {
                         chartNumber === 2 ? (
                             <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrameLow}
-                                              onIntervalChanged={interval => {}}
+                                              onIntervalChanged={interval => {
+                                              }}
                                               width={chart2Width}
                                               security={future}
                                               premise={premise}
@@ -176,7 +237,9 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
                         <div className="p-grid">
                             <div className="p-col-12">
                                 <Notifications filter={filterDto}
-                                               onNotificationSelected={(n) => {console.log(n)}}
+                                               onNotificationSelected={(n) => {
+                                                   console.log(n)
+                                               }}
                                                viewHeight={400}/>
                             </div>
                         </div>
@@ -185,7 +248,8 @@ const AnalysisFutures: React.FC<Props> = ({classCode, future}) => {
                         {
                             alert ?
                                 <ChartWrapper interval={alert.interval}
-                                              onIntervalChanged={interval => {}}
+                                              onIntervalChanged={interval => {
+                                              }}
                                               alert={alert}
                                               width={chartAlertsWidth}
                                               security={future}

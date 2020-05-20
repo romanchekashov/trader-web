@@ -15,6 +15,7 @@ import "./ControlPanel.css";
 import {StopCalc} from "../stack/stop-calc/StopCalc";
 import {SessionTradeResult} from "../../data/SessionTradeResult";
 import SessionTradeResultView from "./components/SessionTradeResultView";
+import {getSelectedSecurity} from "../../utils/Cache";
 
 type Props = {};
 
@@ -79,8 +80,10 @@ export class ControlPanel extends React.Component<Props, States> {
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
                 const {activeTrade} = this.state;
-                if (activeTrade) {
-                    const security = securities.find(o => o.secCode === activeTrade.secCode);
+                const selectedSecurity = getSelectedSecurity();
+                let secCode = activeTrade ? activeTrade.secCode : selectedSecurity ? selectedSecurity.secCode : null;
+                if (secCode) {
+                    const security = securities.find(o => o.secCode === secCode);
                     if (security) {
                         security.timeLastTrade = new Date(security.timeLastTrade);
                     }

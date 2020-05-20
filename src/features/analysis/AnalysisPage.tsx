@@ -3,13 +3,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
-import {
-    loadFilterData,
-    loadSecurityCurrency,
-    loadSecurityFuture,
-    loadSecurityShares,
-    loadTradePremise
-} from "./AnalysisActions";
+import {loadFilterData, loadSecurityCurrency, loadSecurityFuture, loadSecurityShares} from "./AnalysisActions";
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
 import {SecurityShare} from "../../common/data/SecurityShare";
@@ -28,8 +22,8 @@ import {Stack} from "../../common/components/stack/Stack";
 import {SecurityLastInfo} from "../../common/data/SecurityLastInfo";
 import {WebsocketService, WSEvent} from "../../common/api/WebsocketService";
 import {SubscriptionLike} from "rxjs";
-import {TradingPlatform} from "../../common/data/TradingPlatform";
 import {getTradePremise} from "../../common/api/rest/analysisRestApi";
+import {setSelectedSecurity} from "../../common/utils/Cache";
 
 function mapStateToProps(state: RootState) {
     return {
@@ -69,9 +63,7 @@ type Props = {
 
 class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
-    private wsStatusSub: SubscriptionLike = null;
     private lastSecuritiesSubscription: SubscriptionLike = null;
-    private tradePremiseSubscription: SubscriptionLike = null;
 
     constructor(props) {
         super(props);
@@ -87,19 +79,11 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
     }
 
     componentDidMount(): void {
-        const { actions, filterData } = this.props;
+        const {actions, filterData} = this.props;
 
         if (!filterData) {
             actions.loadFilterData();
         }
-
-        this.wsStatusSub = WebsocketService.getInstance().connectionStatus()
-            .subscribe(isConnected => {
-                const {securityLastInfo} = this.state;
-                if (isConnected && securityLastInfo) {
-                    this.informServerAboutRequiredData(securityLastInfo);
-                }
-            });
 
         this.lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
@@ -114,41 +98,14 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                 }
                 this.setState({securities, securityLastInfo});
             });
-
-        this.tradePremiseSubscription = WebsocketService.getInstance()
-            .on<TradePremise>(WSEvent.TRADE_PREMISE).subscribe(premise => {
-                for (const srZone of premise.analysis.srZones) {
-                    srZone.timestamp = new Date(srZone.timestamp)
-                }
-                this.setState({premise});
-            });
     }
 
     componentWillUnmount = (): void => {
-        this.wsStatusSub.unsubscribe();
         this.lastSecuritiesSubscription.unsubscribe();
-        this.tradePremiseSubscription.unsubscribe();
-    };
-
-    informServerAboutRequiredData = (securityLastInfo: SecurityLastInfo): void => {
-        const {filter} = this.state;
-
-        if (securityLastInfo) {
-            WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
-                brokerId: 1,
-                tradingPlatform: TradingPlatform.QUIK,
-                classCode: securityLastInfo.classCode,
-                secCode: securityLastInfo.secCode,
-                timeFrameHigh: filter.timeFrameHigh,
-                timeFrameTrading: filter.timeFrameTrading,
-                timeFrameLow: filter.timeFrameLow
-            });
-            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, securityLastInfo.secCode);
-        }
     };
 
     loadPremise = (share: SecurityShare) => {
-        const { filter } = this.state;
+        const {filter} = this.state;
 
         if (filter && share) {
             if (ClassCode.SPBFUT !== filter.classCode) {
@@ -186,19 +143,23 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
     onSelectRow = (selectedSecurity) => {
         if (selectedSecurity) {
-            const {securities} = this.state;
-            // this.loadPremise(selectedSecurity);
-            const securityLastInfo = securities.find(o => o.secCode === selectedSecurity.secCode);
-            this.informServerAboutRequiredData(securityLastInfo);
-            this.setState({selectedSecurity, isDetailsShown: true, securityLastInfo});
+            if (ClassCode.SPBFUT === selectedSecurity.classCode) {
+                const {securities} = this.state;
+                const securityLastInfo = securities.find(o => o.secCode === selectedSecurity.secCode);
+                this.setState({selectedSecurity, isDetailsShown: true, securityLastInfo});
+            } else {
+                this.loadPremise(selectedSecurity);
+                this.setState({selectedSecurity, isDetailsShown: true});
+            }
+            setSelectedSecurity(selectedSecurity);
         } else {
             this.setState({selectedSecurity, isDetailsShown: false});
         }
     };
 
     render() {
-        const { filterData, shares, currencies, futures } = this.props;
-        const { selectedSecurity, isDetailsShown, filter, securityLastInfo, premise } = this.state;
+        const {filterData, shares, currencies, futures} = this.props;
+        const {selectedSecurity, isDetailsShown, filter, securityLastInfo, premise} = this.state;
         let selectedSecuritiesView = null;
 
         if (selectedSecurity) {
@@ -261,8 +222,7 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                     break;
                 case ClassCode.SPBFUT:
                     analysis = (
-                        <AnalysisFutures classCode={filter ? filter.classCode : null}
-                                         future={selectedSecurity} />
+                        <AnalysisFutures future={selectedSecurity}/>
                     );
                     break;
             }

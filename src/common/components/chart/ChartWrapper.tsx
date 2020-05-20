@@ -27,8 +27,8 @@ import {getTrendLines, saveTrendLines} from "../../api/rest/TrendLineRestApi";
 import {Button} from "primereact/button";
 import {ChartTrendLine} from "./data/ChartTrendLine";
 import {ChartTrendLineType} from "./data/ChartTrendLineType";
-import moment = require("moment");
 import {TrendPoint} from "../../data/strategy/TrendPoint";
+import moment = require("moment");
 
 type Props = {
     interval: Interval,
@@ -192,6 +192,25 @@ export class ChartWrapper extends React.Component<Props, States> {
         this.fetchTrendLines(interval);
     };
 
+    componentDidUpdate = (prevProps) => {
+        const {security, interval} = this.props;
+        const {candles, innerInterval} = this.state;
+        if (security) {
+            if (!this.fetchingCandles) {
+                if (!prevProps.security || candles.length === 0 || security.secCode !== prevProps.security.secCode) {
+                    this.fetchCandles(security, innerInterval);
+                }
+                if (prevProps.security && security.priceLastTrade !== prevProps.security.priceLastTrade) {
+                    this.updateLastCandle();
+                }
+            }
+        }
+
+        if (interval !== innerInterval) {
+            this.setState({innerInterval: interval});
+        }
+    };
+
     fetchTrendLines = (interval: Interval): void => {
         const {security} = this.props;
         getTrendLines({
@@ -241,28 +260,6 @@ export class ChartWrapper extends React.Component<Props, States> {
     componentWillUnmount = (): void => {
         this.candlesSetupSubscription.unsubscribe();
         this.wsStatusSub.unsubscribe();
-    };
-
-    componentWillReceiveProps = (nextProps) => {
-        const {security} = this.props;
-        const {candles, innerInterval} = this.state;
-        if (nextProps.security && !this.fetchingCandles) {
-            if (security) {
-                if (candles.length === 0 || security.secCode !== nextProps.security.secCode) {
-                    this.fetchCandles(nextProps.security, innerInterval);
-                }
-                if (security.priceLastTrade !== nextProps.security.priceLastTrade) {
-                    this.updateLastCandle();
-                }
-            } else {
-                this.fetchCandles(nextProps.security, innerInterval);
-            }
-        }
-        if (nextProps.interval) {
-            if (nextProps.interval !== innerInterval) {
-                this.setState({innerInterval: nextProps.interval});
-            }
-        }
     };
 
     updateLastCandle = () => {

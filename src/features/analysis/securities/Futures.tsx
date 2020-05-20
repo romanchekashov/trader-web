@@ -41,7 +41,6 @@ const Futures: React.FC<Props> = ({futures, selectedFuture, onSelectRow}) => {
 
     const onSelect = (e) => {
         if (!Array.isArray(e.value)) {
-            console.log(e.value);
             onSelectRow(e.value);
         }
     };

@@ -8,7 +8,7 @@ let futures = [];
 let shares = [];
 let currencies = [];
 
-const fetchSecurities = () => {
+const fetchSecurityFutures = () => {
     getAllSecurityFutures()
         .then(securities => {
             futures = sortAlphabetically(securities, "secCode");
@@ -16,7 +16,9 @@ const fetchSecurities = () => {
                 securityMap[security.classCode + security.secCode] = security;
             }
         })
-        .catch(console.error);
+        .catch(fetchSecurityFutures);
+};
+const fetchSecurityShares = () => {
     getAllSecurityShares()
         .then(securities => {
             shares = sortAlphabetically(securities, "secCode");
@@ -24,7 +26,9 @@ const fetchSecurities = () => {
                 securityMap[security.classCode + security.secCode] = security;
             }
         })
-        .catch(console.error);
+        .catch(fetchSecurityShares);
+};
+const fetchSecurityCurrencies = () => {
     getAllSecurityCurrencies()
         .then(securities => {
             currencies = sortAlphabetically(securities, "secCode");
@@ -32,9 +36,11 @@ const fetchSecurities = () => {
                 securityMap[security.classCode + security.secCode] = security;
             }
         })
-        .catch(console.error);
+        .catch(fetchSecurityCurrencies);
 };
-fetchSecurities();
+fetchSecurityFutures();
+fetchSecurityShares();
+fetchSecurityCurrencies();
 
 export const getSecurity = (classCode: ClassCode, secCode: string): Security => {
     return securityMap[classCode + secCode];
@@ -47,3 +53,8 @@ export const getSecuritiesByClassCode = (classCode: ClassCode): Security[] => {
         case ClassCode.CETS: return currencies;
     }
 };
+
+let SELECTED_SECURITY = null;
+
+export const getSelectedSecurity = () => SELECTED_SECURITY;
+export const setSelectedSecurity = (security: Security) => SELECTED_SECURITY = security;
