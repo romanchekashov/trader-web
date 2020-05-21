@@ -7,9 +7,9 @@ import {TradeJournalFilterDto} from "./TradeJournalFilterDto";
 import {ClassCode} from "../../../common/data/ClassCode";
 import {Dropdown} from "primereact/dropdown";
 import {getFilterData} from "../../../common/api/rest/botControlRestApi";
-import {MarketSecuritiesDto} from "../../../common/data/bot/MarketBotFilterDataDto";
 import {SecurityInfo} from "../../../common/data/SecurityInfo";
 import moment = require("moment");
+import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
 
 export interface TradeJournalFilterState {
     market: MarketSecuritiesDto

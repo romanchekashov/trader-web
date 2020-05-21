@@ -1,13 +1,6 @@
 import {Broker} from "../Broker";
-import {SecurityInfo} from "../SecurityInfo";
 import {Interval} from "../Interval";
-import {ClassCode} from "../ClassCode";
-
-export class MarketSecuritiesDto {
-    market: string;
-    classCode: ClassCode;
-    securities: SecurityInfo[];
-}
+import {MarketSecuritiesDto} from "./MarketSecuritiesDto";
 
 export class MarketBotFilterDataDto {
     public broker: Broker;

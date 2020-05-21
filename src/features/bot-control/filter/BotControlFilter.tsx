@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {Button} from "primereact/button";
 import {Dropdown} from "primereact/dropdown";
-import {MarketBotFilterDataDto, MarketSecuritiesDto} from "../../../common/data/bot/MarketBotFilterDataDto";
+import {MarketBotFilterDataDto} from "../../../common/data/bot/MarketBotFilterDataDto";
 import {Broker} from "../../../common/data/Broker";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
 import {SecurityInfo} from "../../../common/data/SecurityInfo";
@@ -16,6 +16,9 @@ import {ClassCode} from "../../../common/data/ClassCode";
 import {Security} from "../../../common/data/Security";
 import {getSecuritiesByClassCode} from "../../../common/utils/Cache";
 import {InputText} from "primereact/inputtext";
+import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
+import {HistoryDateDto} from "../../../common/data/bot/HistoryDateDto";
+import moment = require("moment");
 
 export interface BotControlFilterState {
     broker: Broker
@@ -61,13 +64,21 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
     const [platform, setPlatform] = useState(initState.platform);
 
     const [interval, setInterval] = useState(null);
+    const [minInterval, setMinInterval] = useState(Interval.M1);
     const [classCode, setClassCode] = useState(null);
     const [secCode, setSecCode] = useState(null);
     const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}]);
     const [stop, setStop] = useState(500);
     const [strategy, setStrategy] = useState(null);
+    const [minStartDate, setMinStartDate] = useState(null);
+    const [maxEndDate, setMaxEndDate] = useState(null);
 
-    const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals].map(val => ({label: val || "ALL", value: val}));
+    const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals].map(val => ({
+        label: val || "ALL",
+        value: val
+    }));
+    const minIntervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M3, Interval.M5]
+        .map(val => ({label: val || "ALL", value: val}));
     const classCodes: PrimeDropdownItem<ClassCode>[] = [null, ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
         .map(val => ({label: val || "ALL", value: val}));
     const strategies: PrimeDropdownItem<string>[] = [null, "TREND_LINE_BREAKOUT", "TREND_CHANGE"]
@@ -130,6 +141,12 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
         setInterval(newInterval);
     };
 
+    const onMinIntervalChanged = (newInterval: Interval) => {
+        console.log(newInterval);
+        setMinInterval(newInterval);
+        updateHistoryDates(secCode, newInterval);
+    };
+
     const onClassCodeChanged = (newClassCode: ClassCode) => {
         console.log(newClassCode);
         const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}];
@@ -149,11 +166,24 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
     const onSecCodeChanged = (newSecCode: string) => {
         console.log(newSecCode);
         setSecCode(newSecCode);
+        updateHistoryDates(newSecCode, minInterval);
     };
 
     const onStrategyChanged = (newStrategy: string) => {
         console.log(newStrategy);
         setStrategy(newStrategy);
+    };
+
+    const updateHistoryDates = (newSecCode: string, minInterval: Interval) => {
+        const market: MarketSecuritiesDto = filter.marketSecurities.find(value => value.classCode === classCode);
+        const id: number = market.securities.find(value => value.futureSecCode === newSecCode || value.code === newSecCode).id;
+        const dto: HistoryDateDto = market.securityHistoryDate[id].find(value => value.interval === minInterval);
+        const min = moment(dto.start).toDate();
+        const max = moment(dto.end).toDate();
+        setMinStartDate(min);
+        setMaxEndDate(max);
+        setStart(min);
+        setEnd(max);
     };
 
     return (
@@ -178,6 +208,10 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
                           onChange={(e) => {
                               onIntervalChanged(e.value);
                           }} style={{width: '80px'}}/>
+                <Dropdown value={minInterval} options={minIntervals}
+                          onChange={(e) => {
+                              onMinIntervalChanged(e.value);
+                          }} style={{width: '80px'}}/>
                 <Dropdown value={strategy} options={strategies}
                           onChange={(e) => {
                               onStrategyChanged(e.value);
@@ -190,7 +224,13 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
                            style={{width: '80px'}}/>
             </div>
             <div className="p-toolbar-group-right" style={{display: "flex"}}>
-                <BotControlFilterHistory onEnabled={onHistory} onStartDate={setStart} onEndDate={setEnd}
+                <BotControlFilterHistory start={start}
+                                         end={end}
+                                         minStartDate={minStartDate}
+                                         maxEndDate={maxEndDate}
+                                         onEnabled={onHistory}
+                                         onStartDate={setStart}
+                                         onEndDate={setEnd}
                                          onDebug={setDebug} onStop={onStopHistoryClicked}/>
                 {history ? null :
                     <ToggleButton checked={realDepo} onChange={(e) => setRealDepo(e.value)} onLabel="Real Depo"

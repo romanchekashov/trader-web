@@ -5,13 +5,14 @@ import {Button} from "primereact/button";
 import {Dropdown} from "primereact/dropdown";
 import {Checkbox} from "primereact/checkbox";
 import {Broker} from "../../../common/data/Broker";
-import {MarketBotFilterDataDto, MarketSecuritiesDto} from "../../../common/data/bot/MarketBotFilterDataDto";
+import {MarketBotFilterDataDto} from "../../../common/data/bot/MarketBotFilterDataDto";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
 import {SecurityInfo} from "../../../common/data/SecurityInfo";
 import {Interval} from "../../../common/data/Interval";
 import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
 import "./Filter.css";
 import {Intervals} from "../../../common/utils/utils";
+import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
 
 export interface FilterState {
     broker: Broker

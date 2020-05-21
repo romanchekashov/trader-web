@@ -14,6 +14,8 @@ import {OperationType} from "../../data/OperationType";
 import {createStop} from "../../api/rest/traderRestApi";
 import {OrderType} from "../../data/OrderType";
 import {ActiveTrade} from "../../data/ActiveTrade";
+import {playSound} from "../../assets/assets";
+import {StopOrder} from "../../data/StopOrder";
 
 type Props = {
     history?: boolean
@@ -37,6 +39,9 @@ export class Stack extends React.Component<Props, States> {
     private ordersSetupSubscription: SubscriptionLike = null;
     private volumesSubscription: SubscriptionLike = null;
     private activeTradeSubscription: SubscriptionLike = null;
+
+    private previousOrdersNumber: number = 0;
+    private previousStopOrder: StopOrder;
 
     MOUSE_BTN_LEFT = 0;
     MOUSE_BTN_WHEEL = 1;
@@ -74,6 +79,7 @@ export class Stack extends React.Component<Props, States> {
 
         this.ordersSetupSubscription = WebsocketService.getInstance()
             .on<Order[]>(WSEvent.ORDERS).subscribe(orders => {
+                this.notifyIfOrderHit(orders);
                 this.setState({orders, ordersMap: this.ordersMap(orders)});
             });
 
@@ -84,6 +90,7 @@ export class Stack extends React.Component<Props, States> {
 
         this.activeTradeSubscription = WebsocketService.getInstance()
             .on<ActiveTrade>(WSEvent.ACTIVE_TRADE).subscribe(activeTrade => {
+                this.notifyIfStopHit(activeTrade);
                 this.setState({activeTrade});
             });
     };
@@ -95,6 +102,29 @@ export class Stack extends React.Component<Props, States> {
         this.activeTradeSubscription.unsubscribe();
         window.removeEventListener('resize', this.updateSize);
         document.getElementById("stack-items-wrap-id").removeEventListener('contextmenu', this.blockContextMenu);
+    };
+
+    notifyIfOrderHit = (orders: Order[]): void => {
+        if (orders && orders.length !== this.previousOrdersNumber) {
+            playSound(1);
+            this.previousOrdersNumber = orders.length;
+        }
+    };
+
+    notifyIfStopHit = (newActiveTrade: ActiveTrade): void => {
+        const {activeTrade} = this.state;
+
+        if ((!activeTrade && newActiveTrade) || (activeTrade && !newActiveTrade)) {
+            playSound(2);
+            if (newActiveTrade) {
+                this.previousStopOrder = newActiveTrade.stopOrder;
+            }
+        } else if (newActiveTrade && ((newActiveTrade.stopOrder && !this.previousStopOrder)
+            || (!newActiveTrade.stopOrder && this.previousStopOrder)
+            || (this.previousStopOrder && newActiveTrade.stopOrder.price !== this.previousStopOrder.price))) {
+            playSound(2);
+            this.previousStopOrder = newActiveTrade.stopOrder;
+        }
     };
 
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<States>, nextContext: any): boolean {

@@ -1,18 +1,19 @@
 import * as React from "react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {ToggleButton} from "primereact/togglebutton";
 import {Calendar} from "primereact/calendar";
-import moment = require("moment");
 import {Button} from "primereact/button";
 
 export interface BotControlFilterHistoryState {
     history: boolean
-    start: Date
-    end: Date
     debug: boolean
 }
 
 type Props = {
+    minStartDate: Date
+    maxEndDate: Date
+    start: Date
+    end: Date
     onEnabled: (history: boolean) => void
     onStartDate: (start: Date) => void
     onEndDate: (end: Date) => void
@@ -20,30 +21,20 @@ type Props = {
     onStop: () => void
 };
 
-export const BotControlFilterHistory: React.FC<Props> = ({onEnabled, onStartDate, onEndDate, onDebug, onStop}) => {
+export const BotControlFilterHistory: React.FC<Props> = ({
+                                                             minStartDate, maxEndDate, start, end, onEnabled, onStartDate,
+                                                             onEndDate, onDebug, onStop
+                                                         }) => {
     let initState: BotControlFilterHistoryState = {
         history: false,
-        start: moment().hours(10).minutes(0).seconds(0).toDate(),
-        end: moment().hours(23).minutes(50).seconds(0).toDate(),
         debug: false
     };
 
     const [history, setHistory] = useState(initState.history);
-    const [start, setStart] = useState(initState.start);
-    const [end, setEnd] = useState(initState.end);
+
     const onHistory = (history: boolean) => {
         setHistory(history);
         onEnabled(history);
-    };
-
-    const setStartDate = (start: any) => {
-        setStart(start);
-        onStartDate(start);
-    };
-
-    const setEndDate = (end: any) => {
-        setEnd(end);
-        onEndDate(end);
     };
 
     const [debug, setDebug] = useState(initState.debug);
@@ -62,15 +53,25 @@ export const BotControlFilterHistory: React.FC<Props> = ({onEnabled, onStartDate
             return (
                 <>
                     <div style={{lineHeight: '22px', margin: '5px'}}>Start:</div>
-                    <Calendar value={start} onChange={(e) => setStartDate(e.value)}
-                              showTime={true} showSeconds={true} inputStyle={{width: "90px"}} />
+                    <Calendar value={start}
+                              minDate={minStartDate}
+                              maxDate={maxEndDate}
+                              onChange={(e) => onStartDate(e.value as any)}
+                              showTime={true}
+                              inputStyle={{width: "90px"}}/>
                     <div style={{lineHeight: '22px', margin: '5px'}}>End:</div>
-                    <Calendar value={end} onChange={(e) => setEndDate(e.value)}
-                              showTime={true} showSeconds={true} inputStyle={{width: "90px"}} />
+                    <Calendar value={end}
+                              minDate={minStartDate}
+                              maxDate={maxEndDate}
+                              onChange={(e) => onEndDate(e.value as any)}
+                              showTime={true}
+                              inputStyle={{width: "90px"}}/>
 
-                    <ToggleButton checked={debug} onChange={(e) => onDebugClicked(e.value)} onLabel="Debug" offLabel="Debug"
-                                  style={{marginLeft: '10px'}} />
-                    {debug ? <Button label="Stop" onClick={onStopClicked} className="p-button-danger" style={{marginLeft: '10px'}}/> : null}
+                    <ToggleButton checked={debug} onChange={(e) => onDebugClicked(e.value)} onLabel="Debug"
+                                  offLabel="Debug"
+                                  style={{marginLeft: '10px'}}/>
+                    {debug ? <Button label="Stop" onClick={onStopClicked} className="p-button-danger"
+                                     style={{marginLeft: '10px'}}/> : null}
                 </>
             );
         }
@@ -78,7 +79,7 @@ export const BotControlFilterHistory: React.FC<Props> = ({onEnabled, onStartDate
 
     return (
         <>
-            <ToggleButton checked={history} onChange={(e) => onHistory(e.value)} onLabel="History" offLabel="History" />
+            <ToggleButton checked={history} onChange={(e) => onHistory(e.value)} onLabel="History" offLabel="History"/>
             {showDateSelect()}
         </>
     )
