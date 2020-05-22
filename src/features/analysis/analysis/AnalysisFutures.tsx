@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Interval} from "../../../common/data/Interval";
-import {getTradePremise, getTrend} from "../../../common/api/rest/analysisRestApi";
+import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
@@ -17,6 +17,7 @@ import {TradePremise} from "../../../common/data/strategy/TradePremise";
 import {ClassCode} from "../../../common/data/ClassCode";
 import {Order} from "../../../common/data/Order";
 import {ActiveTrade} from "../../../common/data/ActiveTrade";
+import Alerts from "../../../common/components/alerts/Alerts";
 
 type Props = {
     future: any
@@ -136,7 +137,6 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     }, [future]);
 
 
-
     const informServerAboutRequiredData = (classCode: ClassCode, secCode: string): void => {
         if (classCode && secCode) {
             WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
@@ -233,18 +233,25 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                     }
                 </div>
                 <div className="p-grid">
-                    <div className="p-col-5">
+                    <div className="p-col-12">
                         <div className="p-grid">
-                            <div className="p-col-12">
+                            <div className="p-col-4">
                                 <Notifications filter={filterDto}
                                                onNotificationSelected={(n) => {
                                                    console.log(n)
                                                }}
                                                viewHeight={400}/>
                             </div>
+                            <div className="p-col-4">
+                                <Alerts filter={filterDto}
+                                        onAlertSelected={(n) => {
+                                            console.log(n)
+                                        }}
+                                        alertsHeight={400}/>
+                            </div>
                         </div>
                     </div>
-                    <div className="p-col-7" ref={chartAlertsRef} style={{padding: '0'}}>
+                    <div className="p-col-12" ref={chartAlertsRef} style={{padding: '0'}}>
                         {
                             alert ?
                                 <ChartWrapper interval={alert.interval}

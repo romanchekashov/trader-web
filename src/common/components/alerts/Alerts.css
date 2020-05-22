@@ -34,19 +34,19 @@
 }
 
 .alerts-time {
-    width: 105px;
-    padding-left: 5px;
+    width: 50px;
+    padding-left: 0;
     padding-right: 0;
 }
 
 .alerts-name {
-    width: 50px;
-    padding-left: 5px !important;
-    padding-right: 5px !important;
+    width: 40px;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 .alerts-symbol {
-    width: 60px;
+    width: 50px;
     padding-left: 0;
     padding-right: 0;
     text-align: center;

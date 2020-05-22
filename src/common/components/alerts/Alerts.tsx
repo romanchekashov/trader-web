@@ -1,7 +1,6 @@
 import * as React from "react";
 import {memo, useEffect, useState} from "react";
 import {PatternResult} from "./data/PatternResult";
-import {AlertsFilter} from "./data/AlertsFilter";
 import "./Alerts.css";
 import "./CandlePattern.css";
 import {PatternName} from "./data/PatternName";
@@ -17,10 +16,11 @@ import {ClassCode} from "../../data/ClassCode";
 import {getSecuritiesByClassCode} from "../../utils/Cache";
 import {Security} from "../../data/Security";
 import {Calendar} from "primereact/calendar";
+import {FilterDto} from "../../data/FilterDto";
 import moment = require("moment");
 
 type Props = {
-    filter: AlertsFilter
+    filter: FilterDto
     onAlertSelected: (alert: PatternResult) => void
     alertsHeight?: number
 };
@@ -82,6 +82,9 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
                 alertsSubscription = WebsocketService.getInstance()
                     .on<PatternResult[]>(filter.history ? WSEvent.HISTORY_ALERTS : WSEvent.ALERTS)
                     .subscribe(newAlerts => {
+                        for (const result of newAlerts) {
+                            result.candle.timestamp = new Date(result.candle.timestamp)
+                        }
                         setAlertsReceivedFromServer(newAlerts, classCode, secCode, interval, start);
                     });
             } else {
@@ -93,7 +96,7 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
         return function cleanup() {
             if (alertsSubscription) alertsSubscription.unsubscribe();
         };
-    }, [filter]);
+    }, [filter, classCode, secCode, interval, start]);
 
     const setAlertsReceivedFromServer = (newAlerts: PatternResult[], newClassCode: ClassCode, newSecCode: string,
                                          newInterval: Interval, newStart: Date): void => {
@@ -242,9 +245,9 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
                     <div className="alerts-cell alerts-symbol" title={alert.candle.symbol}>
                         {alert.candle.symbol.substr(0, 8)}
                     </div>
-                    <div className="alerts-cell alerts-strength">
+                    {/*<div className="alerts-cell alerts-strength">
                         {strengthTemplate(alert)}
-                    </div>
+                    </div>*/}
                     <div className="alerts-cell alerts-confirm">
                         {confirmTemplate(alert)}
                     </div>

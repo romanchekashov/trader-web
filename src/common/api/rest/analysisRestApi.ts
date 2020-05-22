@@ -5,7 +5,6 @@ import {Interval} from "../../data/Interval";
 import {Trend} from "../../data/strategy/Trend";
 import {ClassCode} from "../../data/ClassCode";
 import {PatternResult} from "../../components/alerts/data/PatternResult";
-import {AlertsFilter} from "../../components/alerts/data/AlertsFilter";
 import {FilterDto} from "../../data/FilterDto";
 import {NotificationDto} from "../../components/notifications/data/NotificationDto";
 
@@ -35,7 +34,7 @@ export function getTrend(classCode: ClassCode, securityCode: string, interval: I
         .catch(handleError);
 }
 
-export function getCandlePatterns(filter: AlertsFilter): Promise<PatternResult[]> {
+export function getCandlePatterns(filter: FilterDto): Promise<PatternResult[]> {
     return fetch(baseUrl + 'candle-patterns', {
         method: "POST", // POST for create, PUT to update when id already exists.
         headers: {"content-type": "application/json"},
