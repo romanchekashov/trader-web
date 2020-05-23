@@ -1,0 +1,90 @@
+.market-state-column {
+    height: 100%;
+    width: 100%;
+    font-size: 12px;
+    text-align: center;
+    border-right: 1px solid #888;
+}
+
+.market-state-column-inner {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.grid-9 {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+}
+.grid-5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+.market-state-column-main {
+    height: 120px;
+    border-bottom: 1px solid #888;
+}
+.market-state-column-signals {
+    /*border-bottom: 1px solid #888;*/
+}
+.market-state-column-inner-column {
+    border-right: 1px solid #888;
+}
+.market-state-column-signal {
+    width: 20px;
+    padding: 0;
+    zoom: 0.5;
+}
+/*
+.market-state-column-signal:nth-child(6n) {
+    float: left;
+}
+*/
+
+.List {
+    border: 1px solid #d9dddd;
+}
+
+.ListItemEven,
+.ListItemOdd {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ListItemEven {
+    background-color: #f8f8f0;
+}
+
+.bullish_weak {
+    background-color: #81c784;
+    color: white;
+}
+.bullish {
+    background-color: #43a047;
+    color: white;
+}
+.bullish_strong {
+    background-color: #1b5e20;
+    color: white;
+}
+
+.bearish_weak {
+    background-color: #e57373;
+    color: white;
+}
+.bearish {
+    background-color: #e53935;
+    color: white;
+}
+.bearish_strong {
+    background-color: #b71c1c;
+    color: white;
+}

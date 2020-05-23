@@ -18,6 +18,7 @@ import {ClassCode} from "../../../common/data/ClassCode";
 import {Order} from "../../../common/data/Order";
 import {ActiveTrade} from "../../../common/data/ActiveTrade";
 import Alerts from "../../../common/components/alerts/Alerts";
+import MarketState from "../../../common/components/market-state/MarketState";
 
 type Props = {
     future: any
@@ -46,6 +47,8 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     const chartAlertsRef = useRef(null);
     const [trendLowTF, setTrendLowTF] = useState(null);
     const [filterDto, setFilterDto] = useState(null);
+    const [marketStateFilterDto, setMarketStateFilterDto] = useState(null);
+    const [marketStateFilterDto2, setMarketStateFilterDto2] = useState(null);
     const [alert, setAlert] = useState(null);
 
     const updateSize = () => {
@@ -78,6 +81,26 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                     fetchByWS: true,
                     history: false,
                     all: false
+                });
+            }
+            if (!marketStateFilterDto || marketStateFilterDto.secCode !== future.secCode) {
+                setMarketStateFilterDto({
+                    classCode: future.classCode,
+                    secCode: future.secCode,
+                    intervals: [Interval.M3, Interval.M1],
+                    // fetchByWS: true,
+                    // history: false,
+                    numberOfCandles: 1000
+                });
+            }
+            if (!marketStateFilterDto2 || marketStateFilterDto2.secCode !== future.secCode) {
+                setMarketStateFilterDto2({
+                    classCode: future.classCode,
+                    secCode: future.secCode,
+                    intervals: [Interval.M30, Interval.M3],
+                    // fetchByWS: true,
+                    // history: false,
+                    numberOfCandles: 50
                 });
             }
             //
@@ -221,6 +244,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                         chartNumber === 2 ? (
                             <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrameLow}
+                                              initialNumberOfCandles={1000}
                                               onIntervalChanged={interval => {
                                               }}
                                               width={chart2Width}
@@ -233,6 +257,12 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                     }
                 </div>
                 <div className="p-grid">
+                    <div className="p-col-12">
+                        <MarketState filter={marketStateFilterDto}/>
+                    </div>
+                    <div className="p-col-12">
+                        <MarketState filter={marketStateFilterDto2}/>
+                    </div>
                     <div className="p-col-12">
                         <div className="p-grid">
                             <div className="p-col-4">

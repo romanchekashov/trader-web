@@ -7,6 +7,8 @@ import {ClassCode} from "../../data/ClassCode";
 import {PatternResult} from "../../components/alerts/data/PatternResult";
 import {FilterDto} from "../../data/FilterDto";
 import {NotificationDto} from "../../components/notifications/data/NotificationDto";
+import {MarketStateFilterDto} from "../../components/market-state/data/MarketStateFilterDto";
+import {MarketStateDto} from "../../components/market-state/data/MarketStateDto";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -67,6 +69,24 @@ export function getNotifications(filter: FilterDto): Promise<NotificationDto[]> 
                     }
                 }
                 return notifications;
+            }))
+        .catch(handleError);
+}
+
+export function getMarketState(filter: MarketStateFilterDto): Promise<MarketStateDto> {
+    return fetch(baseUrl + 'market-state', {
+        method: "POST", // POST for create, PUT to update when id already exists.
+        headers: {"content-type": "application/json"},
+        body: JSON.stringify(filter)
+    })
+        .then(response => handleResponse(response)
+            .then(marketState => {
+                for (const marketStateInterval of marketState.marketStateIntervals) {
+                    for (const item of marketStateInterval.items) {
+                        item.candle.timestamp = new Date(item.candle.timestamp);
+                    }
+                }
+                return marketState;
             }))
         .catch(handleError);
 }
