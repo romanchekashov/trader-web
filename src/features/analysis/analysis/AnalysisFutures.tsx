@@ -91,7 +91,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                     intervals: [Interval.M3, Interval.M1],
                     // fetchByWS: true,
                     // history: false,
-                    numberOfCandles: 240
+                    numberOfCandles: 280
                 });
             }
             if (!marketStateFilterDto2 || marketStateFilterDto2.secCode !== future.secCode) {
@@ -259,10 +259,10 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                 </div>
                 <div className="p-grid">
                     <div className="p-col-12">
-                        <SwingStateList filter={marketStateFilterDto}/>
+                        <MarketState filter={marketStateFilterDto}/>
                     </div>
                     <div className="p-col-12">
-                        <MarketState filter={marketStateFilterDto}/>
+                        <SwingStateList filter={marketStateFilterDto}/>
                     </div>
                     <div className="p-col-12">
                         <div className="p-grid">

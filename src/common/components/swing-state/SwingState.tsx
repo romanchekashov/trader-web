@@ -15,6 +15,11 @@ type Props = {
 const SwingState: React.FC<Props> = ({swingState}) => {
     if (!swingState) return null;
 
+    const trendDirectionColor = {
+        "UP": "bullish_weak",
+        "DOWN": "bearish_weak"
+    };
+
     const [dateTimeFormat, setDateTimeFormat] = useState<string>("HH:mm/DD-MM-YY");
 
     useEffect(() => {
@@ -41,7 +46,7 @@ const SwingState: React.FC<Props> = ({swingState}) => {
 
     const Row = ({index, style}) => {
         const item: SwingStateItemDto = swingState.items[index];
-        const bullOrBear = item.startSwingPoint > item.endSwingPoint ? "bearish_weak " : "bullish_weak ";
+        const bullOrBear = trendDirectionColor[item.trendDirection];
         const oddOrEven = index % 2 ? "item-odd " : "item-even ";
         const className = "swing-state-column " + bullOrBear;
 
