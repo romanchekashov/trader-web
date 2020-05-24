@@ -11,22 +11,6 @@
     justify-content: flex-end;
 }
 
-.grid-9 {
-    display: grid;
-    grid-template-columns: repeat(9, 1fr);
-}
-.grid-5 {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-}
-.grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-}
-.grid-2 {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-}
 .market-state-column-main {
     height: 120px;
     border-bottom: 1px solid #888;

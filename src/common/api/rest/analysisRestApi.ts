@@ -9,6 +9,7 @@ import {FilterDto} from "../../data/FilterDto";
 import {NotificationDto} from "../../components/notifications/data/NotificationDto";
 import {MarketStateFilterDto} from "../../components/market-state/data/MarketStateFilterDto";
 import {MarketStateDto} from "../../components/market-state/data/MarketStateDto";
+import {SwingStateDto} from "../../components/swing-state/data/SwingStateDto";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -87,6 +88,25 @@ export function getMarketState(filter: MarketStateFilterDto): Promise<MarketStat
                     }
                 }
                 return marketState;
+            }))
+        .catch(handleError);
+}
+
+export function getSwingStates(filter: MarketStateFilterDto): Promise<SwingStateDto[]> {
+    return fetch(baseUrl + 'swing-states', {
+        method: "POST", // POST for create, PUT to update when id already exists.
+        headers: {"content-type": "application/json"},
+        body: JSON.stringify(filter)
+    })
+        .then(response => handleResponse(response)
+            .then(states => {
+                for (const state of states) {
+                    for (const item of state.items) {
+                        item.start = new Date(item.start);
+                        item.end = new Date(item.end);
+                    }
+                }
+                return states;
             }))
         .catch(handleError);
 }

@@ -1,0 +1,23 @@
+.swing-state-column {
+    height: 100%;
+    width: 100%;
+    font-size: 12px;
+    /*text-align: center;*/
+    border-right: 1px solid #888;
+    direction: initial;
+}
+
+.item-even,
+.item-odd {
+    /*display: flex;*/
+    /*align-items: center;*/
+    /*justify-content: center;*/
+}
+
+.item-even {
+    background-color: #f8f8f0;
+}
+
+.swing-state-column-time {
+    font-size: 10px;
+}
