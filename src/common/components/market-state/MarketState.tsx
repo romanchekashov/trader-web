@@ -271,8 +271,15 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
                         <div className="market-state-column-ema-cross">
                             {item.baseItem.emaCrossOperation} / {item.baseItem.emaCrossPrice}
                         </div>
+                        <div>
+                            {item.baseItem.signals
+                                .filter(signal => signal.name.indexOf("CANDLE_PATTERN") !== -1)
+                                .map(signal => nameTemplate(signal))}
+                        </div>
                         <div className={"market-state-column-signals grid-" + (3 * limit)}>
-                            {item.baseItem.signals.map(signal => (
+                            {item.baseItem.signals
+                                .filter(signal => signal.name.indexOf("CANDLE_PATTERN") === -1)
+                                .map(signal => (
                                 <div className="market-state-column-signal">
                                     {nameTemplate(signal)}
                                 </div>
@@ -299,8 +306,15 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
                                         <div className="market-state-column-ema-cross">
                                             {value.emaCrossOperation} / {value.emaCrossPrice}
                                         </div>
+                                        <div>
+                                            {value.signals
+                                                .filter(signal => signal.name.indexOf("CANDLE_PATTERN") !== -1)
+                                                .map(signal => nameTemplate(signal))}
+                                        </div>
                                         <div className={"market-state-column-inner-signals grid-2"}>
-                                            {value.signals.map(signal => (
+                                            {value.signals
+                                                .filter(signal => signal.name.indexOf("CANDLE_PATTERN") === -1)
+                                                .map(signal => (
                                                 <div className="market-state-column-signal">
                                                     {nameTemplate(signal)}
                                                 </div>
