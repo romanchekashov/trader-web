@@ -152,6 +152,11 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
             } else if ("PRICE_CLOSE_TO_SR_LEVEL" === sArr[0]) {
                 const cls = alert.title.replace("PRICE_CLOSE_TO_SR_LEVEL", "sr_level_cross");
                 className += cls.toLowerCase() + "-" + sInterval.toLowerCase();
+            } else if ("PRICE_CLOSE_TO_TREND_LINE" === sArr[0]) {
+                const cls = alert.title.replace("PRICE_CLOSE_TO_TREND_LINE", "trend_line_cross");
+                className += cls.toLowerCase() + "-" + sInterval.toLowerCase();
+            } else if ("SR_ZONE_CROSS" === sArr[0]) {
+                className += alert.title.toLowerCase();
             } else {
                 className += alert.title.toLowerCase() + "-" + sInterval.toLowerCase();
             }

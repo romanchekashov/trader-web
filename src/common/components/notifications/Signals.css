@@ -68,6 +68,12 @@
 .bearish-reversal-pattern-engulfing-m5 {
     background: url("images/signal-icons.png") no-repeat -320px 0;
 }
+.bearish-reversal-pattern-engulfing-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px 0;
+}
+.bearish-reversal-pattern-engulfing-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px 0;
+}
 
 /*------------------------------------------------*/
 .bullish-reversal-pattern-engulfing-m15 {
@@ -96,6 +102,12 @@
 }
 .bullish-reversal-pattern-engulfing-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -20px;
+}
+.bullish-reversal-pattern-engulfing-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -20px;
+}
+.bullish-reversal-pattern-engulfing-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -20px;
 }
 
 /*------------------------------------------------*/
@@ -126,6 +138,12 @@
 .bearish-reversal-pattern-dark-cloud-cover-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -40px;
 }
+.bearish-reversal-pattern-dark-cloud-cover-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -40px;
+}
+.bearish-reversal-pattern-dark-cloud-cover-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -40px;
+}
 
 /*------------------------------------------------*/
 .bearish-reversal-pattern-harami-m15 {
@@ -154,6 +172,12 @@
 }
 .bearish-reversal-pattern-harami-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -60px;
+}
+.bearish-reversal-pattern-harami-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -60px;
+}
+.bearish-reversal-pattern-harami-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -60px;
 }
 
 /*------------------------------------------------*/
@@ -184,6 +208,12 @@
 .bullish-reversal-pattern-harami-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -80px;
 }
+.bullish-reversal-pattern-harami-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -80px;
+}
+.bullish-reversal-pattern-harami-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -80px;
+}
 
 /*------------------------------------------------*/
 .bearish-reversal-pattern-shooting-star-m15 {
@@ -212,6 +242,12 @@
 }
 .bearish-reversal-pattern-shooting-star-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -100px;
+}
+.bearish-reversal-pattern-shooting-star-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -100px;
+}
+.bearish-reversal-pattern-shooting-star-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -100px;
 }
 
 /*------------------------------------------------*/
@@ -242,6 +278,12 @@
 .bearish-reversal-pattern-hanging-man-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -120px;
 }
+.bearish-reversal-pattern-hanging-man-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -120px;
+}
+.bearish-reversal-pattern-hanging-man-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -120px;
+}
 
 /*------------------------------------------------*/
 .bullish-reversal-pattern-hammer-m15 {
@@ -270,6 +312,12 @@
 }
 .bullish-reversal-pattern-hammer-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -140px;
+}
+.bullish-reversal-pattern-hammer-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -140px;
+}
+.bullish-reversal-pattern-hammer-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -140px;
 }
 
 /*------------------------------------------------*/
@@ -300,6 +348,12 @@
 .bullish-reversal-pattern-inverted-hammer-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -160px;
 }
+.bullish-reversal-pattern-inverted-hammer-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -160px;
+}
+.bullish-reversal-pattern-inverted-hammer-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -160px;
+}
 
 /*------------------------------------------------*/
 .bullish-reversal-pattern-piercing-m15 {
@@ -328,6 +382,12 @@
 }
 .bullish-reversal-pattern-piercing-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -180px;
+}
+.bullish-reversal-pattern-piercing-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -180px;
+}
+.bullish-reversal-pattern-piercing-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -180px;
 }
 
 /*------------------------------------------------*/
@@ -358,6 +418,12 @@
 .bearish-reversal-pattern-evening-star-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -200px;
 }
+.bearish-reversal-pattern-evening-star-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -200px;
+}
+.bearish-reversal-pattern-evening-star-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -200px;
+}
 
 /*------------------------------------------------*/
 .bullish-reversal-pattern-morning-star-m15 {
@@ -386,6 +452,12 @@
 }
 .bullish-reversal-pattern-morning-star-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -220px;
+}
+.bullish-reversal-pattern-morning-star-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -220px;
+}
+.bullish-reversal-pattern-morning-star-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -220px;
 }
 
 /*------------------------------------------------*/
@@ -416,8 +488,17 @@
 .reversal-pattern-doji-m5 {
     background: url("images/signal-icons.png") no-repeat -320px -240px;
 }
+.reversal-pattern-doji-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -240px;
+}
+.reversal-pattern-doji-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -240px;
+}
 
 /*------------------------------------------------*/
+.sr_level_cross-from_below-m15 {
+    background: url("images/signal-icons.png") no-repeat 0 -260px;
+}
 .sr_level_cross-from_below-m30 {
     background: url("images/signal-icons.png") no-repeat -40px -260px;
 }
@@ -439,7 +520,19 @@
 .sr_level_cross-from_below-month {
     background: url("images/signal-icons.png") no-repeat -280px -260px;
 }
+.sr_level_cross-from_below-m5 {
+    background: url("images/signal-icons.png") no-repeat -320px -260px;
+}
+.sr_level_cross-from_below-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -260px;
+}
+.sr_level_cross-from_below-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -260px;
+}
 /*------------------------------------------------*/
+.sr_level_cross-from_above-m15 {
+    background: url("images/signal-icons.png") no-repeat 0 -280px;
+}
 .sr_level_cross-from_above-m30 {
     background: url("images/signal-icons.png") no-repeat -40px -280px;
 }
@@ -460,4 +553,90 @@
 }
 .sr_level_cross-from_above-month {
     background: url("images/signal-icons.png") no-repeat -280px -280px;
+}
+.sr_level_cross-from_above-m5 {
+    background: url("images/signal-icons.png") no-repeat -320px -280px;
+}
+.sr_level_cross-from_above-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -280px;
+}
+.sr_level_cross-from_above-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -280px;
+}
+
+/*------------------------------------------------*/
+.trend_line_cross-from_below-m15 {
+    background: url("images/signal-icons.png") no-repeat 0 -300px;
+}
+.trend_line_cross-from_below-m30 {
+    background: url("images/signal-icons.png") no-repeat -40px -300px;
+}
+.trend_line_cross-from_below-m60 {
+    background: url("images/signal-icons.png") no-repeat -80px -300px;
+}
+.trend_line_cross-from_below-h2 {
+    background: url("images/signal-icons.png") no-repeat -120px -300px;
+}
+.trend_line_cross-from_below-h4 {
+    background: url("images/signal-icons.png") no-repeat -160px -300px;
+}
+.trend_line_cross-from_below-day {
+    background: url("images/signal-icons.png") no-repeat -200px -300px;
+}
+.trend_line_cross-from_below-week {
+    background: url("images/signal-icons.png") no-repeat -240px -300px;
+}
+.trend_line_cross-from_below-month {
+    background: url("images/signal-icons.png") no-repeat -280px -300px;
+}
+.trend_line_cross-from_below-m5 {
+    background: url("images/signal-icons.png") no-repeat -320px -300px;
+}
+.trend_line_cross-from_below-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -300px;
+}
+.trend_line_cross-from_below-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -300px;
+}
+/*------------------------------------------------*/
+.trend_line_cross-from_above-m15 {
+    background: url("images/signal-icons.png") no-repeat 0 -320px;
+}
+.trend_line_cross-from_above-m30 {
+    background: url("images/signal-icons.png") no-repeat -40px -320px;
+}
+.trend_line_cross-from_above-m60 {
+    background: url("images/signal-icons.png") no-repeat -80px -320px;
+}
+.trend_line_cross-from_above-h2 {
+    background: url("images/signal-icons.png") no-repeat -120px -320px;
+}
+.trend_line_cross-from_above-h4 {
+    background: url("images/signal-icons.png") no-repeat -160px -320px;
+}
+.trend_line_cross-from_above-day {
+    background: url("images/signal-icons.png") no-repeat -200px -320px;
+}
+.trend_line_cross-from_above-week {
+    background: url("images/signal-icons.png") no-repeat -240px -320px;
+}
+.trend_line_cross-from_above-month {
+    background: url("images/signal-icons.png") no-repeat -280px -320px;
+}
+.trend_line_cross-from_above-m5 {
+    background: url("images/signal-icons.png") no-repeat -320px -320px;
+}
+.trend_line_cross-from_above-m3 {
+    background: url("images/signal-icons.png") no-repeat -360px -320px;
+}
+.trend_line_cross-from_above-m1 {
+    background: url("images/signal-icons.png") no-repeat -400px -320px;
+}
+
+/*------------------------------------------------*/
+.sr_zone_cross-from_below {
+    background: url("images/signal-icons.png") no-repeat 0 -340px;
+}
+.sr_zone_cross-from_above {
+    background: url("images/signal-icons.png") no-repeat -40px -340px;
 }

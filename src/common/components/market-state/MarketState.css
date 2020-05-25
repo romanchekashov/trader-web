@@ -22,9 +22,20 @@
     border-right: 1px solid #888;
 }
 .market-state-column-signal {
-    width: 20px;
     padding: 0;
     zoom: 0.5;
+    background-color: #ccc;
+}
+.market-state-column-signal:hover {
+    zoom: 1;
+}
+
+.market-state-column-time {
+    font-size: 10px;
+    text-align: center;
+    background-color: #ccc;
+    color: #000;
+    /*margin-top: 12px;    */
 }
 /*
 .market-state-column-signal:nth-child(6n) {

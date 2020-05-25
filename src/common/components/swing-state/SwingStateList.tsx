@@ -7,6 +7,7 @@ import {PatternResult} from "../alerts/data/PatternResult";
 import {SwingStateDto} from "./data/SwingStateDto";
 import SwingState from "./SwingState";
 import {MarketStateFilterDto} from "../market-state/data/MarketStateFilterDto";
+import {Button} from "primereact/button";
 
 type Props = {
     filter: MarketStateFilterDto
@@ -17,17 +18,18 @@ let previousAlertsCount = 0;
 const SwingStateList: React.FC<Props> = ({filter}) => {
 
     const [swingStates, setSwingStates] = useState<SwingStateDto[]>([]);
-    const [fetchAlertsError, setFetchAlertsError] = useState(null);
+    const [fetchDataStatus, setFetchDataStatus] = useState(null);
 
     const fetchAlerts = () => {
+        setFetchDataStatus("Loading swing states for " + filter.secCode + "...");
         getSwingStates(filter)
             .then(states => {
                 setAlertsReceivedFromServer(states);
-                setFetchAlertsError(null);
+                setFetchDataStatus(null);
             })
             .catch(reason => {
                 setSwingStates([]);
-                setFetchAlertsError("Cannot get swing states for " + filter.secCode);
+                setFetchDataStatus("Cannot get swing states for " + filter.secCode);
                 if (fetchAlertsAttempt < 3) {
                     fetchAlertsAttempt++;
                     fetchAlerts();
@@ -79,8 +81,13 @@ const SwingStateList: React.FC<Props> = ({filter}) => {
         return (<>Filter for market state is not set.</>);
     }
 
-    if (filter && fetchAlertsError) {
-        return (<div style={{color: "red"}}>{fetchAlertsError}</div>);
+    if (filter && fetchDataStatus) {
+        return (
+            <div>
+                {fetchDataStatus}
+                <Button icon="pi pi-refresh" style={{marginLeft:'.25em'}} onClick={fetchAlerts} />
+            </div>
+        );
     }
 
     return (

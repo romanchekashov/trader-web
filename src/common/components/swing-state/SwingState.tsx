@@ -77,7 +77,8 @@ const SwingState: React.FC<Props> = ({swingState}) => {
                     END: {item.endSwingPoint}
                 </div>
                 <div className="swing-state-column-item swing-state-column-time">
-                    {swingState.interval}|{moment(item.start).format(dateTimeFormat)}/{moment.duration(moment(item.start).diff(item.end)).humanize()}
+                    <div>{swingState.interval} | {moment(item.start).format(dateTimeFormat)}</div>
+                    <div>{moment.duration(moment(item.start).diff(item.end)).humanize()}</div>
                 </div>
             </div>
         );

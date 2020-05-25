@@ -16,6 +16,7 @@ import {MarketStateInterval} from "./data/MarketStateInterval";
 import {PatternName} from "../alerts/data/PatternName";
 import {Signal} from "../../data/Signal";
 import moment = require("moment");
+import {Button} from "primereact/button";
 
 type Props = {
     filter: MarketStateFilterDto
@@ -28,8 +29,25 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
 
     const [marketStateIntervals, setMarketStateIntervals] = useState<MarketStateInterval[]>([]);
     const [limit, setLimit] = useState(1);
-    const [fetchAlertsError, setFetchAlertsError] = useState(null);
+    const [fetchDataStatus, setFetchDataStatus] = useState(null);
     const [selectedMarketStateItem, setSelectedMarketStateItem] = useState(null);
+
+    const dateTimeFormat = {
+        "M1": "HH:mm",
+        "M3": "HH:mm",
+        "M5": "HH:mm",
+        "M60": "HH:mm/DD-MM-YY"
+    };
+
+    const candleSentimentMap = {
+        BULLISH: 'BULL',
+        NEUTRAL: 'N',
+        BEARISH: 'BEAR',
+        BULLISH_STRONG: 'BULLS',
+        BULLISH_WEAK: 'BULLW',
+        BEARISH_STRONG: 'BEARS',
+        BEARISH_WEAK: 'BEARW'
+    };
 
     const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals]
         .map(val => ({label: val || "ALL", value: val}));
@@ -37,14 +55,15 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
         .map(val => ({label: val || "ALL", value: val}));
 
     const fetchAlerts = () => {
+        setFetchDataStatus("Loading market states for " + filter.secCode + "...");
         getMarketState(filter)
             .then(marketState => {
                 setAlertsReceivedFromServer(marketState);
-                setFetchAlertsError(null);
+                setFetchDataStatus(null);
             })
             .catch(reason => {
                 setMarketStateIntervals([]);
-                setFetchAlertsError("Cannot get market states for " + filter.secCode);
+                setFetchDataStatus("Cannot get market states for " + filter.secCode);
                 if (fetchAlertsAttempt < 3) {
                     fetchAlertsAttempt++;
                     fetchAlerts();
@@ -202,6 +221,11 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
             } else if ("PRICE_CLOSE_TO_SR_LEVEL" === sArr[0]) {
                 const cls = alert.name.replace("PRICE_CLOSE_TO_SR_LEVEL", "sr_level_cross");
                 className += cls.toLowerCase() + "-" + sInterval.toLowerCase();
+            } else if ("PRICE_CLOSE_TO_TREND_LINE" === sArr[0]) {
+                const cls = alert.name.replace("PRICE_CLOSE_TO_TREND_LINE", "trend_line_cross");
+                className += cls.toLowerCase() + "-" + sInterval.toLowerCase();
+            } else if ("SR_ZONE_CROSS" === sArr[0]) {
+                className += alert.name.toLowerCase();
             } else {
                 className += alert.name.toLowerCase() + "-" + sInterval.toLowerCase();
             }
@@ -214,8 +238,13 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
         return (<>Filter for market state is not set.</>);
     }
 
-    if (filter && fetchAlertsError) {
-        return (<div style={{color: "red"}}>{fetchAlertsError}</div>);
+    if (filter && fetchDataStatus) {
+        return (
+            <div>
+                {fetchDataStatus}
+                <Button icon="pi pi-refresh" style={{marginLeft:'.25em'}} onClick={fetchAlerts} />
+            </div>
+        );
     }
 
     const Row = ({index, style}) => {
@@ -234,10 +263,10 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
                     <div
                         className={"market-state-column-main " + item.baseItem.candleSentiment.toString().toLowerCase()}>
                         <div className="market-state-column-time">
-                            {moment(item.baseItem.candle.timestamp).format("HH:mm/DD-MM-YYYY")}
+                            {item.baseInterval} | {moment(item.baseItem.candle.timestamp).format(dateTimeFormat[item.baseInterval])}
                         </div>
                         <div className="market-state-column-candle-sentiment">
-                            {item.baseItem.candleSentiment} / {item.baseItem.candle.close}
+                            {candleSentimentMap[item.baseItem.candleSentiment]} / {item.baseItem.candle.close}
                         </div>
                         <div className="market-state-column-ema-cross">
                             {item.baseItem.emaCrossOperation} / {item.baseItem.emaCrossPrice}
@@ -262,10 +291,10 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
                                              setSelectedMarketStateItem(value);
                                          }}>
                                         <div className="market-state-column-time">
-                                            {moment(value.candle.timestamp).format("HH:mm/DD-MM-YYYY")}
+                                            {moment(value.candle.timestamp).format(dateTimeFormat[item.interval])}
                                         </div>
                                         <div className="market-state-column-candle-sentiment">
-                                            {value.candleSentiment} / {value.candle.close}
+                                            {candleSentimentMap[value.candleSentiment]} / {value.candle.close}
                                         </div>
                                         <div className="market-state-column-ema-cross">
                                             {value.emaCrossOperation} / {value.emaCrossPrice}
