@@ -16,11 +16,10 @@ import {OrderType} from "../../data/OrderType";
 import {ActiveTrade} from "../../data/ActiveTrade";
 import {playSound} from "../../assets/assets";
 import {StopOrder} from "../../data/StopOrder";
+import {getSelectedSecurity} from "../../utils/Cache";
+import {ToggleButton} from "primereact/togglebutton";
 
-type Props = {
-    history?: boolean
-    securityLastInfo: SecurityLastInfo
-};
+type Props = {};
 
 type States = {
     stackItemsHeight: number
@@ -31,10 +30,14 @@ type States = {
     orders: Order[]
     volumes: SecurityVolume[]
     activeTrade: ActiveTrade
+    history?: boolean
+    securityLastInfo: SecurityLastInfo
+    visible: string
 };
 
 export class Stack extends React.Component<Props, States> {
 
+    private lastSecuritiesSubscription: SubscriptionLike = null;
     private stackItemsSubscription: SubscriptionLike = null;
     private ordersSetupSubscription: SubscriptionLike = null;
     private volumesSubscription: SubscriptionLike = null;
@@ -49,17 +52,36 @@ export class Stack extends React.Component<Props, States> {
     MOUSE_BTN_BACKWARD = 3;
     MOUSE_BTN_FORWARD = 4;
 
+    private VisibleType = {
+        HIDE: 'HIDE',
+        VISIBLE: 'VISIBLE',
+        VISIBLE_PART: 'VISIBLE_PART'
+    };
+
+    private ToggleVisibleType = {
+        HIDE: -46,
+        VISIBLE: -45,
+        VISIBLE_PART: -47
+    };
+
+    private VisibleTypeViewTop = {
+        HIDE: -240,
+        VISIBLE: 0,
+        VISIBLE_PART: -100
+    };
+
     constructor(props) {
         super(props);
         this.state = {
             stackItemsHeight: 400, items: [], stackItems: [], ordersMap: {}, position: 1, orders: [],
-            volumes: [], activeTrade: null
+            volumes: [], activeTrade: null, history: false, securityLastInfo: null,
+            visible: this.VisibleType.HIDE
         };
     }
 
     updateSize = () => {
         this.setState({
-            stackItemsHeight: document.querySelector('.td__stack-main').clientHeight
+            stackItemsHeight: window.innerHeight
         });
     };
 
@@ -68,9 +90,25 @@ export class Stack extends React.Component<Props, States> {
     };
 
     componentDidMount = (): void => {
+        this.updateSize();
         window.addEventListener('resize', this.updateSize);
 
         document.getElementById("stack-items-wrap-id").addEventListener('contextmenu', this.blockContextMenu);
+
+        this.lastSecuritiesSubscription = WebsocketService.getInstance()
+            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+            .subscribe(securities => {
+                const {activeTrade} = this.state;
+                const selectedSecurity = getSelectedSecurity();
+                let secCode = activeTrade ? activeTrade.secCode : selectedSecurity ? selectedSecurity.secCode : null;
+                if (secCode) {
+                    const securityLastInfo = securities.find(o => o.secCode === secCode);
+                    if (securityLastInfo) {
+                        securityLastInfo.timeLastTrade = new Date(securityLastInfo.timeLastTrade);
+                    }
+                    this.setState({securityLastInfo});
+                }
+            });
 
         this.stackItemsSubscription = WebsocketService.getInstance()
             .on<StackItem[]>(WSEvent.STACK).subscribe(stackItems => {
@@ -96,6 +134,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     componentWillUnmount = (): void => {
+        this.lastSecuritiesSubscription.unsubscribe();
         this.stackItemsSubscription.unsubscribe();
         this.ordersSetupSubscription.unsubscribe();
         this.volumesSubscription.unsubscribe();
@@ -166,7 +205,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     createStopOrder = (val: any) => {
-        const {securityLastInfo} = this.props;
+        const {securityLastInfo} = this.state;
         createStop({
             classCode: securityLastInfo.classCode,
             secCode: securityLastInfo.secCode,
@@ -177,8 +216,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     createOrder = (val: any) => {
-        const {securityLastInfo, history} = this.props;
-        const {position} = this.state;
+        const {position, securityLastInfo, history} = this.state;
 
         const orders: Order[] = [
             {
@@ -196,7 +234,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     cancelOrder = (order: Order) => {
-        const {history} = this.props;
+        const {history} = this.state;
         WebsocketService.getInstance().send(history ? WSEvent.HISTORY_CANCEL_ORDERS : WSEvent.CANCEL_ORDERS, [order])
     };
 
@@ -296,17 +334,31 @@ export class Stack extends React.Component<Props, States> {
         return stackItemWrappers;
     };
 
+    toggleView = (toggle: boolean) => {
+        this.setState({
+            visible: !toggle ? this.VisibleType.VISIBLE : this.VisibleType.HIDE
+        });
+    };
+
+    toggleViewPart = (toggle: boolean) => {
+        this.setState({
+            visible: !toggle ? this.VisibleType.VISIBLE_PART : this.VisibleType.HIDE
+        });
+    };
+
     render() {
-        const {volumes, stackItemsHeight} = this.state;
+        const {volumes, stackItemsHeight, visible} = this.state;
         const stackItemWrappers = this.createStackViewNew();
 
         return (
-            <div id="stack" className="td__stack">
+            <div id="stack" className="td__stack" style={{right: this.VisibleTypeViewTop[visible]}}>
                 <StackSwitcher onSelectedPosition={(pos) => {
                     this.setState({position: pos})
                 }}/>
                 <div className="td__stack-main">
-                    <StackVolumes volumes={volumes}/>
+                    {
+                        visible !== this.VisibleType.VISIBLE_PART ? <StackVolumes volumes={volumes}/> : null
+                    }
                     <div id="stack-items-wrap-id" className="p-grid stack-items-wrap">
                         <div className="p-col-12 stack-items" style={{height: stackItemsHeight}}>
                             {
@@ -319,6 +371,18 @@ export class Stack extends React.Component<Props, States> {
                         </div>
                     </div>
                 </div>
+                <ToggleButton id="stack-toggle-btn"
+                              checked={visible !== this.VisibleType.VISIBLE}
+                              onChange={(e) => this.toggleView(e.value)}
+                              style={{left: this.ToggleVisibleType[visible]}}
+                              onLabel="Show stack"
+                              offLabel="Hide stack"/>
+                <ToggleButton id="stack-toggle-btn-2"
+                              checked={visible !== this.VisibleType.VISIBLE_PART}
+                              onChange={(e) => this.toggleViewPart(e.value)}
+                              style={{left: this.ToggleVisibleType[visible] + 4}}
+                              onLabel="Show part"
+                              offLabel="Hide part"/>
             </div>
         )
     }

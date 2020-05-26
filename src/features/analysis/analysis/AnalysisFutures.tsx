@@ -91,7 +91,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                     intervals: [Interval.M3, Interval.M1],
                     // fetchByWS: true,
                     // history: false,
-                    numberOfCandles: 280
+                    numberOfCandles: 560
                 });
             }
             if (!marketStateFilterDto2 || marketStateFilterDto2.secCode !== future.secCode) {
@@ -232,7 +232,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                 <div className="p-grid" style={{margin: '0'}}>
                     <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
-                                      initialNumberOfCandles={500}
+                                      initialNumberOfCandles={1000}
                                       onIntervalChanged={onTradingIntervalChanged}
                                       width={chart1Width}
                                       security={future}

@@ -250,7 +250,7 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                         {
                             isDetailsShown ?
                                 <div className="p-col-fixed" style={{width: '240px', padding: 0}}>
-                                    <Stack securityLastInfo={securityLastInfo}/>
+
                                 </div>
                                 : null
                         }

@@ -2,7 +2,7 @@
     height: 180px;
     width: 1000px;
     position: fixed;
-    right: 8px;
+    right: 248px;
     background-color: #dadada;
     z-index: 9999;
     transition: top 0.2s;
@@ -11,6 +11,7 @@
 #control-panel-toggle-btn {
     position: absolute;
     transition: bottom 0.2s;
+    left: 200px;
 }
 
 #control-panel-toggle-btn .p-button-text {
@@ -22,7 +23,7 @@
 
 #control-panel-toggle-btn-2 {
     position: absolute;
-    left: 100px;
+    left: 300px;
     transition: bottom 0.2s;
 }
 
