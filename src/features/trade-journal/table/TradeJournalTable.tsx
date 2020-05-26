@@ -179,7 +179,7 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
                    rowExpansionTemplate={rowExpansionTemplate} dataKey="id">
             <Column expander={true}/>
             <Column field="id"/>
-            <Column field="security.symbol"/>
+            <Column field="security.secCode"/>
             <Column field="isShort" body={isShortTemplate}/>
             <Column field="open" body={dateTemplate}/>
             <Column field="open" body={dayOfWeekTemplate} style={{width: '10%'}}/>
