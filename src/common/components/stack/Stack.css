@@ -1,7 +1,7 @@
 #stack {
     top: 0;
     bottom: 0;
-    width: 240px;
+    width: 260px;
     position: fixed;
     right: 8px;
     background-color: #dadada;
@@ -108,7 +108,7 @@
     width: 70px;
 }
 .stack-item-price {
-    width: 30px;
+    width: 50px;
 }
 .stack-item-order {
     width: 40px;
@@ -136,7 +136,7 @@
 }
 
 .stack-items-wrap {
-    width: 140px;
+    width: 160px;
     margin: 0;
     height: 100%;
     overflow: hidden;

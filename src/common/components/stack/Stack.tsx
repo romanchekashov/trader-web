@@ -18,6 +18,7 @@ import {playSound} from "../../assets/assets";
 import {StopOrder} from "../../data/StopOrder";
 import {getSelectedSecurity} from "../../utils/Cache";
 import {ToggleButton} from "primereact/togglebutton";
+import {Security} from "../../data/Security";
 
 type Props = {};
 
@@ -32,6 +33,7 @@ type States = {
     activeTrade: ActiveTrade
     history?: boolean
     securityLastInfo: SecurityLastInfo
+    securityInfo: Security
     visible: string
 };
 
@@ -65,7 +67,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     private VisibleTypeViewTop = {
-        HIDE: -240,
+        HIDE: -260,
         VISIBLE: 0,
         VISIBLE_PART: -100
     };
@@ -74,7 +76,7 @@ export class Stack extends React.Component<Props, States> {
         super(props);
         this.state = {
             stackItemsHeight: 400, items: [], stackItems: [], ordersMap: {}, position: 1, orders: [],
-            volumes: [], activeTrade: null, history: false, securityLastInfo: null,
+            volumes: [], activeTrade: null, history: false, securityLastInfo: null, securityInfo: null,
             visible: this.VisibleType.HIDE
         };
     }
@@ -98,8 +100,11 @@ export class Stack extends React.Component<Props, States> {
         this.lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
-                const {activeTrade} = this.state;
+                const {activeTrade, securityInfo} = this.state;
                 const selectedSecurity = getSelectedSecurity();
+                if (!securityInfo || securityInfo.secCode !== selectedSecurity.secCode) {
+                    this.setState({securityInfo: selectedSecurity});
+                }
                 let secCode = activeTrade ? activeTrade.secCode : selectedSecurity ? selectedSecurity.secCode : null;
                 if (secCode) {
                     const securityLastInfo = securities.find(o => o.secCode === secCode);
@@ -252,22 +257,24 @@ export class Stack extends React.Component<Props, States> {
     };
 
     createStackViewNew = (): StackItemWrapper[] => {
-        const {ordersMap, stackItems, activeTrade} = this.state;
+        const {ordersMap, stackItems, activeTrade, securityInfo} = this.state;
 
-        if (stackItems.length === 0) return [];
+        if (stackItems.length === 0 || !securityInfo) return [];
         const stackItemMap = {};
         for (const stackItem of stackItems) {
             stackItemMap[stackItem.price] = stackItem;
         }
 
-        const multiplier = 100;
-        const step = 0.01 * multiplier;
-        const offset = 0.2 * multiplier;
+        const multiplier = Math.pow(10, securityInfo.scale);
+        const step = securityInfo.secPriceStep * multiplier;
+        const offset = 20 * step;
         const stackItemsStartPrice = Math.round(stackItems[0].price * multiplier);
         const stackItemsEndPrice = Math.round(stackItems[stackItems.length - 1].price * multiplier);
         let price = stackItemsStartPrice + offset;
         const endPrice = stackItemsEndPrice - offset;
         const stackItemWrappers: StackItemWrapper[] = [];
+        const stackItem10 = step * 10;
+        const stackItem5 = step * 5;
 
         while (price > endPrice) {
             let style = {};
@@ -285,9 +292,9 @@ export class Stack extends React.Component<Props, States> {
             }
 
             let className = "stack-item";
-            if (price % 10 === 0) {
+            if (price % stackItem10 === 0) {
                 className += " stack-item-10";
-            } else if (price % 5 === 0) {
+            } else if (price % stackItem5 === 0) {
                 className += " stack-item-5";
             }
 
