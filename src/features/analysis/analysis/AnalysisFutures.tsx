@@ -89,9 +89,9 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                     classCode: future.classCode,
                     secCode: future.secCode,
                     intervals: [Interval.M3, Interval.M1],
-                    // fetchByWS: true,
+                    fetchByWS: true,
                     // history: false,
-                    numberOfCandles: 560
+                    numberOfCandles: 100
                 });
             }
             if (!marketStateFilterDto2 || marketStateFilterDto2.secCode !== future.secCode) {
@@ -173,6 +173,14 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                 timeFrameLow: Interval.M1
             });
             WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, secCode);
+            WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
+                classCode: future.classCode,
+                secCode: future.secCode,
+                intervals: [Interval.M3, Interval.M1],
+                fetchByWS: true,
+                // history: false,
+                numberOfCandles: 100
+            });
         }
     };
 
