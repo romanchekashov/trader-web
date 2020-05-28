@@ -61,9 +61,8 @@ const SwingStateList: React.FC<Props> = ({filter}) => {
                         }
                         setAlertsReceivedFromServer(states);
                     });
-            } else {
-                fetchAlerts();
             }
+            fetchAlerts();
         }
 
         // Specify how to clean up after this effect:

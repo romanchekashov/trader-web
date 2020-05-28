@@ -143,14 +143,9 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
     onSelectRow = (selectedSecurity) => {
         if (selectedSecurity) {
-            if (ClassCode.SPBFUT === selectedSecurity.classCode) {
-                const {securities} = this.state;
-                const securityLastInfo = securities.find(o => o.secCode === selectedSecurity.secCode);
-                this.setState({selectedSecurity, isDetailsShown: true, securityLastInfo});
-            } else {
-                this.loadPremise(selectedSecurity);
-                this.setState({selectedSecurity, isDetailsShown: true});
-            }
+            const {securities} = this.state;
+            const securityLastInfo = securities.find(o => o.secCode === selectedSecurity.secCode);
+            this.setState({selectedSecurity, isDetailsShown: true, securityLastInfo});
             setSelectedSecurity(selectedSecurity);
         } else {
             this.setState({selectedSecurity, isDetailsShown: false});
@@ -201,23 +196,9 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
         if (filter) {
             switch (filter.classCode) {
                 case ClassCode.TQBR:
-                    analysis = (
-                        <Analysis classCode={filter ? filter.classCode : null}
-                                  timeFrameHigh={filter ? filter.timeFrameHigh : null}
-                                  timeFrameTrading={filter ? filter.timeFrameTrading : null}
-                                  timeFrameLow={filter ? filter.timeFrameLow : null}
-                                  security={selectedSecurity}
-                                  premise={premise}/>
-                    );
-                    break;
                 case ClassCode.CETS:
                     analysis = (
-                        <Analysis classCode={filter ? filter.classCode : null}
-                                  timeFrameHigh={filter ? filter.timeFrameHigh : null}
-                                  timeFrameTrading={filter ? filter.timeFrameTrading : null}
-                                  timeFrameLow={filter ? filter.timeFrameLow : null}
-                                  security={selectedSecurity}
-                                  premise={premise}/>
+                        <Analysis security={selectedSecurity}/>
                     );
                     break;
                 case ClassCode.SPBFUT:

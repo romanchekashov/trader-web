@@ -1,38 +1,44 @@
 import * as React from "react";
-import {useEffect} from "react";
-import {ClassCode} from "../../../common/data/ClassCode";
-import {SecurityShare} from "../../../common/data/SecurityShare";
+import {useEffect, useRef, useState} from "react";
 import {TradePremise} from "../../../common/data/strategy/TradePremise";
 import {Interval} from "../../../common/data/Interval";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
-import {SecurityCurrency} from "../../../common/data/SecurityCurrency";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import Alerts from "../../../common/components/alerts/Alerts";
-import {useState} from "react";
-import {useRef} from "react";
 import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
-import {AlertsSize} from "../../../common/components/alerts/data/AlertsSize";
+import {Dropdown} from "primereact/dropdown";
+import {DataTable} from "primereact/datatable";
+import {Column} from "primereact/column";
+import {PrimeDropdownItem} from "../../../common/utils/utils";
+import MarketState from "../../../common/components/market-state/MarketState";
+import SwingStateList from "../../../common/components/swing-state/SwingStateList";
+import Notifications from "../../../common/components/notifications/Notifications";
+import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
+import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import {Order} from "../../../common/data/Order";
+import {ActiveTrade} from "../../../common/data/ActiveTrade";
+import {TradingPlatform} from "../../../common/data/TradingPlatform";
+import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 
 export interface AnalysisState {
     realDepo: boolean
 }
 
 type Props = {
-    classCode: ClassCode
-    timeFrameHigh: Interval
-    timeFrameTrading: Interval
-    timeFrameLow: Interval
     security: any
-    premise: TradePremise
 }
 
-const Analysis: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, timeFrameLow, security, premise}) => {
-    let initState: AnalysisState = {
-        realDepo: false
-    };
+const Analysis: React.FC<Props> = ({security}) => {
+    const [timeFrameHigh, setTimeFrameHigh] = useState(Interval.M30);
+    const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
+    const [timeFrameLow, setTimeFrameLow] = useState(Interval.M1);
+    const [premise, setPremise] = useState(null);
+    const [orders, setOrders] = useState(null);
+    const [activeTrade, setActiveTrade] = useState(null);
 
-    const share: SecurityShare = classCode === ClassCode.TQBR ? security : null;
-    const currency: SecurityCurrency = classCode === ClassCode.CETS ? security : null;
+    const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
+    const [chartNumber, setChartNumber] = useState(1);
+
     const [tradeSetup, setTradeSetup] = useState(null);
     const [securityLastInfo, setSecurityLastInfo] = useState(null);
     const [chart1Width, setChart1Width] = useState(200);
@@ -42,7 +48,9 @@ const Analysis: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, 
     const chart2Ref = useRef(null);
     const chartAlertsRef = useRef(null);
     const [trendLowTF, setTrendLowTF] = useState(null);
-    const [alertsFilter, setAlertsFilter] = useState(null);
+    const [filterDto, setFilterDto] = useState(null);
+    const [marketStateFilterDto, setMarketStateFilterDto] = useState(null);
+    const [marketStateFilterDto2, setMarketStateFilterDto2] = useState(null);
     const [alert, setAlert] = useState(null);
 
     const updateSize = () => {
@@ -53,70 +61,223 @@ const Analysis: React.FC<Props> = ({classCode, timeFrameHigh, timeFrameTrading, 
 
     useEffect(() => {
         if (security) {
-            if (!alertsFilter || alertsFilter.secCode !== security.secCode) {
-                setAlertsFilter({
+            // console.log("AnalysisFutures: ", future);
+            informServerAboutRequiredData();
+
+            // if (!trendLowTF && !trendLowTFLoading) {
+            //     trendLowTFLoading = true;
+            //     getTrend(future.classCode, future.secCode, timeFrameLow, 540)
+            //         .then(trend => {
+            //             setTrendLowTF(trend);
+            //             trendLowTFLoading = false;
+            //         })
+            //         .catch(reason => {
+            //             trendLowTFLoading = false;
+            //         });
+            // }
+            //
+            if (!filterDto || filterDto.secCode !== security.secCode) {
+                setFilterDto({
                     classCode: security.classCode,
                     secCode: security.secCode,
-                    fetchByWS: false,
-                    history: true,
-                    size: AlertsSize.MID,
+                    fetchByWS: true,
+                    history: false,
                     all: false
                 });
             }
+            if (!marketStateFilterDto || marketStateFilterDto.secCode !== security.secCode) {
+                setMarketStateFilterDto({
+                    classCode: security.classCode,
+                    secCode: security.secCode,
+                    intervals: [Interval.M3, Interval.M1],
+                    fetchByWS: true,
+                    // history: false,
+                    numberOfCandles: 100
+                });
+            }
+
+            fetchPremise(timeFrameTrading);
         }
+
+        const wsStatusSub = WebsocketService.getInstance()
+            .connectionStatus()
+            .subscribe(isConnected => {
+                if (isConnected && security) {
+                    informServerAboutRequiredData();
+                }
+            });
+
+        const lastSecuritiesSubscription = WebsocketService.getInstance()
+            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+            .subscribe(securities => {
+                if (security) {
+                    const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
+                    if (newSecurityLastInfo) {
+                        newSecurityLastInfo.timeLastTrade = new Date(newSecurityLastInfo.timeLastTrade);
+                        setSecurityLastInfo(newSecurityLastInfo);
+                    }
+                }
+            });
+
+        const tradePremiseSubscription = WebsocketService.getInstance()
+            .on<TradePremise>(WSEvent.TRADE_PREMISE)
+            .subscribe(newPremise => {
+                for (const srZone of newPremise.analysis.srZones) {
+                    srZone.timestamp = new Date(srZone.timestamp)
+                }
+                setPremise(newPremise);
+            });
+
+        const ordersSetupSubscription = WebsocketService.getInstance()
+            .on<Order[]>(WSEvent.ORDERS)
+            .subscribe(setOrders);
+
+        const activeTradeSubscription = WebsocketService.getInstance()
+            .on<ActiveTrade>(WSEvent.ACTIVE_TRADE)
+            .subscribe(setActiveTrade);
 
         setTimeout(updateSize, 1000);
         window.addEventListener('resize', updateSize);
         return function cleanup() {
             window.removeEventListener('resize', updateSize);
         };
-    }, [security, premise, timeFrameTrading, timeFrameLow]);
+    }, [security]);
+
+
+    const informServerAboutRequiredData = (): void => {
+        if (security) {
+            WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
+                brokerId: 1,
+                tradingPlatform: TradingPlatform.QUIK,
+                classCode: security.classCode,
+                secCode: security.secCode,
+                timeFrameHigh: Interval.M30,
+                timeFrameTrading: Interval.M5,
+                timeFrameLow: Interval.M1
+            });
+            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, security.secCode);
+            WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
+                classCode: security.classCode,
+                secCode: security.secCode,
+                intervals: [Interval.M3, Interval.M1],
+                fetchByWS: true,
+                // history: false,
+                numberOfCandles: 100
+            });
+        }
+    };
+
+    const fetchPremise = (timeFrameTrading: Interval) => {
+        getTradePremise({
+            brokerId: 1,
+            tradingPlatform: TradingPlatform.QUIK,
+            classCode: security.classCode,
+            secCode: security.secCode,
+            timeFrameHigh,
+            timeFrameTrading,
+            timeFrameLow
+        }).then(setPremise).catch(reason => {
+            fetchPremise(timeFrameTrading);
+        })
+    };
+
+    const onChartNumberChanged = (num: number) => {
+        setChartNumber(num);
+        setTimeout(updateSize, 1000);
+    };
 
     const onAlertSelected = (alert: PatternResult) => {
         console.log(alert);
         setAlert(alert);
     };
 
+    const onTradingIntervalChanged = (interval: Interval) => {
+        console.log(interval);
+        setTimeFrameTrading(interval);
+        fetchPremise(interval);
+    };
+
     if (security) {
         return (
             <>
-                <div className="p-grid">
-                    <div className="p-col-2">Кол-во посл: {security.lastTradeQuantity}</div>
-                    <div className="p-col-2">Лот: {security.lotSize}</div>
-                    <div className="p-col-2">Объем обр.: {security.issueSize}</div>
-                    <div className="p-col-2">Ср. взв. цена: {security.weightedAveragePrice}</div>
-                    <div className="p-col-2">Оборот: {security.todayMoneyTurnover}</div>
-                    <div className="p-col-2">Кол-во сделок: {security.numberOfTradesToday}</div>
+                <div className="p-grid analysis-head">
+                    <div className="p-col-12">
+                        <div className="analysis-head-chart-number">
+                            <Dropdown value={chartNumber} options={chartNumbers}
+                                      onChange={(e) => onChartNumberChanged(e.value)}/>
+                        </div>
+                    </div>
+                    <div className="p-col-12">
+                        <DataTable value={[security]}>
+                            <Column field="lastTradeQuantity" header="Кол-во посл"/>
+                            <Column field="lotSize" header="Лот"/>
+                            <Column field="issueSize" header="Объем обр"/>
+                            <Column field="weightedAveragePrice" header="Ср. взв. цена"/>
+                            <Column field="todayMoneyTurnover" header="Оборот"/>
+                            <Column field="numberOfTradesToday" header="Кол-во сделок"/>
+                        </DataTable>
+                    </div>
                 </div>
                 <TrendsView trends={premise ? premise.analysis.trends : []}/>
                 <div className="p-grid" style={{margin: '0'}}>
-                    <div className="p-col-7" ref={chart1Ref} style={{padding: '0'}}>
+                    <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
-                                      onIntervalChanged={interval => {}}
+                                      initialNumberOfCandles={1000}
+                                      onIntervalChanged={onTradingIntervalChanged}
                                       width={chart1Width}
                                       security={security}
                                       premise={premise}
+                                      orders={orders}
+                                      activeTrade={activeTrade}
                                       showGrid={true}/>
                     </div>
-                    <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
-                        <ChartWrapper interval={timeFrameLow}
-                                      onIntervalChanged={interval => {}}
-                                      width={chart2Width}
-                                      security={security}
-                                      trend={trendLowTF}
-                                      showGrid={true}/>
-                    </div>
+                    {
+                        chartNumber === 2 ? (
+                            <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
+                                <ChartWrapper interval={timeFrameLow}
+                                              initialNumberOfCandles={1000}
+                                              onIntervalChanged={interval => {
+                                              }}
+                                              width={chart2Width}
+                                              security={security}
+                                              premise={premise}
+                                              trend={trendLowTF}
+                                              showGrid={true}/>
+                            </div>
+                        ) : null
+                    }
                 </div>
                 <div className="p-grid">
-                    <div className="p-col-5">
-                        <Alerts filter={alertsFilter}
-                                onAlertSelected={onAlertSelected}/>
+                    <div className="p-col-12">
+                        <MarketState filter={marketStateFilterDto}/>
                     </div>
-                    <div className="p-col-7" ref={chartAlertsRef} style={{padding: '0'}}>
+                    <div className="p-col-12">
+                        <SwingStateList filter={marketStateFilterDto}/>
+                    </div>
+                    <div className="p-col-12">
+                        <div className="p-grid">
+                            <div className="p-col-4">
+                                <Notifications filter={filterDto}
+                                               onNotificationSelected={(n) => {
+                                                   console.log(n)
+                                               }}
+                                               viewHeight={400}/>
+                            </div>
+                            <div className="p-col-4">
+                                <Alerts filter={filterDto}
+                                        onAlertSelected={(n) => {
+                                            console.log(n)
+                                        }}
+                                        alertsHeight={400}/>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="p-col-12" ref={chartAlertsRef} style={{padding: '0'}}>
                         {
                             alert ?
                                 <ChartWrapper interval={alert.interval}
-                                              onIntervalChanged={interval => {}}
+                                              onIntervalChanged={interval => {
+                                              }}
                                               alert={alert}
                                               width={chartAlertsWidth}
                                               security={security}

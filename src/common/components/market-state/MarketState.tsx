@@ -33,10 +33,30 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
     const [selectedMarketStateItem, setSelectedMarketStateItem] = useState(null);
 
     const dateTimeFormat = {
+        "M1": "HH:mm/DD MMM YY",
+        "M3": "HH:mm/DD MMM YY",
+        "M5": "HH:mm/DD MMM YY",
+        "M15": "HH:mm/DD MMM YY",
+        "M30": "HH:mm/DD MMM YY",
+        "M60": "HH:mm/DD MMM YY",
+        "H2": "HH:mm/DD MMM YY",
+        "H4": "HH:mm/DD MMM YY",
+        "DAY": "DD MMM YY",
+        "WEEK": "DD MMM YY",
+        "MONTH": "DD MMM YY"
+    };
+    const dateTimeFormatInner = {
         "M1": "HH:mm",
         "M3": "HH:mm",
         "M5": "HH:mm",
-        "M60": "HH:mm/DD-MM-YY"
+        "M15": "HH:mm",
+        "M30": "HH:mm",
+        "M60": "HH:mm",
+        "H2": "HH:mm",
+        "H4": "HH:mm",
+        "DAY": "DD MMM",
+        "WEEK": "DD MMM",
+        "MONTH": "DD MMM"
     };
 
     const candleSentimentMap = {
@@ -94,9 +114,8 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
                         }
                         setAlertsReceivedFromServer(marketState);
                     });
-            } else {
-                fetchAlerts();
             }
+            fetchAlerts();
         }
 
         // Specify how to clean up after this effect:
@@ -162,10 +181,59 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
                 }
             case Interval.M60:
                 switch (minInterval) {
+                    case Interval.M15:
+                        return 4;
                     case Interval.M5:
                         return 12;
-                    case Interval.M3:
+                    default:
+                        return 1;
+                }
+            case Interval.H2:
+                switch (minInterval) {
+                    case Interval.M30:
+                        return 4;
+                    case Interval.M15:
+                        return 8;
+                    default:
+                        return 1;
+                }
+            case Interval.H4:
+                switch (minInterval) {
+                    case Interval.H2:
+                        return 2;
+                    case Interval.M60:
+                        return 4;
+                    case Interval.M30:
+                        return 8;
+                    default:
+                        return 1;
+                }
+            case Interval.DAY:
+                switch (minInterval) {
+                    case Interval.H4:
+                        return 2;
+                    case Interval.H2:
+                        return 4;
+                    case Interval.M60:
+                        return 8;
+                    default:
+                        return 1;
+                }
+            case Interval.WEEK:
+                switch (minInterval) {
+                    case Interval.DAY:
+                        return 5;
+                    case Interval.H4:
+                        return 10;
+                    case Interval.H2:
                         return 20;
+                    default:
+                        return 1;
+                }
+            case Interval.MONTH:
+                switch (minInterval) {
+                    case Interval.WEEK:
+                        return 4;
                     default:
                         return 1;
                 }
@@ -209,29 +277,31 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
         return className;
     };
 
-    const nameTemplate = (alert: Signal) => {
+    const nameTemplate = (signal: Signal) => {
         let className = "alert-icon ";
-        const sInterval = alert.interval.toString();
-        const title = `${alert.name} - Interval: ${sInterval}`;
-        const sArr = alert.name.split("-");
+        const sInterval = signal.interval.toString();
+        const title = `${signal.name} - Interval: ${sInterval}`;
+        const sArr = signal.name.split("-");
 
         if (sArr.length > 1) {
             if ("CANDLE_PATTERN" === sArr[0]) {
-                className += getCandlePatternClassName(alert);
+                className += getCandlePatternClassName(signal);
             } else if ("PRICE_CLOSE_TO_SR_LEVEL" === sArr[0]) {
-                const cls = alert.name.replace("PRICE_CLOSE_TO_SR_LEVEL", "sr_level_cross");
+                const cls = signal.name.replace("PRICE_CLOSE_TO_SR_LEVEL", "sr_level_cross");
                 className += cls.toLowerCase() + "-" + sInterval.toLowerCase();
             } else if ("PRICE_CLOSE_TO_TREND_LINE" === sArr[0]) {
-                const cls = alert.name.replace("PRICE_CLOSE_TO_TREND_LINE", "trend_line_cross");
+                const cls = signal.name.replace("PRICE_CLOSE_TO_TREND_LINE", "trend_line_cross");
                 className += cls.toLowerCase() + "-" + sInterval.toLowerCase();
             } else if ("SR_ZONE_CROSS" === sArr[0]) {
-                className += alert.name.toLowerCase();
+                className += signal.name.toLowerCase();
             } else {
-                className += alert.name.toLowerCase() + "-" + sInterval.toLowerCase();
+                className += signal.name.toLowerCase() + "-" + sInterval.toLowerCase();
             }
         }
 
-        return <div className={className} title={title}></div>;
+        return <div key={signal.name + signal.price + signal.interval + signal.timestamp}
+                    className={className}
+                    title={title}></div>;
     };
 
     if (!filter) {
@@ -280,7 +350,8 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
                             {item.baseItem.signals
                                 .filter(signal => signal.name.indexOf("CANDLE_PATTERN") === -1)
                                 .map(signal => (
-                                <div className="market-state-column-signal">
+                                <div key={signal.name + signal.price + signal.interval + signal.timestamp}
+                                     className="market-state-column-signal">
                                     {nameTemplate(signal)}
                                 </div>
                             ))}
@@ -298,7 +369,7 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
                                              setSelectedMarketStateItem(value);
                                          }}>
                                         <div className="market-state-column-time">
-                                            {moment(value.candle.timestamp).format(dateTimeFormat[item.interval])}
+                                            {moment(value.candle.timestamp).format(dateTimeFormatInner[item.interval])}
                                         </div>
                                         <div className="market-state-column-candle-sentiment">
                                             {candleSentimentMap[value.candleSentiment]} / {value.candle.close}
@@ -315,7 +386,8 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
                                             {value.signals
                                                 .filter(signal => signal.name.indexOf("CANDLE_PATTERN") === -1)
                                                 .map(signal => (
-                                                <div className="market-state-column-signal">
+                                                <div key={signal.name + signal.price + signal.interval + signal.timestamp}
+                                                     className="market-state-column-signal">
                                                     {nameTemplate(signal)}
                                                 </div>
                                             ))}

@@ -396,11 +396,13 @@ export class ChartWrapper extends React.Component<Props, States> {
         return map;
     };
 
-    onIntervalChanged = (innerInterval: Interval) => {
+    onIntervalUpdated = (innerInterval: Interval) => {
         this.fetchTrendLines(innerInterval);
         this.setState({innerInterval});
-        this.props.onIntervalChanged(innerInterval);
-        const {security} = this.props;
+
+        const {security, onIntervalChanged} = this.props;
+
+        onIntervalChanged(innerInterval);
         this.fetchCandles(security, innerInterval);
     };
 
@@ -485,7 +487,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                     <div className="chart-wrapper-head-interval">
                         <Dropdown value={innerInterval} options={this.intervals}
                                   onChange={(e) => {
-                                      this.onIntervalChanged(e.value);
+                                      this.onIntervalUpdated(e.value);
                                   }}/>
                     </div>
                     <div className="chart-wrapper-head-trendline">

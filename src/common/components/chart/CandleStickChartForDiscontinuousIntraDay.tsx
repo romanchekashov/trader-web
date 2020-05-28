@@ -241,7 +241,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         } = this.props;
         const {trends_1} = this.state;
 
-        const height = 600;
+        const volumeHeight = 100;
+        const height = 500;
         const margin = {left: 50, right: 50, top: 10, bottom: 30};
         const gridHeight = height - margin.top - margin.bottom;
         const xGrid = showGrid ? {
@@ -358,7 +359,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
                     <Chart id={2}
                            yExtents={d => [d.volume]}
-                           height={150} origin={(w, h) => [0, h - 150]}>
+                           height={volumeHeight}
+                           origin={(w, h) => [0, h - volumeHeight]}>
                         <YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")}/>
 
                         <MouseCoordinateY
