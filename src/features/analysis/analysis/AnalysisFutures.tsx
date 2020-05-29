@@ -239,13 +239,13 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                         </div>
                     </div>
                     <div className="p-col-12">
-                        <DataTable value={[future]}>
-                            <Column field="totalDemand" header="Общ спрос"/>
-                            <Column field="totalSupply" header="Общ предл"/>
-                            <Column field="sellDepoPerContract" header="ГО прод"/>
-                            <Column field="buyDepoPerContract" header="ГО покуп"/>
-                            <Column field="todayMoneyTurnover" header="Оборот"/>
-                            <Column field="numberOfTradesToday" header="Кол-во сделок"/>
+                        <DataTable value={[securityLastInfo]}>
+                            <Column field="futureTotalDemand" header="Общ спрос"/>
+                            <Column field="futureTotalSupply" header="Общ предл"/>
+                            <Column field="futureSellDepoPerContract" header="ГО прод"/>
+                            <Column field="futureBuyDepoPerContract" header="ГО покуп"/>
+                            <Column field="priceLastTrade" header="Цена"/>
+                            <Column field="numTrades" header="Кол-во сделок"/>
                         </DataTable>
                     </div>
                 </div>

@@ -9,4 +9,9 @@ export class SecurityLastInfo {
     public quantityLastTrade: number;
     public valueLastTrade: number;
     public numTrades: number;
+
+    public futureTotalDemand: number;
+    public futureTotalSupply: number;
+    public futureSellDepoPerContract: number;
+    public futureBuyDepoPerContract: number;
 }
