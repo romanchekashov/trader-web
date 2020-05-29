@@ -299,7 +299,7 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
             }
         }
 
-        return <div key={signal.name + signal.price + signal.interval + signal.timestamp}
+        return <div key={signal.description}
                     className={className}
                     title={title}></div>;
     };

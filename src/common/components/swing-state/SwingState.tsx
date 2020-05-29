@@ -25,13 +25,16 @@ const SwingState: React.FC<Props> = ({swingState}) => {
     useEffect(() => {
         if (swingState) {
             switch (swingState.interval) {
+                case Interval.M30:
                 case Interval.M60:
                 case Interval.H2:
                 case Interval.H4:
+                    setDateTimeFormat("HH:mm/DD-MM-YY");
+                    break;
                 case Interval.DAY:
                 case Interval.WEEK:
                 case Interval.MONTH:
-                    setDateTimeFormat("HH:mm/DD-MM-YY");
+                    setDateTimeFormat("DD MMM YY");
                     break;
                 default:
                     setDateTimeFormat("HH:mm");

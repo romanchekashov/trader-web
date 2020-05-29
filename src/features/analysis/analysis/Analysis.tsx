@@ -29,6 +29,20 @@ type Props = {
 }
 
 const Analysis: React.FC<Props> = ({security}) => {
+    const timeFrameTradingIntervals = {
+        "M1": [Interval.M1],
+        "M3": [Interval.M3, Interval.M1],
+        "M5": [Interval.M5, Interval.M1],
+        "M15": [Interval.M15, Interval.M3],
+        "M30": [Interval.M30, Interval.M5],
+        "M60": [Interval.M60, Interval.M15],
+        "H2": [Interval.H2, Interval.M30],
+        "H4": [Interval.H4, Interval.M60],
+        "DAY": [Interval.DAY, Interval.H2],
+        "WEEK": [Interval.WEEK, Interval.DAY],
+        "MONTH": [Interval.MONTH, Interval.WEEK]
+    };
+
     const [timeFrameHigh, setTimeFrameHigh] = useState(Interval.M30);
     const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
     const [timeFrameLow, setTimeFrameLow] = useState(Interval.M1);
@@ -85,16 +99,7 @@ const Analysis: React.FC<Props> = ({security}) => {
                     all: false
                 });
             }
-            if (!marketStateFilterDto || marketStateFilterDto.secCode !== security.secCode) {
-                setMarketStateFilterDto({
-                    classCode: security.classCode,
-                    secCode: security.secCode,
-                    intervals: [Interval.M3, Interval.M1],
-                    fetchByWS: true,
-                    // history: false,
-                    numberOfCandles: 100
-                });
-            }
+            updateMarketStateFilterDto(timeFrameTrading);
 
             fetchPremise(timeFrameTrading);
         }
@@ -140,9 +145,32 @@ const Analysis: React.FC<Props> = ({security}) => {
         window.addEventListener('resize', updateSize);
         return function cleanup() {
             window.removeEventListener('resize', updateSize);
+            wsStatusSub.unsubscribe();
+            lastSecuritiesSubscription.unsubscribe();
+            tradePremiseSubscription.unsubscribe();
+            ordersSetupSubscription.unsubscribe();
+            activeTradeSubscription.unsubscribe();
         };
     }, [security]);
 
+    const updateMarketStateFilterDto = (interval: Interval) => {
+        setMarketStateFilterDto({
+            classCode: security.classCode,
+            secCode: security.secCode,
+            intervals: timeFrameTradingIntervals[interval],
+            fetchByWS: true,
+            // history: false,
+            numberOfCandles: 100
+        });
+        WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
+            classCode: security.classCode,
+            secCode: security.secCode,
+            intervals: timeFrameTradingIntervals[interval],
+            fetchByWS: true,
+            // history: false,
+            numberOfCandles: 100
+        });
+    };
 
     const informServerAboutRequiredData = (): void => {
         if (security) {
@@ -159,7 +187,7 @@ const Analysis: React.FC<Props> = ({security}) => {
             WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
                 classCode: security.classCode,
                 secCode: security.secCode,
-                intervals: [Interval.M3, Interval.M1],
+                intervals: timeFrameTradingIntervals[timeFrameTrading],
                 fetchByWS: true,
                 // history: false,
                 numberOfCandles: 100
@@ -195,6 +223,7 @@ const Analysis: React.FC<Props> = ({security}) => {
         console.log(interval);
         setTimeFrameTrading(interval);
         fetchPremise(interval);
+        updateMarketStateFilterDto(interval);
     };
 
     if (security) {

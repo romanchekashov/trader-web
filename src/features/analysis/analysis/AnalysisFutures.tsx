@@ -74,7 +74,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     useEffect(() => {
         if (future) {
             // console.log("AnalysisFutures: ", future);
-            informServerAboutRequiredData(future.classCode, future.secCode);
+            informServerAboutRequiredData();
 
             // if (!trendLowTF && !trendLowTFLoading) {
             //     trendLowTFLoading = true;
@@ -106,7 +106,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
             .connectionStatus()
             .subscribe(isConnected => {
                 if (isConnected && future) {
-                    informServerAboutRequiredData(future.classCode, future.secCode);
+                    informServerAboutRequiredData();
                 }
             });
 
@@ -173,18 +173,18 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         });
     };
 
-    const informServerAboutRequiredData = (classCode: ClassCode, secCode: string): void => {
-        if (classCode && secCode) {
+    const informServerAboutRequiredData = (): void => {
+        if (future) {
             WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
                 brokerId: 1,
                 tradingPlatform: TradingPlatform.QUIK,
-                classCode,
-                secCode,
+                classCode: future.classCode,
+                secCode: future.secCode,
                 timeFrameHigh: Interval.M30,
                 timeFrameTrading: Interval.M5,
                 timeFrameLow: Interval.M1
             });
-            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, secCode);
+            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, future.secCode);
             WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
                 classCode: future.classCode,
                 secCode: future.secCode,

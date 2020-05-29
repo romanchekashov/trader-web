@@ -24,7 +24,7 @@
 .market-state-column-signal {
     padding: 0;
     zoom: 0.5;
-    background-color: #ccc;
+    /*background-color: #ccc;*/
 }
 .market-state-column-signal:hover {
     zoom: 1;
