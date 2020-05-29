@@ -10,6 +10,7 @@ import {NotificationDto} from "../../components/notifications/data/NotificationD
 import {MarketStateFilterDto} from "../../components/market-state/data/MarketStateFilterDto";
 import {MarketStateDto} from "../../components/market-state/data/MarketStateDto";
 import {SwingStateDto} from "../../components/swing-state/data/SwingStateDto";
+import {MoexOpenInterest} from "../../data/MoexOpenInterest";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -108,5 +109,11 @@ export function getSwingStates(filter: MarketStateFilterDto): Promise<SwingState
                 }
                 return states;
             }))
+        .catch(handleError);
+}
+
+export function getMoexOpenInterest(classCode: ClassCode, secCode: string): Promise<MoexOpenInterest> {
+    return fetch(`${baseUrl}moex-open-interest?classCode=${classCode}&secCode=${secCode}`)
+        .then(handleResponse)
         .catch(handleError);
 }

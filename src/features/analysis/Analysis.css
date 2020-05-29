@@ -49,3 +49,23 @@
 .analysis-head .p-col-12 {
     padding: 0;
 }
+
+.contract-open-positions {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+.contract-open-positions th {
+    vertical-align: middle;
+    font-weight: normal;
+    color: white;
+    background-color: #888888;
+    border: 1px #C6C6C6 solid;
+}
+.contract-open-positions td {
+    border: 1px #999999 dotted;
+}
+.contract-open-positions td.text_right {
+     text-align: right;
+ }

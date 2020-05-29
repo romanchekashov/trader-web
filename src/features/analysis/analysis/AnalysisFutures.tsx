@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Interval} from "../../../common/data/Interval";
-import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
+import {getMoexOpenInterest, getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
@@ -14,12 +14,12 @@ import Notifications from "../../../common/components/notifications/Notification
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {TradePremise} from "../../../common/data/strategy/TradePremise";
-import {ClassCode} from "../../../common/data/ClassCode";
 import {Order} from "../../../common/data/Order";
 import {ActiveTrade} from "../../../common/data/ActiveTrade";
 import Alerts from "../../../common/components/alerts/Alerts";
 import MarketState from "../../../common/components/market-state/MarketState";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
+import {MoexOpenInterest} from "../../../common/data/MoexOpenInterest";
 
 type Props = {
     future: any
@@ -48,6 +48,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     const [premise, setPremise] = useState(null);
     const [orders, setOrders] = useState(null);
     const [activeTrade, setActiveTrade] = useState(null);
+    const [moexOpenInterest, setMoexOpenInterest] = useState<MoexOpenInterest>(null);
 
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [chartNumber, setChartNumber] = useState(1);
@@ -100,6 +101,9 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
             updateMarketStateFilterDto(timeFrameTrading);
 
             fetchPremise(timeFrameTrading);
+
+            getMoexOpenInterest(future.classCode, future.secCode)
+                .then(setMoexOpenInterest);
         }
 
         const wsStatusSub = WebsocketService.getInstance()
@@ -238,6 +242,52 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                                       onChange={(e) => onChartNumberChanged(e.value)}/>
                         </div>
                     </div>
+                    {
+                        moexOpenInterest ?
+                            <div className="p-col-6">
+                                <table className="contract-open-positions">
+                                    <tbody>
+                                    <tr>
+                                        <th rowSpan={2}>Открытые позиции</th>
+                                        <th colSpan={2} className="white-border-column">Физические лица</th>
+                                        <th colSpan={2} className="white-border-column">Юридические лица</th>
+                                        <th rowSpan={2}>Итого</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Длинные</th>
+                                        <th>Короткие</th>
+                                        <th>Длинные</th>
+                                        <th>Короткие</th>
+                                    </tr>
+                                    <tr>
+                                        <td>Открытые позиции</td>
+                                        <td className="text_right">{moexOpenInterest.openInterestIndividualsLong.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.openInterestIndividualsShort.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.openInterestLegalEntitiesLong.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.openInterestLegalEntitiesShort.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.openInterestTotal.toLocaleString()}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Изменение</td>
+                                        <td className="text_right">{moexOpenInterest.changeIndividualsLong.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.changeIndividualsShort.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.changeLegalEntitiesLong.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.changeLegalEntitiesShort.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.changeTotal.toLocaleString()}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Количество лиц</td>
+                                        <td className="text_right">{moexOpenInterest.entitiesWithOpenPositionsIndividualsLong.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.entitiesWithOpenPositionsIndividualsShort.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.entitiesWithOpenPositionsLegalEntitiesLong.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.entitiesWithOpenPositionsLegalEntitiesShort.toLocaleString()}</td>
+                                        <td className="text_right">{moexOpenInterest.entitiesWithOpenPositionsTotal.toLocaleString()}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            : null
+                    }
                     <div className="p-col-12">
                         <DataTable value={[securityLastInfo]}>
                             <Column field="futureTotalDemand" header="Общ спрос"/>
