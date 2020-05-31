@@ -13,6 +13,7 @@ import {
     getAllSecurityFutures,
     getAllSecurityShares
 } from "../../common/api/rest/traderRestApi";
+import {adjustTradePremise} from "../../common/utils/DataUtils";
 
 export const LOAD_FILTER_DATA_SUCCESS = "LOAD_FILTER_DATA_SUCCESS";
 export const LOAD_SECURITY_SHARES = "LOAD_SECURITY_SHARES";
@@ -125,11 +126,7 @@ export const loadTradePremise = (filter: TradeStrategyAnalysisFilterDto) => (dis
     getTradePremise(filter)
         .then(premise => {
             loadTradePremiseAttempts = 3;
-            if (premise && premise.analysis.srZones) {
-                for (const srZone of premise.analysis.srZones) {
-                    srZone.timestamp = new Date(srZone.timestamp)
-                }
-            }
+            adjustTradePremise(premise);
             dispatch(loadTradePremiseSuccess(premise));
         })
         .catch(error => {

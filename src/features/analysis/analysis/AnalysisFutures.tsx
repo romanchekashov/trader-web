@@ -20,6 +20,7 @@ import Alerts from "../../../common/components/alerts/Alerts";
 import MarketState from "../../../common/components/market-state/MarketState";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
 import {MoexOpenInterest} from "../../../common/data/MoexOpenInterest";
+import {adjustTradePremise} from "../../../common/utils/DataUtils";
 
 type Props = {
     future: any
@@ -129,9 +130,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         const tradePremiseSubscription = WebsocketService.getInstance()
             .on<TradePremise>(WSEvent.TRADE_PREMISE)
             .subscribe(newPremise => {
-                for (const srZone of newPremise.analysis.srZones) {
-                    srZone.timestamp = new Date(srZone.timestamp)
-                }
+                adjustTradePremise(newPremise);
                 setPremise(newPremise);
             });
 

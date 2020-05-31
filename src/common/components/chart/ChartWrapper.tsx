@@ -27,7 +27,7 @@ import {getTrendLines, saveTrendLines} from "../../api/rest/TrendLineRestApi";
 import {Button} from "primereact/button";
 import {ChartTrendLine} from "./data/ChartTrendLine";
 import {ChartTrendLineType} from "./data/ChartTrendLineType";
-import {TrendPoint} from "../../data/strategy/TrendPoint";
+import {TrendWrapper} from "../../data/TrendWrapper";
 import moment = require("moment");
 
 type Props = {
@@ -339,26 +339,63 @@ export class ChartWrapper extends React.Component<Props, States> {
         return [];
     };
 
-    getSwingHighsLowsMap = () => {
-        const {premise, trend} = this.props;
+    private swingHighsLowsTimeFrameTradingIntervals = {
+        "M1": [Interval.M3, Interval.M1],
+        "M3": [Interval.M30, Interval.M3],
+        "M5": [Interval.M60, Interval.M5],
+        "M15": [Interval.H2, Interval.M15],
+        "M30": [Interval.H4, Interval.M30],
+        "M60": [Interval.DAY, Interval.M60],
+        "H2": [Interval.DAY, Interval.H2],
+        "H4": [Interval.WEEK, Interval.H4],
+        "DAY": [Interval.WEEK, Interval.DAY],
+        "WEEK": [Interval.MONTH, Interval.WEEK],
+        "MONTH": [Interval.MONTH, Interval.WEEK]
+    };
 
-        let swingHighsLows: TrendPoint[] = null;
+    getSwingHighsLowsMap = (): TrendWrapper[] => {
+        const {premise, interval} = this.props;
+        const intervals: Interval[] = this.swingHighsLowsTimeFrameTradingIntervals[interval];
 
-        if (premise && premise.analysis.trend) {
-            swingHighsLows = premise.analysis.trend.swingHighsLows;
-        }
+        if (premise && premise.analysis.trends) {
+            const trendWrappers = premise.analysis.trends
+                .filter(trend => intervals.indexOf(trend.interval) !== -1)
+                .map(trend => ({
+                    trend,
+                    isSelectedTimeFrame: (trend.interval === interval)
+                }));
 
-        if (trend) {
-            swingHighsLows = trend.swingHighsLows;
-        }
-
-        if (swingHighsLows) {
-            for (const trendPoint of swingHighsLows) {
-                trendPoint.dateTime = moment(trendPoint.dateTime).toDate();
+            const trendPoints = trendWrappers
+                .filter(t => t.isSelectedTimeFrame)[0].trend.swingHighsLows;
+            const all = {};
+            for (const trendPoint of trendPoints) {
+                all[trendPoint.swingHL] = trendPoint.dateTime;
             }
+
+            trendWrappers
+                .filter(t => !t.isSelectedTimeFrame)
+                .forEach(trendWraps => {
+                    // if (trendWraps.trend.interval === Interval.DAY && interval === Interval.H4) {
+                    //     for (const trendPoint of trendWraps.trend.swingHighsLows) {
+                    //         trendPoint.dateTime = moment(trendPoint.dateTime).hours(8).minutes(0).seconds(0).toDate();
+                    //     }
+                    // } else if (trendWraps.trend.interval === Interval.DAY && interval === Interval.H2) {
+                    //     for (const trendPoint of trendWraps.trend.swingHighsLows) {
+                    //         trendPoint.dateTime = moment(trendPoint.dateTime).hours(10).minutes(0).seconds(0).toDate();
+                    //     }
+                    // } else {
+                    // }
+                    for (const trendPoint of trendWraps.trend.swingHighsLows) {
+                        if (all[trendPoint.swingHL]) {
+                            trendPoint.dateTime = all[trendPoint.swingHL];
+                        }
+                    }
+                });
+
+            return trendWrappers;
         }
 
-        return swingHighsLows;
+        return null;
     };
 
     getStops = () => {

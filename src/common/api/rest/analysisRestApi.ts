@@ -11,6 +11,7 @@ import {MarketStateFilterDto} from "../../components/market-state/data/MarketSta
 import {MarketStateDto} from "../../components/market-state/data/MarketStateDto";
 import {SwingStateDto} from "../../components/swing-state/data/SwingStateDto";
 import {MoexOpenInterest} from "../../data/MoexOpenInterest";
+import {adjustTradePremise} from "../../utils/DataUtils";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -22,11 +23,7 @@ export function getTradePremise(filter: TradeStrategyAnalysisFilterDto): Promise
     })
         .then(response => handleResponse(response)
             .then(premise => {
-                if (premise && premise.analysis.srZones) {
-                    for (const srZone of premise.analysis.srZones) {
-                        srZone.timestamp = new Date(srZone.timestamp)
-                    }
-                }
+                adjustTradePremise(premise);
                 return premise;
             }))
         .catch(handleError);

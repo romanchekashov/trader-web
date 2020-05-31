@@ -19,6 +19,7 @@ import {Order} from "../../../common/data/Order";
 import {ActiveTrade} from "../../../common/data/ActiveTrade";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
 import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
+import {adjustTradePremise} from "../../../common/utils/DataUtils";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -127,9 +128,7 @@ const Analysis: React.FC<Props> = ({security}) => {
         const tradePremiseSubscription = WebsocketService.getInstance()
             .on<TradePremise>(WSEvent.TRADE_PREMISE)
             .subscribe(newPremise => {
-                for (const srZone of newPremise.analysis.srZones) {
-                    srZone.timestamp = new Date(srZone.timestamp)
-                }
+                adjustTradePremise(newPremise);
                 setPremise(newPremise);
             });
 

@@ -46,6 +46,8 @@ import {StoreData} from "../../utils/utils";
 import {ChartTrendLine} from "./data/ChartTrendLine";
 import {ChartSwingHighsLows} from "./components/ChartSwingHighsLows";
 import {TrendPoint} from "../../data/strategy/TrendPoint";
+import {Trend} from "../../data/strategy/Trend";
+import {TrendWrapper} from "../../data/TrendWrapper";
 
 const _ = require("lodash");
 
@@ -61,7 +63,7 @@ type Props = {
     srLevels?: SRLevel[]
     candlePatternsUp?: any
     candlePatternsDown?: any
-    swingHighsLows?: TrendPoint[]
+    swingHighsLows?: TrendWrapper[]
     showGrid?: boolean
     scale: number
     enableTrendLine: boolean
