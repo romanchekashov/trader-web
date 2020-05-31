@@ -19,7 +19,7 @@ export type TradeStrategyBotControlActionTypes = LoadFilterSuccessAction
 export const loadFilterDataSuccess = (filter: MarketBotFilterDataDto): LoadFilterSuccessAction => ({type: LOAD_FILTER_DATA_SUCCESS, filter});
 
 export const loadFilterData = () => (dispatch: AppDispatch) => {
-    getFilterData()
+    getFilterData(true)
         .then(filter => {
             dispatch(loadFilterDataSuccess(filter));
         })

@@ -4,8 +4,8 @@ import {MarketBotStartDto} from "../../data/bot/MarketBotStartDto";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 
-export function getFilterData(): Promise<MarketBotFilterDataDto> {
-    return fetch(baseUrl + 'filter-data')
+export function getFilterData(history: boolean): Promise<MarketBotFilterDataDto> {
+    return fetch(baseUrl + 'filter-data?history=' + history)
         .then(handleResponse)
         .catch(handleError);
 }

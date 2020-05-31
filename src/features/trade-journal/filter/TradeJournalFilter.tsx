@@ -4,12 +4,11 @@ import {Button} from "primereact/button";
 import "./TradeJournalFilter.css";
 import {Calendar} from "primereact/calendar";
 import {TradeJournalFilterDto} from "./TradeJournalFilterDto";
-import {ClassCode} from "../../../common/data/ClassCode";
 import {Dropdown} from "primereact/dropdown";
 import {getFilterData} from "../../../common/api/rest/botControlRestApi";
 import {SecurityInfo} from "../../../common/data/SecurityInfo";
-import moment = require("moment");
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
+import moment = require("moment");
 
 export interface TradeJournalFilterState {
     market: MarketSecuritiesDto
@@ -35,8 +34,6 @@ export const TradeJournalFilter: React.FC<Props> = ({onFilter}) => {
         end: moment().hours(19).minutes(0).seconds(0).toDate()
     };
 
-    const classCodes = [ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS];
-
     const [market, setMarket] = useState(initState.market);
     const [markets, setMarkets] = useState([]);
     const [securities, setSecurities] = useState([]);
@@ -45,7 +42,7 @@ export const TradeJournalFilter: React.FC<Props> = ({onFilter}) => {
     const [end, setEnd] = useState(initState.end);
 
     useEffect(() => {
-        getFilterData()
+        getFilterData(false)
             .then(marketBotFilterDataDto => {
                 setMarkets(marketBotFilterDataDto.marketSecurities);
                 const marketSec = marketBotFilterDataDto.marketSecurities[0];

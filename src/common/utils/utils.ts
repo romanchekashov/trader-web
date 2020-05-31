@@ -1,5 +1,9 @@
 import {Interval} from "../data/Interval";
 
+export function round10(num: any): number {
+    return Math.round(num * 10) / 10;
+}
+
 export function round100(num: any): number {
     return Math.round(num * 100) / 100;
 }

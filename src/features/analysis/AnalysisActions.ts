@@ -7,7 +7,6 @@ import {getTradePremise} from "../../common/api/rest/analysisRestApi";
 import {TradeStrategyAnalysisFilterDto} from "../../common/data/TradeStrategyAnalysisFilterDto";
 import {SecurityCurrency} from "../../common/data/SecurityCurrency";
 import {SecurityFuture} from "../../common/data/SecurityFuture";
-import moment = require("moment");
 import {
     getAllSecurityCurrencies,
     getAllSecurityFutures,
@@ -72,7 +71,7 @@ export const loadFilterDataSuccess = (filter: MarketBotFilterDataDto): LoadFilte
     filter
 });
 export const loadFilterData = () => (dispatch: AppDispatch) => {
-    getFilterData()
+    getFilterData(false)
         .then(filter => {
             dispatch(loadFilterDataSuccess(filter));
         })
@@ -166,7 +165,3 @@ export const loadSecurityFuture = () => (dispatch: AppDispatch) => {
             throw error;
         });
 };
-
-function compareNumbers(a, b) {
-    return a - b;
-}

@@ -8,7 +8,6 @@ import {RootState} from "../../app/rootReducer";
 import {BotControlFilter} from "./filter/BotControlFilter";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
 import {runHistory, startBot, stopHistory} from "../../common/api/rest/botControlRestApi";
-import {BotControlHistory} from "./history/BotControlHistory";
 
 
 function mapStateToProps(state: RootState) {
@@ -42,7 +41,7 @@ class BotControlPage extends React.Component<Props, TradeStrategyBotControlState
     }
 
     onStart(data: MarketBotStartDto): void {
-        if (data.history) {
+        if (data.historySetup) {
             runHistory(data).then(value => {
                 console.log(data, value);
             }).catch(console.error);
@@ -54,7 +53,7 @@ class BotControlPage extends React.Component<Props, TradeStrategyBotControlState
     }
 
     onStopHistory(data: MarketBotStartDto): void {
-        if (data.history) {
+        if (data.historySetup) {
             stopHistory(data).then(value => {
                 console.log(data, value);
             }).catch(console.error);

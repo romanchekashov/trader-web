@@ -18,7 +18,6 @@ import Currencies from "./securities/Currencies";
 import Futures from "./securities/Futures";
 import AnalysisFutures from "./analysis/AnalysisFutures";
 import "./Analysis.css";
-import {Stack} from "../../common/components/stack/Stack";
 import {SecurityLastInfo} from "../../common/data/SecurityLastInfo";
 import {WebsocketService, WSEvent} from "../../common/api/WebsocketService";
 import {SubscriptionLike} from "rxjs";
@@ -114,9 +113,8 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                     tradingPlatform: filter.tradingPlatform,
                     classCode: filter.classCode,
                     secCode: share.secCode,
-                    timeFrameHigh: filter.timeFrameHigh,
                     timeFrameTrading: filter.timeFrameTrading,
-                    timeFrameLow: filter.timeFrameLow
+                    timeFrameMin: filter.timeFrameMin
                 })
                     .then(premise => this.setState({premise}))
                     .catch(console.error);
@@ -154,7 +152,7 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
     render() {
         const {filterData, shares, currencies, futures} = this.props;
-        const {selectedSecurity, isDetailsShown, filter, securityLastInfo, premise} = this.state;
+        const {selectedSecurity, isDetailsShown, filter} = this.state;
         let selectedSecuritiesView = null;
 
         if (selectedSecurity) {

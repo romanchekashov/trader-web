@@ -7,7 +7,6 @@ export class TradeStrategyAnalysisFilterDto {
     public tradingPlatform: TradingPlatform;
     public classCode: ClassCode;
     public secCode: string;
-    public timeFrameHigh: Interval;
     public timeFrameTrading: Interval;
-    public timeFrameLow: Interval;
+    public timeFrameMin: Interval;
 }

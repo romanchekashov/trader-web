@@ -1,12 +1,12 @@
 import {ClassCode} from "../ClassCode";
 import {Interval} from "../Interval";
+import {DepositSetup} from "../DepositSetup";
 
 export class TradingStrategyConfig {
     public classCode: ClassCode;
     public secCode: string;
-    public timeFrameHigher: Interval;
     public timeFrameTrading: Interval;
-    public timeFrameLower: Interval;
-    public demo: boolean;
+    public timeFrameMin: Interval;
+    public depositSetup: DepositSetup;
     public key: string;
 }

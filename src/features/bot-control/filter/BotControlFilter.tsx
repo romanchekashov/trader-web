@@ -9,15 +9,17 @@ import {SecurityInfo} from "../../../common/data/SecurityInfo";
 import {Interval} from "../../../common/data/Interval";
 import "./BotControlFilter.css";
 import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
-import {ToggleButton} from "primereact/togglebutton";
 import {BotControlFilterHistory} from "./BotControlFilterHistory";
 import {Intervals, PrimeDropdownItem} from "../../../common/utils/utils";
 import {ClassCode} from "../../../common/data/ClassCode";
 import {Security} from "../../../common/data/Security";
 import {getSecuritiesByClassCode} from "../../../common/utils/Cache";
-import {InputText} from "primereact/inputtext";
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
 import {HistoryDateDto} from "../../../common/data/bot/HistoryDateDto";
+import {HistorySetup} from "../../../common/data/HistorySetup";
+import {TradingStrategy} from "../../../common/data/TradingStrategy";
+import {DepositSetupView} from "./DepositSetupView";
+import {DepositSetup} from "../../../common/data/DepositSetup";
 import moment = require("moment");
 
 export interface BotControlFilterState {
@@ -25,7 +27,7 @@ export interface BotControlFilterState {
     platform: TradingPlatform
     market: MarketSecuritiesDto
     security: PrimeDropdownItem<SecurityInfo>
-    realDepo: boolean
+    demo: boolean
     highTimeFrame: Interval
     tradingTimeFrame: Interval
     lowTimeFrame: Interval
@@ -47,7 +49,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
         platform: filter ? filter.broker.tradingPlatform : null,
         market: filter ? filter.marketSecurities[0] : null,
         security: null,
-        realDepo: false,
+        demo: true,
         highTimeFrame: Interval.M30,
         tradingTimeFrame: Interval.M3,
         lowTimeFrame: Interval.M1,
@@ -63,12 +65,18 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
     const platforms = filter ? [filter.broker.tradingPlatform].map(val => ({label: val, value: val})) : [];
     const [platform, setPlatform] = useState(initState.platform);
 
+    const [depositSetup, setDepositSetup] = useState<DepositSetup>({
+        demo: true,
+        amount: 100000,
+        maxRiskPerTradeInPercent: 1,
+        maxRiskPerSessionTimeoutInPercent: 2,
+        maxRiskPerSessionInPercent: 3
+    });
     const [interval, setInterval] = useState(null);
     const [minInterval, setMinInterval] = useState(Interval.M1);
     const [classCode, setClassCode] = useState(null);
     const [secCode, setSecCode] = useState(null);
     const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}]);
-    const [stop, setStop] = useState(500);
     const [strategy, setStrategy] = useState(null);
     const [minStartDate, setMinStartDate] = useState(null);
     const [maxEndDate, setMaxEndDate] = useState(null);
@@ -84,8 +92,6 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
     const strategies: PrimeDropdownItem<string>[] = [null, "TREND_LINE_BREAKOUT", "TREND_CHANGE"]
         .map(val => ({label: val || "ALL", value: val}));
 
-    const [realDepo, setRealDepo] = useState(initState.realDepo);
-
     useEffect(() => {
         if (brokers.length === 1) {
             // console.log(['arguments'], initState.broker, broker);
@@ -94,20 +100,34 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
         }
     });
 
-    const onStartClicked = () => {
-        onStart({
+    const getDto = (): MarketBotStartDto => {
+        let historySetup: HistorySetup = null;
+
+        if (history) {
+            historySetup = {
+                start,
+                end
+            };
+        }
+
+        return {
             brokerId: broker.id,
             tradingPlatform: platform,
             classCode: classCode,
             secCode: secCode,
-            realDeposit: realDepo,
-            timeFrameHigh: interval,
+
             timeFrameTrading: interval,
-            timeFrameLow: interval,
-            history: history,
-            start: history ? start : null,
-            end: history ? end : null
-        });
+            timeFrameMin: minInterval,
+
+            depositSetup,
+            historySetup,
+            strategy: TradingStrategy.futuresSimpleTradingStrategy
+        };
+    };
+
+    const onStartClicked = () => {
+        console.log(getDto());
+        // onStart(getDto());
     };
 
     const [history, setHistory] = useState(initState.history);
@@ -117,23 +137,12 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
 
     const onHistory = (history: boolean) => {
         setHistory(history);
-        setRealDepo(false);
+        depositSetup.demo = true;
+        setDepositSetup(Object.assign({}, depositSetup));
     };
 
     const onStopHistoryClicked = () => {
-        onStopHistory({
-            brokerId: broker.id,
-            tradingPlatform: platform,
-            classCode: classCode,
-            secCode: secCode,
-            realDeposit: realDepo,
-            timeFrameHigh: interval,
-            timeFrameTrading: interval,
-            timeFrameLow: interval,
-            history: history,
-            start: history ? start : null,
-            end: history ? end : null
-        });
+        onStopHistory(getDto());
     };
 
     const onIntervalChanged = (newInterval: Interval) => {
@@ -186,44 +195,81 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
         setEnd(max);
     };
 
+    const onDepositSetupChanged = (newSetup: DepositSetup): void => {
+        setDepositSetup(Object.assign({}, newSetup));
+    };
+
     return (
-        <div className="filter">
-            <div className="p-toolbar-group-left">
-                <Dropdown optionLabel="name" value={broker} options={brokers} onChange={(e) => {
-                    setBroker(e.value)
-                }} placeholder="Select a broker" style={{width: '130px'}}/>
-                <Dropdown value={platform} options={platforms} onChange={(e) => {
-                    setPlatform(e.value)
-                }} placeholder="Select a platform" style={{width: '80px'}}/>
-
-                <Dropdown value={classCode} options={classCodes}
-                          onChange={(e) => {
-                              onClassCodeChanged(e.value);
-                          }} style={{width: '90px'}}/>
-                <Dropdown value={secCode} options={secCodes}
-                          onChange={(e) => {
-                              onSecCodeChanged(e.value);
-                          }} filter={true} style={{width: '90px'}}/>
-                <Dropdown value={interval} options={intervals}
-                          onChange={(e) => {
-                              onIntervalChanged(e.value);
-                          }} style={{width: '80px'}}/>
-                <Dropdown value={minInterval} options={minIntervals}
-                          onChange={(e) => {
-                              onMinIntervalChanged(e.value);
-                          }} style={{width: '80px'}}/>
-                <Dropdown value={strategy} options={strategies}
-                          onChange={(e) => {
-                              onStrategyChanged(e.value);
-                          }} filter={true}/>
-
-                <InputText type="number"
-                           min={0}
-                           value={stop}
-                           onChange={(e) => setStop(e.target['value'])}
-                           style={{width: '80px'}}/>
+        <div className="p-grid filter">
+            <div className="p-col-8">
+                <div className="p-grid">
+                    <div className="p-col-2">
+                        <div style={{fontSize: "10px"}}>Broker</div>
+                        <Dropdown optionLabel="name"
+                                  value={broker}
+                                  options={brokers}
+                                  onChange={(e) => {
+                                      setBroker(e.value)
+                                  }}
+                                  placeholder="Select a broker"
+                                  style={{width: '130px'}}/>
+                    </div>
+                    <div className="p-col-2">
+                        <div style={{fontSize: "10px"}}>Trading platform</div>
+                        <Dropdown value={platform}
+                                  options={platforms}
+                                  onChange={(e) => {
+                                      setPlatform(e.value)
+                                  }}
+                                  placeholder="Select a platform"
+                                  style={{width: '80px'}}/>
+                    </div>
+                    <div className="p-col-2">
+                        <div style={{fontSize: "10px"}}>Class code</div>
+                        <Dropdown value={classCode}
+                                  options={classCodes}
+                                  onChange={(e) => {
+                                      onClassCodeChanged(e.value);
+                                  }}
+                                  style={{width: '90px'}}/>
+                    </div>
+                    <div className="p-col-2">
+                        <div style={{fontSize: "10px"}}>Sec code</div>
+                        <Dropdown value={secCode}
+                                  options={secCodes}
+                                  onChange={(e) => {
+                                      onSecCodeChanged(e.value);
+                                  }}
+                                  filter={true}
+                                  style={{width: '90px'}}/>
+                    </div>
+                    <div className="p-col-1">
+                        <div style={{fontSize: "10px"}}>Trading Interval</div>
+                        <Dropdown value={interval}
+                                  options={intervals}
+                                  onChange={(e) => {
+                                      onIntervalChanged(e.value);
+                                  }} style={{width: '80px'}}/>
+                    </div>
+                    <div className="p-col-1">
+                        <div style={{fontSize: "10px"}}>Min Interval</div>
+                        <Dropdown value={minInterval}
+                                  options={minIntervals}
+                                  onChange={(e) => {
+                                      onMinIntervalChanged(e.value);
+                                  }} style={{width: '80px'}}/>
+                    </div>
+                    <div className="p-col-2">
+                        <Dropdown value={strategy} options={strategies}
+                                  onChange={(e) => {
+                                      onStrategyChanged(e.value);
+                                  }} filter={true}/>
+                    </div>
+                </div>
+                <DepositSetupView setup={depositSetup}
+                                  onChange={onDepositSetupChanged}/>
             </div>
-            <div className="p-toolbar-group-right" style={{display: "flex"}}>
+            <div className="p-col-4" style={{display: "flex"}}>
                 <BotControlFilterHistory start={start}
                                          end={end}
                                          minStartDate={minStartDate}
@@ -232,10 +278,9 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
                                          onStartDate={setStart}
                                          onEndDate={setEnd}
                                          onDebug={setDebug} onStop={onStopHistoryClicked}/>
-                {history ? null :
-                    <ToggleButton checked={realDepo} onChange={(e) => setRealDepo(e.value)} onLabel="Real Depo"
-                                  offLabel="Real Depo" style={{marginLeft: '10px'}}/>}
-                <Button label="Start" icon="pi pi-caret-right" className="p-button-warning" onClick={onStartClicked}
+                <Button label="Start" icon="pi pi-caret-right"
+                        className="p-button-warning"
+                        onClick={onStartClicked}
                         style={{marginLeft: '10px'}}/>
             </div>
         </div>

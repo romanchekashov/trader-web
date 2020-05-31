@@ -17,7 +17,7 @@ const StrategyBtn: React.FC<Props> = ({onSelectStrategy}) => {
         Interval.M1, Interval.M3, Interval.M5, Interval.M15,
         Interval.M30, Interval.M60, Interval.H2, Interval.DAY
     ]
-        .map(val => ({ label: val, value: val }));
+        .map(val => ({label: val, value: val}));
 
     const [highTimeFrame, setHighTimeFrame] = useState(Interval.M30);
     const [tradingTimeFrame, setTradingTimeFrame] = useState(Interval.M5);
@@ -29,9 +29,8 @@ const StrategyBtn: React.FC<Props> = ({onSelectStrategy}) => {
             tradingPlatform: TradingPlatform.QUIK,
             classCode: null,
             secCode: null,
-            timeFrameHigh: highTimeFrame,
             timeFrameTrading: tradingTimeFrame,
-            timeFrameLow: lowTimeFrame
+            timeFrameMin: lowTimeFrame
         })
     };
 

@@ -3,7 +3,6 @@ import {useEffect, useRef, useState} from "react";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Interval} from "../../../common/data/Interval";
 import {getMoexOpenInterest, getTradePremise} from "../../../common/api/rest/analysisRestApi";
-import {PatternResult} from "../../../common/components/alerts/data/PatternResult";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
 import {Dropdown} from "primereact/dropdown";
@@ -26,8 +25,6 @@ type Props = {
     future: any
 };
 
-let trendLowTFLoading = false;
-
 const AnalysisFutures: React.FC<Props> = ({future}) => {
     const timeFrameTradingIntervals = {
         "M1": [Interval.M1],
@@ -43,9 +40,8 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         "MONTH": [Interval.MONTH, Interval.WEEK]
     };
 
-    const [timeFrameHigh, setTimeFrameHigh] = useState(Interval.M30);
     const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
-    const [timeFrameLow, setTimeFrameLow] = useState(Interval.M1);
+    const [timeFrameMin, setTimeFrameMin] = useState(Interval.M1);
     const [premise, setPremise] = useState(null);
     const [orders, setOrders] = useState(null);
     const [activeTrade, setActiveTrade] = useState(null);
@@ -54,7 +50,6 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [chartNumber, setChartNumber] = useState(1);
 
-    const [tradeSetup, setTradeSetup] = useState(null);
     const [securityLastInfo, setSecurityLastInfo] = useState(null);
     const [chart1Width, setChart1Width] = useState(200);
     const [chart2Width, setChart2Width] = useState(200);
@@ -183,9 +178,8 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                 tradingPlatform: TradingPlatform.QUIK,
                 classCode: future.classCode,
                 secCode: future.secCode,
-                timeFrameHigh: Interval.M30,
                 timeFrameTrading: Interval.M5,
-                timeFrameLow: Interval.M1
+                timeFrameMin: Interval.M1
             });
             WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, future.secCode);
             WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
@@ -205,22 +199,16 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
             tradingPlatform: TradingPlatform.QUIK,
             classCode: future.classCode,
             secCode: future.secCode,
-            timeFrameHigh,
             timeFrameTrading,
-            timeFrameLow
+            timeFrameMin
         }).then(setPremise).catch(reason => {
             fetchPremise(timeFrameTrading);
-        })
+        });
     };
 
     const onChartNumberChanged = (num: number) => {
         setChartNumber(num);
         setTimeout(updateSize, 1000);
-    };
-
-    const onAlertSelected = (alert: PatternResult) => {
-        console.log(alert);
-        setAlert(alert);
     };
 
     const onTradingIntervalChanged = (interval: Interval) => {
@@ -314,7 +302,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                     {
                         chartNumber === 2 ? (
                             <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
-                                <ChartWrapper interval={timeFrameLow}
+                                <ChartWrapper interval={timeFrameMin}
                                               initialNumberOfCandles={1000}
                                               onIntervalChanged={interval => {
                                               }}

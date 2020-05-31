@@ -13,6 +13,7 @@ import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
 import "./Filter.css";
 import {Intervals} from "../../../common/utils/utils";
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
+import {TradingStrategy} from "../../../common/data/TradingStrategy";
 
 export interface FilterState {
     broker: Broker
@@ -50,7 +51,7 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
     const brokers = filter ? [filter.broker] : [];
     const [broker, setBroker] = useState(initState.broker);
 
-    const platforms = filter ? [filter.broker.tradingPlatform].map(val => ({ label: val, value: val })) : [];
+    const platforms = filter ? [filter.broker.tradingPlatform].map(val => ({label: val, value: val})) : [];
     const [platform, setPlatform] = useState(initState.platform);
 
     const markets = filter ? filter.marketSecurities : [];
@@ -60,7 +61,7 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
 
     const [security, setSecurity] = useState(initState.security);
 
-    const intervals: PrimeDropdownItem<Interval>[] = Intervals.map(val => ({ label: val, value: val }));
+    const intervals: PrimeDropdownItem<Interval>[] = Intervals.map(val => ({label: val, value: val}));
     const [highTimeFrame, setHighTimeFrame] = useState(initState.highTimeFrame);
     const [tradingTimeFrame, setTradingTimeFrame] = useState(initState.tradingTimeFrame);
     const [lowTimeFrame, setLowTimeFrame] = useState(initState.lowTimeFrame);
@@ -70,7 +71,10 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
     const onMarketChange = (val: MarketSecuritiesDto) => {
         setMarket(val);
         setSecurity(null);
-        setSecurities(val.securities.map((security): PrimeDropdownItem<SecurityInfo> => ({label: `${security.name}(${security.code})`, value: security})));
+        setSecurities(val.securities.map((security): PrimeDropdownItem<SecurityInfo> => ({
+            label: `${security.name}(${security.code})`,
+            value: security
+        })));
     };
 
     useEffect(() => {
@@ -86,27 +90,42 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
             brokerId: broker.id,
             tradingPlatform: platform,
             classCode: market.classCode,
-            secCode: security ? security["code"]: null,
-            realDeposit: realDepo,
-            timeFrameHigh: highTimeFrame,
+            secCode: security ? security["code"] : null,
             timeFrameTrading: tradingTimeFrame,
-            timeFrameLow: lowTimeFrame
+            timeFrameMin: lowTimeFrame,
+
+            depositSetup: null,
+            historySetup: null,
+            strategy: TradingStrategy.futuresSimpleTradingStrategy
         });
     };
 
     return (
         <Toolbar className="filter">
             <div className="p-toolbar-group-left">
-                <Dropdown optionLabel="name" value={broker} options={brokers} onChange={(e) => {setBroker(e.value)}} placeholder="Select a broker"/>
-                <Dropdown value={platform} options={platforms} onChange={(e) => {setPlatform(e.value)}} placeholder="Select a platform"/>
-                <Dropdown optionLabel="market" value={market} options={markets} onChange={(e) => onMarketChange(e.value)} placeholder="Select a market"/>
-                <Dropdown value={security} options={securities} onChange={(e) => {setSecurity(e.value)}} filter={true} filterPlaceholder="Sec. name" filterBy="label" placeholder="Select a security"/>
-                <Dropdown value={highTimeFrame} options={intervals} onChange={(e) => {setHighTimeFrame(e.value)}}/>
-                <Dropdown value={tradingTimeFrame} options={intervals} onChange={(e) => {setTradingTimeFrame(e.value)}}/>
-                <Dropdown value={lowTimeFrame} options={intervals} onChange={(e) => {setLowTimeFrame(e.value)}}/>
+                <Dropdown optionLabel="name" value={broker} options={brokers} onChange={(e) => {
+                    setBroker(e.value)
+                }} placeholder="Select a broker"/>
+                <Dropdown value={platform} options={platforms} onChange={(e) => {
+                    setPlatform(e.value)
+                }} placeholder="Select a platform"/>
+                <Dropdown optionLabel="market" value={market} options={markets}
+                          onChange={(e) => onMarketChange(e.value)} placeholder="Select a market"/>
+                <Dropdown value={security} options={securities} onChange={(e) => {
+                    setSecurity(e.value)
+                }} filter={true} filterPlaceholder="Sec. name" filterBy="label" placeholder="Select a security"/>
+                <Dropdown value={highTimeFrame} options={intervals} onChange={(e) => {
+                    setHighTimeFrame(e.value)
+                }}/>
+                <Dropdown value={tradingTimeFrame} options={intervals} onChange={(e) => {
+                    setTradingTimeFrame(e.value)
+                }}/>
+                <Dropdown value={lowTimeFrame} options={intervals} onChange={(e) => {
+                    setLowTimeFrame(e.value)
+                }}/>
             </div>
             <div className="p-toolbar-group-right">
-                <Checkbox inputId="cb1" onChange={e => setRealDepo(e.checked)} checked={realDepo} />
+                <Checkbox inputId="cb1" onChange={e => setRealDepo(e.checked)} checked={realDepo}/>
                 <label htmlFor="cb1" className="p-checkbox-label" style={{marginRight: '1em'}}>Real Deposit</label>
                 <Button label="Analyze" icon="pi pi-caret-right" onClick={onStartClicked}/>
             </div>

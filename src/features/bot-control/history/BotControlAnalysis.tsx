@@ -17,36 +17,30 @@ type States = {
 
 export class BotControlAnalysis extends React.Component<Props, States> {
 
-    private multipliers = [1, 2, 4, 8];
-
     constructor(props) {
         super(props);
         this.state = {price: 0, quantity: 1, steps: 2, multiplier: 1};
     }
 
     render() {
-        const {premise, setup} = this.props;
-        const {price, quantity, steps, multiplier} = this.state;
-        //
+        const {premise} = this.props;
+
         if (!premise) {
             return <div>Loading...</div>
         }
-
 
         return (
             <div className="p-grid td__analysis">
                 <div className="p-col-6">
                     <span style={{marginRight: '2px'}}>
-                            TFHigh: {premise.analysis.tradingStrategyConfig.timeFrameHigher}</span>
-                    <span style={{marginRight: '2px'}}>
                             TFTrading: {premise.analysis.tradingStrategyConfig.timeFrameTrading}</span>
-                    <span>TFLow: {premise.analysis.tradingStrategyConfig.timeFrameLower}</span>
+                    <span>TFLow: {premise.analysis.tradingStrategyConfig.timeFrameMin}</span>
                 </div>
                 <div className="p-col-6">
                     Momentum State: {premise.analysis.momentum.state}
                 </div>
                 <div className="p-col-6">
-                    <TrendView trend={premise.analysis.trend} />
+                    <TrendView trend={premise.analysis.trend}/>
                 </div>
                 <div className="p-col-6">
                     <ul>
