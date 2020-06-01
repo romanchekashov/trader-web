@@ -132,9 +132,14 @@ export class Stack extends React.Component<Props, States> {
             });
 
         this.activeTradeSubscription = WebsocketService.getInstance()
-            .on<ActiveTrade>(WSEvent.ACTIVE_TRADE).subscribe(activeTrade => {
-                this.notifyIfStopHit(activeTrade);
-                this.setState({activeTrade});
+            .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES).subscribe(activeTrades => {
+                const {securityLastInfo} = this.state;
+                if (securityLastInfo) {
+                    const activeTrade = activeTrades
+                        .find(at => at && at.classCode === securityLastInfo.classCode && at.secCode === securityLastInfo.secCode);
+                    this.notifyIfStopHit(activeTrade);
+                    this.setState({activeTrade});
+                }
             });
     };
 

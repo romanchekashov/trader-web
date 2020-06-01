@@ -134,8 +134,14 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
             .subscribe(setOrders);
 
         const activeTradeSubscription = WebsocketService.getInstance()
-            .on<ActiveTrade>(WSEvent.ACTIVE_TRADE)
-            .subscribe(setActiveTrade);
+            .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
+            .subscribe(activeTrades => {
+                if (securityLastInfo) {
+                    const activeTrade = activeTrades
+                        .find(at => at && at.classCode === securityLastInfo.classCode && at.secCode === securityLastInfo.secCode);
+                    setActiveTrade(activeTrade);
+                }
+            });
 
 
         setTimeout(updateSize, 1000);

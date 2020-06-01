@@ -92,8 +92,13 @@ export class ControlPanel extends React.Component<Props, States> {
             });
 
         this.activeTradeSubscription = WebsocketService.getInstance()
-            .on<ActiveTrade>(WSEvent.ACTIVE_TRADE).subscribe(activeTrade => {
-                this.setState({activeTrade});
+            .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES).subscribe(activeTrades => {
+                const {security} = this.state;
+                if (security) {
+                    const activeTrade = activeTrades
+                        .find(at => at && at.classCode === security.classCode && at.secCode === security.secCode);
+                    this.setState({activeTrade});
+                }
             });
     };
 
