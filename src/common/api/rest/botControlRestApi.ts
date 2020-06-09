@@ -1,6 +1,7 @@
 import {handleError, handleResponse} from "../apiUtils";
 import {MarketBotFilterDataDto} from "../../data/bot/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../data/bot/MarketBotStartDto";
+import {ResultDto} from "../../data/journal/ResultDto";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 
@@ -20,7 +21,7 @@ export function startBot(dto: MarketBotStartDto): Promise<any> {
         .catch(handleError);
 }
 
-export function runHistory(dto: MarketBotStartDto): Promise<any> {
+export function runHistory(dto: MarketBotStartDto): Promise<ResultDto[]> {
     return fetch(baseUrl + 'run-history', {
         method: "POST", // POST for create, PUT to update when id already exists.
         headers: { "content-type": "application/json" },

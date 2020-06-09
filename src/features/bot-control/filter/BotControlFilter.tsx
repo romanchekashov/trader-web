@@ -127,7 +127,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
 
     const onStartClicked = () => {
         console.log(getDto());
-        // onStart(getDto());
+        onStart(getDto());
     };
 
     const [history, setHistory] = useState(initState.history);
