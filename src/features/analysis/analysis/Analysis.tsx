@@ -19,6 +19,7 @@ import {ActiveTrade} from "../../../common/data/ActiveTrade";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
 import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {adjustTradePremise} from "../../../common/utils/DataUtils";
+import moment = require("moment");
 
 export interface AnalysisState {
     realDepo: boolean
@@ -43,6 +44,7 @@ const Analysis: React.FC<Props> = ({security}) => {
         "MONTH": [Interval.MONTH, Interval.WEEK]
     };
 
+    const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate());
     const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
     const [timeFrameMin, setTimeFrameMin] = useState(Interval.M1);
     const [premise, setPremise] = useState(null);
@@ -221,6 +223,11 @@ const Analysis: React.FC<Props> = ({security}) => {
         updateMarketStateFilterDto(interval);
     };
 
+    const onStartChanged = (start: Date) => {
+        console.log(start);
+        setStart(start);
+    };
+
     if (security) {
         return (
             <>
@@ -246,8 +253,10 @@ const Analysis: React.FC<Props> = ({security}) => {
                 <div className="p-grid" style={{margin: '0'}}>
                     <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
+                                      start={start}
                                       initialNumberOfCandles={1000}
                                       onIntervalChanged={onTradingIntervalChanged}
+                                      onStartChanged={onStartChanged}
                                       width={chart1Width}
                                       security={security}
                                       premise={premise}
@@ -259,8 +268,11 @@ const Analysis: React.FC<Props> = ({security}) => {
                         chartNumber === 2 ? (
                             <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrameMin}
+                                              start={start}
                                               initialNumberOfCandles={1000}
                                               onIntervalChanged={interval => {
+                                              }}
+                                              onStartChanged={start => {
                                               }}
                                               width={chart2Width}
                                               security={security}
@@ -300,7 +312,10 @@ const Analysis: React.FC<Props> = ({security}) => {
                         {
                             alert ?
                                 <ChartWrapper interval={alert.interval}
+                                              start={start}
                                               onIntervalChanged={interval => {
+                                              }}
+                                              onStartChanged={start => {
                                               }}
                                               alert={alert}
                                               width={chartAlertsWidth}

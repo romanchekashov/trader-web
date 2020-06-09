@@ -47,11 +47,13 @@ export class BotControlHistory extends React.Component<Props, States> {
 
     constructor(props) {
         super(props);
-        this.state = { chart1Width: 200, chart2Width: 200, security: null, securities: [], setup: null,
+        this.state = {
+            chart1Width: 200, chart2Width: 200, security: null, securities: [], setup: null,
             orders: [], activeTrade: null, result: null,
             start: moment().hours(10).minutes(0).seconds(0).toDate(),
             end: moment().hours(23).minutes(50).seconds(0).toDate(), timeInHistory: null,
-            tradingStrategyState: null };
+            tradingStrategyState: null
+        };
         this.chart1Ref = React.createRef();
         this.chart2Ref = React.createRef();
     }
@@ -73,9 +75,9 @@ export class BotControlHistory extends React.Component<Props, States> {
                         security = securities.find(o => o.secCode === security.secCode);
                     }
                     // console.log(securities[0]);
-                    this.setState({ securities, security, timeInHistory: security?.timeLastTrade });
+                    this.setState({securities, security, timeInHistory: security?.timeLastTrade});
                 } else {
-                    this.setState({ securities: [], security: null, timeInHistory: null });
+                    this.setState({securities: [], security: null, timeInHistory: null});
                 }
             });
 
@@ -137,25 +139,32 @@ export class BotControlHistory extends React.Component<Props, States> {
             WebsocketService.getInstance().send(WSEvent.HISTORY_GET_TRADE_PREMISE_AND_SETUP, {
                 brokerId: 1, tradingPlatform: TradingPlatform.QUIK,
                 classCode: security.classCode, secCode: security.secCode,
-                timeFrameHigh: Interval.M30, timeFrameTrading: Interval.M3, timeFrameLow: Interval.M1});
+                timeFrameHigh: Interval.M30, timeFrameTrading: Interval.M3, timeFrameLow: Interval.M1
+            });
             WebsocketService.getInstance().send(WSEvent.HISTORY_GET_TRADES_AND_ORDERS, security.secCode)
         }
     };
 
     render() {
-        const {chart1Width, chart2Width, security, securities, setup, orders, activeTrade,
-            result, start, end, timeInHistory, tradingStrategyState} = this.state;
+        const {
+            chart1Width, chart2Width, security, securities, setup, orders, activeTrade,
+            result, start, end, timeInHistory, tradingStrategyState
+        } = this.state;
         const timeInHistoryView = timeInHistory ? moment(timeInHistory).format("DD.MM.YYYY HH:mm:ss") : "";
 
         return (
             <>
                 <span>{timeInHistoryView}</span>
                 <div className="p-grid td__history_main">
-                    <div className="p-col-7" style={{padding:'0', minWidth:'600px'}}>
-                        <div className="p-grid" style={{margin:'0'}}>
-                            <div className="p-col-7" ref={this.chart1Ref} style={{padding:'0'}}>
+                    <div className="p-col-7" style={{padding: '0', minWidth: '600px'}}>
+                        <div className="p-grid" style={{margin: '0'}}>
+                            <div className="p-col-7" ref={this.chart1Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={Interval.M3}
-                                              onIntervalChanged={interval => {}}
+                                              start={start}
+                                              onIntervalChanged={interval => {
+                                              }}
+                                              onStartChanged={start => {
+                                              }}
                                               initialNumberOfCandles={168}
                                               width={chart1Width}
                                               security={security}
@@ -163,9 +172,13 @@ export class BotControlHistory extends React.Component<Props, States> {
                                               orders={orders}
                                               history={true}/>
                             </div>
-                            <div className="p-col-5" ref={this.chart2Ref} style={{padding:'0'}}>
+                            <div className="p-col-5" ref={this.chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={Interval.M1}
-                                              onIntervalChanged={interval => {}}
+                                              start={start}
+                                              onIntervalChanged={interval => {
+                                              }}
+                                              onStartChanged={start => {
+                                              }}
                                               initialNumberOfCandles={50}
                                               width={chart2Width}
                                               security={security}
@@ -173,7 +186,7 @@ export class BotControlHistory extends React.Component<Props, States> {
                             </div>
                         </div>
                     </div>
-                    <div className="p-col-5" style={{width:'500px', padding: 0}}>
+                    <div className="p-col-5" style={{width: '500px', padding: 0}}>
                         <BotControlAnalysis premise={tradingStrategyState ? tradingStrategyState.currentPremise : null}
                                             setup={setup}/>
                     </div>
