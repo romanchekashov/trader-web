@@ -82,36 +82,21 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                                       onStart={this.onStart}
                                       onStopHistory={this.onStopHistory}/>
                 </div>
-                <div className="p-col-12 p-md-1">
-                    Menu
-                </div>
-                <div className="p-col-12 p-md-11 p-col-nogutter">
-                    <div className="p-col-12 p-col-nogutter">
-                        Top Bar
-                    </div>
-                    <div className="p-col-12">
-                        <div className="p-grid">
-                            {
-                                stat.length > 0 ?
-                                    <div className="p-col-12 p-md-12">
-                                        <div className="p-col-6">
-                                            <ProfitLossChart stat={stat[0]}/>
-                                        </div>
-                                        <div className="p-col-6">
-                                            <TradeJournalStatistic stat={stat[0]}/>
-                                        </div>
-                                        <div className="p-col-12 journal-trades-table">
-                                            <TradeJournalTable stat={stat}/>
-                                        </div>
-                                    </div>
-                                    : null
-                            }
+                {
+                    stat.length > 0 ?
+                        <div className="p-col-12 p-md-12">
+                            <div className="p-col-6">
+                                <ProfitLossChart stat={stat[0]}/>
+                            </div>
+                            <div className="p-col-6">
+                                <TradeJournalStatistic stat={stat[0]}/>
+                            </div>
+                            <div className="p-col-12 journal-trades-table">
+                                <TradeJournalTable stat={stat}/>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div className="p-col-12">
-                    Footer
-                </div>
+                        : null
+                }
             </div>
         );
     }
