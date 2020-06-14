@@ -112,7 +112,7 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     updateCandles = (candles: Candle[], security: SecurityLastInfo) => {
-        if (candles && candles.length === 1) {
+        if (candles && candles.length <= 1) {
             this.setState({
                 candles: [],
                 nodata: true
@@ -532,15 +532,6 @@ export class ChartWrapper extends React.Component<Props, States> {
 
     render() {
         const {candles, nodata, innerInterval, innerStart, enableTrendLine, needSave, trends_1, showSRLevels, showSRZones} = this.state;
-
-        if (nodata) {
-            return <div>No data</div>
-        }
-
-        if (candles.length === 0) {
-            return <div>Loading...</div>
-        }
-
         const {width, showGrid, premise, security, start, onStartChanged} = this.props;
 
         return (
@@ -607,25 +598,29 @@ export class ChartWrapper extends React.Component<Props, States> {
                     </div>
 
                 </div>
-                <CandleStickChartForDiscontinuousIntraDay
-                    type={ChartDrawType.CANVAS_SVG}
-                    data={candles}
-                    width={width}
-                    ratio={1}
-                    htSRLevels={this.getHighTimeFrameSRLevels()}
-                    orders={this.getOrdersLevels()}
-                    swingHighsLows={this.getSwingHighsLowsMap()}
-                    showGrid={showGrid}
-                    stops={this.getStops()}
-                    zones={premise && showSRZones ? premise.analysis.srZones : null}
-                    srLevels={premise && showSRLevels ? premise.analysis.srLevels : null}
-                    candlePatternsUp={this.getCandlePatternsUp()}
-                    candlePatternsDown={this.getCandlePatternsDown()}
-                    scale={this.securityInfo ? this.securityInfo.scale : 0}
-                    enableTrendLine={enableTrendLine}
-                    onEnableTrendLine={this.onEnableTrendLine}
-                    needSave={this.onNeedSave}
-                    trends={trends_1}/>
+                {
+                    candles.length > 0 ?
+                        <CandleStickChartForDiscontinuousIntraDay
+                            type={ChartDrawType.CANVAS_SVG}
+                            data={candles}
+                            width={width}
+                            ratio={1}
+                            htSRLevels={this.getHighTimeFrameSRLevels()}
+                            orders={this.getOrdersLevels()}
+                            swingHighsLows={this.getSwingHighsLowsMap()}
+                            showGrid={showGrid}
+                            stops={this.getStops()}
+                            zones={premise && showSRZones ? premise.analysis.srZones : null}
+                            srLevels={premise && showSRLevels ? premise.analysis.srLevels : null}
+                            candlePatternsUp={this.getCandlePatternsUp()}
+                            candlePatternsDown={this.getCandlePatternsDown()}
+                            scale={this.securityInfo ? this.securityInfo.scale : 0}
+                            enableTrendLine={enableTrendLine}
+                            onEnableTrendLine={this.onEnableTrendLine}
+                            needSave={this.onNeedSave}
+                            trends={trends_1}/>
+                    : nodata ? <div>No data</div> : <div>Loading...</div>
+                }
             </>
         )
     }
