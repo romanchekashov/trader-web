@@ -11,12 +11,17 @@ let data = null;
 
 const ProfitLossChart: React.FC<Props> = ({stat}) => {
 
-    const [title, setTitle] = useState(null);
+    const [titleFirstRow, setTitleFirstRow] = useState(null);
+    const [titleSecondRow, setTitleSecondRow] = useState(null);
     const [data, setData] = useState(null);
 
     useEffect(() => {
         updateData(stat);
     }, [stat]);
+
+    const timeDuration = (seconds: number): any => {
+        return seconds ? moment.duration(seconds, 'seconds').humanize() : '-';
+    };
 
     const updateData = (result: ResultDto) => {
         let color = '#42A5F5';
@@ -70,10 +75,23 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
         averageWin = Math.round(averageWin * 100) / 100;
         averageLoss = Math.round(averageLoss * 100) / 100;
 
-        const newTitle = 'P/L ratio: ' + profitLossRatio + ', Win %: ' + winPercentage + '%, Expectancy: ' + expectancy
-            + ', Avg Win: ' + averageWin + ', Avg Loss: ' + averageLoss;
+        const newTitleFirstRow = '<strong>Total P/L:</strong> ' + result.totalGainAndLoss
+            + ', <strong>Profit Factor:</strong> ' + result.profitFactor
+            + ', <strong>Win %:</strong> ' + winPercentage
+            + '%, <strong>Expect.:</strong> ' + expectancy
+            + ', <strong>P/L ratio:</strong> ' + profitLossRatio
+            + ', <strong>Avg Win:</strong> ' + averageWin
+            + ', <strong>Avg Loss:</strong> ' + averageLoss;
 
-        setTitle(newTitle);
+        const newTitleSecondRow = '<strong>Largest Gain:</strong> ' + result.largestGain
+            + ', <strong>Largest Loss:</strong> ' + result.largestLoss
+            + ', <strong>Max Con. Wins:</strong> ' + result.maxConsecutiveWins
+            + ', <strong>Max Con. Losses:</strong> ' + result.maxConsecutiveLosses
+            + ', <strong>Avg hold time (Win):</strong> ' + timeDuration(result.avgHoldTimeWinTradesSeconds)
+            + ', <strong>Avg hold time (Los):</strong> ' + timeDuration(result.avgHoldTimeLossTradesSeconds);
+
+        setTitleFirstRow(newTitleFirstRow);
+        setTitleSecondRow(newTitleSecondRow);
         setData({
             labels: labelData.map(value => value.label),
             datasets: [{
@@ -89,11 +107,18 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
     if (data) {
         return (
             <>
-                {title ? <h5 style={{textAlign: "center"}}>{title}</h5> : null}
+                {titleFirstRow ?
+                    <>
+                        <div style={{textAlign: "center"}}
+                             dangerouslySetInnerHTML={{__html: titleFirstRow}}></div>
+                        <div style={{textAlign: "center"}}
+                             dangerouslySetInnerHTML={{__html: titleSecondRow}}></div>
+                    </>
+                    : null}
                 <Chart type="bar"
                        data={data}
                        width={'1200px'}
-                       height={'300px'} />
+                       height={'300px'} style={{marginLeft: "auto", marginRight: "auto"}} />
             </>
         )
     } else {

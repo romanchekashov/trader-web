@@ -2,3 +2,7 @@
     text-align: center;
     font-weight: bold;
 }
+
+.tj_stat .p-col-3 {
+    padding: 0;
+}

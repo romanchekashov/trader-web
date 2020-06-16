@@ -73,10 +73,10 @@ class TradeJournalPage extends React.Component<Props, TradeJournalState> {
                 <div className="p-col-12">
                     <TradeJournalFilter onFilter={this.onFilter}/>
                 </div>
-                <div className="p-col-6">
+                <div className="p-col-12">
                     <ProfitLossChart stat={stat.length > 0 ? stat[0] : null}/>
                 </div>
-                <div className="p-col-6">
+                <div className="p-col-12">
                     <TradeJournalStatistic stat={stat.length > 0 ? stat[0] : null}/>
                 </div>
                 <div className="p-col-12 journal-trades-table">
