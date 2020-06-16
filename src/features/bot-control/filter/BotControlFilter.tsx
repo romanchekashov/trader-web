@@ -70,7 +70,9 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
         amount: 100000,
         maxRiskPerTradeInPercent: 1,
         maxRiskPerSessionTimeoutInPercent: 2,
-        maxRiskPerSessionInPercent: 3
+        maxRiskPerSessionInPercent: 3,
+        takeProfitPerTradeFactorFirst: 2,
+        takeProfitPerTradeFactorSecond: 4
     });
     const [interval, setInterval] = useState(null);
     const [minInterval, setMinInterval] = useState(Interval.M1);
@@ -269,19 +271,24 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
                 <DepositSetupView setup={depositSetup}
                                   onChange={onDepositSetupChanged}/>
             </div>
-            <div className="p-col-4" style={{display: "flex"}}>
-                <BotControlFilterHistory start={start}
-                                         end={end}
-                                         minStartDate={minStartDate}
-                                         maxEndDate={maxEndDate}
-                                         onEnabled={onHistory}
-                                         onStartDate={setStart}
-                                         onEndDate={setEnd}
-                                         onDebug={setDebug} onStop={onStopHistoryClicked}/>
-                <Button label="Start" icon="pi pi-caret-right"
-                        className="p-button-warning"
-                        onClick={onStartClicked}
-                        style={{marginLeft: '10px'}}/>
+            <div className="p-col-4">
+                <div className="p-grid">
+                    <div className="p-col-12">
+                        <BotControlFilterHistory start={start}
+                                                 end={end}
+                                                 minStartDate={minStartDate}
+                                                 maxEndDate={maxEndDate}
+                                                 onEnabled={onHistory}
+                                                 onStartDate={setStart}
+                                                 onEndDate={setEnd}
+                                                 onDebug={setDebug} onStop={onStopHistoryClicked}/>
+                    </div>
+                    <div className="p-col-12">
+                        <Button label="Start" icon="pi pi-caret-right"
+                                className="p-button-warning"
+                                onClick={onStartClicked}/>
+                    </div>
+                </div>
             </div>
         </div>
     )

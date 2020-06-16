@@ -3,7 +3,8 @@ import {useState} from "react";
 import {DepositSetup} from "../../../common/data/DepositSetup";
 import {InputText} from "primereact/inputtext";
 import {ToggleButton} from "primereact/togglebutton";
-import {round10} from "../../../common/utils/utils";
+import {PrimeDropdownItem, round10} from "../../../common/utils/utils";
+import {Dropdown} from "primereact/dropdown";
 
 type Props = {
     setup: DepositSetup
@@ -11,6 +12,9 @@ type Props = {
 };
 
 export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
+
+    const takeProfitNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
+    const [takeProfitNumber, setTakeProfitNumber] = useState(2);
 
     const getMaxRiskPerTradeInPercent = (stop: number): number => {
         return stop * 100 / setup.amount;
@@ -113,6 +117,65 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                               onLabel="Demo"
                               offLabel="Real"
                               style={{marginLeft: '10px'}}/>
+            </div>
+            <div className="p-col-2">
+                <div style={{fontSize: "10px"}}>Take Profits Number</div>
+                <Dropdown value={takeProfitNumber} options={takeProfitNumbers}
+                          onChange={(e) => {
+                              setTakeProfitNumber(e.value)
+                              if (e.value === 1) {
+                                  setup.takeProfitPerTradeFactorSecond = 0;
+                              } else {
+                                  setup.takeProfitPerTradeFactorSecond = 4;
+                              }
+                          }}
+                          style={{width: '60px'}}/>
+            </div>
+            <div className="p-col-2">
+                <div style={{fontSize: "10px"}}>First Take Profit Per Trade Factor</div>
+                <InputText type="number"
+                           min={1}
+                           value={setup.takeProfitPerTradeFactorFirst}
+                           onKeyDown={(e) => {
+                           }}
+                           onChange={(e) => {
+                               setup.takeProfitPerTradeFactorFirst = e.target['value'];
+                               onChange(setup);
+                           }}
+                           style={{width: '80px'}}/>
+            </div>
+            <div className="p-col-2">
+                <div style={{fontSize: "10px"}}>First Take Profit Per Trade</div>
+                <InputText value={setup.takeProfitPerTradeFactorFirst * stop}
+                           onKeyDown={(e) => {
+                           }}
+                           onChange={(e) => {
+                           }}
+                           style={{width: '80px'}}/>
+            </div>
+            <div className="p-col-2">
+                <div style={{fontSize: "10px"}}>Second Take Profit Per Trade Factor</div>
+                <InputText type="number"
+                           min={2}
+                           value={setup.takeProfitPerTradeFactorSecond}
+                           onKeyDown={(e) => {
+                           }}
+                           onChange={(e) => {
+                               setup.takeProfitPerTradeFactorSecond = e.target['value'];
+                               onChange(setup);
+                           }}
+                           disabled={takeProfitNumber===1}
+                           style={{width: '80px'}}/>
+            </div>
+            <div className="p-col-2">
+                <div style={{fontSize: "10px"}}>Second Take Profit Per Trade</div>
+                <InputText value={setup.takeProfitPerTradeFactorSecond * stop}
+                           onKeyDown={(e) => {
+                           }}
+                           onChange={(e) => {
+                           }}
+                           disabled={takeProfitNumber===1}
+                           style={{width: '80px'}}/>
             </div>
         </div>
     )

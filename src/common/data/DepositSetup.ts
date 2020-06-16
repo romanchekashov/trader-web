@@ -4,4 +4,6 @@ export class DepositSetup {
     maxRiskPerTradeInPercent: number;
     maxRiskPerSessionTimeoutInPercent: number;
     maxRiskPerSessionInPercent: number;
+    takeProfitPerTradeFactorFirst: number;
+    takeProfitPerTradeFactorSecond: number;
 }

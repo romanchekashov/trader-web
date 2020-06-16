@@ -51,36 +51,50 @@ export const BotControlFilterHistory: React.FC<Props> = ({
     const showDateSelect = () => {
         if (history) {
             return (
-                <>
-                    <div style={{lineHeight: '22px', margin: '5px'}}>Start:</div>
-                    <Calendar value={start}
-                              minDate={minStartDate}
-                              maxDate={maxEndDate}
-                              onChange={(e) => onStartDate(e.value as any)}
-                              showTime={true}
-                              inputStyle={{width: "90px"}}/>
-                    <div style={{lineHeight: '22px', margin: '5px'}}>End:</div>
-                    <Calendar value={end}
-                              minDate={minStartDate}
-                              maxDate={maxEndDate}
-                              onChange={(e) => onEndDate(e.value as any)}
-                              showTime={true}
-                              inputStyle={{width: "90px"}}/>
+                <div className="p-grid">
+                    <div className="p-col-4">
+                        <div style={{fontSize: "10px"}}>Start</div>
+                        <Calendar value={start}
+                                  minDate={minStartDate}
+                                  maxDate={maxEndDate}
+                                  onChange={(e) => onStartDate(e.value as any)}
+                                  showTime={true}
+                                  inputStyle={{width: "90px"}}/>
+                    </div>
 
-                    <ToggleButton checked={debug} onChange={(e) => onDebugClicked(e.value)} onLabel="Debug"
-                                  offLabel="Debug"
-                                  style={{marginLeft: '10px'}}/>
-                    {debug ? <Button label="Stop" onClick={onStopClicked} className="p-button-danger"
-                                     style={{marginLeft: '10px'}}/> : null}
-                </>
+
+                    <div className="p-col-4">
+                        <div style={{fontSize: "10px"}}>End</div>
+                        <Calendar value={end}
+                                  minDate={minStartDate}
+                                  maxDate={maxEndDate}
+                                  onChange={(e) => onEndDate(e.value as any)}
+                                  showTime={true}
+                                  inputStyle={{width: "90px"}}/>
+
+                    </div>
+
+
+                    <div className="p-col-4">
+                        <ToggleButton checked={debug} onChange={(e) => onDebugClicked(e.value)} onLabel="Debug"
+                                      offLabel="Debug"
+                                      style={{marginLeft: '10px'}}/>
+                        {debug ? <Button label="Stop" onClick={onStopClicked} className="p-button-danger"
+                                         style={{marginLeft: '10px'}}/> : null}
+                    </div>
+                </div>
             );
         }
     };
 
     return (
-        <>
-            <ToggleButton checked={history} onChange={(e) => onHistory(e.value)} onLabel="History" offLabel="History"/>
-            {showDateSelect()}
-        </>
+        <div className="p-grid">
+            <div className="p-col-3">
+                <ToggleButton checked={history} onChange={(e) => onHistory(e.value)} onLabel="History" offLabel="History"/>
+            </div>
+            <div className="p-col-9">
+                {showDateSelect()}
+            </div>
+        </div>
     )
 };
