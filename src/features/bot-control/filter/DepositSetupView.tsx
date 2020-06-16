@@ -139,7 +139,7 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                            onKeyDown={(e) => {
                            }}
                            onChange={(e) => {
-                               setup.takeProfitPerTradeFactorFirst = e.target['value'];
+                               setup.takeProfitPerTradeFactorFirst = parseInt(e.target['value']);
                                onChange(setup);
                            }}
                            style={{width: '80px'}}/>
@@ -161,7 +161,7 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                            onKeyDown={(e) => {
                            }}
                            onChange={(e) => {
-                               setup.takeProfitPerTradeFactorSecond = e.target['value'];
+                               setup.takeProfitPerTradeFactorSecond = parseInt(e.target['value']);
                                onChange(setup);
                            }}
                            disabled={takeProfitNumber===1}
