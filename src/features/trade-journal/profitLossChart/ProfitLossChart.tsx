@@ -92,7 +92,7 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
                 {title ? <h5 style={{textAlign: "center"}}>{title}</h5> : null}
                 <Chart type="bar"
                        data={data}
-                       width={'600px'}
+                       width={'1200px'}
                        height={'300px'} />
             </>
         )

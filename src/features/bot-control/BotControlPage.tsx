@@ -84,17 +84,17 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                 </div>
                 {
                     stat.length > 0 ?
-                        <div className="p-col-12 p-md-12">
-                            <div className="p-col-6">
+                        <>
+                            <div className="p-col-12">
                                 <ProfitLossChart stat={stat[0]}/>
                             </div>
-                            <div className="p-col-6">
+                            <div className="p-col-12">
                                 <TradeJournalStatistic stat={stat[0]}/>
                             </div>
                             <div className="p-col-12 journal-trades-table">
                                 <TradeJournalTable stat={stat}/>
                             </div>
-                        </div>
+                        </>
                         : null
                 }
             </div>
