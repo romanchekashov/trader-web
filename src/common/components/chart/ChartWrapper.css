@@ -30,6 +30,14 @@
     margin-left: 5px;
 }
 
+.chart-wrapper-head-start-date button {
+    width: auto !important;
+    font-size: 12px;
+}
+.chart-wrapper-head-start-date .p-button.p-button-icon-only .p-button-text {
+    padding: 0;
+}
+
 .chart-wrapper-head-start-date .p-inputtext {
     font-size: 12px;
     padding-top: 0;

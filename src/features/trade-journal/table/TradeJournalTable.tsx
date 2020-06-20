@@ -17,7 +17,7 @@ export interface TradeJournalTableState {
 }
 
 type Props = {
-    stat: ResultDto[]
+    stat: ResultDto
 };
 
 export const TradeJournalTable: React.FC<Props> = ({stat}) => {
@@ -165,13 +165,13 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
                 <Column header="Изм. цены за 1шт"/>
                 <Column header="Сумма (%)"/>
                 <Column header="Чистая сумма (руб)"/>
-                <Column header={stat[0].totalGainAndLoss}/>
+                <Column header={stat.totalGainAndLoss}/>
             </Row>
         </ColumnGroup>
     );
 
     return (
-        <DataTable value={stat[0].trades}
+        <DataTable value={stat.trades}
                    headerColumnGroup={headerGroup}
                    expandedRows={expandedRows}
                    onRowToggle={onRowToggle}
@@ -185,13 +185,13 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
             <Column field="open" body={dayOfWeekTemplate} style={{width: '10%'}}/>
             <Column field="open" body={timeTemplate}/>
             <Column field="openPosition"/>
-            <Column field="openSum"/>
+            <Column field="openSum" style={{overflow: 'auto'}}/>
             <Column field="openPrice"/>
             <Column field="close" body={dateTemplate}/>
             <Column field="close" body={dayOfWeekTemplate}/>
             <Column field="close" body={timeTemplate}/>
             <Column field="closePosition"/>
-            <Column field="closeSum"/>
+            <Column field="closeSum" style={{overflow: 'auto'}}/>
             <Column field="closePrice"/>
             <Column field="security.brokerCommission"/>
             <Column field="openCommission"/>

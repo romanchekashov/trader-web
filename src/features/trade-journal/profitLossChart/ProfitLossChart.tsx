@@ -1,8 +1,8 @@
 import * as React from "react";
+import {useEffect, useState} from "react";
 import {Chart} from "primereact/chart";
 import {ResultDto} from "../../../common/data/journal/ResultDto";
 import moment = require("moment");
-import {useEffect, useState} from "react";
 
 type Props = {
     stat: ResultDto
@@ -27,9 +27,11 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
         let color = '#42A5F5';
         const labelData = result.trades
             .map(trade => {
-                const dates = trade.trades.map(trade => trade.dateTime).sort((a, b) => {
-                    return new Date(a).getTime() - new Date(b).getTime();
-                });
+                const dates = trade.trades
+                    .map(trade => trade.dateTime)
+                    .sort((a, b) => {
+                        return new Date(a).getTime() - new Date(b).getTime();
+                    });
 
                 return {
                     date: dates[dates.length - 1],
@@ -95,11 +97,11 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
         setData({
             labels: labelData.map(value => value.label),
             datasets: [{
-                    label: 'P/L',
-                    data: labelData.map(value => value.data),
-                    fill: false,
-                    backgroundColor: color,
-                    borderColor: color
+                label: 'P/L',
+                data: labelData.map(value => value.data),
+                fill: false,
+                backgroundColor: color,
+                borderColor: color
             }]
         });
     };
@@ -118,7 +120,7 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
                 <Chart type="bar"
                        data={data}
                        width={'1200px'}
-                       height={'300px'} style={{marginLeft: "auto", marginRight: "auto"}} />
+                       height={'300px'} style={{marginLeft: "auto", marginRight: "auto"}}/>
             </>
         )
     } else {

@@ -7,8 +7,10 @@ import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
 import {BotControlFilter} from "./filter/BotControlFilter";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
-import {runHistory, startBot, stopHistory} from "../../common/api/rest/botControlRestApi";
-import {ResultDto} from "../../common/data/journal/ResultDto";
+import {runHistory, search, startBot, stopHistory} from "../../common/api/rest/botControlRestApi";
+import {HistoryStrategyResultDto} from "../../common/data/history/HistoryStrategyResultDto";
+import {HistoryStrategyResultTable} from "./table/HistoryStrategyResultTable";
+import {TradeSystemType} from "../../common/data/trading/TradeSystemType";
 import ProfitLossChart from "../trade-journal/profitLossChart/ProfitLossChart";
 import {TradeJournalStatistic} from "../trade-journal/statistic/TradeJournalStatistic";
 import {TradeJournalTable} from "../trade-journal/table/TradeJournalTable";
@@ -30,7 +32,7 @@ function mapDispatchToProps(dispatch: AppDispatch) {
 
 interface BotControlState {
     filterData: MarketBotFilterDataDto
-    stat: ResultDto[]
+    stat: HistoryStrategyResultDto
 }
 
 type Props = ReturnType<typeof mapStateToProps> &
@@ -40,11 +42,11 @@ class BotControlPage extends React.Component<Props, BotControlState> {
 
     constructor(props) {
         super(props);
-        this.state = {filterData: null, stat: []};
+        this.state = {filterData: null, stat: null};
     }
 
     componentDidMount = (): void => {
-        const { actions, filterData } = this.props;
+        const {actions, filterData} = this.props;
 
         if (!filterData) {
             actions.loadFilterData();
@@ -52,7 +54,7 @@ class BotControlPage extends React.Component<Props, BotControlState> {
     }
 
     onStart = (data: MarketBotStartDto): void => {
-        if (data.historySetup) {
+        if (data.systemType === TradeSystemType.HISTORY) {
             runHistory(data)
                 .then(stat => this.setState({stat}))
                 .catch(console.error);
@@ -63,8 +65,14 @@ class BotControlPage extends React.Component<Props, BotControlState> {
         }
     }
 
+    onSearch = (data: MarketBotStartDto): void => {
+        search(data)
+            .then(stat => this.setState({stat}))
+            .catch(console.error);
+    }
+
     onStopHistory = (data: MarketBotStartDto): void => {
-        if (data.historySetup) {
+        if (data.systemType === TradeSystemType.HISTORY) {
             stopHistory(data).then(value => {
                 console.log(data, value);
             }).catch(console.error);
@@ -72,27 +80,31 @@ class BotControlPage extends React.Component<Props, BotControlState> {
     }
 
     render() {
-        const { filterData } = this.props;
-        const { stat } = this.state;
+        const {filterData} = this.props;
+        const {stat} = this.state;
 
         return (
             <div className="p-grid sample-layout">
                 <div className="p-col-12" style={{backgroundColor: "aliceblue"}}>
                     <BotControlFilter filter={filterData}
                                       onStart={this.onStart}
+                                      onSearch={this.onSearch}
                                       onStopHistory={this.onStopHistory}/>
                 </div>
                 {
-                    stat.length > 0 ?
+                    stat != null ?
                         <>
                             <div className="p-col-12">
-                                <ProfitLossChart stat={stat[0]}/>
+                                <ProfitLossChart stat={stat.stat}/>
                             </div>
                             <div className="p-col-12">
-                                <TradeJournalStatistic stat={stat[0]}/>
+                                <TradeJournalStatistic stat={stat.stat}/>
+                            </div>
+                            <div className="p-col-12">
+                                <TradeJournalTable stat={stat.stat}/>
                             </div>
                             <div className="p-col-12 journal-trades-table">
-                                <TradeJournalTable stat={stat}/>
+                                <HistoryStrategyResultTable stat={stat}/>
                             </div>
                         </>
                         : null

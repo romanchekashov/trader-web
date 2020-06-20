@@ -13,7 +13,8 @@ import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
 import "./Filter.css";
 import {Intervals} from "../../../common/utils/utils";
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
-import {TradingStrategy} from "../../../common/data/TradingStrategy";
+import {TradingStrategyName} from "../../../common/data/trading/TradingStrategyName";
+import {TradeSystemType} from "../../../common/data/trading/TradeSystemType";
 
 export interface FilterState {
     broker: Broker
@@ -24,6 +25,7 @@ export interface FilterState {
     highTimeFrame: Interval
     tradingTimeFrame: Interval
     lowTimeFrame: Interval
+    systemType: TradeSystemType
 }
 
 type Props = {
@@ -45,7 +47,8 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
         realDepo: false,
         highTimeFrame: Interval.M30,
         tradingTimeFrame: Interval.M3,
-        lowTimeFrame: Interval.M1
+        lowTimeFrame: Interval.M1,
+        systemType: TradeSystemType.HISTORY
     };
 
     const brokers = filter ? [filter.broker] : [];
@@ -67,6 +70,10 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
     const [lowTimeFrame, setLowTimeFrame] = useState(initState.lowTimeFrame);
 
     const [realDepo, setRealDepo] = useState(initState.realDepo);
+
+    const systemTypes: PrimeDropdownItem<TradeSystemType>[] = [TradeSystemType.HISTORY,
+        TradeSystemType.DEMO, TradeSystemType.REAL].map(val => ({label: val, value: val}));
+    const [systemType, setSystemType] = useState(initState.systemType);
 
     const onMarketChange = (val: MarketSecuritiesDto) => {
         setMarket(val);
@@ -95,8 +102,10 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
             timeFrameMin: lowTimeFrame,
 
             depositSetup: null,
-            historySetup: null,
-            strategy: TradingStrategy.futuresSimpleTradingStrategy
+            systemType,
+            start: null,
+            end: null,
+            strategy: TradingStrategyName.TWO_EMA_CROSS
         });
     };
 

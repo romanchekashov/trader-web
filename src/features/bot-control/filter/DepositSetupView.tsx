@@ -2,7 +2,6 @@ import * as React from "react";
 import {useState} from "react";
 import {DepositSetup} from "../../../common/data/DepositSetup";
 import {InputText} from "primereact/inputtext";
-import {ToggleButton} from "primereact/togglebutton";
 import {PrimeDropdownItem, round10} from "../../../common/utils/utils";
 import {Dropdown} from "primereact/dropdown";
 
@@ -41,7 +40,7 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
 
     return (
         <div className="p-grid">
-            <div className="p-col-2">
+            <div className="p-col-1">
                 <div style={{fontSize: "10px"}}>Deposit</div>
                 <InputText type="number"
                            min={0}
@@ -53,7 +52,7 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                            }}
                            style={{width: '90px'}}/>
             </div>
-            <div className="p-col-2">
+            <div className="p-col-1">
                 <div style={{fontSize: "10px"}}>Max Stop Per Trade</div>
                 <InputText type="number"
                            min={0}
@@ -66,7 +65,7 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                            }}
                            style={{width: '80px'}}/>
             </div>
-            <div className="p-col-2">
+            <div className="p-col-1">
                 <div style={{fontSize: "10px"}}>Max Risk Per Trade In Percent</div>
                 <InputText value={setup.maxRiskPerTradeInPercent}
                            onKeyDown={(e) => {
@@ -81,20 +80,7 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                            }}
                            style={{width: '80px'}}/>
             </div>
-            <div className="p-col-2">
-                <div style={{fontSize: "10px"}}>Max Risk Per Session Timeout In Percent</div>
-                <InputText value={setup.maxRiskPerSessionTimeoutInPercent}
-                           onKeyDown={(e) => {
-                               riskChangeByKeyDown(e, "maxRiskPerSessionTimeoutInPercent");
-                               onChange(setup);
-                           }}
-                           onChange={(e) => {
-                               setup.maxRiskPerSessionTimeoutInPercent = e.target['value'];
-                               onChange(setup);
-                           }}
-                           style={{width: '80px'}}/>
-            </div>
-            <div className="p-col-2">
+            <div className="p-col-1">
                 <div style={{fontSize: "10px"}}>Max Risk Per Session In Percent</div>
                 <InputText value={setup.maxRiskPerSessionInPercent}
                            onKeyDown={(e) => {
@@ -107,18 +93,7 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                            }}
                            style={{width: '80px'}}/>
             </div>
-            <div className="p-col-2">
-                <ToggleButton checked={setup.demo}
-                              className={setup.demo ? "" : "p-button-danger"}
-                              onChange={(e) => {
-                                  setup.demo = e.value;
-                                  onChange(setup);
-                              }}
-                              onLabel="Demo"
-                              offLabel="Real"
-                              style={{marginLeft: '10px'}}/>
-            </div>
-            <div className="p-col-2">
+            <div className="p-col-1">
                 <div style={{fontSize: "10px"}}>Take Profits Number</div>
                 <Dropdown value={takeProfitNumber} options={takeProfitNumbers}
                           onChange={(e) => {
@@ -131,7 +106,7 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                           }}
                           style={{width: '60px'}}/>
             </div>
-            <div className="p-col-2">
+            <div className="p-col-1">
                 <div style={{fontSize: "10px"}}>First Take Profit Per Trade Factor</div>
                 <InputText type="number"
                            min={1}
@@ -144,7 +119,7 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                            }}
                            style={{width: '80px'}}/>
             </div>
-            <div className="p-col-2">
+            <div className="p-col-1">
                 <div style={{fontSize: "10px"}}>First Take Profit Per Trade</div>
                 <InputText value={setup.takeProfitPerTradeFactorFirst * stop}
                            onKeyDown={(e) => {
@@ -153,7 +128,7 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                            }}
                            style={{width: '80px'}}/>
             </div>
-            <div className="p-col-2">
+            <div className="p-col-1">
                 <div style={{fontSize: "10px"}}>Second Take Profit Per Trade Factor</div>
                 <InputText type="number"
                            min={2}
@@ -164,17 +139,17 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
                                setup.takeProfitPerTradeFactorSecond = parseInt(e.target['value']);
                                onChange(setup);
                            }}
-                           disabled={takeProfitNumber===1}
+                           disabled={takeProfitNumber === 1}
                            style={{width: '80px'}}/>
             </div>
-            <div className="p-col-2">
+            <div className="p-col-1">
                 <div style={{fontSize: "10px"}}>Second Take Profit Per Trade</div>
                 <InputText value={setup.takeProfitPerTradeFactorSecond * stop}
                            onKeyDown={(e) => {
                            }}
                            onChange={(e) => {
                            }}
-                           disabled={takeProfitNumber===1}
+                           disabled={takeProfitNumber === 1}
                            style={{width: '80px'}}/>
             </div>
         </div>

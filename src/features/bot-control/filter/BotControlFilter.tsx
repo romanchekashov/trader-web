@@ -9,17 +9,17 @@ import {SecurityInfo} from "../../../common/data/SecurityInfo";
 import {Interval} from "../../../common/data/Interval";
 import "./BotControlFilter.css";
 import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
-import {BotControlFilterHistory} from "./BotControlFilterHistory";
 import {Intervals, PrimeDropdownItem} from "../../../common/utils/utils";
 import {ClassCode} from "../../../common/data/ClassCode";
 import {Security} from "../../../common/data/Security";
 import {getSecuritiesByClassCode} from "../../../common/utils/Cache";
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
 import {HistoryDateDto} from "../../../common/data/bot/HistoryDateDto";
-import {HistorySetup} from "../../../common/data/HistorySetup";
-import {TradingStrategy} from "../../../common/data/TradingStrategy";
+import {TradingStrategyName} from "../../../common/data/trading/TradingStrategyName";
 import {DepositSetupView} from "./DepositSetupView";
 import {DepositSetup} from "../../../common/data/DepositSetup";
+import {TradeSystemType} from "../../../common/data/trading/TradeSystemType";
+import {Calendar} from "primereact/calendar";
 import moment = require("moment");
 
 export interface BotControlFilterState {
@@ -27,7 +27,6 @@ export interface BotControlFilterState {
     platform: TradingPlatform
     market: MarketSecuritiesDto
     security: PrimeDropdownItem<SecurityInfo>
-    demo: boolean
     highTimeFrame: Interval
     tradingTimeFrame: Interval
     lowTimeFrame: Interval
@@ -35,28 +34,32 @@ export interface BotControlFilterState {
     start: Date
     end: Date
     debug: boolean
+    systemType: TradeSystemType
+    strategy: TradingStrategyName
 }
 
 type Props = {
     filter: MarketBotFilterDataDto
     onStart: (data: MarketBotStartDto) => void
+    onSearch: (data: MarketBotStartDto) => void
     onStopHistory: (data: MarketBotStartDto) => void
 };
 
-export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistory}) => {
+export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHistory}) => {
     let initState: BotControlFilterState = {
         broker: filter ? filter.broker : null,
         platform: filter ? filter.broker.tradingPlatform : null,
         market: filter ? filter.marketSecurities[0] : null,
         security: null,
-        demo: true,
         highTimeFrame: Interval.M30,
         tradingTimeFrame: Interval.M3,
         lowTimeFrame: Interval.M1,
         history: false,
         start: null,
         end: null,
-        debug: false
+        debug: false,
+        systemType: TradeSystemType.HISTORY,
+        strategy: TradingStrategyName.TWO_EMA_CROSS
     };
 
     const brokers = filter ? [filter.broker] : [];
@@ -66,20 +69,17 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
     const [platform, setPlatform] = useState(initState.platform);
 
     const [depositSetup, setDepositSetup] = useState<DepositSetup>({
-        demo: true,
         amount: 100000,
         maxRiskPerTradeInPercent: 1,
-        maxRiskPerSessionTimeoutInPercent: 2,
         maxRiskPerSessionInPercent: 3,
-        takeProfitPerTradeFactorFirst: 2,
-        takeProfitPerTradeFactorSecond: 4
+        takeProfitPerTradeFactorFirst: 3,
+        takeProfitPerTradeFactorSecond: 6
     });
     const [interval, setInterval] = useState(null);
     const [minInterval, setMinInterval] = useState(Interval.M1);
     const [classCode, setClassCode] = useState(null);
     const [secCode, setSecCode] = useState(null);
     const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}]);
-    const [strategy, setStrategy] = useState(null);
     const [minStartDate, setMinStartDate] = useState(null);
     const [maxEndDate, setMaxEndDate] = useState(null);
 
@@ -91,8 +91,14 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
         .map(val => ({label: val || "ALL", value: val}));
     const classCodes: PrimeDropdownItem<ClassCode>[] = [null, ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
         .map(val => ({label: val || "ALL", value: val}));
-    const strategies: PrimeDropdownItem<string>[] = [null, "TREND_LINE_BREAKOUT", "TREND_CHANGE"]
-        .map(val => ({label: val || "ALL", value: val}));
+
+    const systemTypes: PrimeDropdownItem<TradeSystemType>[] = [TradeSystemType.HISTORY,
+        TradeSystemType.DEMO, TradeSystemType.REAL].map(val => ({label: val, value: val}));
+    const [systemType, setSystemType] = useState(initState.systemType);
+
+    const strategies: PrimeDropdownItem<TradingStrategyName>[] = [TradingStrategyName.TWO_EMA_CROSS]
+        .map(val => ({label: val, value: val}));
+    const [strategy, setStrategy] = useState(initState.strategy);
 
     useEffect(() => {
         if (brokers.length === 1) {
@@ -103,15 +109,6 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
     });
 
     const getDto = (): MarketBotStartDto => {
-        let historySetup: HistorySetup = null;
-
-        if (history) {
-            historySetup = {
-                start,
-                end
-            };
-        }
-
         return {
             brokerId: broker.id,
             tradingPlatform: platform,
@@ -122,8 +119,10 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
             timeFrameMin: minInterval,
 
             depositSetup,
-            historySetup,
-            strategy: TradingStrategy.futuresSimpleTradingStrategy
+            systemType,
+            start,
+            end,
+            strategy
         };
     };
 
@@ -132,16 +131,13 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
         onStart(getDto());
     };
 
-    const [history, setHistory] = useState(initState.history);
+    const onSearchClicked = () => {
+        console.log(getDto());
+        onSearch(getDto());
+    };
+
     const [start, setStart] = useState(initState.start);
     const [end, setEnd] = useState(initState.end);
-    const [debug, setDebug] = useState(initState.debug);
-
-    const onHistory = (history: boolean) => {
-        setHistory(history);
-        depositSetup.demo = true;
-        setDepositSetup(Object.assign({}, depositSetup));
-    };
 
     const onStopHistoryClicked = () => {
         onStopHistory(getDto());
@@ -180,7 +176,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
         updateHistoryDates(newSecCode, minInterval);
     };
 
-    const onStrategyChanged = (newStrategy: string) => {
+    const onStrategyChanged = (newStrategy: TradingStrategyName) => {
         console.log(newStrategy);
         setStrategy(newStrategy);
     };
@@ -203,9 +199,9 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
 
     return (
         <div className="p-grid filter">
-            <div className="p-col-8">
+            <div className="p-col-12">
                 <div className="p-grid">
-                    <div className="p-col-2">
+                    <div className="p-col-1">
                         <div style={{fontSize: "10px"}}>Broker</div>
                         <Dropdown optionLabel="name"
                                   value={broker}
@@ -216,7 +212,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
                                   placeholder="Select a broker"
                                   style={{width: '130px'}}/>
                     </div>
-                    <div className="p-col-2">
+                    <div className="p-col-1">
                         <div style={{fontSize: "10px"}}>Trading platform</div>
                         <Dropdown value={platform}
                                   options={platforms}
@@ -226,7 +222,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
                                   placeholder="Select a platform"
                                   style={{width: '80px'}}/>
                     </div>
-                    <div className="p-col-2">
+                    <div className="p-col-1">
                         <div style={{fontSize: "10px"}}>Class code</div>
                         <Dropdown value={classCode}
                                   options={classCodes}
@@ -235,7 +231,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
                                   }}
                                   style={{width: '90px'}}/>
                     </div>
-                    <div className="p-col-2">
+                    <div className="p-col-1">
                         <div style={{fontSize: "10px"}}>Sec code</div>
                         <Dropdown value={secCode}
                                   options={secCodes}
@@ -261,29 +257,52 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onStopHistor
                                       onMinIntervalChanged(e.value);
                                   }} style={{width: '80px'}}/>
                     </div>
-                    <div className="p-col-2">
-                        <Dropdown value={strategy} options={strategies}
-                                  onChange={(e) => {
-                                      onStrategyChanged(e.value);
-                                  }} filter={true}/>
+
+                    <div className="p-col-1">
+                        <div style={{fontSize: "10px"}}>Start</div>
+                        <Calendar value={start}
+                                  minDate={minStartDate}
+                                  maxDate={maxEndDate}
+                                  onChange={(e) => setStart(e.value as any)}
+                                  showTime={true}
+                                  inputStyle={{width: "90px"}}/>
+                    </div>
+                    <div className="p-col-1">
+                        <div style={{fontSize: "10px"}}>End</div>
+                        <Calendar value={end}
+                                  minDate={minStartDate}
+                                  maxDate={maxEndDate}
+                                  onChange={(e) => setEnd(e.value as any)}
+                                  showTime={true}
+                                  inputStyle={{width: "90px"}}/>
                     </div>
                 </div>
                 <DepositSetupView setup={depositSetup}
                                   onChange={onDepositSetupChanged}/>
             </div>
-            <div className="p-col-4">
+            <div className="p-col-12">
                 <div className="p-grid">
-                    <div className="p-col-12">
-                        <BotControlFilterHistory start={start}
-                                                 end={end}
-                                                 minStartDate={minStartDate}
-                                                 maxEndDate={maxEndDate}
-                                                 onEnabled={onHistory}
-                                                 onStartDate={setStart}
-                                                 onEndDate={setEnd}
-                                                 onDebug={setDebug} onStop={onStopHistoryClicked}/>
+                    <div className="p-col-2">
+                        <div style={{fontSize: "10px"}}>Trading strategy</div>
+                        <Dropdown value={strategy}
+                                  options={strategies}
+                                  onChange={(e) => {
+                                      onStrategyChanged(e.value as any);
+                                  }}/>
                     </div>
-                    <div className="p-col-12">
+                    <div className="p-col-2">
+                        <div style={{fontSize: "10px"}}>Trade system type</div>
+                        <Dropdown value={systemType}
+                                  options={systemTypes}
+                                  onChange={(e) => {
+                                      setSystemType(e.value as any);
+                                  }}/>
+                    </div>
+                    <div className="p-col-1">
+                        <Button label="Search" icon="pi pi-search"
+                                onClick={onSearchClicked}/>
+                    </div>
+                    <div className="p-col-1">
                         <Button label="Start" icon="pi pi-caret-right"
                                 className="p-button-warning"
                                 onClick={onStartClicked}/>

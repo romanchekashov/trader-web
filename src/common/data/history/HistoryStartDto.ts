@@ -3,7 +3,7 @@ import {Interval} from "../Interval";
 import {ClassCode} from "../ClassCode";
 import {DepositSetup} from "../DepositSetup";
 import {HistorySetup} from "../HistorySetup";
-import {TradingStrategy} from "../TradingStrategy";
+import {TradingStrategyName} from "../trading/TradingStrategyName";
 
 export class HistoryStartDto {
     public brokerId: number;
@@ -17,5 +17,6 @@ export class HistoryStartDto {
     public depositSetup: DepositSetup;
     public historySetup: HistorySetup;
 
-    public strategy: TradingStrategy = TradingStrategy.futuresSimpleTradingStrategy;
+    public strategy: TradingStrategyName;
+    public tradingStrategyId: number;
 }

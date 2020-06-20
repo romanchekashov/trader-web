@@ -80,7 +80,7 @@ class TradeJournalPage extends React.Component<Props, TradeJournalState> {
                     <TradeJournalStatistic stat={stat.length > 0 ? stat[0] : null}/>
                 </div>
                 <div className="p-col-12 journal-trades-table">
-                    <TradeJournalTable stat={stat}/>
+                    <TradeJournalTable stat={stat[0]}/>
                 </div>
             </div>
         );

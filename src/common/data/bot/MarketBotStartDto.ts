@@ -2,20 +2,21 @@ import {TradingPlatform} from "../TradingPlatform";
 import {Interval} from "../Interval";
 import {ClassCode} from "../ClassCode";
 import {DepositSetup} from "../DepositSetup";
-import {HistorySetup} from "../HistorySetup";
-import {TradingStrategy} from "../TradingStrategy";
+import {TradingStrategyName} from "../trading/TradingStrategyName";
+import {TradeSystemType} from "../trading/TradeSystemType";
 
 export class MarketBotStartDto {
-    public brokerId: number;
-    public tradingPlatform: TradingPlatform;
-    public classCode: ClassCode;
-    public secCode: string;
+    public brokerId: number
+    public tradingPlatform: TradingPlatform
+    public classCode: ClassCode
+    public secCode: string
+    public strategy: TradingStrategyName
+    public systemType: TradeSystemType
 
-    public timeFrameTrading: Interval;
-    public timeFrameMin: Interval;
+    public timeFrameTrading: Interval
+    public timeFrameMin: Interval
 
-    public depositSetup: DepositSetup;
-    public historySetup: HistorySetup;
-
-    public strategy: TradingStrategy = TradingStrategy.futuresSimpleTradingStrategy;
+    public depositSetup: DepositSetup
+    public start: Date
+    public end: Date
 }

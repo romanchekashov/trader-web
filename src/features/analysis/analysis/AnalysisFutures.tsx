@@ -303,7 +303,6 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                 <div className="p-grid" style={{margin: '0'}}>
                     <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
-                                      start={start}
                                       initialNumberOfCandles={1000}
                                       onIntervalChanged={onTradingIntervalChanged}
                                       onStartChanged={onStartChanged}
