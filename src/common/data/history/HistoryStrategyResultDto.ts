@@ -1,7 +1,7 @@
-import {TradingStrategyTrade} from "./TradingStrategyTrade";
 import {ResultDto} from "../journal/ResultDto";
+import {TradingStrategyData} from "./TradingStrategyData";
 
 export class HistoryStrategyResultDto {
-    public trades: TradingStrategyTrade[];
+    public tradingStrategyData: TradingStrategyData;
     public stat: ResultDto;
 }

@@ -13,7 +13,7 @@
 #stack-toggle-btn {
     position: absolute;
     transition: bottom 0.2s;
-    top: 130px;
+    top: 330px;
     transform: rotate(90deg);
     border-radius: 0 0 3px 3px;
 }
@@ -28,7 +28,7 @@
 #stack-toggle-btn-2 {
     position: absolute;
     transition: bottom 0.2s;
-    top: 200px;
+    top: 400px;
     transform: rotate(90deg);
     border-radius: 0 0 3px 3px;
 }

@@ -14,6 +14,9 @@ import {TradeSystemType} from "../../common/data/trading/TradeSystemType";
 import ProfitLossChart from "../trade-journal/profitLossChart/ProfitLossChart";
 import {TradeJournalStatistic} from "../trade-journal/statistic/TradeJournalStatistic";
 import {TradeJournalTable} from "../trade-journal/table/TradeJournalTable";
+import {TabMenu} from "primereact/tabmenu";
+import {BotControlLastInfo} from "./last-info/BotControlLastInfo";
+import {TabPanel, TabView} from "primereact/tabview";
 
 
 function mapStateToProps(state: RootState) {
@@ -33,6 +36,8 @@ function mapDispatchToProps(dispatch: AppDispatch) {
 interface BotControlState {
     filterData: MarketBotFilterDataDto
     stat: HistoryStrategyResultDto
+    items: any[]
+    activeItem: any
 }
 
 type Props = ReturnType<typeof mapStateToProps> &
@@ -40,9 +45,21 @@ type Props = ReturnType<typeof mapStateToProps> &
 
 class BotControlPage extends React.Component<Props, BotControlState> {
 
+    private items = [
+        {label: 'Current State', icon: 'pi pi-fw pi-home'},
+        {label: 'Real Deposit Stats', icon: 'pi pi-fw pi-calendar'},
+        {label: 'Demo Deposit Stats', icon: 'pi pi-fw pi-pencil'},
+        {label: 'History Stats', icon: 'pi pi-fw pi-file'}
+    ]
+
     constructor(props) {
         super(props);
-        this.state = {filterData: null, stat: null};
+        this.state = {
+            filterData: null,
+            stat: null,
+            items: this.items,
+            activeItem: this.items[0]
+        };
     }
 
     componentDidMount = (): void => {
@@ -91,24 +108,46 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                                       onSearch={this.onSearch}
                                       onStopHistory={this.onStopHistory}/>
                 </div>
-                {
-                    stat != null ?
-                        <>
-                            <div className="p-col-12">
-                                <ProfitLossChart stat={stat.stat}/>
-                            </div>
-                            <div className="p-col-12">
-                                <TradeJournalStatistic stat={stat.stat}/>
-                            </div>
-                            <div className="p-col-12">
-                                <TradeJournalTable stat={stat.stat}/>
-                            </div>
-                            <div className="p-col-12 journal-trades-table">
-                                <HistoryStrategyResultTable stat={stat}/>
-                            </div>
-                        </>
-                        : null
-                }
+                <div className="p-col-12">
+                    <div className="p-grid">
+                        <div className="p-col-2">
+                            <BotControlLastInfo outerHeight={400}
+                                                onStrategyResultSelected={(stat) => this.setState({stat})}/>
+                        </div>
+                        <div className="p-col-10" style={{padding: 0}}>
+                            <TabView>
+                                <TabPanel header="Analysis">
+                                    Analysis
+                                </TabPanel>
+                                <TabPanel header="Strategy Stat">
+                                    {
+                                        stat != null ? <HistoryStrategyResultTable stat={stat}/> : null
+                                    }
+                                </TabPanel>
+                                <TabPanel header="Profit Loss Stat">
+                                    {
+                                        stat != null ? <>
+                                            <div className="p-col-12">
+                                                <ProfitLossChart stat={stat.stat}/>
+                                            </div>
+                                            <div className="p-col-12">
+                                                <TradeJournalStatistic stat={stat.stat}/>
+                                            </div>
+                                        </> : null
+                                    }
+                                </TabPanel>
+                                <TabPanel header="Trades">
+                                    {
+                                        stat != null ? <TradeJournalTable stat={stat.stat}/> : null
+                                    }
+                                </TabPanel>
+                            </TabView>
+                            {/*<TabMenu model={this.state.items}
+                                     activeItem={this.state.activeItem}
+                                     onTabChange={(e) => this.setState({activeItem: e.value})}/>*/}
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

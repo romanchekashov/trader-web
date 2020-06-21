@@ -22,6 +22,12 @@ export function startBot(dto: MarketBotStartDto): Promise<any> {
         .catch(handleError);
 }
 
+export function getAllStrategies(): Promise<HistoryStrategyResultDto[]> {
+    return fetch(baseUrl + 'all-strategies')
+        .then(handleResponse)
+        .catch(handleError);
+}
+
 export function search(dto: MarketBotStartDto): Promise<HistoryStrategyResultDto> {
     return fetch(baseUrl + 'search', {
         method: "POST", // POST for create, PUT to update when id already exists.

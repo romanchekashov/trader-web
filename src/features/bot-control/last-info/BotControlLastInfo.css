@@ -1,0 +1,19 @@
+.row-selected {
+    background-color: #b3e5fc !important;
+}
+
+.bot-control-last-info-row-even div,
+.bot-control-last-info-row-odd div {
+    overflow: hidden;
+}
+.bot-control-last-info-row-even,
+.bot-control-last-info-row-odd {
+    cursor: pointer;
+    font-size: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.bot-control-last-info-row-even {
+    background-color: #f8f8f0;
+}

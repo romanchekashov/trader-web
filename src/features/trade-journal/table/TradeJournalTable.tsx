@@ -172,6 +172,7 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
 
     return (
         <DataTable value={stat.trades}
+                   className="trade-journal-table"
                    headerColumnGroup={headerGroup}
                    expandedRows={expandedRows}
                    onRowToggle={onRowToggle}

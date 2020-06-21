@@ -12,12 +12,14 @@ import TradeStrategyAnalysisPage from "../features/analysis/AnalysisPage";
 import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
 import {ControlPanel} from "../common/components/control-panel/ControlPanel";
 import {Stack} from "../common/components/stack/Stack";
+import {BotControl} from "../common/components/bot-control/BotControl";
 
 export const App = () => {
     return (
         <div className="container-fluid">
-            <ControlPanel />
-            <Stack />
+            <ControlPanel/>
+            <Stack/>
+            <BotControl/>
             <Header/>
             <Switch>
                 <Route exact path="/" component={HomePage}/>

@@ -172,7 +172,8 @@ export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
     );
 
     return (
-        <DataTable value={stat.trades}
+        <DataTable value={stat.tradingStrategyData.trades}
+                   className="history-strategy-result-table"
                    headerColumnGroup={headerGroup}
                    expandedRows={expandedRows}
                    onRowToggle={onRowToggle}

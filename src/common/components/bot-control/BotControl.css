@@ -1,0 +1,41 @@
+#bot-control {
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    position: fixed;
+    left: 0;
+    background-color: #dadada;
+    z-index: 9999;
+    transition: top 0.2s;
+    padding: 0;
+}
+
+#bot-control-toggle-btn {
+    position: absolute;
+    transition: bottom 0.2s;
+    top: 330px;
+    transform: rotate(-90deg);
+    border-radius: 0 0 3px 3px;
+}
+
+#bot-control-toggle-btn .p-button-text {
+    font-size: 10px;
+    padding-top: 2px;
+    padding-bottom: 0;
+    line-height: 16px;
+}
+
+#bot-control-toggle-btn-2 {
+    position: absolute;
+    transition: bottom 0.2s;
+    top: 415px;
+    transform: rotate(-90deg);
+    border-radius: 0 0 3px 3px;
+}
+
+#bot-control-toggle-btn-2 .p-button-text {
+    font-size: 10px;
+    padding-top: 2px;
+    padding-bottom: 0;
+    line-height: 16px;
+}
