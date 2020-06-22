@@ -7,7 +7,6 @@ import {SubscriptionLike} from "rxjs";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {Interval} from "../../../common/data/Interval";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
-import {BotControlAnalysis} from "../analysis/BotControlAnalysis";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {TradingStrategyState} from "../../../common/data/strategy/TradingStrategyState";
 import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
@@ -187,8 +186,8 @@ export class BotControlHistory extends React.Component<Props, States> {
                         </div>
                     </div>
                     <div className="p-col-5" style={{width: '500px', padding: 0}}>
-                        <BotControlAnalysis premise={tradingStrategyState ? tradingStrategyState.currentPremise : null}
-                                            setup={setup}/>
+                        {/*<BotControlAnalysis premise={tradingStrategyState ? tradingStrategyState.currentPremise : null}
+                                            setup={setup}/>*/}
                     </div>
                 </div>
             </>

@@ -9,7 +9,7 @@ import {Row} from "primereact/row";
 import {Trade} from "../../../common/data/journal/Trade";
 import {JournalTradeDto} from "../../../common/data/journal/JournalTradeDto";
 import TreeNode from "primereact/components/treenode/TreeNode";
-import {HistoryStrategyResultDto} from "../../../common/data/history/HistoryStrategyResultDto";
+import {TradingStrategyResult} from "../../../common/data/history/TradingStrategyResult";
 import {OperationType} from "../../../common/data/OperationType";
 import {TradingStrategyTrade} from "../../../common/data/history/TradingStrategyTrade";
 import moment = require("moment");
@@ -19,7 +19,7 @@ export interface HistoryStrategyResultTableState {
 }
 
 type Props = {
-    stat: HistoryStrategyResultDto
+    stat: TradingStrategyResult
 };
 
 export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {

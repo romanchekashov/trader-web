@@ -6,6 +6,7 @@ import {OperationType} from "../OperationType";
 export class TradingStrategyTrade {
   public trades: Trade[]
   public id: string
+  public tradingStrategyId: number
   public operation: OperationType
   public setup: TradeSetup
 

@@ -3,32 +3,46 @@ import {useEffect, useState} from "react";
 import {FixedSizeList as List} from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import "./BotControlLastInfo.css";
+import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {TradingStrategyResult} from "../../../common/data/history/TradingStrategyResult";
-import {getAllStrategies} from "../../../common/api/rest/botControlRestApi";
 
 type Props = {
     onStrategyResultSelected: (result: TradingStrategyResult) => void
     outerHeight?: number
 };
 
-export const BotControlLastInfo: React.FC<Props> = ({onStrategyResultSelected, outerHeight}) => {
+export const BotControlRunningStrategies: React.FC<Props> = ({onStrategyResultSelected, outerHeight}) => {
     const [results, setResults] = useState([]);
     const [selectedResult, setSelectedResult] = useState(null);
 
     useEffect(() => {
-        let alertsSubscription;
-        getAllStrategies()
-            .then(setResults)
-            .catch(console.error);
+        const wsStatusSub = WebsocketService.getInstance()
+            .connectionStatus()
+            .subscribe(isConnected => {
+                if (isConnected) {
+                    // informServerAboutRequiredData();
+                }
+            });
+
+        const tradingStrategiesStatesSubscription = WebsocketService.getInstance()
+            .on<TradingStrategyResult[]>(WSEvent.TRADING_STRATEGIES_RESULTS)
+            .subscribe(setResults);
 
         // Specify how to clean up after this effect:
         return function cleanup() {
-            if (alertsSubscription) alertsSubscription.unsubscribe();
+            if (wsStatusSub) wsStatusSub.unsubscribe();
+            if (tradingStrategiesStatesSubscription) tradingStrategiesStatesSubscription.unsubscribe();
         };
     }, []);
 
     if (results.length === 0) {
-        return (<>No Data</>);
+        return (
+            <div className="p-grid">
+                <div className="p-col-12">
+                    No Running Trading Strategy Bots
+                </div>
+            </div>
+        );
     }
 
     const Row = ({index, style}) => {
@@ -69,7 +83,7 @@ export const BotControlLastInfo: React.FC<Props> = ({onStrategyResultSelected, o
                         className="List"
                         height={height}
                         itemCount={results.length}
-                        itemSize={35}
+                        itemSize={60}
                         width={width}
                     >
                         {Row}

@@ -8,18 +8,18 @@ import {RootState} from "../../app/rootReducer";
 import {BotControlFilter} from "./filter/BotControlFilter";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
 import {runHistory, search, startBot, stopHistory} from "../../common/api/rest/botControlRestApi";
-import {HistoryStrategyResultDto} from "../../common/data/history/HistoryStrategyResultDto";
+import {TradingStrategyResult} from "../../common/data/history/TradingStrategyResult";
 import {HistoryStrategyResultTable} from "./table/HistoryStrategyResultTable";
 import {TradeSystemType} from "../../common/data/trading/TradeSystemType";
 import ProfitLossChart from "../trade-journal/profitLossChart/ProfitLossChart";
 import {TradeJournalStatistic} from "../trade-journal/statistic/TradeJournalStatistic";
 import {TradeJournalTable} from "../trade-journal/table/TradeJournalTable";
-import {TabMenu} from "primereact/tabmenu";
 import {BotControlLastInfo} from "./last-info/BotControlLastInfo";
 import {TabPanel, TabView} from "primereact/tabview";
 import {BotControlAnalysis} from "./analysis/BotControlAnalysis";
 import {getSecurity} from "../../common/utils/Cache";
 import {BotControlAnalysisInfo} from "./analysis/BotControlAnalysisInfo";
+import {BotControlRunningStrategies} from "./last-info/BotControlRunningStrategies";
 
 
 function mapStateToProps(state: RootState) {
@@ -38,7 +38,7 @@ function mapDispatchToProps(dispatch: AppDispatch) {
 
 interface BotControlState {
     filterData: MarketBotFilterDataDto
-    stat: HistoryStrategyResultDto
+    stat: TradingStrategyResult
     items: any[]
     activeItem: any
     selectedSecurity: any
@@ -101,7 +101,14 @@ class BotControlPage extends React.Component<Props, BotControlState> {
         }
     }
 
-    onStrategyResultSelected = (stat: HistoryStrategyResultDto): void => {
+    onRunningStrategyResultSelected = (result: TradingStrategyResult): void => {
+        // this.setState({
+        //     stat,
+        //     selectedSecurity: getSecurity(stat.tradingStrategyData.security.classCode, stat.tradingStrategyData.security.futureSecCode)
+        // })
+    }
+
+    onStrategyResultSelected = (stat: TradingStrategyResult): void => {
         this.setState({
             stat,
             selectedSecurity: getSecurity(stat.tradingStrategyData.security.classCode, stat.tradingStrategyData.security.futureSecCode)
@@ -123,6 +130,8 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                 <div className="p-col-12">
                     <div className="p-grid">
                         <div className="p-col-2">
+                            <BotControlRunningStrategies outerHeight={400}
+                                                         onStrategyResultSelected={this.onRunningStrategyResultSelected}/>
                             <BotControlLastInfo outerHeight={400}
                                                 onStrategyResultSelected={this.onStrategyResultSelected}/>
                         </div>
