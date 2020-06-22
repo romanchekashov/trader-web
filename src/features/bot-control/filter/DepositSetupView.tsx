@@ -4,13 +4,15 @@ import {DepositSetup} from "../../../common/data/DepositSetup";
 import {InputText} from "primereact/inputtext";
 import {PrimeDropdownItem, round10} from "../../../common/utils/utils";
 import {Dropdown} from "primereact/dropdown";
+import {Deposit} from "../../../common/data/Deposit";
 
 type Props = {
+    realDeposit: Deposit
     setup: DepositSetup
     onChange: (setup: DepositSetup) => void
 };
 
-export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
+export const DepositSetupView: React.FC<Props> = ({realDeposit, setup, onChange}) => {
 
     const takeProfitNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [takeProfitNumber, setTakeProfitNumber] = useState(2);
@@ -41,7 +43,9 @@ export const DepositSetupView: React.FC<Props> = ({setup, onChange}) => {
     return (
         <div className="p-grid">
             <div className="p-col-1">
-                <div style={{fontSize: "10px"}}>Deposit</div>
+                <div style={{fontSize: "10px"}}>
+                    Deposit (<span style={{fontWeight: 700, color: "red"}}>Real: {realDeposit?.amount}</span>)
+                </div>
                 <InputText type="number"
                            min={0}
                            value={setup.amount}

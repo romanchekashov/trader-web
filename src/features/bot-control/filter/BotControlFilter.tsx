@@ -21,6 +21,7 @@ import {DepositSetup} from "../../../common/data/DepositSetup";
 import {TradeSystemType} from "../../../common/data/trading/TradeSystemType";
 import {Calendar} from "primereact/calendar";
 import moment = require("moment");
+import {getCurrentDeposit} from "../../../common/api/rest/capitalRestApi";
 
 export interface BotControlFilterState {
     broker: Broker
@@ -82,6 +83,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}]);
     const [minStartDate, setMinStartDate] = useState(null);
     const [maxEndDate, setMaxEndDate] = useState(null);
+    const [realDeposit, setRealDeposit] = useState(null);
 
     const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals].map(val => ({
         label: val || "ALL",
@@ -106,7 +108,8 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
             setBroker(initState.broker);
             setPlatform(initState.platform);
         }
-    });
+
+    }, []);
 
     const getDto = (): MarketBotStartDto => {
         return {
@@ -156,6 +159,9 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
 
     const onClassCodeChanged = (newClassCode: ClassCode) => {
         console.log(newClassCode);
+        getCurrentDeposit(newClassCode)
+            .then(setRealDeposit);
+
         const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}];
         if (newClassCode) {
             const securities: Security[] = getSecuritiesByClassCode(newClassCode);
@@ -277,7 +283,8 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
                                   inputStyle={{width: "90px"}}/>
                     </div>
                 </div>
-                <DepositSetupView setup={depositSetup}
+                <DepositSetupView realDeposit={realDeposit}
+                                  setup={depositSetup}
                                   onChange={onDepositSetupChanged}/>
             </div>
             <div className="p-col-12">
