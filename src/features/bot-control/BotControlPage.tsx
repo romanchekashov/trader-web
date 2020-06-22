@@ -141,34 +141,23 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                                     <BotControlAnalysis security={selectedSecurity}/>
                                 </TabPanel>
                                 <TabPanel header="Strategy Stat">
-                                    {
-                                        stat != null ? <HistoryStrategyResultTable stat={stat}/> : null
-                                    }
+                                    <HistoryStrategyResultTable stat={stat}/>
                                 </TabPanel>
                                 <TabPanel header="Profit Loss Stat">
-                                    {
-                                        stat != null ? <>
-                                            <div className="p-col-12">
-                                                <ProfitLossChart stat={stat.stat}/>
-                                            </div>
-                                            <div className="p-col-12">
-                                                <TradeJournalStatistic stat={stat.stat}/>
-                                            </div>
-                                        </> : null
-                                    }
+                                    <div className="p-col-12">
+                                        <ProfitLossChart stat={stat?.stat}/>
+                                    </div>
+                                    <div className="p-col-12">
+                                        <TradeJournalStatistic stat={stat?.stat}/>
+                                    </div>
                                 </TabPanel>
                                 <TabPanel header="Trades">
-                                    {
-                                        stat != null ? <TradeJournalTable stat={stat.stat}/> : null
-                                    }
+                                    <TradeJournalTable stat={stat?.stat}/>
                                 </TabPanel>
                                 <TabPanel header="Info">
                                     <BotControlAnalysisInfo security={selectedSecurity}/>
                                 </TabPanel>
                             </TabView>
-                            {/*<TabMenu model={this.state.items}
-                                     activeItem={this.state.activeItem}
-                                     onTabChange={(e) => this.setState({activeItem: e.value})}/>*/}
                         </div>
                     </div>
                 </div>

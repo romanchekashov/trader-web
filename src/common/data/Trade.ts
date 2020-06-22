@@ -8,7 +8,7 @@ export class Trade {
     public orderNumber: number;
     public classCode: ClassCode;
     public secCode: string;
-    public strategy: string;
+    public tradingStrategyTradeId: number;
     public systemType: TradeSystemType;
     public price: number;
     public quantity: number;

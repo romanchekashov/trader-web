@@ -28,7 +28,13 @@ export const BotControlLastInfo: React.FC<Props> = ({onStrategyResultSelected, o
     }, []);
 
     if (results.length === 0) {
-        return (<>No Data</>);
+        return (
+            <div className="p-grid">
+                <div className="p-col-12">
+                    No Finished Trading Strategy Bots
+                </div>
+            </div>
+        );
     }
 
     const Row = ({index, style}) => {

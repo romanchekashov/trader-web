@@ -16,7 +16,9 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        updateData(stat);
+        if (stat) {
+            updateData(stat);
+        }
     }, [stat]);
 
     const timeDuration = (seconds: number): any => {
@@ -125,7 +127,7 @@ const ProfitLossChart: React.FC<Props> = ({stat}) => {
         )
     } else {
         return (
-            <div>ProfitLossChart needs data</div>
+            <div>No data</div>
         )
     }
 };

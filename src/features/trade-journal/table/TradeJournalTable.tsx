@@ -165,10 +165,20 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
                 <Column header="Изм. цены за 1шт"/>
                 <Column header="Сумма (%)"/>
                 <Column header="Чистая сумма (руб)"/>
-                <Column header={stat.totalGainAndLoss}/>
+                <Column header={stat?.totalGainAndLoss}/>
             </Row>
         </ColumnGroup>
     );
+
+    if (!stat) {
+        return (
+            <div className="p-grid">
+                <div className="p-col-12">
+                    No data
+                </div>
+            </div>
+        );
+    }
 
     return (
         <DataTable value={stat.trades}

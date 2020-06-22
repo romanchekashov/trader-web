@@ -48,7 +48,7 @@ export const TradeJournalStatistic: React.FC<Props> = ({stat}) => {
     if (!stat) {
         return (
             <div className="p-grid">
-                <div className="p-col-12 trade-journal-statistic-head">Statistics</div>
+                <div className="p-col-12">No data</div>
             </div>
         );
     }

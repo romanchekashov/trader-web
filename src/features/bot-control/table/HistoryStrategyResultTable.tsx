@@ -141,7 +141,7 @@ export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
         <ColumnGroup>
             <Row>
                 <Column header="" style={{width: '30px'}}/>
-                <Column header="Стратегия"/>
+                <Column header="№" style={{width: '30px'}}/>
 
                 <Column header="Op." style={{width: '30px'}}/>
                 <Column header="In Order N."/>
@@ -171,6 +171,16 @@ export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
         </ColumnGroup>
     );
 
+    if (!stat || !stat.tradingStrategyData) {
+        return (
+            <div className="p-grid">
+                <div className="p-col-12">
+                    No Data
+                </div>
+            </div>
+        );
+    }
+
     return (
         <DataTable value={stat.tradingStrategyData.trades}
                    className="history-strategy-result-table"
@@ -181,7 +191,7 @@ export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
                    rowExpansionTemplate={rowExpansionTemplate}
                    dataKey="id">
             <Column expander={true}/>
-            <Column field="id" style={{overflow: 'auto'}}/>
+            <Column field="id" style={{width: '30px'}}/>
 
             <Column field="operation" style={{width: '30px'}}/>
             <Column field="enterOrderNumber"/>
