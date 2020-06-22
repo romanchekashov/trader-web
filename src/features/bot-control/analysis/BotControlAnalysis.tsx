@@ -1,33 +1,33 @@
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
-import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
-import {Interval} from "../../../common/data/Interval";
-import {getMoexOpenInterest, getTradePremise} from "../../../common/api/rest/analysisRestApi";
-import {TrendsView} from "../../../common/components/trend/TrendsView";
-import {TradingPlatform} from "../../../common/data/TradingPlatform";
-import {Dropdown} from "primereact/dropdown";
-import {PrimeDropdownItem} from "../../../common/utils/utils";
-import {Column} from "primereact/column";
-import {DataTable} from "primereact/datatable";
-import Notifications from "../../../common/components/notifications/Notifications";
-import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
-import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {TradePremise} from "../../../common/data/strategy/TradePremise";
-import {Order} from "../../../common/data/Order";
-import {ActiveTrade} from "../../../common/data/ActiveTrade";
-import Alerts from "../../../common/components/alerts/Alerts";
+import {Interval} from "../../../common/data/Interval";
+import {TrendsView} from "../../../common/components/trend/TrendsView";
+import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
+import {Dropdown} from "primereact/dropdown";
+import {DataTable} from "primereact/datatable";
+import {Column} from "primereact/column";
+import {PrimeDropdownItem} from "../../../common/utils/utils";
 import MarketState from "../../../common/components/market-state/MarketState";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
-import {MoexOpenInterest} from "../../../common/data/MoexOpenInterest";
+import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
+import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import {Order} from "../../../common/data/Order";
+import {ActiveTrade} from "../../../common/data/ActiveTrade";
+import {TradingPlatform} from "../../../common/data/TradingPlatform";
+import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {adjustTradePremise} from "../../../common/utils/DataUtils";
 import moment = require("moment");
-import {MoexOpenInterestView} from "./MoexOpenInterestView";
+
+export interface AnalysisState {
+    realDepo: boolean
+}
 
 type Props = {
-    future: any
-};
+    security: any
+}
 
-const AnalysisFutures: React.FC<Props> = ({future}) => {
+export const BotControlAnalysis: React.FC<Props> = ({security}) => {
     const timeFrameTradingIntervals = {
         "M1": [Interval.M1],
         "M3": [Interval.M3, Interval.M1],
@@ -48,7 +48,6 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     const [premise, setPremise] = useState(null);
     const [orders, setOrders] = useState(null);
     const [activeTrade, setActiveTrade] = useState(null);
-    const [moexOpenInterest, setMoexOpenInterest] = useState<MoexOpenInterest>(null);
 
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [chartNumber, setChartNumber] = useState(1);
@@ -72,7 +71,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     };
 
     useEffect(() => {
-        if (future) {
+        if (security) {
             // console.log("AnalysisFutures: ", future);
             informServerAboutRequiredData();
 
@@ -88,10 +87,10 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
             //         });
             // }
             //
-            if (!filterDto || filterDto.secCode !== future.secCode) {
+            if (!filterDto || filterDto.secCode !== security.secCode) {
                 setFilterDto({
-                    classCode: future.classCode,
-                    secCode: future.secCode,
+                    classCode: security.classCode,
+                    secCode: security.secCode,
                     fetchByWS: true,
                     history: false,
                     all: false
@@ -100,15 +99,12 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
             updateMarketStateFilterDto(timeFrameTrading);
 
             fetchPremise(timeFrameTrading);
-
-            getMoexOpenInterest(future.classCode, future.secCode)
-                .then(setMoexOpenInterest);
         }
 
         const wsStatusSub = WebsocketService.getInstance()
             .connectionStatus()
             .subscribe(isConnected => {
-                if (isConnected && future) {
+                if (isConnected && security) {
                     informServerAboutRequiredData();
                 }
             });
@@ -116,8 +112,8 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         const lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
-                if (future) {
-                    const newSecurityLastInfo = securities.find(o => o.secCode === future.secCode);
+                if (security) {
+                    const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
                     if (newSecurityLastInfo) {
                         newSecurityLastInfo.timeLastTrade = new Date(newSecurityLastInfo.timeLastTrade);
                         setSecurityLastInfo(newSecurityLastInfo);
@@ -159,20 +155,20 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
             ordersSetupSubscription.unsubscribe();
             activeTradeSubscription.unsubscribe();
         };
-    }, [future]);
+    }, [security]);
 
     const updateMarketStateFilterDto = (interval: Interval) => {
         setMarketStateFilterDto({
-            classCode: future.classCode,
-            secCode: future.secCode,
+            classCode: security.classCode,
+            secCode: security.secCode,
             intervals: timeFrameTradingIntervals[interval],
             fetchByWS: true,
             // history: false,
             numberOfCandles: 100
         });
         WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
-            classCode: future.classCode,
-            secCode: future.secCode,
+            classCode: security.classCode,
+            secCode: security.secCode,
             intervals: timeFrameTradingIntervals[interval],
             fetchByWS: true,
             // history: false,
@@ -181,19 +177,19 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     };
 
     const informServerAboutRequiredData = (): void => {
-        if (future) {
+        if (security) {
             WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
                 brokerId: 1,
                 tradingPlatform: TradingPlatform.QUIK,
-                classCode: future.classCode,
-                secCode: future.secCode,
+                classCode: security.classCode,
+                secCode: security.secCode,
                 timeFrameTrading: Interval.M5,
                 timeFrameMin: Interval.M1
             });
-            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, future.secCode);
+            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, security.secCode);
             WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
-                classCode: future.classCode,
-                secCode: future.secCode,
+                classCode: security.classCode,
+                secCode: security.secCode,
                 intervals: timeFrameTradingIntervals[timeFrameTrading],
                 fetchByWS: true,
                 // history: false,
@@ -206,8 +202,8 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         getTradePremise({
             brokerId: 1,
             tradingPlatform: TradingPlatform.QUIK,
-            classCode: future.classCode,
-            secCode: future.secCode,
+            classCode: security.classCode,
+            secCode: security.secCode,
             timeFrameTrading,
             timeFrameMin
         }).then(setPremise).catch(reason => {
@@ -232,7 +228,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         setStart(start);
     };
 
-    if (future) {
+    if (security) {
 
         return (
             <>
@@ -243,7 +239,6 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                                       onChange={(e) => onChartNumberChanged(e.value)}/>
                         </div>
                     </div>
-                    <MoexOpenInterestView moexOpenInterest={moexOpenInterest}/>
                     <div className="p-col-12">
                         <DataTable value={[securityLastInfo]}>
                             <Column field="futureTotalDemand" header="Общ спрос"/>
@@ -263,7 +258,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                                       onIntervalChanged={onTradingIntervalChanged}
                                       onStartChanged={onStartChanged}
                                       width={chart1Width}
-                                      security={future}
+                                      security={security}
                                       premise={premise}
                                       orders={orders}
                                       activeTrade={activeTrade}
@@ -280,7 +275,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                                               onStartChanged={start => {
                                               }}
                                               width={chart2Width}
-                                              security={future}
+                                              security={security}
                                               premise={premise}
                                               trend={trendLowTF}
                                               showGrid={true}/>
@@ -295,40 +290,6 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                     <div className="p-col-12">
                         <SwingStateList filter={marketStateFilterDto}/>
                     </div>
-                    <div className="p-col-12">
-                        <div className="p-grid">
-                            <div className="p-col-4">
-                                <Notifications filter={filterDto}
-                                               onNotificationSelected={(n) => {
-                                                   console.log(n)
-                                               }}
-                                               viewHeight={400}/>
-                            </div>
-                            <div className="p-col-4">
-                                <Alerts filter={filterDto}
-                                        onAlertSelected={(n) => {
-                                            console.log(n)
-                                        }}
-                                        alertsHeight={400}/>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="p-col-12" ref={chartAlertsRef} style={{padding: '0'}}>
-                        {
-                            alert ?
-                                <ChartWrapper interval={alert.interval}
-                                              start={start}
-                                              onIntervalChanged={interval => {
-                                              }}
-                                              onStartChanged={start => {
-                                              }}
-                                              alert={alert}
-                                              width={chartAlertsWidth}
-                                              security={future}
-                                              premise={premise}
-                                              showGrid={true}/> : null
-                        }
-                    </div>
                 </div>
             </>
         )
@@ -338,5 +299,3 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         )
     }
 };
-
-export default AnalysisFutures;

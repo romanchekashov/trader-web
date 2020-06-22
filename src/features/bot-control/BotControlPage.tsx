@@ -17,6 +17,9 @@ import {TradeJournalTable} from "../trade-journal/table/TradeJournalTable";
 import {TabMenu} from "primereact/tabmenu";
 import {BotControlLastInfo} from "./last-info/BotControlLastInfo";
 import {TabPanel, TabView} from "primereact/tabview";
+import {BotControlAnalysis} from "./analysis/BotControlAnalysis";
+import {getSecurity} from "../../common/utils/Cache";
+import {BotControlAnalysisInfo} from "./analysis/BotControlAnalysisInfo";
 
 
 function mapStateToProps(state: RootState) {
@@ -38,6 +41,7 @@ interface BotControlState {
     stat: HistoryStrategyResultDto
     items: any[]
     activeItem: any
+    selectedSecurity: any
 }
 
 type Props = ReturnType<typeof mapStateToProps> &
@@ -58,7 +62,8 @@ class BotControlPage extends React.Component<Props, BotControlState> {
             filterData: null,
             stat: null,
             items: this.items,
-            activeItem: this.items[0]
+            activeItem: this.items[0],
+            selectedSecurity: null
         };
     }
 
@@ -96,9 +101,16 @@ class BotControlPage extends React.Component<Props, BotControlState> {
         }
     }
 
+    onStrategyResultSelected = (stat: HistoryStrategyResultDto): void => {
+        this.setState({
+            stat,
+            selectedSecurity: getSecurity(stat.tradingStrategyData.security.classCode, stat.tradingStrategyData.security.futureSecCode)
+        })
+    }
+
     render() {
         const {filterData} = this.props;
-        const {stat} = this.state;
+        const {stat, selectedSecurity} = this.state;
 
         return (
             <div className="p-grid sample-layout">
@@ -112,12 +124,12 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                     <div className="p-grid">
                         <div className="p-col-2">
                             <BotControlLastInfo outerHeight={400}
-                                                onStrategyResultSelected={(stat) => this.setState({stat})}/>
+                                                onStrategyResultSelected={this.onStrategyResultSelected}/>
                         </div>
                         <div className="p-col-10" style={{padding: 0}}>
                             <TabView>
                                 <TabPanel header="Analysis">
-                                    Analysis
+                                    <BotControlAnalysis security={selectedSecurity}/>
                                 </TabPanel>
                                 <TabPanel header="Strategy Stat">
                                     {
@@ -140,6 +152,9 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                                     {
                                         stat != null ? <TradeJournalTable stat={stat.stat}/> : null
                                     }
+                                </TabPanel>
+                                <TabPanel header="Info">
+                                    <BotControlAnalysisInfo security={selectedSecurity}/>
                                 </TabPanel>
                             </TabView>
                             {/*<TabMenu model={this.state.items}

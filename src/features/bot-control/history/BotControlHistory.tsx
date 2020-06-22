@@ -7,7 +7,7 @@ import {SubscriptionLike} from "rxjs";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {Interval} from "../../../common/data/Interval";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
-import {BotControlAnalysis} from "./BotControlAnalysis";
+import {BotControlAnalysis} from "../analysis/BotControlAnalysis";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {TradingStrategyState} from "../../../common/data/strategy/TradingStrategyState";
 import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
