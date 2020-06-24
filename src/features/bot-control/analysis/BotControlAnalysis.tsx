@@ -1,6 +1,5 @@
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
-import {TradePremise} from "../../../common/data/strategy/TradePremise";
 import {Interval} from "../../../common/data/Interval";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
@@ -10,13 +9,9 @@ import {Column} from "primereact/column";
 import {PrimeDropdownItem} from "../../../common/utils/utils";
 import MarketState from "../../../common/components/market-state/MarketState";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
-import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
-import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
-import {Order} from "../../../common/data/Order";
-import {ActiveTrade} from "../../../common/data/ActiveTrade";
-import {TradingPlatform} from "../../../common/data/TradingPlatform";
-import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
-import {adjustTradePremise} from "../../../common/utils/DataUtils";
+import {TradingStrategyResult} from "../../../common/data/history/TradingStrategyResult";
+import {SwingStateDto} from "../../../common/components/swing-state/data/SwingStateDto";
+import {MarketStateDto} from "../../../common/components/market-state/data/MarketStateDto";
 import moment = require("moment");
 
 export interface AnalysisState {
@@ -25,9 +20,10 @@ export interface AnalysisState {
 
 type Props = {
     security: any
+    tradingStrategyResult: TradingStrategyResult
 }
 
-export const BotControlAnalysis: React.FC<Props> = ({security}) => {
+export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyResult}) => {
     const timeFrameTradingIntervals = {
         "M1": [Interval.M1],
         "M3": [Interval.M3, Interval.M1],
@@ -43,7 +39,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security}) => {
     };
 
     const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate());
-    const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
+    const [timeFrameTrading, setTimeFrameTrading] = useState(null);
     const [timeFrameMin, setTimeFrameMin] = useState(Interval.M1);
     const [premise, setPremise] = useState(null);
     const [orders, setOrders] = useState(null);
@@ -61,8 +57,10 @@ export const BotControlAnalysis: React.FC<Props> = ({security}) => {
     const chartAlertsRef = useRef(null);
     const [trendLowTF, setTrendLowTF] = useState(null);
     const [filterDto, setFilterDto] = useState(null);
-    const [marketStateFilterDto, setMarketStateFilterDto] = useState(null);
     const [alert, setAlert] = useState(null);
+    const [marketStateDto, setMarketStateDto] = useState<MarketStateDto>(null);
+    const [swingStates, setSwingStates] = useState<SwingStateDto[]>([]);
+    const [hasData, setHasData] = useState(false);
 
     const updateSize = () => {
         setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200);
@@ -71,77 +69,19 @@ export const BotControlAnalysis: React.FC<Props> = ({security}) => {
     };
 
     useEffect(() => {
-        if (security) {
-            // console.log("AnalysisFutures: ", future);
-            informServerAboutRequiredData();
+        if (security && tradingStrategyResult && (tradingStrategyResult.tradePremise || tradingStrategyResult.tradeSetup)) {
 
-            // if (!trendLowTF && !trendLowTFLoading) {
-            //     trendLowTFLoading = true;
-            //     getTrend(future.classCode, future.secCode, timeFrameLow, 540)
-            //         .then(trend => {
-            //             setTrendLowTF(trend);
-            //             trendLowTFLoading = false;
-            //         })
-            //         .catch(reason => {
-            //             trendLowTFLoading = false;
-            //         });
-            // }
-            //
-            if (!filterDto || filterDto.secCode !== security.secCode) {
-                setFilterDto({
-                    classCode: security.classCode,
-                    secCode: security.secCode,
-                    fetchByWS: true,
-                    history: false,
-                    all: false
-                });
-            }
-            updateMarketStateFilterDto(timeFrameTrading);
+            const premise = tradingStrategyResult.tradeSetup ?
+                tradingStrategyResult.tradeSetup.premise : tradingStrategyResult.tradePremise;
 
-            fetchPremise(timeFrameTrading);
+            setPremise(premise)
+            setTimeFrameTrading(premise.analysis.tradingStrategyConfig.timeFrameTrading);
+            setMarketStateDto(premise.marketState);
+            setSwingStates([premise.swingStateTradingInterval, premise.swingStateMinInterval]);
+            setHasData(true);
+        } else {
+            setHasData(false);
         }
-
-        const wsStatusSub = WebsocketService.getInstance()
-            .connectionStatus()
-            .subscribe(isConnected => {
-                if (isConnected && security) {
-                    informServerAboutRequiredData();
-                }
-            });
-
-        const lastSecuritiesSubscription = WebsocketService.getInstance()
-            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-            .subscribe(securities => {
-                if (security) {
-                    const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
-                    if (newSecurityLastInfo) {
-                        newSecurityLastInfo.timeLastTrade = new Date(newSecurityLastInfo.timeLastTrade);
-                        setSecurityLastInfo(newSecurityLastInfo);
-                    }
-                }
-            });
-
-        const tradePremiseSubscription = WebsocketService.getInstance()
-            .on<TradePremise>(WSEvent.TRADE_PREMISE)
-            .subscribe(newPremise => {
-                adjustTradePremise(newPremise);
-                setPremise(newPremise);
-            });
-
-        const ordersSetupSubscription = WebsocketService.getInstance()
-            .on<Order[]>(WSEvent.ORDERS)
-            .subscribe(setOrders);
-
-        const activeTradeSubscription = WebsocketService.getInstance()
-            .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
-            .subscribe(activeTrades => {
-                if (securityLastInfo) {
-                    const activeTrade = activeTrades
-                        .find(at => at && at.classCode === securityLastInfo.classCode && at.secCode === securityLastInfo.secCode);
-                    setActiveTrade(activeTrade);
-                }
-            });
-
 
         setTimeout(updateSize, 1000);
         window.addEventListener('resize', updateSize);
@@ -149,86 +89,15 @@ export const BotControlAnalysis: React.FC<Props> = ({security}) => {
         // Specify how to clean up after this effect:
         return function cleanup() {
             window.removeEventListener('resize', updateSize);
-            wsStatusSub.unsubscribe();
-            lastSecuritiesSubscription.unsubscribe();
-            tradePremiseSubscription.unsubscribe();
-            ordersSetupSubscription.unsubscribe();
-            activeTradeSubscription.unsubscribe();
         };
-    }, [security]);
-
-    const updateMarketStateFilterDto = (interval: Interval) => {
-        setMarketStateFilterDto({
-            classCode: security.classCode,
-            secCode: security.secCode,
-            intervals: timeFrameTradingIntervals[interval],
-            fetchByWS: true,
-            // history: false,
-            numberOfCandles: 100
-        });
-        WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
-            classCode: security.classCode,
-            secCode: security.secCode,
-            intervals: timeFrameTradingIntervals[interval],
-            fetchByWS: true,
-            // history: false,
-            numberOfCandles: 100
-        });
-    };
-
-    const informServerAboutRequiredData = (): void => {
-        if (security) {
-            WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
-                brokerId: 1,
-                tradingPlatform: TradingPlatform.QUIK,
-                classCode: security.classCode,
-                secCode: security.secCode,
-                timeFrameTrading: Interval.M5,
-                timeFrameMin: Interval.M1
-            });
-            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, security.secCode);
-            WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
-                classCode: security.classCode,
-                secCode: security.secCode,
-                intervals: timeFrameTradingIntervals[timeFrameTrading],
-                fetchByWS: true,
-                // history: false,
-                numberOfCandles: 100
-            });
-        }
-    };
-
-    const fetchPremise = (timeFrameTrading: Interval) => {
-        getTradePremise({
-            brokerId: 1,
-            tradingPlatform: TradingPlatform.QUIK,
-            classCode: security.classCode,
-            secCode: security.secCode,
-            timeFrameTrading,
-            timeFrameMin
-        }).then(setPremise).catch(reason => {
-            fetchPremise(timeFrameTrading);
-        });
-    };
+    }, [security, tradingStrategyResult]);
 
     const onChartNumberChanged = (num: number) => {
         setChartNumber(num);
         setTimeout(updateSize, 1000);
     };
 
-    const onTradingIntervalChanged = (interval: Interval) => {
-        console.log(interval);
-        setTimeFrameTrading(interval);
-        fetchPremise(interval);
-        updateMarketStateFilterDto(interval);
-    };
-
-    const onStartChanged = (start: Date) => {
-        console.log(start);
-        setStart(start);
-    };
-
-    if (security) {
+    if (hasData) {
 
         return (
             <>
@@ -255,8 +124,10 @@ export const BotControlAnalysis: React.FC<Props> = ({security}) => {
                     <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
                                       initialNumberOfCandles={1000}
-                                      onIntervalChanged={onTradingIntervalChanged}
-                                      onStartChanged={onStartChanged}
+                                      onIntervalChanged={interval => {
+                                      }}
+                                      onStartChanged={start => {
+                                      }}
                                       width={chart1Width}
                                       security={security}
                                       premise={premise}
@@ -285,17 +156,19 @@ export const BotControlAnalysis: React.FC<Props> = ({security}) => {
                 </div>
                 <div className="p-grid">
                     <div className="p-col-12">
-                        <MarketState filter={marketStateFilterDto}/>
+                        <MarketState filter={null}
+                                     initMarketState={marketStateDto}/>
                     </div>
                     <div className="p-col-12">
-                        <SwingStateList filter={marketStateFilterDto}/>
+                        <SwingStateList filter={null}
+                                        initSwingStates={swingStates}/>
                     </div>
                 </div>
             </>
         )
     } else {
         return (
-            <div>Select security for analysis</div>
+            <div>Run bot to see analysis</div>
         )
     }
 };

@@ -2,6 +2,7 @@ import {handleError, handleResponse} from "../apiUtils";
 import {MarketBotFilterDataDto} from "../../data/bot/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../data/bot/MarketBotStartDto";
 import {TradingStrategyResult} from "../../data/history/TradingStrategyResult";
+import {adjustMarketState, adjustTradingStrategyResult} from "../../utils/DataUtils";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 
@@ -34,6 +35,13 @@ export function search(dto: MarketBotStartDto): Promise<TradingStrategyResult> {
         body: JSON.stringify(dto)
     })
         .then(handleResponse)
+        .catch(handleError);
+}
+
+export function searchByTradingStrategyId(id: number): Promise<TradingStrategyResult> {
+    return fetch(baseUrl + 'search?tradingStrategyId=' + id)
+        .then(response => handleResponse(response)
+            .then(adjustTradingStrategyResult))
         .catch(handleError);
 }
 

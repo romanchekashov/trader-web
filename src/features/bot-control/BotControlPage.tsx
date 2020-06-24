@@ -7,7 +7,13 @@ import {AppDispatch} from "../../app/store";
 import {RootState} from "../../app/rootReducer";
 import {BotControlFilter} from "./filter/BotControlFilter";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
-import {runHistory, search, startBot, stopHistory} from "../../common/api/rest/botControlRestApi";
+import {
+    runHistory,
+    search,
+    searchByTradingStrategyId,
+    startBot,
+    stopHistory
+} from "../../common/api/rest/botControlRestApi";
 import {TradingStrategyResult} from "../../common/data/history/TradingStrategyResult";
 import {HistoryStrategyResultTable} from "./table/HistoryStrategyResultTable";
 import {TradeSystemType} from "../../common/data/trading/TradeSystemType";
@@ -38,10 +44,10 @@ function mapDispatchToProps(dispatch: AppDispatch) {
 
 interface BotControlState {
     filterData: MarketBotFilterDataDto
-    stat: TradingStrategyResult
     items: any[]
     activeItem: any
     selectedSecurity: any
+    selectedTSResult: TradingStrategyResult
 }
 
 type Props = ReturnType<typeof mapStateToProps> &
@@ -60,10 +66,10 @@ class BotControlPage extends React.Component<Props, BotControlState> {
         super(props);
         this.state = {
             filterData: null,
-            stat: null,
             items: this.items,
             activeItem: this.items[0],
-            selectedSecurity: null
+            selectedSecurity: null,
+            selectedTSResult: null
         };
     }
 
@@ -78,7 +84,7 @@ class BotControlPage extends React.Component<Props, BotControlState> {
     onStart = (data: MarketBotStartDto): void => {
         if (data.systemType === TradeSystemType.HISTORY) {
             runHistory(data)
-                .then(stat => this.setState({stat}))
+                .then(selectedTSResult => this.setState({selectedTSResult}))
                 .catch(console.error);
         } else {
             startBot(data).then(value => {
@@ -89,7 +95,7 @@ class BotControlPage extends React.Component<Props, BotControlState> {
 
     onSearch = (data: MarketBotStartDto): void => {
         search(data)
-            .then(stat => this.setState({stat}))
+            .then(selectedTSResult => this.setState({selectedTSResult}))
             .catch(console.error);
     }
 
@@ -101,23 +107,30 @@ class BotControlPage extends React.Component<Props, BotControlState> {
         }
     }
 
-    onRunningStrategyResultSelected = (result: TradingStrategyResult): void => {
-        // this.setState({
-        //     stat,
-        //     selectedSecurity: getSecurity(stat.tradingStrategyData.security.classCode, stat.tradingStrategyData.security.futureSecCode)
-        // })
+    onSelectedTSResultUpdate = (result: TradingStrategyResult): void => {
+        this.setState({
+            selectedTSResult: result
+        });
     }
 
-    onStrategyResultSelected = (stat: TradingStrategyResult): void => {
+    onStrategyResultSelected = (result: TradingStrategyResult): void => {
         this.setState({
-            stat,
-            selectedSecurity: getSecurity(stat.tradingStrategyData.security.classCode, stat.tradingStrategyData.security.futureSecCode)
+            selectedTSResult: result,
+            selectedSecurity: getSecurity(
+                result.tradingStrategyData.security.classCode,
+                result.tradingStrategyData.security.futureSecCode)
         })
+
+        if (result.tradingStrategyData.id) {
+            searchByTradingStrategyId(result.tradingStrategyData.id)
+                .then(selectedTSResult => this.setState({selectedTSResult}))
+                .catch(console.error);
+        }
     }
 
     render() {
         const {filterData} = this.props;
-        const {stat, selectedSecurity} = this.state;
+        const {selectedTSResult, selectedSecurity} = this.state;
 
         return (
             <div className="p-grid sample-layout">
@@ -130,29 +143,31 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                 <div className="p-col-12">
                     <div className="p-grid">
                         <div className="p-col-2">
-                            <BotControlRunningStrategies outerHeight={400}
-                                                         onStrategyResultSelected={this.onRunningStrategyResultSelected}/>
+                            <BotControlRunningStrategies outerHeight={200}
+                                                         onStrategyResultSelected={this.onStrategyResultSelected}
+                                                         onSelectedTSResultUpdate={this.onSelectedTSResultUpdate}/>
                             <BotControlLastInfo outerHeight={400}
                                                 onStrategyResultSelected={this.onStrategyResultSelected}/>
                         </div>
                         <div className="p-col-10" style={{padding: 0}}>
                             <TabView>
                                 <TabPanel header="Analysis">
-                                    <BotControlAnalysis security={selectedSecurity}/>
+                                    <BotControlAnalysis security={selectedSecurity}
+                                                        tradingStrategyResult={selectedTSResult}/>
                                 </TabPanel>
                                 <TabPanel header="Strategy Stat">
-                                    <HistoryStrategyResultTable stat={stat}/>
+                                    <HistoryStrategyResultTable stat={selectedTSResult}/>
                                 </TabPanel>
                                 <TabPanel header="Profit Loss Stat">
                                     <div className="p-col-12">
-                                        <ProfitLossChart stat={stat?.stat}/>
+                                        <ProfitLossChart stat={selectedTSResult?.stat}/>
                                     </div>
                                     <div className="p-col-12">
-                                        <TradeJournalStatistic stat={stat?.stat}/>
+                                        <TradeJournalStatistic stat={selectedTSResult?.stat}/>
                                     </div>
                                 </TabPanel>
                                 <TabPanel header="Trades">
-                                    <TradeJournalTable stat={stat?.stat}/>
+                                    <TradeJournalTable stat={selectedTSResult?.stat}/>
                                 </TabPanel>
                                 <TabPanel header="Info">
                                     <BotControlAnalysisInfo security={selectedSecurity}/>

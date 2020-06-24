@@ -11,20 +11,21 @@ import {Button} from "primereact/button";
 
 type Props = {
     filter: MarketStateFilterDto
+    initSwingStates?: SwingStateDto[]
 };
 let fetchAlertsAttempt = 0;
 let previousAlertsCount = 0;
 
-const SwingStateList: React.FC<Props> = ({filter}) => {
+const SwingStateList: React.FC<Props> = ({filter, initSwingStates}) => {
 
-    const [swingStates, setSwingStates] = useState<SwingStateDto[]>([]);
+    const [swingStates, setSwingStates] = useState<SwingStateDto[]>(initSwingStates || []);
     const [fetchDataStatus, setFetchDataStatus] = useState(null);
 
     const fetchAlerts = () => {
         setFetchDataStatus("Loading swing states for " + filter.secCode + "...");
         getSwingStates(filter)
             .then(states => {
-                setAlertsReceivedFromServer(states);
+                setDataReceivedFromServer(states);
                 setFetchDataStatus(null);
             })
             .catch(reason => {
@@ -59,19 +60,21 @@ const SwingStateList: React.FC<Props> = ({filter}) => {
                                 item.end = new Date(item.end);
                             }
                         }
-                        setAlertsReceivedFromServer(states);
+                        setDataReceivedFromServer(states);
                     });
             }
             fetchAlerts();
+        } else if (initSwingStates) {
+            setDataReceivedFromServer(initSwingStates);
         }
 
         // Specify how to clean up after this effect:
         return function cleanup() {
             if (alertsSubscription) alertsSubscription.unsubscribe();
         };
-    }, [filter]);
+    }, [filter, initSwingStates]);
 
-    const setAlertsReceivedFromServer = (states: SwingStateDto[]): void => {
+    const setDataReceivedFromServer = (states: SwingStateDto[]): void => {
         setSwingStates(states);
         // notifyOnNewAlert(newAlerts);
     };
@@ -84,7 +87,7 @@ const SwingStateList: React.FC<Props> = ({filter}) => {
         return (
             <div>
                 {fetchDataStatus}
-                <Button icon="pi pi-refresh" style={{marginLeft:'.25em'}} onClick={fetchAlerts} />
+                <Button icon="pi pi-refresh" style={{marginLeft: '.25em'}} onClick={fetchAlerts}/>
             </div>
         );
     }

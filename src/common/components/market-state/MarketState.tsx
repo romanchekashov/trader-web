@@ -20,12 +20,13 @@ import {Button} from "primereact/button";
 
 type Props = {
     filter: MarketStateFilterDto
+    initMarketState?: MarketStateDto
     viewHeight?: number
 };
 let fetchAlertsAttempt = 0;
 let previousAlertsCount = 0;
 
-const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
+const MarketState: React.FC<Props> = ({filter, initMarketState, viewHeight}) => {
 
     const [marketStateIntervals, setMarketStateIntervals] = useState<MarketStateInterval[]>([]);
     const [limit, setLimit] = useState(1);
@@ -78,7 +79,7 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
         setFetchDataStatus("Loading market states for " + filter.secCode + "...");
         getMarketState(filter)
             .then(marketState => {
-                setAlertsReceivedFromServer(marketState);
+                setDataReceivedFromServer(marketState);
                 setFetchDataStatus(null);
             })
             .catch(reason => {
@@ -112,19 +113,21 @@ const MarketState: React.FC<Props> = ({filter, viewHeight}) => {
                                 item.candle.timestamp = new Date(item.candle.timestamp);
                             }
                         }
-                        setAlertsReceivedFromServer(marketState);
+                        setDataReceivedFromServer(marketState);
                     });
             }
             fetchAlerts();
+        } else if (initMarketState) {
+            setDataReceivedFromServer(initMarketState);
         }
 
         // Specify how to clean up after this effect:
         return function cleanup() {
             if (alertsSubscription) alertsSubscription.unsubscribe();
         };
-    }, [filter]);
+    }, [filter, initMarketState]);
 
-    const setAlertsReceivedFromServer = (marketState: MarketStateDto): void => {
+    const setDataReceivedFromServer = (marketState: MarketStateDto): void => {
         const baseInterval: Interval = marketState.marketStateIntervals[0].interval;
         const interval: Interval = marketState.marketStateIntervals[1].interval;
         const limit = getLimit(interval, baseInterval);

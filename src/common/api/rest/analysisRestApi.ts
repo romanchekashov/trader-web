@@ -11,7 +11,7 @@ import {MarketStateFilterDto} from "../../components/market-state/data/MarketSta
 import {MarketStateDto} from "../../components/market-state/data/MarketStateDto";
 import {SwingStateDto} from "../../components/swing-state/data/SwingStateDto";
 import {MoexOpenInterest} from "../../data/MoexOpenInterest";
-import {adjustTradePremise} from "../../utils/DataUtils";
+import {adjustMarketState, adjustSwingStateDto, adjustTradePremise} from "../../utils/DataUtils";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -79,14 +79,7 @@ export function getMarketState(filter: MarketStateFilterDto): Promise<MarketStat
         body: JSON.stringify(filter)
     })
         .then(response => handleResponse(response)
-            .then(marketState => {
-                for (const marketStateInterval of marketState.marketStateIntervals) {
-                    for (const item of marketStateInterval.items) {
-                        item.candle.timestamp = new Date(item.candle.timestamp);
-                    }
-                }
-                return marketState;
-            }))
+            .then(adjustMarketState))
         .catch(handleError);
 }
 
@@ -99,10 +92,7 @@ export function getSwingStates(filter: MarketStateFilterDto): Promise<SwingState
         .then(response => handleResponse(response)
             .then(states => {
                 for (const state of states) {
-                    for (const item of state.items) {
-                        item.start = new Date(item.start);
-                        item.end = new Date(item.end);
-                    }
+                    adjustSwingStateDto(state)
                 }
                 return states;
             }))
