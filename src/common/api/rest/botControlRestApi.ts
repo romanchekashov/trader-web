@@ -3,6 +3,7 @@ import {MarketBotFilterDataDto} from "../../data/bot/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../data/bot/MarketBotStartDto";
 import {TradingStrategyResult} from "../../data/history/TradingStrategyResult";
 import {adjustMarketState, adjustTradingStrategyResult} from "../../utils/DataUtils";
+import {TradingStrategyStatus} from "../../data/trading/TradingStrategyStatus";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 
@@ -18,6 +19,13 @@ export function startBot(dto: MarketBotStartDto): Promise<any> {
         headers: {"content-type": "application/json"},
         body: JSON.stringify(dto)
     })
+        .then(handleResponse)
+        .catch(handleError);
+}
+
+export function switchBotStatus(tradingStrategyId: number,
+                                tradingStrategyStatus: TradingStrategyStatus): Promise<void> {
+    return fetch(`${baseUrl}switch-bot-status?tradingStrategyId=${tradingStrategyId}&tradingStrategyStatus=${tradingStrategyStatus}`)
         .then(handleResponse)
         .catch(handleError);
 }

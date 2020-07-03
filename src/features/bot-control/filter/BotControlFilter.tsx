@@ -311,7 +311,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
                     </div>
                     <div className="p-col-1">
                         <Button label="Start" icon="pi pi-caret-right"
-                                className="p-button-warning"
+                                className="p-button-success"
                                 onClick={onStartClicked}/>
                     </div>
                 </div>

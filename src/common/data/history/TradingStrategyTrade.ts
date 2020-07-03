@@ -7,32 +7,49 @@ export class TradingStrategyTrade {
   public trades: Trade[]
   public id: number
   public tradingStrategyId: number
-  public operation: OperationType
   public setup: TradeSetup
-
-  public enterOrderNumber: number
-  public stopOrderTransactionId: number
-  public firstTargetOrderNumber: number
-  public secondTargetOrderNumber: number
-  public killOrderNumber: number
-  public killExceptionOrderNumber: number
+  public operation: OperationType
   public state: TradingStrategyTradeState
 
-  // Entry preconditions
-  public stopPrice: number
-  public targetPrice1: number
-  public targetPrice2: number
+  public enterOrderTransId: number
+  public enterOrderNumber: number
   public lastWholesalePrice: number
   public lastRewardRiskRatioPrice: number
-  public quantity: number
-
-  // real numbers from trading platform
-  public realEntryQuantity: number
+  public entryPrice: number
+  public entryQuantity: number
   public realEntryPrice: number
-  public realStoppedPrice: number
-  public realTargetPrice1: number
-  public realTargetPrice2: number
+  public realEntryQuantity: number
+
+  public stopOrderTransId: number
+  public stopPrice: number
+  public realStopPrice: number
+  public realStopQuantity: number
+
+  public firstTargetOrderTransId: number
+  public firstTargetOrderNumber: number
+  public firstTargetPrice: number
+  public firstTargetQuantity: number
+  public realFirstTargetPrice: number
+  public realFirstTargetQuantity: number
+
+  public secondTargetStopOrderTransId: number
+  public secondTargetOrderTransId: number
+  public secondTargetOrderNumber: number
+  public secondTargetPrice: number
+  public secondTargetQuantity: number
+  public realSecondTargetPrice: number
+  public realSecondTargetQuantity: number
+
+  public killOrderTransId: number
+  public killOrderNumber: number
+  public killQuantity: number
   public realKillPrice: number
+  public realKillQuantity: number
+
+  public killExceptionOrderTransId: number
+  public killExceptionOrderNumber: number
+  public killExceptionQuantity: number
   public realKillExceptionPrice: number
-  public leftQuantity: number
+  public realKillExceptionQuantity: number
+
 }
