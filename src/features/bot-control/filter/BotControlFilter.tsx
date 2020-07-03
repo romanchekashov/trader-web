@@ -20,8 +20,9 @@ import {DepositSetupView} from "./DepositSetupView";
 import {DepositSetup} from "../../../common/data/DepositSetup";
 import {TradeSystemType} from "../../../common/data/trading/TradeSystemType";
 import {Calendar} from "primereact/calendar";
-import moment = require("moment");
 import {getCurrentDeposit} from "../../../common/api/rest/capitalRestApi";
+import {getSecurityHistoryDates} from "../../../common/api/rest/botControlRestApi";
+import moment = require("moment");
 
 export interface BotControlFilterState {
     broker: Broker
@@ -188,15 +189,16 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     };
 
     const updateHistoryDates = (newSecCode: string, minInterval: Interval) => {
-        const market: MarketSecuritiesDto = filter.marketSecurities.find(value => value.classCode === classCode);
-        const id: number = market.securities.find(value => value.futureSecCode === newSecCode || value.code === newSecCode).id;
-        const dto: HistoryDateDto = market.securityHistoryDate[id].find(value => value.interval === minInterval);
-        const min = moment(dto.start).toDate();
-        const max = moment(dto.end).toDate();
-        setMinStartDate(min);
-        setMaxEndDate(max);
-        setStart(min);
-        setEnd(max);
+        getSecurityHistoryDates(classCode, newSecCode)
+            .then(value => {
+                const dto: HistoryDateDto = value.historyDates.find(value => value.interval === minInterval);
+                const min = moment(dto.start).toDate();
+                const max = moment(dto.end).toDate();
+                setMinStartDate(min);
+                setMaxEndDate(max);
+                setStart(min);
+                setEnd(max);
+            })
     };
 
     const onDepositSetupChanged = (newSetup: DepositSetup): void => {
