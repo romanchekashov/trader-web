@@ -18,7 +18,9 @@ export const BotControlLastInfo: React.FC<Props> = ({onStrategyResultSelected, o
     useEffect(() => {
         let alertsSubscription;
         getAllStrategies()
-            .then(setResults)
+            .then(results => {
+                setResults(results.filter(result => result.tradingStrategyData))
+            })
             .catch(console.error);
 
         // Specify how to clean up after this effect:

@@ -20,6 +20,8 @@ import {Button} from "primereact/button";
 import {switchBotStatus} from "../../../common/api/rest/botControlRestApi";
 import {TradingStrategyStatus} from "../../../common/data/trading/TradingStrategyStatus";
 import moment = require("moment");
+import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
+import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -87,10 +89,23 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             setMarketStateDto(premise.marketState);
             setSwingStates([premise.swingStateTradingInterval, premise.swingStateMinInterval]);
             setHasData(true);
-            setTsTrade(tradingStrategyResult.tradingStrategyData.trades[0]);
+            const trades = tradingStrategyResult.tradingStrategyData.trades;
+            setTsTrade(trades.length > 0 ? trades[0] : null);
         } else {
             setHasData(false);
         }
+
+        const lastSecuritiesSubscription = WebsocketService.getInstance()
+            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+            .subscribe(securities => {
+                if (security) {
+                    const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
+                    if (newSecurityLastInfo) {
+                        newSecurityLastInfo.timeLastTrade = new Date(newSecurityLastInfo.timeLastTrade);
+                        setSecurityLastInfo(newSecurityLastInfo);
+                    }
+                }
+            });
 
         setTimeout(updateSize, 1000);
         window.addEventListener('resize', updateSize);
@@ -98,6 +113,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
         // Specify how to clean up after this effect:
         return function cleanup() {
             window.removeEventListener('resize', updateSize);
+            lastSecuritiesSubscription.unsubscribe();
         };
     }, [security, tradingStrategyResult]);
 
@@ -144,44 +160,50 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                         <div>End: {moment(tradingStrategyResult.tradingStrategyData.end).format("HH:mm/DD MMM YY")}</div>
                     </div>
                 </div>
-                <div className="p-grid bot-control-analysis-info">
-                    <div className="p-col-1">{tsTrade.id}-{tsTrade.state}</div>
-                    <div className="p-col-2" title={"Order Num:"+tsTrade.enterOrderNumber}>
-                        <div>
-                            Entry: {OperationType.BUY === tsTrade.operation ? 'BUY' : 'SELL'} {tsTrade.entryQuantity} by {tsTrade.entryPrice} (LWP: {tsTrade.lastWholesalePrice} - LRP: {tsTrade.lastRewardRiskRatioPrice})
+
+                {
+                    tsTrade ?
+                        <div className="p-grid bot-control-analysis-info">
+                            <div className="p-col-1">{tsTrade.id}-{tsTrade.state}</div>
+                            <div className="p-col-2" title={"Order Num:"+tsTrade.enterOrderNumber}>
+                                <div>
+                                    Entry: {OperationType.BUY === tsTrade.operation ? 'BUY' : 'SELL'} {tsTrade.entryQuantity} by {tsTrade.entryPrice} (LWP: {tsTrade.lastWholesalePrice} - LRP: {tsTrade.lastRewardRiskRatioPrice})
+                                </div>
+                                <div>
+                                    Real: {OperationType.BUY === tsTrade.operation ? 'BUY' : 'SELL'} {tsTrade.realEntryQuantity} by {tsTrade.realEntryPrice}
+                                </div>
+                            </div>
+                            <div className="p-col-2" title={"Stop Order TransId:"+tsTrade.stopOrderTransId}>
+                                Stop: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.entryQuantity} by {tsTrade.stopPrice}
+                            </div>
+                            <div className="p-col-2" title={"Order Num:"+tsTrade.firstTargetOrderNumber}>
+                                <div>
+                                    T1: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.firstTargetQuantity} by {tsTrade.firstTargetPrice}
+                                </div>
+                                <div>
+                                    Real T1: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realFirstTargetQuantity} by {tsTrade.realFirstTargetPrice}
+                                </div>
+                            </div>
+                            <div className="p-col-2" title={"Order Num:"+tsTrade.secondTargetOrderNumber}>
+                                <div>
+                                    T2: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.secondTargetQuantity} by {tsTrade.secondTargetPrice}
+                                </div>
+                                <div>
+                                    Real T2: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realSecondTargetQuantity} by {tsTrade.realSecondTargetPrice}
+                                </div>
+                            </div>
+                            <div className="p-col-3">
+                                <div title={"Order Num:"+tsTrade.killOrderNumber}>
+                                    Real Kill: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realKillQuantity} by {tsTrade.realKillPrice}
+                                </div>
+                                <div title={"Order Num:"+tsTrade.killExceptionOrderNumber}>
+                                    Real Kill Exception: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realKillExceptionQuantity} by {tsTrade.realKillExceptionPrice}
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            Real: {OperationType.BUY === tsTrade.operation ? 'BUY' : 'SELL'} {tsTrade.realEntryQuantity} by {tsTrade.realEntryPrice}
-                        </div>
-                    </div>
-                    <div className="p-col-2" title={"Stop Order TransId:"+tsTrade.stopOrderTransId}>
-                        Stop: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.entryQuantity} by {tsTrade.stopPrice}
-                    </div>
-                    <div className="p-col-2" title={"Order Num:"+tsTrade.firstTargetOrderNumber}>
-                        <div>
-                            T1: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.firstTargetQuantity} by {tsTrade.firstTargetPrice}
-                        </div>
-                        <div>
-                            Real T1: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realFirstTargetQuantity} by {tsTrade.realFirstTargetPrice}
-                        </div>
-                    </div>
-                    <div className="p-col-2" title={"Order Num:"+tsTrade.secondTargetOrderNumber}>
-                        <div>
-                            T2: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.secondTargetQuantity} by {tsTrade.secondTargetPrice}
-                        </div>
-                        <div>
-                            Real T2: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realSecondTargetQuantity} by {tsTrade.realSecondTargetPrice}
-                        </div>
-                    </div>
-                    <div className="p-col-3">
-                        <div title={"Order Num:"+tsTrade.killOrderNumber}>
-                            Real Kill: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realKillQuantity} by {tsTrade.realKillPrice}
-                        </div>
-                        <div title={"Order Num:"+tsTrade.killExceptionOrderNumber}>
-                            Real Kill Exception: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realKillExceptionQuantity} by {tsTrade.realKillExceptionPrice}
-                        </div>
-                    </div>
-                </div>
+                        : null
+                }
+
                 <div className="p-grid analysis-head">
                     <div className="p-col-12">
                         <div className="analysis-head-chart-number">
