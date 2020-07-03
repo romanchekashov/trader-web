@@ -33,12 +33,10 @@ export const BotControlRunningStrategies: React.FC<Props> =
             .subscribe(data => {
                 const results = adjustTradingStrategyResultArray(data)
                 setResults(results);
-                if (selectedResult != null) {
-                    for (const result of results) {
-                        if (selectedResult.tradingStrategyData.id === result.tradingStrategyData.id) {
-                            setSelectedResult(result);
-                            onSelectedTSResultUpdate(result);
-                        }
+                for (const result of results) {
+                    if (selectedResult === null || selectedResult.tradingStrategyData.id === result.tradingStrategyData.id) {
+                        setSelectedResult(result);
+                        onSelectedTSResultUpdate(result);
                     }
                 }
             });

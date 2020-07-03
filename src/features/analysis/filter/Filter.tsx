@@ -78,10 +78,13 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
     const onMarketChange = (val: MarketSecuritiesDto) => {
         setMarket(val);
         setSecurity(null);
-        setSecurities(val.securities.map((security): PrimeDropdownItem<SecurityInfo> => ({
-            label: `${security.name}(${security.code})`,
-            value: security
-        })));
+        setSecurities(val.securityHistoryDates
+            .map((securityHistoryDate): PrimeDropdownItem<SecurityInfo> => ({
+                    label: `${securityHistoryDate.security.name}(${securityHistoryDate.security.code})`,
+                    value: securityHistoryDate.security
+                })
+            )
+        );
     };
 
     useEffect(() => {

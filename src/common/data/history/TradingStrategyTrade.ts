@@ -13,43 +13,43 @@ export class TradingStrategyTrade {
 
   public enterOrderTransId: number
   public enterOrderNumber: number
-  public lastWholesalePrice: number
-  public lastRewardRiskRatioPrice: number
+  public enterLastWholesalePrice: number
+  public enterLastRewardRiskRatioPrice: number
   public entryPrice: number
   public entryQuantity: number
-  public realEntryPrice: number
-  public realEntryQuantity: number
+  public entryRealPrice: number
+  public entryRealQuantity: number
 
   public stopOrderTransId: number
   public stopPrice: number
-  public realStopPrice: number
-  public realStopQuantity: number
+  public stopRealPrice: number
+  public stopRealQuantity: number
 
   public firstTargetOrderTransId: number
   public firstTargetOrderNumber: number
   public firstTargetPrice: number
   public firstTargetQuantity: number
-  public realFirstTargetPrice: number
-  public realFirstTargetQuantity: number
+  public firstTargetRealPrice: number
+  public firstTargetRealQuantity: number
 
   public secondTargetStopOrderTransId: number
   public secondTargetOrderTransId: number
   public secondTargetOrderNumber: number
   public secondTargetPrice: number
   public secondTargetQuantity: number
-  public realSecondTargetPrice: number
-  public realSecondTargetQuantity: number
+  public secondTargetRealPrice: number
+  public secondTargetRealQuantity: number
 
   public killOrderTransId: number
   public killOrderNumber: number
   public killQuantity: number
-  public realKillPrice: number
-  public realKillQuantity: number
+  public killRealPrice: number
+  public killRealQuantity: number
 
   public killExceptionOrderTransId: number
   public killExceptionOrderNumber: number
   public killExceptionQuantity: number
-  public realKillExceptionPrice: number
-  public realKillExceptionQuantity: number
+  public killExceptionRealPrice: number
+  public killExceptionRealQuantity: number
 
 }

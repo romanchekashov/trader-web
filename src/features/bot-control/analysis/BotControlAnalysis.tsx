@@ -167,10 +167,10 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                             <div className="p-col-1">{tsTrade.id}-{tsTrade.state}</div>
                             <div className="p-col-2" title={"Order Num:"+tsTrade.enterOrderNumber}>
                                 <div>
-                                    Entry: {OperationType.BUY === tsTrade.operation ? 'BUY' : 'SELL'} {tsTrade.entryQuantity} by {tsTrade.entryPrice} (LWP: {tsTrade.lastWholesalePrice} - LRP: {tsTrade.lastRewardRiskRatioPrice})
+                                    Entry: {OperationType.BUY === tsTrade.operation ? 'BUY' : 'SELL'} {tsTrade.entryQuantity} by {tsTrade.entryPrice} (LWP: {tsTrade.enterLastWholesalePrice} - LRP: {tsTrade.enterLastRewardRiskRatioPrice})
                                 </div>
                                 <div>
-                                    Real: {OperationType.BUY === tsTrade.operation ? 'BUY' : 'SELL'} {tsTrade.realEntryQuantity} by {tsTrade.realEntryPrice}
+                                    Real: {OperationType.BUY === tsTrade.operation ? 'BUY' : 'SELL'} {tsTrade.entryRealQuantity} by {tsTrade.entryRealPrice}
                                 </div>
                             </div>
                             <div className="p-col-2" title={"Stop Order TransId:"+tsTrade.stopOrderTransId}>
@@ -181,7 +181,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                                     T1: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.firstTargetQuantity} by {tsTrade.firstTargetPrice}
                                 </div>
                                 <div>
-                                    Real T1: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realFirstTargetQuantity} by {tsTrade.realFirstTargetPrice}
+                                    Real T1: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.firstTargetRealQuantity} by {tsTrade.firstTargetRealPrice}
                                 </div>
                             </div>
                             <div className="p-col-2" title={"Order Num:"+tsTrade.secondTargetOrderNumber}>
@@ -189,15 +189,15 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                                     T2: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.secondTargetQuantity} by {tsTrade.secondTargetPrice}
                                 </div>
                                 <div>
-                                    Real T2: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realSecondTargetQuantity} by {tsTrade.realSecondTargetPrice}
+                                    Real T2: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.secondTargetRealQuantity} by {tsTrade.secondTargetRealPrice}
                                 </div>
                             </div>
                             <div className="p-col-3">
                                 <div title={"Order Num:"+tsTrade.killOrderNumber}>
-                                    Real Kill: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realKillQuantity} by {tsTrade.realKillPrice}
+                                    Real Kill: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.killRealQuantity} by {tsTrade.killRealPrice}
                                 </div>
                                 <div title={"Order Num:"+tsTrade.killExceptionOrderNumber}>
-                                    Real Kill Exception: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.realKillExceptionQuantity} by {tsTrade.realKillExceptionPrice}
+                                    Real Kill Exception: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.killExceptionRealQuantity} by {tsTrade.killExceptionRealPrice}
                                 </div>
                             </div>
                         </div>
