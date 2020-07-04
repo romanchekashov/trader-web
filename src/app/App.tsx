@@ -13,6 +13,7 @@ import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
 import {ControlPanel} from "../common/components/control-panel/ControlPanel";
 import {Stack} from "../common/components/stack/Stack";
 import {BotControl} from "../common/components/bot-control/BotControl";
+import {EconomicCalendarPage} from "../features/economic-calendar/EconomicCalendarPage";
 
 export const App = () => {
     return (
@@ -26,6 +27,7 @@ export const App = () => {
                 <Route path="/analysis" component={TradeStrategyAnalysisPage}/>
                 <Route path="/bot-control" component={TradeStrategyBotControlPage}/>
                 <Route path="/trade-journal" component={TradeJournalPage}/>
+                <Route path="/economic-calendar" component={EconomicCalendarPage}/>
                 <Route component={PageNotFound}/>
             </Switch>
         </div>

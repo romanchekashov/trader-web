@@ -22,6 +22,10 @@ export const Header = () => {
                 Journal
             </NavLink>
             {" / "}
+            <NavLink to="/economic-calendar" activeStyle={activeStyle}>
+                Calendar
+            </NavLink>
+            {" / "}
             <NavLink to="/about" activeStyle={activeStyle}>
                 About
             </NavLink>
