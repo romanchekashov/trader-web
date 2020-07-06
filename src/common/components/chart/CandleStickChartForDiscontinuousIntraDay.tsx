@@ -55,6 +55,7 @@ type Props = {
     data: Candle[]
     width?: any
     ratio?: any
+    chartHeight?: number
     type: ChartDrawType
     htSRLevels?: ChartLevel[]
     orders?: ChartLevel[]
@@ -238,13 +239,13 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
     render() {
         const {
-            type, data: initialData, width, ratio, htSRLevels, orders, stops,
+            type, data: initialData, width, ratio, chartHeight, htSRLevels, orders, stops,
             swingHighsLows, showGrid, zones, candlePatternsUp, candlePatternsDown, scale, srLevels
         } = this.props;
         const {trends_1} = this.state;
 
         const volumeHeight = 100;
-        const height = 500;
+        const height = chartHeight || 500;
         const margin = {left: 50, right: 50, top: 10, bottom: 30};
         const gridHeight = height - margin.top - margin.bottom;
         const xGrid = showGrid ? {

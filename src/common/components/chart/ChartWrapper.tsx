@@ -37,6 +37,7 @@ type Props = {
     onIntervalChanged: (interval: Interval) => void
     onStartChanged: (start: Date) => void
     width: number,
+    chartHeight?: number
     start?: Date,
     initialNumberOfCandles?: number,
     security: SecurityLastInfo
@@ -204,8 +205,10 @@ export class ChartWrapper extends React.Component<Props, States> {
         const {security, interval, start} = this.props;
         const {numberOfCandles} = this.state;
 
-        this.fetchCandles(security, interval, start, numberOfCandles);
-        this.fetchTrendLines(interval);
+        if (security) {
+            this.fetchCandles(security, interval, start, numberOfCandles);
+            this.fetchTrendLines(interval);
+        }
     };
 
     componentDidUpdate = (prevProps) => {
@@ -561,12 +564,44 @@ export class ChartWrapper extends React.Component<Props, States> {
         this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
     };
 
+    getSRLevels = () => {
+        const {innerInterval, showSRLevels} = this.state;
+        const {premise} = this.props;
+
+        if (!premise || !showSRLevels) return null;
+
+        return premise.analysis.srLevels.filter(value => {
+            switch (innerInterval) {
+                case Interval.M60:
+                    return Interval.M30 !== value.interval;
+                case Interval.H2:
+                    return Interval.M30 !== value.interval && Interval.M60 !== value.interval;
+                case Interval.H4:
+                    return Interval.M30 !== value.interval && Interval.M60 !== value.interval
+                        && Interval.H2 !== value.interval;
+                case Interval.DAY:
+                    return Interval.M30 !== value.interval && Interval.M60 !== value.interval
+                        && Interval.H2 !== value.interval && Interval.H4 !== value.interval;
+                case Interval.WEEK:
+                case Interval.MONTH:
+                    return Interval.M30 !== value.interval && Interval.M60 !== value.interval
+                        && Interval.H2 !== value.interval && Interval.H4 !== value.interval
+                        && Interval.DAY !== value.interval;
+                default: return true;
+            }
+        });
+    }
+
     render() {
         const {
             candles, nodata, innerInterval, innerStart, enableTrendLine, needSave, trends_1, showSRLevels,
             showSRZones, numberOfCandles, startCalendarVisible
         } = this.state;
-        const {width, showGrid, premise, security, start, onStartChanged} = this.props;
+        const {width, chartHeight, showGrid, premise, security, start, onStartChanged} = this.props;
+
+        if (!security) {
+            return (<>Select security for chart</>)
+        }
 
         return (
             <>
@@ -651,6 +686,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                             type={ChartDrawType.CANVAS_SVG}
                             data={candles}
                             width={width}
+                            chartHeight={chartHeight}
                             ratio={1}
                             htSRLevels={this.getHighTimeFrameSRLevels()}
                             orders={this.getOrdersLevels()}
@@ -658,7 +694,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                             showGrid={showGrid}
                             stops={this.getStops()}
                             zones={premise && showSRZones ? premise.analysis.srZones : null}
-                            srLevels={premise && showSRLevels ? premise.analysis.srLevels : null}
+                            srLevels={this.getSRLevels()}
                             candlePatternsUp={this.getCandlePatternsUp()}
                             candlePatternsDown={this.getCandlePatternsDown()}
                             scale={this.securityInfo ? this.securityInfo.scale : 0}

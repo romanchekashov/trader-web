@@ -194,12 +194,12 @@ export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
             <Column field="id" style={{width: '30px'}}/>
 
             <Column field="operation" style={{width: '30px'}}/>
-            <Column field="enterOrderNumber"/>
-            <Column field="stopOrderTransactionId"/>
-            <Column field="firstTargetOrderNumber"/>
-            <Column field="secondTargetOrderNumber"/>
-            <Column field="killOrderNumber"/>
-            <Column field="killExceptionOrderNumber"/>
+            <Column field="enterOrderNumber" style={{overflow: 'auto'}}/>
+            <Column field="stopOrderTransactionId" style={{overflow: 'auto'}}/>
+            <Column field="firstTargetOrderNumber" style={{overflow: 'auto'}}/>
+            <Column field="secondTargetOrderNumber" style={{overflow: 'auto'}}/>
+            <Column field="killOrderNumber" style={{overflow: 'auto'}}/>
+            <Column field="killExceptionOrderNumber" style={{overflow: 'auto'}}/>
             <Column field="state" style={{overflow: 'auto'}}/>
 
             <Column field="stopPrice"/>

@@ -10,6 +10,10 @@ export const Header = () => {
                 Home
             </NavLink>
             {" / "}
+            <NavLink to="/trading-charts" activeStyle={activeStyle}>
+                TCharts
+            </NavLink>
+            {" / "}
             <NavLink to="/analysis" activeStyle={activeStyle}>
                 Analysis
             </NavLink>

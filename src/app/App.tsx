@@ -14,6 +14,7 @@ import {ControlPanel} from "../common/components/control-panel/ControlPanel";
 import {Stack} from "../common/components/stack/Stack";
 import {BotControl} from "../common/components/bot-control/BotControl";
 import {EconomicCalendarPage} from "../features/economic-calendar/EconomicCalendarPage";
+import {TradingChartsPage} from "../features/trading-charts/TradingChartsPage";
 
 export const App = () => {
     return (
@@ -25,6 +26,7 @@ export const App = () => {
             <Switch>
                 <Route exact path="/" component={HomePage}/>
                 <Route path="/analysis" component={TradeStrategyAnalysisPage}/>
+                <Route path="/trading-charts" component={TradingChartsPage}/>
                 <Route path="/bot-control" component={TradeStrategyBotControlPage}/>
                 <Route path="/trade-journal" component={TradeJournalPage}/>
                 <Route path="/economic-calendar" component={EconomicCalendarPage}/>
