@@ -134,7 +134,7 @@ class BotControlPage extends React.Component<Props, BotControlState> {
 
         return (
             <div className="p-grid sample-layout">
-                <div className="p-col-12" style={{backgroundColor: "aliceblue"}}>
+                <div className="p-col-12">
                     <BotControlFilter filter={filterData}
                                       onStart={this.onStart}
                                       onSearch={this.onSearch}
@@ -143,11 +143,9 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                 <div className="p-col-12">
                     <div className="p-grid">
                         <div className="p-col-2">
-                            <BotControlRunningStrategies outerHeight={200}
-                                                         onStrategyResultSelected={this.onStrategyResultSelected}
-                                                         onSelectedTSResultUpdate={this.onSelectedTSResultUpdate}/>
                             <BotControlLastInfo outerHeight={400}
-                                                onStrategyResultSelected={this.onStrategyResultSelected}/>
+                                                onStrategyResultSelected={this.onStrategyResultSelected}
+                                                onSelectedTSResultUpdate={this.onSelectedTSResultUpdate}/>
                         </div>
                         <div className="p-col-10" style={{padding: 0}}>
                             <TabView>

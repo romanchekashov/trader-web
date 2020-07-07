@@ -23,6 +23,7 @@ import {Calendar} from "primereact/calendar";
 import {getCurrentDeposit} from "../../../common/api/rest/capitalRestApi";
 import {getSecurityHistoryDates} from "../../../common/api/rest/botControlRestApi";
 import moment = require("moment");
+import {Panel} from "primereact/panel";
 
 export interface BotControlFilterState {
     broker: Broker
@@ -85,6 +86,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     const [minStartDate, setMinStartDate] = useState(null);
     const [maxEndDate, setMaxEndDate] = useState(null);
     const [realDeposit, setRealDeposit] = useState(null);
+    const [panelCollapsed, setPanelCollapsed] = useState(true);
 
     const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals].map(val => ({
         label: val || "ALL",
@@ -110,7 +112,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
             setPlatform(initState.platform);
         }
 
-    }, []);
+    }, [filter]);
 
     const getDto = (): MarketBotStartDto => {
         return {
@@ -206,118 +208,123 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     };
 
     return (
-        <div className="p-grid filter">
-            <div className="p-col-12">
-                <div className="p-grid">
-                    <div className="p-col-1">
-                        <div style={{fontSize: "10px"}}>Broker</div>
-                        <Dropdown optionLabel="name"
-                                  value={broker}
-                                  options={brokers}
-                                  onChange={(e) => {
-                                      setBroker(e.value)
-                                  }}
-                                  placeholder="Select a broker"
-                                  style={{width: '130px'}}/>
-                    </div>
-                    <div className="p-col-1">
-                        <div style={{fontSize: "10px"}}>Trading platform</div>
-                        <Dropdown value={platform}
-                                  options={platforms}
-                                  onChange={(e) => {
-                                      setPlatform(e.value)
-                                  }}
-                                  placeholder="Select a platform"
-                                  style={{width: '80px'}}/>
-                    </div>
-                    <div className="p-col-1">
-                        <div style={{fontSize: "10px"}}>Class code</div>
-                        <Dropdown value={classCode}
-                                  options={classCodes}
-                                  onChange={(e) => {
-                                      onClassCodeChanged(e.value);
-                                  }}
-                                  style={{width: '90px'}}/>
-                    </div>
-                    <div className="p-col-1">
-                        <div style={{fontSize: "10px"}}>Sec code</div>
-                        <Dropdown value={secCode}
-                                  options={secCodes}
-                                  onChange={(e) => {
-                                      onSecCodeChanged(e.value);
-                                  }}
-                                  filter={true}
-                                  style={{width: '90px'}}/>
-                    </div>
-                    <div className="p-col-1">
-                        <div style={{fontSize: "10px"}}>Trading Interval</div>
-                        <Dropdown value={interval}
-                                  options={intervals}
-                                  onChange={(e) => {
-                                      onIntervalChanged(e.value);
-                                  }} style={{width: '80px'}}/>
-                    </div>
-                    <div className="p-col-1">
-                        <div style={{fontSize: "10px"}}>Min Interval</div>
-                        <Dropdown value={minInterval}
-                                  options={minIntervals}
-                                  onChange={(e) => {
-                                      onMinIntervalChanged(e.value);
-                                  }} style={{width: '80px'}}/>
-                    </div>
+        <Panel header="Filter" style={{marginTop:0}}
+               toggleable={true}
+               collapsed={panelCollapsed}
+               onToggle={(e) => setPanelCollapsed(e.value)}>
+            <div className="p-grid filter">
+                <div className="p-col-12">
+                    <div className="p-grid">
+                        <div className="p-col-2">
+                            <div style={{fontSize: "10px"}}>Broker</div>
+                            <Dropdown optionLabel="name"
+                                      value={broker}
+                                      options={brokers}
+                                      onChange={(e) => {
+                                          setBroker(e.value)
+                                      }}
+                                      placeholder="Select a broker"
+                                      style={{width: '130px'}}/>
+                        </div>
+                        <div className="p-col-1">
+                            <div style={{fontSize: "10px"}}>Trading platform</div>
+                            <Dropdown value={platform}
+                                      options={platforms}
+                                      onChange={(e) => {
+                                          setPlatform(e.value)
+                                      }}
+                                      placeholder="Select a platform"
+                                      style={{width: '80px'}}/>
+                        </div>
+                        <div className="p-col-1">
+                            <div style={{fontSize: "10px"}}>Class code</div>
+                            <Dropdown value={classCode}
+                                      options={classCodes}
+                                      onChange={(e) => {
+                                          onClassCodeChanged(e.value);
+                                      }}
+                                      style={{width: '90px'}}/>
+                        </div>
+                        <div className="p-col-1">
+                            <div style={{fontSize: "10px"}}>Sec code</div>
+                            <Dropdown value={secCode}
+                                      options={secCodes}
+                                      onChange={(e) => {
+                                          onSecCodeChanged(e.value);
+                                      }}
+                                      filter={true}
+                                      style={{width: '90px'}}/>
+                        </div>
+                        <div className="p-col-1">
+                            <div style={{fontSize: "10px"}}>Trading Interval</div>
+                            <Dropdown value={interval}
+                                      options={intervals}
+                                      onChange={(e) => {
+                                          onIntervalChanged(e.value);
+                                      }} style={{width: '80px'}}/>
+                        </div>
+                        <div className="p-col-1">
+                            <div style={{fontSize: "10px"}}>Min Interval</div>
+                            <Dropdown value={minInterval}
+                                      options={minIntervals}
+                                      onChange={(e) => {
+                                          onMinIntervalChanged(e.value);
+                                      }} style={{width: '80px'}}/>
+                        </div>
 
-                    <div className="p-col-1">
-                        <div style={{fontSize: "10px"}}>Start</div>
-                        <Calendar value={start}
-                                  minDate={minStartDate}
-                                  maxDate={maxEndDate}
-                                  onChange={(e) => setStart(e.value as any)}
-                                  showTime={true}
-                                  inputStyle={{width: "90px"}}/>
+                        <div className="p-col-1">
+                            <div style={{fontSize: "10px"}}>Start</div>
+                            <Calendar value={start}
+                                      minDate={minStartDate}
+                                      maxDate={maxEndDate}
+                                      onChange={(e) => setStart(e.value as any)}
+                                      showTime={true}
+                                      inputStyle={{width: "90px"}}/>
+                        </div>
+                        <div className="p-col-1">
+                            <div style={{fontSize: "10px"}}>End</div>
+                            <Calendar value={end}
+                                      minDate={minStartDate}
+                                      maxDate={maxEndDate}
+                                      onChange={(e) => setEnd(e.value as any)}
+                                      showTime={true}
+                                      inputStyle={{width: "90px"}}/>
+                        </div>
                     </div>
-                    <div className="p-col-1">
-                        <div style={{fontSize: "10px"}}>End</div>
-                        <Calendar value={end}
-                                  minDate={minStartDate}
-                                  maxDate={maxEndDate}
-                                  onChange={(e) => setEnd(e.value as any)}
-                                  showTime={true}
-                                  inputStyle={{width: "90px"}}/>
+                    <DepositSetupView realDeposit={realDeposit}
+                                      setup={depositSetup}
+                                      onChange={onDepositSetupChanged}/>
+                </div>
+                <div className="p-col-12">
+                    <div className="p-grid">
+                        <div className="p-col-2">
+                            <div style={{fontSize: "10px"}}>Trading strategy</div>
+                            <Dropdown value={strategy}
+                                      options={strategies}
+                                      onChange={(e) => {
+                                          onStrategyChanged(e.value as any);
+                                      }}/>
+                        </div>
+                        <div className="p-col-2">
+                            <div style={{fontSize: "10px"}}>Trade system type</div>
+                            <Dropdown value={systemType}
+                                      options={systemTypes}
+                                      onChange={(e) => {
+                                          setSystemType(e.value as any);
+                                      }}/>
+                        </div>
+                        <div className="p-col-1">
+                            <Button label="Search" icon="pi pi-search"
+                                    onClick={onSearchClicked}/>
+                        </div>
+                        <div className="p-col-1">
+                            <Button label="Start" icon="pi pi-caret-right"
+                                    className="p-button-success"
+                                    onClick={onStartClicked}/>
+                        </div>
                     </div>
                 </div>
-                <DepositSetupView realDeposit={realDeposit}
-                                  setup={depositSetup}
-                                  onChange={onDepositSetupChanged}/>
             </div>
-            <div className="p-col-12">
-                <div className="p-grid">
-                    <div className="p-col-2">
-                        <div style={{fontSize: "10px"}}>Trading strategy</div>
-                        <Dropdown value={strategy}
-                                  options={strategies}
-                                  onChange={(e) => {
-                                      onStrategyChanged(e.value as any);
-                                  }}/>
-                    </div>
-                    <div className="p-col-2">
-                        <div style={{fontSize: "10px"}}>Trade system type</div>
-                        <Dropdown value={systemType}
-                                  options={systemTypes}
-                                  onChange={(e) => {
-                                      setSystemType(e.value as any);
-                                  }}/>
-                    </div>
-                    <div className="p-col-1">
-                        <Button label="Search" icon="pi pi-search"
-                                onClick={onSearchClicked}/>
-                    </div>
-                    <div className="p-col-1">
-                        <Button label="Start" icon="pi pi-caret-right"
-                                className="p-button-success"
-                                onClick={onStartClicked}/>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </Panel>
     )
 };
