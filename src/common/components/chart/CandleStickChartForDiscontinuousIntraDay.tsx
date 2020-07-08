@@ -3,14 +3,7 @@ import {format} from "d3-format";
 import {timeFormat} from "d3-time-format";
 
 import {Chart, ChartCanvas} from "react-financial-charts";
-import {
-    BarSeries,
-    CandlestickSeries,
-    Circle,
-    LineSeries,
-    ScatterSeries,
-    Square,
-} from "react-financial-charts/lib/series";
+import {BarSeries, CandlestickSeries, LineSeries, ScatterSeries, Square,} from "react-financial-charts/lib/series";
 import {XAxis, YAxis} from "react-financial-charts/lib/axes";
 import {
     CrossHairCursor,
@@ -45,9 +38,9 @@ import {TrendLineDto} from "../../data/TrendLineDto";
 import {StoreData} from "../../utils/utils";
 import {ChartTrendLine} from "./data/ChartTrendLine";
 import {ChartSwingHighsLows} from "./components/ChartSwingHighsLows";
-import {TrendPoint} from "../../data/strategy/TrendPoint";
-import {Trend} from "../../data/strategy/Trend";
 import {TrendWrapper} from "../../data/TrendWrapper";
+import {ChartTrades} from "./components/ChartTrades";
+import {Trade} from "../../data/Trade";
 
 const _ = require("lodash");
 
@@ -59,6 +52,7 @@ type Props = {
     type: ChartDrawType
     htSRLevels?: ChartLevel[]
     orders?: ChartLevel[]
+    trades?: Trade[]
     stops?: ChartLevel[]
     zones?: SRZone[]
     srLevels?: SRLevel[]
@@ -239,7 +233,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
     render() {
         const {
-            type, data: initialData, width, ratio, chartHeight, htSRLevels, orders, stops,
+            type, data: initialData, width, ratio, chartHeight, htSRLevels, orders, trades, stops,
             swingHighsLows, showGrid, zones, candlePatternsUp, candlePatternsDown, scale, srLevels
         } = this.props;
         const {trends_1} = this.state;
@@ -430,6 +424,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                                     marker={Square}
                                     markerProps={{width: 16, stroke: "#e53935", fill: "#e53935"}}/> : null
                         }
+
+                        <ChartTrades candles={data} trades={trades}/>
 
                         <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>
                         <LineSeries yAccessor={ema7.accessor()} stroke={ema7.stroke()}/>

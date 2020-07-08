@@ -30,14 +30,22 @@ export interface StoreData<T> {
 export const sortAlphabetically = (arr: any[], field?: string): any[] => {
     if (field) {
         return arr.sort((a, b) => {
-            if(a[field] < b[field]) { return -1; }
-            if(a[field] > b[field]) { return 1; }
+            if (a[field] < b[field]) {
+                return -1;
+            }
+            if (a[field] > b[field]) {
+                return 1;
+            }
             return 0;
         });
     } else {
         return arr.sort((a, b) => {
-            if(a < b) { return -1; }
-            if(a > b) { return 1; }
+            if (a < b) {
+                return -1;
+            }
+            if (a > b) {
+                return 1;
+            }
             return 0;
         });
     }
@@ -62,3 +70,8 @@ export const TrendDirectionColor = {
     DOWN: "#f44336",
     SIDE: "#2196f3" // "#3f51b5"
 };
+
+export const OperationTypeColor = {
+    BUY: "#4caf50",
+    SELL: "#f44336"
+}

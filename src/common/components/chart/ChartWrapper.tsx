@@ -31,6 +31,7 @@ import {TrendWrapper} from "../../data/TrendWrapper";
 import {Calendar} from "primereact/calendar";
 import {InputText} from "primereact/inputtext";
 import moment = require("moment");
+import {Trade} from "../../data/Trade";
 
 type Props = {
     interval: Interval,
@@ -43,6 +44,7 @@ type Props = {
     security: SecurityLastInfo
     premise?: TradePremise
     orders?: Order[]
+    trades?: Trade[]
     history?: boolean
     trend?: Trend
     showGrid?: boolean
@@ -597,7 +599,7 @@ export class ChartWrapper extends React.Component<Props, States> {
             candles, nodata, innerInterval, innerStart, enableTrendLine, needSave, trends_1, showSRLevels,
             showSRZones, numberOfCandles, startCalendarVisible
         } = this.state;
-        const {width, chartHeight, showGrid, premise, security, start, onStartChanged} = this.props;
+        const {width, chartHeight, showGrid, premise, security, start, onStartChanged, trades} = this.props;
 
         if (!security) {
             return (<>Select security for chart</>)
@@ -690,6 +692,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                             ratio={1}
                             htSRLevels={this.getHighTimeFrameSRLevels()}
                             orders={this.getOrdersLevels()}
+                            trades={trades}
                             swingHighsLows={this.getSwingHighsLowsMap()}
                             showGrid={showGrid}
                             stops={this.getStops()}

@@ -1,6 +1,7 @@
 import {ClassCode} from "./ClassCode";
 import {OrderType} from "./OrderType";
 import {OperationType} from "./OperationType";
+import {OrderStatus} from "./OrderStatus";
 
 export class Order {
     public id?: number;
@@ -12,7 +13,8 @@ export class Order {
     public quantity: number;
     public type: OrderType;
     public operation: OperationType;
+    public dateTime?: Date;
     public balance?: number;
     public value?: number;
-    public dateTime?: Date;
+    public status?: OrderStatus;
 }

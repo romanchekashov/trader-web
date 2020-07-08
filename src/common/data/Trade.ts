@@ -4,6 +4,7 @@ import {TradeSystemType} from "./trading/TradeSystemType";
 
 export class Trade {
     public id: number;
+    public tradingPlatformTradeId: number;
     public transId: number;
     public orderNumber: number;
     public classCode: ClassCode;

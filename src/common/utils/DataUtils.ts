@@ -2,6 +2,9 @@ import {TradePremise} from "../data/strategy/TradePremise";
 import {MarketStateDto} from "../components/market-state/data/MarketStateDto";
 import {SwingStateDto} from "../components/swing-state/data/SwingStateDto";
 import {TradingStrategyResult} from "../data/history/TradingStrategyResult";
+import {Trade} from "../data/Trade";
+import {Order} from "../data/Order";
+import {StopOrder} from "../data/StopOrder";
 
 export const adjustTradingStrategyResultArray = (results: TradingStrategyResult[]): TradingStrategyResult[] => {
     for (const result of results) {
@@ -61,4 +64,28 @@ export const adjustSwingStateDto = (state: SwingStateDto): SwingStateDto => {
         item.end = new Date(item.end);
     }
     return state;
+}
+
+export const adjustTrades = (trades: Trade[]): any => {
+    if (trades && trades.length > 0) {
+        for (const trade of trades) trade.dateTime = new Date(trade.dateTime)
+    }
+
+    return trades
+}
+
+export const adjustOrders = (orders: Order[]): any => {
+    if (orders && orders.length > 0) {
+        for (const order of orders) order.dateTime = new Date(order.dateTime)
+    }
+
+    return orders
+}
+
+export const adjustStopOrders = (orders: StopOrder[]): any => {
+    if (orders && orders.length > 0) {
+        for (const order of orders) order.dateTime = new Date(order.dateTime)
+    }
+
+    return orders
 }

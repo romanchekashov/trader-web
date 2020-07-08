@@ -20,8 +20,10 @@ import MarketState from "../../../common/components/market-state/MarketState";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
 import {MoexOpenInterest} from "../../../common/data/MoexOpenInterest";
 import {adjustTradePremise} from "../../../common/utils/DataUtils";
-import moment = require("moment");
 import {MoexOpenInterestView} from "./MoexOpenInterestView";
+import {Trade} from "../../../common/data/Trade";
+import {getTrades} from "../../../common/api/rest/quikRestApi";
+import moment = require("moment");
 
 type Props = {
     future: any
@@ -64,6 +66,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     const [filterDto, setFilterDto] = useState(null);
     const [marketStateFilterDto, setMarketStateFilterDto] = useState(null);
     const [alert, setAlert] = useState(null);
+    const [trades, setTrades] = useState<Trade[]>([]);
 
     const updateSize = () => {
         setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200);
@@ -103,6 +106,8 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
 
             getMoexOpenInterest(future.classCode, future.secCode)
                 .then(setMoexOpenInterest);
+
+            getTrades(40).then(setTrades);
         }
 
         const wsStatusSub = WebsocketService.getInstance()
@@ -259,13 +264,14 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                 <div className="p-grid" style={{margin: '0'}}>
                     <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
-                                      initialNumberOfCandles={1000}
+                                      initialNumberOfCandles={500}
                                       onIntervalChanged={onTradingIntervalChanged}
                                       onStartChanged={onStartChanged}
                                       width={chart1Width}
                                       security={future}
                                       premise={premise}
                                       orders={orders}
+                                      trades={trades}
                                       activeTrade={activeTrade}
                                       showGrid={true}/>
                     </div>
@@ -274,7 +280,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                             <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrameMin}
                                               start={start}
-                                              initialNumberOfCandles={1000}
+                                              initialNumberOfCandles={500}
                                               onIntervalChanged={interval => {
                                               }}
                                               onStartChanged={start => {
