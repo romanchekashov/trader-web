@@ -5,4 +5,5 @@ export class SecurityShare extends Security {
     public issueSize: number;
     public voltoday: number;
     public weightedAveragePrice: number;
+    public percentOfFloatTradedToday: number;
 }

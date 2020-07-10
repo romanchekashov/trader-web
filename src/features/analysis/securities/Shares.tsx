@@ -3,6 +3,8 @@ import {useEffect} from "react";
 import {SecurityShare} from "../../../common/data/SecurityShare";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
+import {OperationType} from "../../../common/data/OperationType";
+import {round100} from "../../../common/utils/utils";
 
 type Props = {
     shares: SecurityShare[]
@@ -22,7 +24,8 @@ const Shares: React.FC<Props> = ({shares, selectedShare, onSelectRow}) => {
         {field: 'voltoday', header: 'Общее кол-во'},
         {field: 'weightedAveragePrice', header: 'Ср. взв. цена'},
         {field: 'todayMoneyTurnover', header: 'Оборот'},
-        {field: 'numberOfTradesToday', header: 'Кол-во сделок'}
+        {field: 'numberOfTradesToday', header: 'Кол-во сделок'},
+        {field: 'percentOfFloatTradedToday', header: '% Flt Traded'}
     ];
 
     const lessColumns = [

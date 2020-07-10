@@ -5,6 +5,7 @@ import {SecurityFuture} from "../../data/SecurityFuture";
 import {SecurityShare} from "../../data/SecurityShare";
 import {SecurityCurrency} from "../../data/SecurityCurrency";
 import {TradingPlatformDataFilter} from "../../data/TradingPlatformDataFilter";
+import {adjustOrders, adjustShares} from "../../utils/DataUtils";
 
 const baseUrl = process.env.API_URL + "/api/v1/";
 
@@ -32,7 +33,8 @@ export function getAllSecurityFutures(): Promise<SecurityFuture[]> {
 
 export function getAllSecurityShares(): Promise<SecurityShare[]> {
     return fetch(`${baseUrl}security-shares`)
-        .then(handleResponse)
+        .then(response => handleResponse(response)
+            .then(adjustShares))
         .catch(handleError);
 }
 

@@ -5,6 +5,8 @@ import {TradingStrategyResult} from "../data/history/TradingStrategyResult";
 import {Trade} from "../data/Trade";
 import {Order} from "../data/Order";
 import {StopOrder} from "../data/StopOrder";
+import {SecurityShare} from "../data/SecurityShare";
+import {round100} from "./utils";
 
 export const adjustTradingStrategyResultArray = (results: TradingStrategyResult[]): TradingStrategyResult[] => {
     for (const result of results) {
@@ -80,6 +82,17 @@ export const adjustOrders = (orders: Order[]): any => {
     }
 
     return orders
+}
+
+export const adjustShares = (shares: SecurityShare[]): any => {
+    if (shares && shares.length > 0) {
+        for (const share of shares) {
+            share.percentOfFloatTradedToday = share.issueSize > 0
+                ? round100((share.voltoday / share.issueSize) * 100) : 0;
+        }
+    }
+
+    return shares
 }
 
 export const adjustStopOrders = (orders: StopOrder[]): any => {
