@@ -30,8 +30,8 @@ import {ChartTrendLineType} from "./data/ChartTrendLineType";
 import {TrendWrapper} from "../../data/TrendWrapper";
 import {Calendar} from "primereact/calendar";
 import {InputText} from "primereact/inputtext";
-import moment = require("moment");
 import {Trade} from "../../data/Trade";
+import moment = require("moment");
 
 type Props = {
     interval: Interval,
@@ -102,6 +102,7 @@ export class ChartWrapper extends React.Component<Props, States> {
 
     getNewCandles = (security: SecurityLastInfo, interval: Interval, start: Date, numberOfCandles: number): Promise<Candle[]> => {
         const {history} = this.props;
+        const {startCalendarVisible} = this.state;
 
         if (history) {
             return getHistoryCandles(security.classCode, security.secCode, interval, numberOfCandles);
@@ -111,8 +112,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                 secCode: security.secCode,
                 interval,
                 numberOfCandles,
-                useCache: true,
-                startTimestamp: start
+                startTimestamp: startCalendarVisible ? start : null
             });
         }
     };
@@ -589,7 +589,8 @@ export class ChartWrapper extends React.Component<Props, States> {
                     return Interval.M30 !== value.interval && Interval.M60 !== value.interval
                         && Interval.H2 !== value.interval && Interval.H4 !== value.interval
                         && Interval.DAY !== value.interval;
-                default: return true;
+                default:
+                    return true;
             }
         });
     }
@@ -624,12 +625,12 @@ export class ChartWrapper extends React.Component<Props, States> {
                     <div className="chart-wrapper-head-start-date">
                         <Button icon="pi pi-calendar"
                                 className={startCalendarVisible ? "" : "p-button-secondary"}
-                                onClick={this.showStartCalendar} />
+                                onClick={this.showStartCalendar}/>
                         {
                             startCalendarVisible ?
                                 <Calendar value={innerStart}
                                           onChange={(e) => this.onStartUpdated(e.value as Date)}/>
-                                          : null
+                                : null
                         }
                     </div>
                     <div className="chart-wrapper-head-trendline">

@@ -182,7 +182,6 @@ const Analysis: React.FC<Props> = ({security}) => {
                 tradingPlatform: TradingPlatform.QUIK,
                 classCode: security.classCode,
                 secCode: security.secCode,
-                timeFrameHigh: Interval.M30,
                 timeFrameTrading: Interval.M5,
                 timeFrameMin: Interval.M1
             });
@@ -253,8 +252,7 @@ const Analysis: React.FC<Props> = ({security}) => {
                 <div className="p-grid" style={{margin: '0'}}>
                     <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
-                                      start={start}
-                                      initialNumberOfCandles={1000}
+                                      initialNumberOfCandles={500}
                                       onIntervalChanged={onTradingIntervalChanged}
                                       onStartChanged={onStartChanged}
                                       width={chart1Width}
@@ -268,8 +266,7 @@ const Analysis: React.FC<Props> = ({security}) => {
                         chartNumber === 2 ? (
                             <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrameMin}
-                                              start={start}
-                                              initialNumberOfCandles={1000}
+                                              initialNumberOfCandles={500}
                                               onIntervalChanged={interval => {
                                               }}
                                               onStartChanged={start => {
@@ -312,7 +309,6 @@ const Analysis: React.FC<Props> = ({security}) => {
                         {
                             alert ?
                                 <ChartWrapper interval={alert.interval}
-                                              start={start}
                                               onIntervalChanged={interval => {
                                               }}
                                               onStartChanged={start => {

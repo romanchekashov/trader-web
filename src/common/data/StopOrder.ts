@@ -14,5 +14,4 @@ export class StopOrder {
     public operation: OperationType;
     public dateTime?: Date;
     public status: StopOrderStatus;
-    public active: boolean;
 }

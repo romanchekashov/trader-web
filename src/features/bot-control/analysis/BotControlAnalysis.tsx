@@ -162,7 +162,6 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                         chartNumber === 2 ? (
                             <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrameMin}
-                                              start={start}
                                               initialNumberOfCandles={500}
                                               onIntervalChanged={interval => {
                                               }}

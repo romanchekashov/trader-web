@@ -2,6 +2,7 @@ import {SessionTradeResult} from "../data/SessionTradeResult";
 import {ClassCode} from "../data/ClassCode";
 import {ActiveTrade} from "../data/ActiveTrade";
 import {OperationType} from "../data/OperationType";
+import {StopOrderStatus} from "../data/StopOrderStatus";
 
 export const sessionResult: SessionTradeResult = {
     classCode: ClassCode.SPBFUT,
@@ -18,8 +19,17 @@ export const activeTrade: ActiveTrade = {
     secCode: "BRM0",
     avgPrice: 34,
     stopOrder: {
-        price: 33, quantity: 5, active: true, classCode: ClassCode.SPBFUT, secCode: "BRM0",
-        conditionPrice: 33.2, dateTime: new Date(), operation: OperationType.BUY, orderNum: 2, transId: 1
+        transId: 1,
+        number: 2,
+        linkedOrderNum: 2,
+        classCode: ClassCode.SPBFUT,
+        secCode: "BRM0",
+        operation: OperationType.BUY,
+        price: 33,
+        conditionPrice: 33.2,
+        quantity: 5,
+        status: StopOrderStatus.ACTIVE,
+        dateTime: new Date()
     },
     quantity: 5,
     operation: OperationType.SELL,

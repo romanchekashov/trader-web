@@ -288,6 +288,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                                               width={chart2Width}
                                               security={future}
                                               premise={premise}
+                                              trades={trades}
                                               trend={trendLowTF}
                                               showGrid={true}/>
                             </div>

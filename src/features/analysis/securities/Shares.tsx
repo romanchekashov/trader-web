@@ -19,6 +19,7 @@ const Shares: React.FC<Props> = ({shares, selectedShare, onSelectRow}) => {
         {field: 'lastTradeQuantity', header: 'Кол-во посл'},
         {field: 'lotSize', header: 'Лот'},
         {field: 'issueSize', header: 'Объем обр.'},
+        {field: 'voltoday', header: 'Общее кол-во'},
         {field: 'weightedAveragePrice', header: 'Ср. взв. цена'},
         {field: 'todayMoneyTurnover', header: 'Оборот'},
         {field: 'numberOfTradesToday', header: 'Кол-во сделок'}
@@ -34,8 +35,8 @@ const Shares: React.FC<Props> = ({shares, selectedShare, onSelectRow}) => {
     });
 
     const selectedColumns = selectedShare ? lessColumns : columns;
-    const columnComponents = selectedColumns.map(col=> {
-        return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true} />;
+    const columnComponents = selectedColumns.map(col => {
+        return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}/>;
     });
 
     const onSelect = (e) => {
