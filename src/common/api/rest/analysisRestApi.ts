@@ -10,8 +10,14 @@ import {NotificationDto} from "../../components/notifications/data/NotificationD
 import {MarketStateFilterDto} from "../../components/market-state/data/MarketStateFilterDto";
 import {MarketStateDto} from "../../components/market-state/data/MarketStateDto";
 import {SwingStateDto} from "../../components/swing-state/data/SwingStateDto";
-import {MoexOpenInterest} from "../../data/MoexOpenInterest";
-import {adjustMarketState, adjustSwingStateDto, adjustTradePremise} from "../../utils/DataUtils";
+import {MoexOpenInterest} from "../../data/open-interest/MoexOpenInterest";
+import {
+    adjustMarketState,
+    adjustMoexOpenInterest, adjustMoexOpenInterestList,
+    adjustSwingStateDto,
+    adjustTradePremise
+} from "../../utils/DataUtils";
+import {MoexApiOpenInterest} from "../../data/open-interest/MoexApiOpenInterest";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -101,6 +107,14 @@ export function getSwingStates(filter: MarketStateFilterDto): Promise<SwingState
 
 export function getMoexOpenInterest(classCode: ClassCode, secCode: string): Promise<MoexOpenInterest> {
     return fetch(`${baseUrl}moex-open-interest?classCode=${classCode}&secCode=${secCode}`)
-        .then(handleResponse)
+        .then(response => handleResponse(response)
+            .then(adjustMoexOpenInterest))
+        .catch(handleError);
+}
+
+export function getMoexApiOpenInterestList(classCode: ClassCode, secCode: string): Promise<MoexOpenInterest[]> {
+    return fetch(`${baseUrl}moex-api-open-interest-list?classCode=${classCode}&secCode=${secCode}`)
+        .then(response => handleResponse(response)
+            .then(adjustMoexOpenInterestList))
         .catch(handleError);
 }

@@ -7,6 +7,8 @@ import {Order} from "../data/Order";
 import {StopOrder} from "../data/StopOrder";
 import {SecurityShare} from "../data/SecurityShare";
 import {round100} from "./utils";
+import {MoexApiOpenInterest} from "../data/open-interest/MoexApiOpenInterest";
+import {MoexOpenInterest} from "../data/open-interest/MoexOpenInterest";
 
 export const adjustTradingStrategyResultArray = (results: TradingStrategyResult[]): TradingStrategyResult[] => {
     for (const result of results) {
@@ -101,4 +103,20 @@ export const adjustStopOrders = (orders: StopOrder[]): any => {
     }
 
     return orders
+}
+
+export const adjustMoexOpenInterestList = (list: MoexOpenInterest[]): any => {
+    if (list && list.length > 0) {
+        for (const item of list) item.dateTime = new Date(item.dateTime)
+    }
+
+    return list
+}
+
+export const adjustMoexOpenInterest = (item: MoexOpenInterest): any => {
+    if (item) {
+        item.dateTime = new Date(item.dateTime)
+    }
+
+    return item
 }

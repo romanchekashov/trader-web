@@ -1,5 +1,5 @@
 import * as React from "react";
-import {MoexOpenInterest} from "../../../common/data/MoexOpenInterest";
+import {MoexOpenInterest} from "../../../common/data/open-interest/MoexOpenInterest";
 
 type Props = {
     moexOpenInterest: MoexOpenInterest
@@ -26,27 +26,27 @@ export const MoexOpenInterestView: React.FC<Props> = ({moexOpenInterest}) => {
                     </tr>
                     <tr>
                         <td>Открытые позиции</td>
-                        <td className="text_right">{moexOpenInterest.openInterestIndividualsLong.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.openInterestIndividualsShort.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.openInterestLegalEntitiesLong.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.openInterestLegalEntitiesShort.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.openInterestTotal.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.fizPosLong.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.fizPosShort.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.yurPosLong.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.yurPosShort.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.posTotal.toLocaleString()}</td>
                     </tr>
                     <tr>
                         <td>Изменение</td>
-                        <td className="text_right">{moexOpenInterest.changeIndividualsLong.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.changeIndividualsShort.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.changeLegalEntitiesLong.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.changeLegalEntitiesShort.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.changeTotal.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.changeFizPosLong.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.changeFizPosShort.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.changeYurPosLong.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.changeYurPosShort.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.changePosTotal.toLocaleString()}</td>
                     </tr>
                     <tr>
                         <td>Количество лиц</td>
-                        <td className="text_right">{moexOpenInterest.entitiesWithOpenPositionsIndividualsLong.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.entitiesWithOpenPositionsIndividualsShort.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.entitiesWithOpenPositionsLegalEntitiesLong.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.entitiesWithOpenPositionsLegalEntitiesShort.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.entitiesWithOpenPositionsTotal.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.fizPosLongHolders.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.fizPosShortHolders.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.yurPosLongHolders.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.yurPosShortHolders.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.posHoldersTotal.toLocaleString()}</td>
                     </tr>
                     </tbody>
                 </table>

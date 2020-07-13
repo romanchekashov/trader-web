@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {getMoexOpenInterest} from "../../../common/api/rest/analysisRestApi";
-import {MoexOpenInterest} from "../../../common/data/MoexOpenInterest";
+import {MoexOpenInterest} from "../../../common/data/open-interest/MoexOpenInterest";
 import {MoexOpenInterestView} from "../../analysis/analysis/MoexOpenInterestView";
 
 export interface AnalysisState {
