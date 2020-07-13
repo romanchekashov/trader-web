@@ -34,11 +34,16 @@ export const MoexOpenInterestView: React.FC<Props> = ({moexOpenInterest}) => {
                     </tr>
                     <tr>
                         <td>Изменение</td>
-                        <td className="text_right">{moexOpenInterest.changeFizPosLong.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.changeFizPosShort.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.changeYurPosLong.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.changeYurPosShort.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.changePosTotal.toLocaleString()}</td>
+                        <td className="text_right">{moexOpenInterest.changeFizPosLong
+                            ? moexOpenInterest.changeFizPosLong.toLocaleString() : null}</td>
+                        <td className="text_right">{moexOpenInterest.changeFizPosShort
+                            ? moexOpenInterest.changeFizPosShort.toLocaleString() : null}</td>
+                        <td className="text_right">{moexOpenInterest.changeYurPosLong
+                            ? moexOpenInterest.changeYurPosLong.toLocaleString() : null}</td>
+                        <td className="text_right">{moexOpenInterest.changeYurPosShort
+                            ? moexOpenInterest.changeYurPosShort.toLocaleString() : null}</td>
+                        <td className="text_right">{moexOpenInterest.changePosTotal
+                            ? moexOpenInterest.changePosTotal.toLocaleString() : null}</td>
                     </tr>
                     <tr>
                         <td>Количество лиц</td>

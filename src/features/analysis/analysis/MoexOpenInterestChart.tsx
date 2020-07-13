@@ -8,12 +8,13 @@ import moment = require("moment");
 type Props = {
     moexOpenInterests: MoexOpenInterest[]
     dateTimeFormat: string
+    title: string
     width: number
     height: number
 };
 
 export const MoexOpenInterestChart: React.FC<Props> = ({moexOpenInterests, dateTimeFormat,
-                                                           width, height}) => {
+                                                           title, width, height}) => {
 
     if (!moexOpenInterests || moexOpenInterests.length == 0) return null
 
@@ -22,7 +23,7 @@ export const MoexOpenInterestChart: React.FC<Props> = ({moexOpenInterests, dateT
     const options = {
         title: {
             display: true,
-            text: 'Real-time OI for last date',
+            text: title,
             fontSize: 16
         },
         legend: {
@@ -39,7 +40,7 @@ export const MoexOpenInterestChart: React.FC<Props> = ({moexOpenInterests, dateT
                 {
                     label: ClientGroup.YUR,
                     data: moexOpenInterests
-                        .map(value => value.yurPosLong + value.yurPosShort),
+                        .map(value => value.yurPosLong - value.yurPosShort),
                     fill: false,
                     backgroundColor: yurColor,
                     borderColor: yurColor
@@ -47,7 +48,7 @@ export const MoexOpenInterestChart: React.FC<Props> = ({moexOpenInterests, dateT
                 {
                     label: ClientGroup.FIZ,
                     data: moexOpenInterests
-                        .map(value => value.fizPosLong + value.fizPosShort),
+                        .map(value => value.fizPosLong - value.fizPosShort),
                     fill: false,
                     backgroundColor: fizColor,
                     borderColor: fizColor

@@ -4,7 +4,7 @@ import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Interval} from "../../../common/data/Interval";
 import {
     getMoexApiOpenInterestList,
-    getMoexOpenInterest,
+    getMoexOpenInterests,
     getTradePremise
 } from "../../../common/api/rest/analysisRestApi";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
@@ -56,7 +56,6 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     const [premise, setPremise] = useState(null);
     const [orders, setOrders] = useState(null);
     const [activeTrade, setActiveTrade] = useState(null);
-    const [moexOpenInterest, setMoexOpenInterest] = useState<MoexOpenInterest>(null);
 
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [chartNumber, setChartNumber] = useState(1);
@@ -73,6 +72,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     const [marketStateFilterDto, setMarketStateFilterDto] = useState(null);
     const [alert, setAlert] = useState(null);
     const [trades, setTrades] = useState<Trade[]>([]);
+    const [moexOpenInterestsForDays, setMoexOpenInterestsForDays] = useState<MoexOpenInterest[]>([]);
     const [moexOpenInterests, setMoexOpenInterests] = useState<MoexOpenInterest[]>([]);
 
     const updateSize = () => {
@@ -111,8 +111,8 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
 
             fetchPremise(timeFrameTrading);
 
-            getMoexOpenInterest(future.classCode, future.secCode)
-                .then(setMoexOpenInterest);
+            getMoexOpenInterests(future.classCode, future.secCode, moment().subtract(15, 'days').format("YYYY-MM-DD"))
+                .then(setMoexOpenInterestsForDays);
             getMoexApiOpenInterestList(future.classCode, future.secCode)
                 .then(setMoexOpenInterests);
 
@@ -351,12 +351,20 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                 <TabPanel header="Open Interest">
                     <div className="p-grid analysis-head">
                         <div className="p-col-6">
-                            <MoexOpenInterestView moexOpenInterest={moexOpenInterest}/>
+                            <MoexOpenInterestView moexOpenInterest={moexOpenInterestsForDays.length > 0
+                                ? moexOpenInterestsForDays[moexOpenInterestsForDays.length - 1] : null}/>
                         </div>
                         <div className="p-col-6">
                             <MoexOpenInterestChart moexOpenInterests={moexOpenInterests}
+                                                   title={"Real-time OI for last date"}
                                                    dateTimeFormat={"HH:mm/DD MMM YY"}
                                                    width={500} height={400}/>
+                        </div>
+                        <div className="p-col-12">
+                            <MoexOpenInterestChart moexOpenInterests={moexOpenInterestsForDays}
+                                                   title={"OI history"}
+                                                   dateTimeFormat={"DD MMM YY"}
+                                                   width={800} height={400}/>
                         </div>
                     </div>
                     <div className="p-grid">

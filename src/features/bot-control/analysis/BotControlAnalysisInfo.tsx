@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {getMoexOpenInterest} from "../../../common/api/rest/analysisRestApi";
+import {getMoexOpenInterests} from "../../../common/api/rest/analysisRestApi";
 import {MoexOpenInterest} from "../../../common/data/open-interest/MoexOpenInterest";
 import {MoexOpenInterestView} from "../../analysis/analysis/MoexOpenInterestView";
 
@@ -17,8 +17,8 @@ export const BotControlAnalysisInfo: React.FC<Props> = ({security}) => {
 
     useEffect(() => {
         if (security) {
-            getMoexOpenInterest(security.classCode, security.secCode)
-                .then(setMoexOpenInterest);
+            getMoexOpenInterests(security.classCode, security.secCode)
+                .then(value => setMoexOpenInterest(value.length > 0 ? value[0] : null));
         }
 
         // Specify how to clean up after this effect:
