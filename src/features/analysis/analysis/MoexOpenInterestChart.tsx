@@ -18,8 +18,11 @@ export const MoexOpenInterestChart: React.FC<Props> = ({moexOpenInterests, dateT
 
     if (!moexOpenInterests || moexOpenInterests.length == 0) return null
 
-    const yurColor = '#4caf50'
-    const fizColor = '#2196f3'
+    const fizLongColor = '#4caf50'
+    const fizShortColor = "#f44336"
+    const yurLongColor = "#1a237e"
+    const yurShortColor = "#870000"
+
     const options = {
         title: {
             display: true,
@@ -38,20 +41,32 @@ export const MoexOpenInterestChart: React.FC<Props> = ({moexOpenInterests, dateT
                 .map(value => moment(value.dateTime).format(dateTimeFormat)),
             datasets: [
                 {
-                    label: ClientGroup.YUR,
-                    data: moexOpenInterests
-                        .map(value => value.yurPosLong - value.yurPosShort),
+                    label: ClientGroup.FIZ + " LONG",
+                    data: moexOpenInterests.map(value => value.fizPosLong),
                     fill: false,
-                    backgroundColor: yurColor,
-                    borderColor: yurColor
+                    backgroundColor: fizLongColor,
+                    borderColor: fizLongColor
                 },
                 {
-                    label: ClientGroup.FIZ,
-                    data: moexOpenInterests
-                        .map(value => value.fizPosLong - value.fizPosShort),
+                    label: ClientGroup.FIZ + " SHORT",
+                    data: moexOpenInterests.map(value => value.fizPosShort),
                     fill: false,
-                    backgroundColor: fizColor,
-                    borderColor: fizColor
+                    backgroundColor: fizShortColor,
+                    borderColor: fizShortColor
+                },
+                {
+                    label: ClientGroup.YUR + " LONG",
+                    data: moexOpenInterests.map(value => value.yurPosLong),
+                    fill: false,
+                    backgroundColor: yurLongColor,
+                    borderColor: yurLongColor
+                },
+                {
+                    label: ClientGroup.YUR + " SHORT",
+                    data: moexOpenInterests.map(value => value.yurPosShort),
+                    fill: false,
+                    backgroundColor: yurShortColor,
+                    borderColor: yurShortColor
                 }
             ]
         })

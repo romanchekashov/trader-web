@@ -111,13 +111,21 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
 
             fetchPremise(timeFrameTrading);
 
-            getMoexOpenInterests(future.classCode, future.secCode, moment().subtract(15, 'days').format("YYYY-MM-DD"))
+            getMoexOpenInterests(future.classCode, future.secCode, moment().subtract(100, 'days').format("YYYY-MM-DD"))
                 .then(setMoexOpenInterestsForDays);
+
             getMoexApiOpenInterestList(future.classCode, future.secCode)
                 .then(setMoexOpenInterests);
 
             getTrades(40).then(setTrades);
         }
+
+        const intervalToFetchOpenInterest = setInterval(() => {
+            if (future) {
+                getMoexApiOpenInterestList(future.classCode, future.secCode)
+                    .then(setMoexOpenInterests)
+            }
+        }, 120000)
 
         const wsStatusSub = WebsocketService.getInstance()
             .connectionStatus()
@@ -172,6 +180,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
             tradePremiseSubscription.unsubscribe();
             ordersSetupSubscription.unsubscribe();
             activeTradeSubscription.unsubscribe();
+            clearInterval(intervalToFetchOpenInterest)
         };
     }, [future]);
 
@@ -364,7 +373,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                             <MoexOpenInterestChart moexOpenInterests={moexOpenInterestsForDays}
                                                    title={"OI history"}
                                                    dateTimeFormat={"DD MMM YY"}
-                                                   width={800} height={400}/>
+                                                   width={1000} height={600}/>
                         </div>
                     </div>
                     <div className="p-grid">
