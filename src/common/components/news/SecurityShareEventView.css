@@ -1,0 +1,22 @@
+.menu-item {
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    padding: 5px;
+}
+
+.menu-item-selected {
+    background-color: #0277bd;
+    color: #fff;
+}
+
+.menu-item-even {
+    background-color: #f8f8f0;
+}
+
+.menu-item-title {
+    font-weight: bold;
+}
+
+.menu-item-pub {
+    font-size: 12px;
+}

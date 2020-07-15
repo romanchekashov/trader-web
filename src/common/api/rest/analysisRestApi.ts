@@ -13,10 +13,11 @@ import {SwingStateDto} from "../../components/swing-state/data/SwingStateDto";
 import {MoexOpenInterest} from "../../data/open-interest/MoexOpenInterest";
 import {
     adjustMarketState,
-    adjustMoexOpenInterestList,
+    adjustMoexOpenInterestList, adjustSecurityShareEvents,
     adjustSwingStateDto,
     adjustTradePremise
 } from "../../utils/DataUtils";
+import {SecurityShareEvent} from "../../data/news/SecurityShareEvent";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -119,5 +120,12 @@ export function getMoexApiOpenInterestList(classCode: ClassCode, secCode: string
     return fetch(`${baseUrl}moex-api-open-interest-list?classCode=${classCode}&secCode=${secCode}`)
         .then(response => handleResponse(response)
             .then(adjustMoexOpenInterestList))
+        .catch(handleError);
+}
+
+export function getSecurityShareEvents(secCode: string): Promise<SecurityShareEvent[]> {
+    return fetch(`${baseUrl}security-share-events?secCode=${secCode}`)
+        .then(response => handleResponse(response)
+            .then(adjustSecurityShareEvents))
         .catch(handleError);
 }

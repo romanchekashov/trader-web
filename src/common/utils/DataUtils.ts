@@ -9,6 +9,7 @@ import {SecurityShare} from "../data/SecurityShare";
 import {round100} from "./utils";
 import {MoexApiOpenInterest} from "../data/open-interest/MoexApiOpenInterest";
 import {MoexOpenInterest} from "../data/open-interest/MoexOpenInterest";
+import {SecurityShareEvent} from "../data/news/SecurityShareEvent";
 
 export const adjustTradingStrategyResultArray = (results: TradingStrategyResult[]): TradingStrategyResult[] => {
     for (const result of results) {
@@ -119,4 +120,15 @@ export const adjustMoexOpenInterest = (item: MoexOpenInterest): any => {
     }
 
     return item
+}
+
+export const adjustSecurityShareEvents = (list: SecurityShareEvent[]): any => {
+    if (list && list.length > 0) {
+        for (const item of list) {
+            item.date = new Date(item.date)
+            item.published = new Date(item.published)
+        }
+    }
+
+    return list
 }
