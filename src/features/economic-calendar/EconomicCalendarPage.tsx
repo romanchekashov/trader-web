@@ -4,7 +4,7 @@ import {EconomicCalendar} from "../../common/components/economic-calendar/Econom
 export const EconomicCalendarPage = () => {
 
     return (
-        <div className="p-grid">
+        <div className="p-grid" style={{margin: 0}}>
             <div className="p-col-12">
                 <EconomicCalendar/>
             </div>

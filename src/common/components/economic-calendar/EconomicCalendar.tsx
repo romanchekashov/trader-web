@@ -6,10 +6,9 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-// import '@fullcalendar/common/main.css';
-// import '@fullcalendar/daygrid/main.css';
-// import '@fullcalendar/timegrid/main.css';
-import moment = require("moment");
+import listPlugin from '@fullcalendar/list'
+import ruLocale from '@fullcalendar/core/locales/ru'
+import "./EconomicCalendar.css"
 
 type Props = {
     code?: string
@@ -25,18 +24,6 @@ class FullCalendarEvent<T> {
 export const EconomicCalendar: React.FC<Props> = ({code, onEventSelected}) => {
     const [events, setEvents] = useState<FullCalendarEvent<EconomicCalendarEvent>[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<EconomicCalendarEvent>(null);
-
-    const fullCalendarOptions = {
-        plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-        defaultView: 'timeGridDay',
-        defaultDate: moment().format("YYYY-MM-DD"),
-        header: {
-            left: 'prev,next',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        editable: true
-    }
 
     useEffect(() => {
         getEconomicCalendarEvents().then(events => {
@@ -54,19 +41,26 @@ export const EconomicCalendar: React.FC<Props> = ({code, onEventSelected}) => {
 
     return (
         <div className="p-grid">
-            <div className="p-col-12">
-                <FullCalendar plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            <div id="calendar" className="p-col-12">
+                <FullCalendar plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+                              views={{
+                                  listDay: { buttonText: 'list day' },
+                                  listWeek: { buttonText: 'list week' },
+                                  listMonth: { buttonText: 'list month' }
+                              }}
                               headerToolbar={{
                                   left: 'prev,next today',
                                   center: 'title',
-                                  right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                                  right: 'dayGridMonth,timeGridWeek,timeGridDay,listDay,listWeek,listMonth'
                               }}
-                              initialView='dayGridMonth'
+                              initialView='listDay'
                               editable={true}
                               selectable={true}
                               selectMirror={true}
                               dayMaxEvents={true}
                               events={events}
+                              locales={[ruLocale]}
+                              locale='ru'
                 />
             </div>
             <div className="p-col-12">
