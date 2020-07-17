@@ -15,6 +15,7 @@ import {Stack} from "../common/components/stack/Stack";
 import {BotControl} from "../common/components/bot-control/BotControl";
 import {EconomicCalendarPage} from "../features/economic-calendar/EconomicCalendarPage";
 import {TradingChartsPage} from "../features/trading-charts/TradingChartsPage";
+import {NewsPage} from "../features/news/NewsPage";
 
 export const App = () => {
     return (
@@ -25,6 +26,7 @@ export const App = () => {
             <Header/>
             <Switch>
                 <Route exact path="/" component={HomePage}/>
+                <Route path="/news" component={NewsPage}/>
                 <Route path="/analysis" component={TradeStrategyAnalysisPage}/>
                 <Route path="/trading-charts" component={TradingChartsPage}/>
                 <Route path="/bot-control" component={TradeStrategyBotControlPage}/>
