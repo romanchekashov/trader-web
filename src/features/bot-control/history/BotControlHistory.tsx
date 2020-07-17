@@ -1,8 +1,4 @@
 import * as React from "react";
-import 'primereact/resources/primereact.css';
-import 'primereact/resources/themes/nova-light/theme.css';
-import 'primeicons/primeicons.css';
-import 'primeflex/primeflex.css';
 import {SubscriptionLike} from "rxjs";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {Interval} from "../../../common/data/Interval";

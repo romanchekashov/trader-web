@@ -11,6 +11,7 @@ import {MoexApiOpenInterest} from "../data/open-interest/MoexApiOpenInterest";
 import {MoexOpenInterest} from "../data/open-interest/MoexOpenInterest";
 import {SecurityShareEvent} from "../data/news/SecurityShareEvent";
 import {NewsItem} from "../data/news/NewsItem";
+import {EconomicCalendarEvent} from "../data/news/EconomicCalendarEvent";
 
 export const adjustTradingStrategyResultArray = (results: TradingStrategyResult[]): TradingStrategyResult[] => {
     for (const result of results) {
@@ -135,6 +136,14 @@ export const adjustSecurityShareEvents = (list: SecurityShareEvent[]): any => {
 }
 
 export const adjustNewsItems = (list: NewsItem[]): any => {
+    if (list && list.length > 0) {
+        for (const item of list) item.dateTime = new Date(item.dateTime)
+    }
+
+    return list
+}
+
+export const adjustEconomicCalendarEvents = (list: EconomicCalendarEvent[]): any => {
     if (list && list.length > 0) {
         for (const item of list) item.dateTime = new Date(item.dateTime)
     }
