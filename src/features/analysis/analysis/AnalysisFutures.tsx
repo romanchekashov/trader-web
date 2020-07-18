@@ -30,6 +30,7 @@ import {getTrades} from "../../../common/api/rest/quikRestApi";
 import {TabPanel, TabView} from "primereact/tabview";
 import {MoexOpenInterestChart} from "./MoexOpenInterestChart";
 import moment = require("moment");
+import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
 
 type Props = {
     future: any
@@ -83,7 +84,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
 
     useEffect(() => {
         if (future) {
-            // console.log("AnalysisFutures: ", future);
+            console.log("AnalysisFutures: ", future);
             informServerAboutRequiredData();
 
             // if (!trendLowTF && !trendLowTFLoading) {
@@ -244,14 +245,12 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     };
 
     const onTradingIntervalChanged = (interval: Interval) => {
-        console.log(interval);
         setTimeFrameTrading(interval);
         fetchPremise(interval);
         updateMarketStateFilterDto(interval);
     };
 
     const onStartChanged = (start: Date) => {
-        console.log(start);
         setStart(start);
     };
 
@@ -382,6 +381,9 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                 </TabPanel>
                 <TabPanel header="News">
 
+                </TabPanel>
+                <TabPanel header="Calendar">
+                    <EconomicCalendar secId={future.id}/>
                 </TabPanel>
             </TabView>
         )

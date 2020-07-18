@@ -1,7 +1,9 @@
 import {ClassCode} from "./ClassCode";
 
 export class Security {
+    public id: number;
     public classCode: ClassCode;
+    public code: string;
     public secCode: string;
     public name: string;
     public shortName: string;

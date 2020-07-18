@@ -13,15 +13,15 @@ export function getNews(): Promise<NewsItem[]> {
         .catch(handleError);
 }
 
-export function getEconomicCalendarEvents(calendarType?: CalendarType, code?: string): Promise<EconomicCalendarEvent[]> {
+export function getEconomicCalendarEvents(calendarType?: CalendarType, secId?: number): Promise<EconomicCalendarEvent[]> {
     let url = `${baseUrl}economic-calendar`
 
-    if (calendarType && code) {
-        url += `?calendarType=${calendarType}&code=${code}`
+    if (calendarType && secId) {
+        url += `?calendarType=${calendarType}&secId=${secId}`
     } else if (calendarType) {
         url += `?calendarType=${calendarType}`
-    } else if (code) {
-        url += `?code=${code}`
+    } else if (secId) {
+        url += `?secId=${secId}`
     }
 
     return fetch(url)

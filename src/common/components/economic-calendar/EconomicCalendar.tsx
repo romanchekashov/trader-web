@@ -12,7 +12,7 @@ import "./EconomicCalendar.css"
 import moment = require("moment");
 
 type Props = {
-    code?: string
+    secId?: number
     onEventSelected?: (event: EconomicCalendarEvent) => void
 }
 
@@ -22,12 +22,12 @@ class FullCalendarEvent<T> {
     data: T
 }
 
-export const EconomicCalendar: React.FC<Props> = ({code, onEventSelected}) => {
+export const EconomicCalendar: React.FC<Props> = ({secId, onEventSelected}) => {
     const [events, setEvents] = useState<FullCalendarEvent<EconomicCalendarEvent>[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<EconomicCalendarEvent>(null);
 
     useEffect(() => {
-        getEconomicCalendarEvents().then(events => {
+        getEconomicCalendarEvents(null, secId).then(events => {
             setEvents(events.map(value => ({
                 title: value.title,
                 start: value.dateTime,
@@ -38,7 +38,7 @@ export const EconomicCalendar: React.FC<Props> = ({code, onEventSelected}) => {
         // Specify how to clean up after this effect:
         return function cleanup() {
         };
-    }, [code]);
+    }, [secId]);
 
     const renderEventContent = (eventContent: any) => {
         const calEvent: EconomicCalendarEvent = eventContent.event.extendedProps.data
@@ -51,6 +51,8 @@ export const EconomicCalendar: React.FC<Props> = ({code, onEventSelected}) => {
 
         switch (eventContent.view.type) {
             case 'listDay':
+            case 'listWeek':
+            case 'listMonth':
                 return renderEventContentForListDay(calEvent)
         }
 
@@ -113,9 +115,9 @@ export const EconomicCalendar: React.FC<Props> = ({code, onEventSelected}) => {
             <div id="calendar" className="p-col-12">
                 <FullCalendar plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
                               views={{
-                                  listDay: {buttonText: 'list day'},
-                                  listWeek: {buttonText: 'list week'},
-                                  listMonth: {buttonText: 'list month'}
+                                  listDay: {buttonText: 'Дневная повестка'},
+                                  listWeek: {buttonText: 'Недельная повестка'},
+                                  listMonth: {buttonText: 'Месячная повестка'}
                               }}
                               headerToolbar={{
                                   left: 'prev,next today',
@@ -124,7 +126,7 @@ export const EconomicCalendar: React.FC<Props> = ({code, onEventSelected}) => {
                               }}
                               locales={[ruLocale]}
                               locale='ru'
-                              initialView='listDay'
+                              initialView='listWeek'
                               editable={true}
                               selectable={true}
                               selectMirror={true}
