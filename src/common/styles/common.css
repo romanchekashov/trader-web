@@ -1,0 +1,94 @@
+.ceFlags {
+    width: 16px;
+    height: 15px;
+    background-image: url(../assets/images/ce_flags_v6.png);
+    background-repeat: no-repeat;
+    padding: 0;
+    display: inline-block;
+}
+
+.New_Zealand, .nzl, .nzd {
+    background-position: -17px -561px;
+}
+.Singapore, .sgd {
+    background-position: -17px -1207px;
+}
+.Italy {
+    background-position: 0 -1768px;
+}
+.Spain {
+    background-position: -17px -1343px;
+}
+.European_Union, .eur, .Europe, .Euro_Zone {
+    background-position: 0 -1224px;
+}
+.Germany {
+    background-position: 0 -1360px;
+}
+.UK, .United_Kingdom, .gbr, .gbp {
+    background-position: -17px -1836px;
+}
+.India, .inr {
+    background-position: 0 -1649px;
+}
+.USA, .USD, .usa, .usd, .United_States {
+    background-position: -17px -1751px;
+}
+.Canada, .can, .cad {
+    background-position: 0 -680px;
+}
+.Russian_Federation, .rub, .Russia {
+    background-position: -17px -1003px;
+}
+.Mexico, .mxn {
+    background-position: -17px -289px;
+}
+.Switzerland, .che, .chf {
+    background-position: -17px -1479px;
+}
+.Australia, .aus, .aud {
+    background-position: 0 -255px;
+}
+.Brazil, .brl {
+    background-position: 0 -527px;
+}
+.Japan, .jpn, .jpy {
+    background-position: 0 -1802px;
+}
+.France {
+    background-position: 0 -1292px;
+}
+.China, .cny {
+    background-position: 0 -782px;
+}
+.South_Korea, .krw {
+    background-position: -17px -1326px;
+}
+.Netherlands {
+    background-position: -17px -527px;
+}
+.Indonesia, .idr {
+    background-position: 0 -1666px;
+}
+.Saudi_Arabia {
+    background-position: -17px -1105px;
+}
+.Hong_Kong, .hkd {
+    background-position: 0 -1598px;
+}
+
+.newSiteIconsSprite {
+    background-image: url(../assets/images/newSiteIconsSprite_v30i.png);
+}
+.grayEmptyBullishIcon {
+    background-position: -5px -1059px;
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+}
+.grayFullBullishIcon {
+    background-position: -5px -1077px;
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+}

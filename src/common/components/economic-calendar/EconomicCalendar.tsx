@@ -9,6 +9,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list'
 import ruLocale from '@fullcalendar/core/locales/ru'
 import "./EconomicCalendar.css"
+import moment = require("moment");
 
 type Props = {
     code?: string
@@ -39,28 +40,97 @@ export const EconomicCalendar: React.FC<Props> = ({code, onEventSelected}) => {
         };
     }, [code]);
 
+    const renderEventContent = (eventContent: any) => {
+        const calEvent: EconomicCalendarEvent = eventContent.event.extendedProps.data
+
+        if (moment().isAfter(calEvent.dateTime)) {
+            eventContent.backgroundColor = "#aaa"
+        } else if (moment().diff(moment(calEvent.dateTime), 'minutes') < 30) {
+            eventContent.backgroundColor = "#f00"
+        }
+
+        switch (eventContent.view.type) {
+            case 'listDay':
+                return renderEventContentForListDay(calEvent)
+        }
+
+        return (
+            <>
+                <b>{eventContent.timeText}</b>
+                <i>{eventContent.event.title}</i>
+            </>
+        )
+    }
+
+    const renderEventContentForListDay = (calEvent: EconomicCalendarEvent) => {
+        const className = "ceFlags " + calEvent.country.replace(" ", "_")
+
+        return (
+            <div className="listDayEvent">
+                <div><span className={className} title={calEvent.country}></span> {calEvent.currency}</div>
+                {
+                    calEvent.expectedVolatility === "High" ?
+                        <div>
+                            <i className="newSiteIconsSprite grayFullBullishIcon"></i>
+                            <i className="newSiteIconsSprite grayFullBullishIcon"></i>
+                            <i className="newSiteIconsSprite grayFullBullishIcon"></i>
+                        </div>
+                        : calEvent.expectedVolatility === "Low" ?
+                        <div>
+                            <i className="newSiteIconsSprite grayFullBullishIcon"></i>
+                            <i className="newSiteIconsSprite grayEmptyBullishIcon"></i>
+                            <i className="newSiteIconsSprite grayEmptyBullishIcon"></i>
+                        </div>
+                        :
+                        <div>
+                            <i className="newSiteIconsSprite grayFullBullishIcon"></i>
+                            <i className="newSiteIconsSprite grayFullBullishIcon"></i>
+                            <i className="newSiteIconsSprite grayEmptyBullishIcon"></i>
+                        </div>
+                }
+                <div>
+                    {calEvent.title}
+                    {
+                        calEvent.eventType ?
+                            <span className="eventType">{calEvent.eventType}</span> : null
+                    }
+                </div>
+                <div>Actual: <span style={{fontWeight: "bold"}}>{calEvent.valueActual}</span></div>
+                <div>Forecast: <span style={{fontWeight: "bold"}}>{calEvent.valueForecast}</span></div>
+                <div>
+                    Previous: <span style={{fontWeight: "bold"}}>{calEvent.valuePrevious}</span>
+                    {
+                        calEvent.valuePreviousRevised ?
+                            <span className="valuePreviousRevised" title={calEvent.valuePreviousRevised}></span> : null
+                    }
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="p-grid">
             <div id="calendar" className="p-col-12">
                 <FullCalendar plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
                               views={{
-                                  listDay: { buttonText: 'list day' },
-                                  listWeek: { buttonText: 'list week' },
-                                  listMonth: { buttonText: 'list month' }
+                                  listDay: {buttonText: 'list day'},
+                                  listWeek: {buttonText: 'list week'},
+                                  listMonth: {buttonText: 'list month'}
                               }}
                               headerToolbar={{
                                   left: 'prev,next today',
                                   center: 'title',
                                   right: 'dayGridMonth,timeGridWeek,timeGridDay,listDay,listWeek,listMonth'
                               }}
+                              locales={[ruLocale]}
+                              locale='ru'
                               initialView='listDay'
                               editable={true}
                               selectable={true}
                               selectMirror={true}
                               dayMaxEvents={true}
                               events={events}
-                              locales={[ruLocale]}
-                              locale='ru'
+                              eventContent={renderEventContent}
                 />
             </div>
             <div className="p-col-12">
