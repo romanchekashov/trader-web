@@ -22,7 +22,7 @@ export const App = () => {
         <div className="container-fluid">
             <ControlPanel/>
             <Stack/>
-            <BotControl/>
+            {/*<BotControl/>*/}
             <Header/>
             <Switch>
                 <Route exact path="/" component={HomePage}/>

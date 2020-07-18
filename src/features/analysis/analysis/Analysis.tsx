@@ -22,7 +22,9 @@ import {adjustTradePremise} from "../../../common/utils/DataUtils";
 import {TabPanel, TabView} from "primereact/tabview";
 import {SecurityShareEventView} from "../../../common/components/news/SecurityShareEventView";
 import {ClassCode} from "../../../common/data/ClassCode";
+import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
 import moment = require("moment");
+import {News} from "../../../common/components/news/News";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -335,7 +337,14 @@ const Analysis: React.FC<Props> = ({security}) => {
                     }
                 </TabPanel>
                 <TabPanel header="News">
-
+                    <News secId={security.id}/>
+                </TabPanel>
+                <TabPanel header="Calendar">
+                    {
+                        ClassCode.CETS === security.classCode ?
+                            <EconomicCalendar secId={security.id}/>
+                            : null
+                    }
                 </TabPanel>
             </TabView>
         )

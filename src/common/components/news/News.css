@@ -1,0 +1,29 @@
+#news {
+    width: -webkit-calc(100% - 30px);
+    margin-top: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.news-item {
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    padding: 5px;
+}
+
+.news-item-selected {
+    background-color: #0277bd;
+    color: #fff;
+}
+
+.news-item-even {
+    background-color: #f8f8f0;
+}
+
+.news-item-title {
+    font-weight: bold;
+}
+
+.news-item-pub {
+    font-size: 12px;
+}

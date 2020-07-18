@@ -31,6 +31,7 @@ import {TabPanel, TabView} from "primereact/tabview";
 import {MoexOpenInterestChart} from "./MoexOpenInterestChart";
 import moment = require("moment");
 import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
+import {News} from "../../../common/components/news/News";
 
 type Props = {
     future: any
@@ -380,7 +381,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                     </div>
                 </TabPanel>
                 <TabPanel header="News">
-
+                    <News secId={future.id}/>
                 </TabPanel>
                 <TabPanel header="Calendar">
                     <EconomicCalendar secId={future.id}/>
