@@ -63,7 +63,7 @@ export const SecurityShareEventView: React.FC<Props> = ({secCode}) => {
                     })
                 }
             </div>
-            <div className="p-col-8" style={{padding: 0, paddingLeft: 5}}>
+            <div className="p-col-8" style={{padding: 0, paddingLeft: 5, height: 800, overflowY: "scroll"}}>
                 {
                     selectedEvent ? formatEvent(selectedEvent) : null
                 }
