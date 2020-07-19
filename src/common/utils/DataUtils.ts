@@ -137,7 +137,7 @@ export const adjustSecurityShareEvents = (list: SecurityShareEvent[]): any => {
 
 export const adjustNewsItems = (list: NewsItem[]): any => {
     if (list && list.length > 0) {
-        for (const item of list) item.dateTime = new Date(item.dateTime)
+        for (const item of list) item.timestamp = new Date(item.timestamp)
     }
 
     return list

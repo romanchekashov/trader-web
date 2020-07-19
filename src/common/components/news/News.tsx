@@ -45,7 +45,7 @@ export const News: React.FC<Props> = ({secId, onItemSelected}) => {
     }
 
     const formatNews = (item: NewsItem) => {
-        const published = moment(item.dateTime).format("DD-MM-YYYY HH:mm");
+        const published = moment(item.timestamp).format("DD-MM-YYYY HH:mm");
 
         return (
             <>
@@ -72,9 +72,9 @@ export const News: React.FC<Props> = ({secId, onItemSelected}) => {
             <div className="p-col-6" style={{height: "100%", overflowY: "scroll"}}>
                 {
                     items.map((shareEvent, index) => {
-                        const published = moment(shareEvent.dateTime).format("DD-MM-YYYY HH:mm");
+                        const published = moment(shareEvent.timestamp).format("DD-MM-YYYY HH:mm");
                         const isSelected = selectedItem && shareEvent.title === selectedItem.title
-                            && shareEvent.dateTime.getTime() === selectedItem.dateTime.getTime()
+                            && shareEvent.timestamp.getTime() === selectedItem.timestamp.getTime()
                             && shareEvent.newsProvider === selectedItem.newsProvider
 
                         let className = "news-item"

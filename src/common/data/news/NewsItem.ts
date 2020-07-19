@@ -6,6 +6,6 @@ export class NewsItem {
     public title: string;
     public brief: string;
     public text: string;
-    public dateTime: Date;
+    public timestamp: Date;
     public html: boolean;
 }
