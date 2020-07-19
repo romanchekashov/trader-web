@@ -7,11 +7,11 @@ import {Order} from "../data/Order";
 import {StopOrder} from "../data/StopOrder";
 import {SecurityShare} from "../data/SecurityShare";
 import {round100} from "./utils";
-import {MoexApiOpenInterest} from "../data/open-interest/MoexApiOpenInterest";
 import {MoexOpenInterest} from "../data/open-interest/MoexOpenInterest";
 import {SecurityShareEvent} from "../data/news/SecurityShareEvent";
 import {NewsItem} from "../data/news/NewsItem";
 import {EconomicCalendarEvent} from "../data/news/EconomicCalendarEvent";
+import {Security} from "../data/Security";
 
 export const adjustTradingStrategyResultArray = (results: TradingStrategyResult[]): TradingStrategyResult[] => {
     for (const result of results) {
@@ -146,6 +146,14 @@ export const adjustNewsItems = (list: NewsItem[]): any => {
 export const adjustEconomicCalendarEvents = (list: EconomicCalendarEvent[]): any => {
     if (list && list.length > 0) {
         for (const item of list) item.dateTime = new Date(item.dateTime)
+    }
+
+    return list
+}
+
+export const adjustSecurities = (list: Security[]): any => {
+    if (list && list.length > 0) {
+        for (const item of list) item.lastTradeTime = new Date(item.lastTradeTime)
     }
 
     return list

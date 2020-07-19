@@ -29,15 +29,16 @@ import {Trade} from "../../../common/data/Trade";
 import {getTrades} from "../../../common/api/rest/quikRestApi";
 import {TabPanel, TabView} from "primereact/tabview";
 import {MoexOpenInterestChart} from "./MoexOpenInterestChart";
-import moment = require("moment");
 import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
 import {News} from "../../../common/components/news/News";
+import {SecurityAnalysis} from "../../../common/data/SecurityAnalysis";
+import moment = require("moment");
 
 type Props = {
-    future: any
+    security: SecurityAnalysis
 };
 
-const AnalysisFutures: React.FC<Props> = ({future}) => {
+const AnalysisFutures: React.FC<Props> = ({security}) => {
     const timeFrameTradingIntervals = {
         "M1": [Interval.M1],
         "M3": [Interval.M3, Interval.M1],
@@ -84,8 +85,8 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     };
 
     useEffect(() => {
-        if (future) {
-            console.log("AnalysisFutures: ", future);
+        if (security) {
+            console.log("AnalysisFutures: ", security);
             informServerAboutRequiredData();
 
             // if (!trendLowTF && !trendLowTFLoading) {
@@ -100,10 +101,10 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
             //         });
             // }
             //
-            if (!filterDto || filterDto.secCode !== future.secCode) {
+            if (!filterDto || filterDto.secCode !== security.secCode) {
                 setFilterDto({
-                    classCode: future.classCode,
-                    secCode: future.secCode,
+                    classCode: security.classCode,
+                    secCode: security.secCode,
                     fetchByWS: true,
                     history: false,
                     all: false
@@ -113,18 +114,35 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
 
             fetchPremise(timeFrameTrading);
 
-            getMoexOpenInterests(future.classCode, future.secCode, moment().subtract(100, 'days').format("YYYY-MM-DD"))
+            getMoexOpenInterests(security.classCode, security.secCode, moment().subtract(100, 'days').format("YYYY-MM-DD"))
                 .then(setMoexOpenInterestsForDays);
 
-            getMoexApiOpenInterestList(future.classCode, future.secCode)
+            getMoexApiOpenInterestList(security.classCode, security.secCode)
                 .then(setMoexOpenInterests);
 
             getTrades(40).then(setTrades);
+
+            if (!securityLastInfo) {
+                setSecurityLastInfo({
+                    classCode: security.classCode,
+                    secCode: security.secCode,
+                    valueToday: null,
+                    priceLastTrade: security.lastTradePrice,
+                    timeLastTrade: security.lastTradeTime,
+                    quantityLastTrade: security.lastTradeQuantity,
+                    valueLastTrade: null,
+                    numTrades: security.numberOfTradesToday,
+                    futureTotalDemand: null,
+                    futureTotalSupply: null,
+                    futureSellDepoPerContract: null,
+                    futureBuyDepoPerContract: null
+                });
+            }
         }
 
         const intervalToFetchOpenInterest = setInterval(() => {
-            if (future) {
-                getMoexApiOpenInterestList(future.classCode, future.secCode)
+            if (security) {
+                getMoexApiOpenInterestList(security.classCode, security.secCode)
                     .then(setMoexOpenInterests)
             }
         }, 120000)
@@ -132,7 +150,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         const wsStatusSub = WebsocketService.getInstance()
             .connectionStatus()
             .subscribe(isConnected => {
-                if (isConnected && future) {
+                if (isConnected && security) {
                     informServerAboutRequiredData();
                 }
             });
@@ -140,8 +158,8 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         const lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
-                if (future) {
-                    const newSecurityLastInfo = securities.find(o => o.secCode === future.secCode);
+                if (security) {
+                    const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
                     if (newSecurityLastInfo) {
                         newSecurityLastInfo.timeLastTrade = new Date(newSecurityLastInfo.timeLastTrade);
                         setSecurityLastInfo(newSecurityLastInfo);
@@ -184,20 +202,20 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
             activeTradeSubscription.unsubscribe();
             clearInterval(intervalToFetchOpenInterest)
         };
-    }, [future]);
+    }, [security]);
 
     const updateMarketStateFilterDto = (interval: Interval) => {
         setMarketStateFilterDto({
-            classCode: future.classCode,
-            secCode: future.secCode,
+            classCode: security.classCode,
+            secCode: security.secCode,
             intervals: timeFrameTradingIntervals[interval],
             fetchByWS: true,
             // history: false,
             numberOfCandles: 100
         });
         WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
-            classCode: future.classCode,
-            secCode: future.secCode,
+            classCode: security.classCode,
+            secCode: security.secCode,
             intervals: timeFrameTradingIntervals[interval],
             fetchByWS: true,
             // history: false,
@@ -206,19 +224,19 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
     };
 
     const informServerAboutRequiredData = (): void => {
-        if (future) {
+        if (security) {
             WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
                 brokerId: 1,
                 tradingPlatform: TradingPlatform.QUIK,
-                classCode: future.classCode,
-                secCode: future.secCode,
+                classCode: security.classCode,
+                secCode: security.secCode,
                 timeFrameTrading: Interval.M5,
                 timeFrameMin: Interval.M1
             });
-            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, future.secCode);
+            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, security.secCode);
             WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
-                classCode: future.classCode,
-                secCode: future.secCode,
+                classCode: security.classCode,
+                secCode: security.secCode,
                 intervals: timeFrameTradingIntervals[timeFrameTrading],
                 fetchByWS: true,
                 // history: false,
@@ -231,8 +249,8 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         getTradePremise({
             brokerId: 1,
             tradingPlatform: TradingPlatform.QUIK,
-            classCode: future.classCode,
-            secCode: future.secCode,
+            classCode: security.classCode,
+            secCode: security.secCode,
             timeFrameTrading,
             timeFrameMin
         }).then(setPremise).catch(reason => {
@@ -255,7 +273,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
         setStart(start);
     };
 
-    if (future) {
+    if (security) {
 
         return (
             <TabView>
@@ -287,7 +305,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                                           onIntervalChanged={onTradingIntervalChanged}
                                           onStartChanged={onStartChanged}
                                           width={chart1Width}
-                                          security={future}
+                                          security={securityLastInfo}
                                           premise={premise}
                                           orders={orders}
                                           trades={trades}
@@ -305,7 +323,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                                                   onStartChanged={start => {
                                                   }}
                                                   width={chart2Width}
-                                                  security={future}
+                                                  security={securityLastInfo}
                                                   premise={premise}
                                                   trades={trades}
                                                   trend={trendLowTF}
@@ -350,7 +368,7 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                                                   }}
                                                   alert={alert}
                                                   width={chartAlertsWidth}
-                                                  security={future}
+                                                  security={securityLastInfo}
                                                   premise={premise}
                                                   showGrid={true}/> : null
                             }
@@ -381,10 +399,10 @@ const AnalysisFutures: React.FC<Props> = ({future}) => {
                     </div>
                 </TabPanel>
                 <TabPanel header="News">
-                    <News secId={future.id}/>
+                    <News secId={security.id}/>
                 </TabPanel>
                 <TabPanel header="Calendar">
-                    <EconomicCalendar secId={future.id}/>
+                    <EconomicCalendar secId={security.id}/>
                 </TabPanel>
             </TabView>
         )

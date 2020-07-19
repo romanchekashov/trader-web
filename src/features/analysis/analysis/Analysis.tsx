@@ -23,15 +23,16 @@ import {TabPanel, TabView} from "primereact/tabview";
 import {SecurityShareEventView} from "../../../common/components/news/SecurityShareEventView";
 import {ClassCode} from "../../../common/data/ClassCode";
 import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
-import moment = require("moment");
 import {News} from "../../../common/components/news/News";
+import {SecurityAnalysis} from "../../../common/data/SecurityAnalysis";
+import moment = require("moment");
 
 export interface AnalysisState {
     realDepo: boolean
 }
 
 type Props = {
-    security: any
+    security: SecurityAnalysis
 }
 
 const Analysis: React.FC<Props> = ({security}) => {
@@ -59,7 +60,7 @@ const Analysis: React.FC<Props> = ({security}) => {
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [chartNumber, setChartNumber] = useState(1);
 
-    const [securityLastInfo, setSecurityLastInfo] = useState(null);
+    const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
     const [chart1Width, setChart1Width] = useState(200);
     const [chart2Width, setChart2Width] = useState(200);
     const [chartAlertsWidth, setChartAlertsWidth] = useState(200);
@@ -106,6 +107,23 @@ const Analysis: React.FC<Props> = ({security}) => {
             updateMarketStateFilterDto(timeFrameTrading);
 
             fetchPremise(timeFrameTrading);
+
+            if (!securityLastInfo) {
+                setSecurityLastInfo({
+                    classCode: security.classCode,
+                    secCode: security.secCode,
+                    valueToday: null,
+                    priceLastTrade: security.lastTradePrice,
+                    timeLastTrade: security.lastTradeTime,
+                    quantityLastTrade: security.lastTradeQuantity,
+                    valueLastTrade: null,
+                    numTrades: security.numberOfTradesToday,
+                    futureTotalDemand: null,
+                    futureTotalSupply: null,
+                    futureSellDepoPerContract: null,
+                    futureBuyDepoPerContract: null
+                });
+            }
         }
 
         const wsStatusSub = WebsocketService.getInstance()
@@ -263,7 +281,7 @@ const Analysis: React.FC<Props> = ({security}) => {
                                           onIntervalChanged={onTradingIntervalChanged}
                                           onStartChanged={onStartChanged}
                                           width={chart1Width}
-                                          security={security}
+                                          security={securityLastInfo}
                                           premise={premise}
                                           orders={orders}
                                           activeTrade={activeTrade}
@@ -279,7 +297,7 @@ const Analysis: React.FC<Props> = ({security}) => {
                                                   onStartChanged={start => {
                                                   }}
                                                   width={chart2Width}
-                                                  security={security}
+                                                  security={securityLastInfo}
                                                   premise={premise}
                                                   trend={trendLowTF}
                                                   showGrid={true}/>
@@ -322,7 +340,7 @@ const Analysis: React.FC<Props> = ({security}) => {
                                                   }}
                                                   alert={alert}
                                                   width={chartAlertsWidth}
-                                                  security={security}
+                                                  security={securityLastInfo}
                                                   premise={premise}
                                                   showGrid={true}/> : null
                             }

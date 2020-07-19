@@ -13,9 +13,6 @@ import Analysis from "./analysis/Analysis";
 import {TradePremise} from "../../common/data/strategy/TradePremise";
 import {SecurityCurrency} from "../../common/data/SecurityCurrency";
 import {SecurityFuture} from "../../common/data/SecurityFuture";
-import Shares from "./securities/Shares";
-import Currencies from "./securities/Currencies";
-import Futures from "./securities/Futures";
 import AnalysisFutures from "./analysis/AnalysisFutures";
 import "./Analysis.css";
 import {SecurityLastInfo} from "../../common/data/SecurityLastInfo";
@@ -23,6 +20,8 @@ import {WebsocketService, WSEvent} from "../../common/api/WebsocketService";
 import {SubscriptionLike} from "rxjs";
 import {getTradePremise} from "../../common/api/rest/analysisRestApi";
 import {setSelectedSecurity} from "../../common/utils/Cache";
+import {Securities} from "./securities/Securities";
+import {SecurityAnalysis} from "../../common/data/SecurityAnalysis";
 
 function mapStateToProps(state: RootState) {
     return {
@@ -45,7 +44,7 @@ function mapDispatchToProps(dispatch: AppDispatch) {
 }
 
 interface TradeStrategyAnalysisState {
-    selectedSecurity: any
+    selectedSecurity: SecurityAnalysis
     isDetailsShown: boolean
     filter: MarketBotStartDto
     securityLastInfo: SecurityLastInfo
@@ -124,22 +123,22 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
     onStart = (filter: MarketBotStartDto): void => {
         this.setState({filter, selectedSecurity: null, isDetailsShown: false});
-        if (filter) {
-            switch (filter.classCode) {
-                case ClassCode.CETS:
-                    this.props.actions.loadSecurityCurrency();
-                    break;
-                case ClassCode.TQBR:
-                    this.props.actions.loadSecurityShares();
-                    break;
-                case ClassCode.SPBFUT:
-                    this.props.actions.loadSecurityFuture();
-                    break;
-            }
-        }
+        // if (filter) {
+        //     switch (filter.classCode) {
+        //         case ClassCode.CETS:
+        //             this.props.actions.loadSecurityCurrency();
+        //             break;
+        //         case ClassCode.TQBR:
+        //             this.props.actions.loadSecurityShares();
+        //             break;
+        //         case ClassCode.SPBFUT:
+        //             this.props.actions.loadSecurityFuture();
+        //             break;
+        //     }
+        // }
     };
 
-    onSelectRow = (selectedSecurity) => {
+    onSelectRow = (selectedSecurity: SecurityAnalysis) => {
         if (selectedSecurity) {
             const {securities} = this.state;
             const securityLastInfo = securities.find(o => o.secCode === selectedSecurity.secCode);
@@ -160,39 +159,12 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                 <div key={selectedSecurity.secCode}>{selectedSecurity.secCode}</div>
             );
         }
-        const classDataTable = isDetailsShown ? 'p-col-2' : 'p-col-12';
-        const classDetails = isDetailsShown ? 'p-col-10' : 'hidden';
-
-        let dataTable = <div>Select classCode</div>;
-        if (filter) {
-            switch (filter.classCode) {
-                case ClassCode.TQBR:
-                    dataTable = (
-                        <Shares shares={shares}
-                                onSelectRow={this.onSelectRow}
-                                selectedShare={selectedSecurity}/>
-                    );
-                    break;
-                case ClassCode.CETS:
-                    dataTable = (
-                        <Currencies currencies={currencies}
-                                    onSelectRow={this.onSelectRow}
-                                    selectedCurrency={selectedSecurity}/>
-                    );
-                    break;
-                case ClassCode.SPBFUT:
-                    dataTable = (
-                        <Futures futures={futures}
-                                 onSelectRow={this.onSelectRow}
-                                 selectedFuture={selectedSecurity}/>
-                    );
-                    break;
-            }
-        }
+        const classDataTable = isDetailsShown ? 'p-col-3' : 'p-col-12';
+        const classDetails = isDetailsShown ? 'p-col-9' : 'hidden';
 
         let analysis = <div>Select security</div>;
-        if (filter) {
-            switch (filter.classCode) {
+        if (selectedSecurity) {
+            switch (selectedSecurity.classCode) {
                 case ClassCode.TQBR:
                 case ClassCode.CETS:
                     analysis = (
@@ -201,7 +173,7 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                     break;
                 case ClassCode.SPBFUT:
                     analysis = (
-                        <AnalysisFutures future={selectedSecurity}/>
+                        <AnalysisFutures security={selectedSecurity}/>
                     );
                     break;
             }
@@ -218,7 +190,7 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                             <div className="p-grid">
                                 <div className={classDataTable}>
                                     <div className="p-grid analysis-securities">
-                                        {dataTable}
+                                        <Securities onSelectRow={this.onSelectRow}/>
                                     </div>
                                 </div>
                                 <div className={classDetails}>

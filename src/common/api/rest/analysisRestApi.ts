@@ -13,11 +13,14 @@ import {SwingStateDto} from "../../components/swing-state/data/SwingStateDto";
 import {MoexOpenInterest} from "../../data/open-interest/MoexOpenInterest";
 import {
     adjustMarketState,
-    adjustMoexOpenInterestList, adjustSecurityShareEvents,
+    adjustMoexOpenInterestList,
+    adjustSecurities,
+    adjustSecurityShareEvents,
     adjustSwingStateDto,
     adjustTradePremise
 } from "../../utils/DataUtils";
 import {SecurityShareEvent} from "../../data/news/SecurityShareEvent";
+import {SecurityAnalysis} from "../../data/SecurityAnalysis";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -127,5 +130,12 @@ export function getSecurityShareEvents(secCode: string): Promise<SecurityShareEv
     return fetch(`${baseUrl}security-share-events?secCode=${secCode}`)
         .then(response => handleResponse(response)
             .then(adjustSecurityShareEvents))
+        .catch(handleError);
+}
+
+export function getSecurities(): Promise<SecurityAnalysis[]> {
+    return fetch(`${baseUrl}securities`)
+        .then(response => handleResponse(response)
+            .then(adjustSecurities))
         .catch(handleError);
 }

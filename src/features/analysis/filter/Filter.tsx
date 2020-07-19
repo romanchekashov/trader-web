@@ -121,8 +121,11 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
                 <Dropdown value={platform} options={platforms} onChange={(e) => {
                     setPlatform(e.value)
                 }} placeholder="Select a platform"/>
-                <Dropdown optionLabel="market" value={market} options={markets}
-                          onChange={(e) => onMarketChange(e.value)} placeholder="Select a market"/>
+                <Dropdown optionLabel="market"
+                          value={market}
+                          options={markets}
+                          onChange={(e) => onMarketChange(e.value)}
+                          placeholder="Select a market"/>
                 <Dropdown value={security} options={securities} onChange={(e) => {
                     setSecurity(e.value)
                 }} filter={true} filterPlaceholder="Sec. name" filterBy="label" placeholder="Select a security"/>
