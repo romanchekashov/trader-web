@@ -45,7 +45,7 @@ export const EconomicCalendar: React.FC<Props> = ({secId, onEventSelected}) => {
 
         if (moment().isAfter(calEvent.dateTime)) {
             eventContent.backgroundColor = "#aaa"
-        } else if (moment().diff(moment(calEvent.dateTime), 'minutes') < 30) {
+        } else if (moment(calEvent.dateTime).diff(moment(), 'minutes') < 30) {
             eventContent.backgroundColor = "#f00"
         }
 

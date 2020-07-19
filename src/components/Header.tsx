@@ -10,6 +10,10 @@ export const Header = () => {
                 Home
             </NavLink>
             {" / "}
+            <NavLink to="/economic-calendar" activeStyle={activeStyle}>
+                Calendar
+            </NavLink>
+            {" / "}
             <NavLink to="/news" activeStyle={activeStyle}>
                 News
             </NavLink>
@@ -28,10 +32,6 @@ export const Header = () => {
             {" / "}
             <NavLink to="/trade-journal" activeStyle={activeStyle}>
                 Journal
-            </NavLink>
-            {" / "}
-            <NavLink to="/economic-calendar" activeStyle={activeStyle}>
-                Calendar
             </NavLink>
             {" / "}
             <NavLink to="/about" activeStyle={activeStyle}>
