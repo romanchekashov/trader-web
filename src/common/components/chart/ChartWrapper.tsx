@@ -701,7 +701,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                             srLevels={this.getSRLevels()}
                             candlePatternsUp={this.getCandlePatternsUp()}
                             candlePatternsDown={this.getCandlePatternsDown()}
-                            scale={this.securityInfo ? this.securityInfo.scale : 0}
+                            securityInfo={this.securityInfo}
                             enableTrendLine={enableTrendLine}
                             onEnableTrendLine={this.onEnableTrendLine}
                             needSave={this.onNeedSave}

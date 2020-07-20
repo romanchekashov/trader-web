@@ -4,9 +4,10 @@
 
 ### react-financial-charts
 
-- Fix Trendline:
+- Fix Trendline And InteractiveYCoordinate:
 ```bash
 node_modules/react-financial-charts/lib/interactive/TrendLine.js
+node_modules/react-financial-charts/lib/interactive/InteractiveYCoordinate.js
 
 constructor(props) {
     ...
@@ -16,6 +17,7 @@ constructor(props) {
 
 ```bash
 node_modules/react-financial-charts/lib/interactive/wrapper/EachTrendLine.js
+node_modules/react-financial-charts/lib/interactive/wrapper/EachInteractiveYCoordinate.js
 
 constructor(props) {
     ...

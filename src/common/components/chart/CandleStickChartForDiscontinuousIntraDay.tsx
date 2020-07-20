@@ -17,7 +17,7 @@ import {
 import {discontinuousTimeScaleProvider} from "react-financial-charts/lib/scale";
 import {OHLCTooltip} from "react-financial-charts/lib/tooltip";
 // import { fitWidth } from "react-financial-charts/lib/helper";
-import {last, toObject} from "react-financial-charts/lib/utils";
+import {head, last, toObject} from "react-financial-charts/lib/utils";
 import {ChartDrawType} from "./data/ChartDrawType";
 import {Candle} from "../../data/Candle";
 import {ChartLevel} from "./data/ChartLevel";
@@ -26,7 +26,7 @@ import ChartZones from "./components/ChartZones";
 import {Interval} from "../../data/Interval";
 import {SRLevel} from "../../data/strategy/SRLevel";
 import {ChartLevels} from "./components/ChartLevels";
-import {DrawingObjectSelector, TrendLine} from "react-financial-charts/lib/interactive";
+import {DrawingObjectSelector, InteractiveYCoordinate, TrendLine} from "react-financial-charts/lib/interactive";
 import {ema} from "react-financial-charts/lib/indicator";
 import {
     getInteractiveNodes,
@@ -35,12 +35,16 @@ import {
     setCurrentChartInteractingId,
 } from "./utils/interactiveutils";
 import {TrendLineDto} from "../../data/TrendLineDto";
-import {StoreData} from "../../utils/utils";
+import {round, StoreData} from "../../utils/utils";
 import {ChartTrendLine} from "./data/ChartTrendLine";
 import {ChartSwingHighsLows} from "./components/ChartSwingHighsLows";
 import {TrendWrapper} from "../../data/TrendWrapper";
 import {ChartTrades} from "./components/ChartTrades";
 import {Trade} from "../../data/Trade";
+import {ChartDialog} from "./components/ChartDialog";
+import {getMorePropsForChart} from "react-financial-charts/lib/interactive/utils";
+import {Security} from "../../data/Security";
+import {Order} from "../../data/Order";
 
 const _ = require("lodash");
 
@@ -60,15 +64,21 @@ type Props = {
     candlePatternsDown?: any
     swingHighsLows?: TrendWrapper[]
     showGrid?: boolean
-    scale: number
+    securityInfo: Security
     enableTrendLine: boolean
     onEnableTrendLine: (enableTrendLine: boolean) => void
     needSave: (storeData: StoreData<TrendLineDto[]>) => void
     trends: ChartTrendLine[]
 };
 
-interface State {
-    trends_1: ChartTrendLine[]
+type State = {
+    trends_1: ChartTrendLine[],
+    enableInteractiveObject: boolean,
+    yCoordinateList_1: any[],
+    yCoordinateList_3: any[],
+    showModal: boolean,
+    alertToEdit: any,
+    originalAlertList: any[]
 }
 
 export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, State> {
@@ -85,14 +95,32 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         this.id = _.uniqueId("candle-stick-chart-");
 
         this.onKeyPress = this.onKeyPress.bind(this);
+        this.onDragComplete = this.onDragComplete.bind(this);
+        this.onDelete = this.onDelete.bind(this);
+        this.handleChoosePosition = this.handleChoosePosition.bind(this);
+
         this.onTrendLineComplete = this.onTrendLineComplete.bind(this);
         this.handleSelection = this.handleSelection.bind(this);
 
         this.saveInteractiveNodes = saveInteractiveNodes.bind(this);
         this.getInteractiveNodes = getInteractiveNodes.bind(this);
+        this.handleDoubleClickAlert = this.handleDoubleClickAlert.bind(this);
 
         this.state = {
-            trends_1: []
+            trends_1: [],
+            enableInteractiveObject: false,
+            yCoordinateList_1: [
+                {
+                    ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+                    yValue: 43,
+                    id: _.uniqueId('order_'),
+                    draggable: true
+                }
+            ],
+            yCoordinateList_3: [],
+            showModal: false,
+            alertToEdit: {},
+            originalAlertList: []
         };
         this.trendRef = React.createRef();
         this.canvasNode = React.createRef();
@@ -121,6 +149,10 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                     save: trends_1.filter(each => !each.selected).map(this.mapChartTrendToTrendLine),
                     delete: trends_1.filter(each => each.selected).map(this.mapChartTrendToTrendLine)
                 });
+                this.setState({
+                    yCoordinateList_1: this.state.yCoordinateList_1.filter(d => !d.selected),
+                    yCoordinateList_3: this.state.yCoordinateList_3.filter(d => !d.selected)
+                });
                 // this.canvasNode.cancelDrag();
                 break;
             }
@@ -128,11 +160,17 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                 // this.node_1.terminate();
                 // this.canvasNode.cancelDrag();
                 onEnableTrendLine(false);
+                this.setState({
+                    enableInteractiveObject: false
+                });
                 break;
             }
             case 68:   // D - Draw trendline
             case 69: { // E - Enable trendline
-                onEnableTrendLine(true);
+                // onEnableTrendLine(true);
+                this.setState({
+                    enableInteractiveObject: true
+                });
                 break;
             }
         }
@@ -191,15 +229,131 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         return price;
     };
 
-    handleSelection = (interactives) => {
-        const state = toObject(interactives, each => {
-            return [
-                `trends_${each.chartId}`,
-                each.objects,
-            ];
-        });
-        this.setState(state);
+    handleSelection = (interactives, moreProps, e) => {
+        if (this.state.enableInteractiveObject) {
+            const independentCharts = moreProps.currentCharts.filter(d => d !== 2);
+            if (independentCharts.length > 0) {
+                const first = head(independentCharts);
+
+                const morePropsForChart = getMorePropsForChart(moreProps, first);
+                const {
+                    mouseXY: [, mouseY],
+                    chartConfig: {yScale},
+                } = morePropsForChart;
+
+                const yValue = round(yScale.invert(mouseY), 2);
+                const newAlert = {
+                    ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+                    yValue,
+                    id: _.uniqueId('order_'),
+                    draggable: true
+                };
+                this.handleChoosePosition(newAlert, morePropsForChart, e);
+            }
+        } else {
+            const state = toObject(interactives, each => {
+                return [
+                    `trends_${each.chartId}`,
+                    `yCoordinateList_${each.chartId}`,
+                    each.objects
+                ];
+            });
+            this.setState(state);
+        }
     };
+
+    handleChoosePosition = (alert, moreProps, e) => {
+        const {id: chartId} = moreProps.chartConfig;
+        this.setState({
+            yCoordinateList_1: [
+                ...this.state.yCoordinateList_1,
+                alert
+            ],
+            enableInteractiveObject: false,
+        });
+    }
+
+    handleDoubleClickAlert = (item) => {
+        this.setState({
+            showModal: true,
+            alertToEdit: {
+                alert: item.object,
+                chartId: item.chartId,
+            },
+        });
+    }
+
+    handleChangeAlert = (alert, chartId, order: Order) => {
+        console.log(order)
+        const {yCoordinateList_1} = this.state;
+        const newAlertList = yCoordinateList_1.map(d => {
+            return d.id === alert.id ? alert : d;
+        });
+
+        this.setState({
+            yCoordinateList_1: newAlertList,
+            showModal: false,
+            enableInteractiveObject: false,
+        });
+    }
+
+    handleDeleteAlert = () => {
+        const {alertToEdit} = this.state;
+        const key = `yCoordinateList_${alertToEdit.chartId}`;
+        const yCoordinateList = this.state[key].filter(d => {
+            return d.id !== alertToEdit.alert.id;
+        });
+        // this.setState({
+        //     showModal: false,
+        //     alertToEdit: {},
+        //     [key]: yCoordinateList
+        // });
+    }
+
+    handleDialogClose = () => {
+        // cancel alert edit
+
+        const {originalAlertList, alertToEdit} = this.state;
+
+        const key = `yCoordinateList_${alertToEdit.chartId}`;
+        const list = originalAlertList || this.state[key];
+
+        this.setState({
+            showModal: false,
+            // [key]: list,
+        });
+    }
+
+    onDelete = (yCoordinate, moreProps) => {
+        // this.setState(state => {
+        //     const chartId = moreProps.chartConfig.id;
+        //     const key = `yCoordinateList_${chartId}`;
+        //
+        //     const list = state[key];
+        //     return {
+        //         [key]: list.filter(d => d.id !== yCoordinate.id)
+        //     };
+        // });
+    }
+
+    onDragComplete = (yCoordinateList, moreProps, draggedAlert) => {
+        // this gets called on drag complete of drawing object
+        const {id: chartId} = moreProps.chartConfig;
+
+        const key = `yCoordinateList_${chartId}`;
+        const alertDragged = draggedAlert != null;
+
+        this.setState({
+            enableInteractiveObject: false,
+            // [key]: yCoordinateList,
+            showModal: alertDragged,
+            alertToEdit: {
+                alert: draggedAlert,
+                chartId,
+            },
+            originalAlertList: this.state[key],
+        });
+    }
 
     static getDerivedStateFromProps(props, state) {
         // Any time the current user changes,
@@ -234,9 +388,9 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     render() {
         const {
             type, data: initialData, width, ratio, chartHeight, htSRLevels, orders, trades, stops,
-            swingHighsLows, showGrid, zones, candlePatternsUp, candlePatternsDown, scale, srLevels
+            swingHighsLows, showGrid, zones, candlePatternsUp, candlePatternsDown, securityInfo, srLevels
         } = this.props;
-        const {trends_1} = this.state;
+        const {trends_1, showModal, alertToEdit} = this.state;
 
         const volumeHeight = 100;
         const height = chartHeight || 500;
@@ -282,7 +436,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         const xExtents = [start, end];
 
         let key = 0;
-        const formatInput = `.${scale}f`;
+        const formatInput = `.${securityInfo.scale}f`;
         let timeFormatInput = "%H:%M:%S";
         if (initialData && initialData.length > 0 && initialData[0]) {
             const interval = initialData[0].interval;
@@ -440,17 +594,36 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                                    trends={trends_1}
                         />
 
+                        <InteractiveYCoordinate
+                            ref={this.saveInteractiveNodes("InteractiveYCoordinate", 1)}
+                            enabled={this.state.enableInteractiveObject}
+                            onDragComplete={this.onDragComplete}
+                            onDelete={this.onDelete}
+                            yCoordinateList={this.state.yCoordinateList_1}
+                        />
+
                     </Chart>
                     <CrossHairCursor/>
                     <DrawingObjectSelector
                         enabled={!this.props.enableTrendLine}
                         getInteractiveNodes={this.getInteractiveNodes}
                         drawingObjectMap={{
-                            Trendline: "trends"
+                            Trendline: "trends",
+                            InteractiveYCoordinate: "yCoordinateList"
                         }}
                         onSelect={this.handleSelection}
+                        onDoubleClick={this.handleDoubleClickAlert}
                     />
                 </ChartCanvas>
+                <ChartDialog
+                    securityInfo={securityInfo}
+                    showModal={showModal}
+                    alert={alertToEdit.alert}
+                    chartId={alertToEdit.chartId}
+                    onClose={this.handleDialogClose}
+                    onSave={this.handleChangeAlert}
+                    onDeleteAlert={this.handleDeleteAlert}
+                />
             </div>
         );
     }
