@@ -41,7 +41,7 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
         {field: 'relativeVolumeDay', header: 'Rel Vol(D)'}
     ];
 
-    const FETCH_TIMEOUT = 10000
+    const FETCH_TIMEOUT = 60000
 
     const fetchSecurities = () => {
         getSecurities().then(setSecurities)

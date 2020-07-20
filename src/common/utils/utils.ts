@@ -1,5 +1,10 @@
 import {Interval} from "../data/Interval";
 
+export function round(number, precision = 0): number {
+    const d = Math.pow(10, precision);
+    return Math.round(number * d) / d;
+}
+
 export function round10(num: any): number {
     return Math.round(num * 10) / 10;
 }
