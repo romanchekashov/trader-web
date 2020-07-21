@@ -13,5 +13,5 @@ export class StopOrder {
     public quantity: number;
     public operation: OperationType;
     public dateTime?: Date;
-    public status: StopOrderStatus;
+    public status?: StopOrderStatus;
 }

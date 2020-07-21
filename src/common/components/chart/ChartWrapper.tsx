@@ -31,6 +31,8 @@ import {TrendWrapper} from "../../data/TrendWrapper";
 import {Calendar} from "primereact/calendar";
 import {InputText} from "primereact/inputtext";
 import {Trade} from "../../data/Trade";
+import {ChartManageOrder} from "./data/ChartManageOrder";
+import {StopOrder} from "../../data/StopOrder";
 import moment = require("moment");
 
 const _ = require("lodash");
@@ -45,6 +47,7 @@ type Props = {
     initialNumberOfCandles?: number,
     security: SecurityLastInfo
     premise?: TradePremise
+    stops?: StopOrder[]
     orders?: Order[]
     trades?: Trade[]
     history?: boolean
@@ -62,6 +65,7 @@ type States = {
     innerInterval: Interval
     innerStart: Date
     enableTrendLine: boolean
+    enableNewOrder: boolean
     needSave: boolean
     showSRLevels: boolean
     showSRZones: boolean
@@ -91,15 +95,26 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     constructor(props) {
-        super(props);
-        const {interval, initialNumberOfCandles, start} = props;
+        super(props)
+        const {interval, initialNumberOfCandles, start} = props
 
         this.state = {
-            candles: [], nodata: false, secCode: null, innerInterval: interval, innerStart: start,
-            enableTrendLine: false, needSave: false, storeData: null, trendLines: [], trends_1: [],
-            showSRLevels: true, showSRZones: true, numberOfCandles: initialNumberOfCandles || 500,
+            candles: [],
+            nodata: false,
+            secCode: null,
+            innerInterval: interval,
+            innerStart: start,
+            enableTrendLine: false,
+            enableNewOrder: false,
+            needSave: false,
+            storeData: null,
+            trendLines: [],
+            trends_1: [],
+            showSRLevels: true,
+            showSRZones: true,
+            numberOfCandles: initialNumberOfCandles || 500,
             startCalendarVisible: !!start
-        };
+        }
     }
 
     getNewCandles = (security: SecurityLastInfo, interval: Interval, start: Date, numberOfCandles: number): Promise<Candle[]> => {
@@ -488,11 +503,15 @@ export class ChartWrapper extends React.Component<Props, States> {
         this.setState({numberOfCandles});
 
         this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
-    };
+    }
 
     onEnableTrendLine = (enableTrendLine: boolean) => {
         this.setState({enableTrendLine});
-    };
+    }
+
+    onEnableNewOrder = (enableNewOrder: boolean) => {
+        this.setState({enableNewOrder});
+    }
 
     onSave = () => {
         const {security} = this.props;
@@ -597,12 +616,36 @@ export class ChartWrapper extends React.Component<Props, States> {
         });
     }
 
+    manageOrder = (order: ChartManageOrder) => {
+        const {history} = this.props;
+
+        if (order.type === 'order') {
+            if (order.cancelOrder) {
+                WebsocketService.getInstance().send(history ? WSEvent.HISTORY_CANCEL_ORDERS : WSEvent.CANCEL_ORDERS,
+                    [order.cancelOrder])
+            }
+            if (order.createOrder) {
+                WebsocketService.getInstance().send(history ? WSEvent.HISTORY_CREATE_ORDERS : WSEvent.CREATE_ORDERS,
+                    [order.createOrder]);
+            }
+        } else {
+            if (order.cancelStopOrder) {
+                WebsocketService.getInstance().send(history ? WSEvent.HISTORY_CANCEL_STOP_ORDERS : WSEvent.CANCEL_STOP_ORDERS,
+                    [order.cancelStopOrder])
+            }
+            if (order.createStopOrder) {
+                WebsocketService.getInstance().send(history ? WSEvent.HISTORY_CREATE_STOP_ORDERS : WSEvent.CREATE_STOP_ORDERS,
+                    [order.createStopOrder]);
+            }
+        }
+    }
+
     render() {
         const {
-            candles, nodata, innerInterval, innerStart, enableTrendLine, needSave, trends_1, showSRLevels,
+            candles, nodata, innerInterval, innerStart, enableTrendLine, enableNewOrder, needSave, trends_1, showSRLevels,
             showSRZones, numberOfCandles, startCalendarVisible
         } = this.state;
-        const {width, chartHeight, showGrid, premise, security, start, onStartChanged, trades, orders, activeTrade} = this.props;
+        const {width, chartHeight, showGrid, premise, security, start, onStartChanged, trades, orders, stops, activeTrade} = this.props;
 
         if (!security) {
             return (<>Select security for chart</>)
@@ -634,6 +677,12 @@ export class ChartWrapper extends React.Component<Props, States> {
                                           onChange={(e) => this.onStartUpdated(e.value as Date)}/>
                                 : null
                         }
+                    </div>
+                    <div className="chart-wrapper-head-trendline">
+                        <ToggleButton onLabel="New Order"
+                                      offLabel="New Order"
+                                      checked={enableNewOrder}
+                                      onChange={(e) => this.onEnableNewOrder(e.value)}/>
                     </div>
                     <div className="chart-wrapper-head-trendline">
                         <ToggleButton onLabel="Drawing"
@@ -694,8 +743,9 @@ export class ChartWrapper extends React.Component<Props, States> {
                             chartHeight={chartHeight}
                             ratio={1}
                             htSRLevels={this.getHighTimeFrameSRLevels()}
-                            stops={activeTrade && activeTrade.stopOrder ? [activeTrade.stopOrder] : []}
+                            stops={stops}
                             orders={orders}
+                            onManageOrder={this.manageOrder}
                             trades={trades}
                             swingHighsLows={this.getSwingHighsLowsMap()}
                             showGrid={showGrid}
@@ -706,6 +756,8 @@ export class ChartWrapper extends React.Component<Props, States> {
                             securityInfo={this.securityInfo}
                             enableTrendLine={enableTrendLine}
                             onEnableTrendLine={this.onEnableTrendLine}
+                            enableNewOrder={enableNewOrder}
+                            onEnableNewOrder={this.onEnableNewOrder}
                             needSave={this.onNeedSave}
                             trends={trends_1}/>
                         : nodata ? <div>No data</div> : <div>Loading...</div>

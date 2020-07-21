@@ -33,6 +33,7 @@ import {EconomicCalendar} from "../../../common/components/economic-calendar/Eco
 import {News} from "../../../common/components/news/News";
 import {SecurityAnalysis} from "../../../common/data/SecurityAnalysis";
 import moment = require("moment");
+import {StopOrder} from "../../../common/data/StopOrder";
 
 type Props = {
     security: SecurityAnalysis
@@ -57,7 +58,8 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
     const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
     const [timeFrameMin, setTimeFrameMin] = useState(Interval.M1);
     const [premise, setPremise] = useState(null);
-    const [orders, setOrders] = useState(null);
+    const [orders, setOrders] = useState<Order[]>(null);
+    const [stopOrders, setStopOrders] = useState<StopOrder[]>(null);
     const [activeTrade, setActiveTrade] = useState(null);
 
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
@@ -178,6 +180,10 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
             .on<Order[]>(WSEvent.ORDERS)
             .subscribe(setOrders);
 
+        const stopOrdersSubscription = WebsocketService.getInstance()
+            .on<StopOrder[]>(WSEvent.STOP_ORDERS)
+            .subscribe(setStopOrders);
+
         const activeTradeSubscription = WebsocketService.getInstance()
             .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
             .subscribe(activeTrades => {
@@ -199,6 +205,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
             lastSecuritiesSubscription.unsubscribe();
             tradePremiseSubscription.unsubscribe();
             ordersSetupSubscription.unsubscribe();
+            stopOrdersSubscription.unsubscribe();
             activeTradeSubscription.unsubscribe();
             clearInterval(intervalToFetchOpenInterest)
         };
@@ -307,6 +314,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                                           width={chart1Width}
                                           security={securityLastInfo}
                                           premise={premise}
+                                          stops={stopOrders}
                                           orders={orders}
                                           trades={trades}
                                           activeTrade={activeTrade}
