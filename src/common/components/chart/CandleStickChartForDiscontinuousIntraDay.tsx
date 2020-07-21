@@ -157,31 +157,38 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
         switch (keyCode) {
             case 46: { // DEL
-                const {trends_1} = this.state;
+                const {trends_1, yCoordinateList_1} = this.state;
 
-                needSave({
-                    save: trends_1.filter(each => !each.selected).map(this.mapChartTrendToTrendLine),
-                    delete: trends_1.filter(each => each.selected).map(this.mapChartTrendToTrendLine)
-                });
-                this.setState({
-                    yCoordinateList_1: this.state.yCoordinateList_1.filter(d => !d.selected),
-                    yCoordinateList_3: this.state.yCoordinateList_3.filter(d => !d.selected)
-                });
+                if (trends_1.some(each => each.selected)) {
+                    needSave({
+                        save: trends_1.filter(each => !each.selected).map(this.mapChartTrendToTrendLine),
+                        delete: trends_1.filter(each => each.selected).map(this.mapChartTrendToTrendLine)
+                    })
+                }
+
+                if (yCoordinateList_1.some(each => each.selected)) {
+                    const selectedOrder = yCoordinateList_1.find(d => {
+                        return d.selected
+                    })
+                    this.deleteOrderView(selectedOrder.id)
+                }
                 // this.canvasNode.cancelDrag();
                 break;
             }
             case 27: { // ESC
                 // this.node_1.terminate();
                 // this.canvasNode.cancelDrag();
-                onEnableTrendLine(false);
-                onEnableNewOrder(false);
-                break;
+                onEnableTrendLine(false)
+                onEnableNewOrder(false)
+                break
             }
-            case 68:   // D - Draw trendline
-            case 69: { // E - Enable trendline
-                // onEnableTrendLine(true);
-                onEnableNewOrder(true);
-                break;
+            case 84: { // T - Enable trendline
+                onEnableTrendLine(true)
+                break
+            }
+            case 81: { // Q - Enable NewOrder
+                onEnableNewOrder(true)
+                break
             }
         }
     };
@@ -240,51 +247,62 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     };
 
     handleSelection = (interactives, moreProps, e) => {
-        if (this.props.enableNewOrder) {
-            const independentCharts = moreProps.currentCharts.filter(d => d !== 2);
-            if (independentCharts.length > 0) {
-                const first = head(independentCharts);
-
-                const morePropsForChart = getMorePropsForChart(moreProps, first);
-                const {
-                    mouseXY: [, mouseY],
-                    chartConfig: {yScale},
-                } = morePropsForChart;
-
-                const yValue = round(yScale.invert(mouseY), 2);
-                const newAlert = {
-                    ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
-                    stroke: "#777",
-                    textFill: "#777",
-                    text: "Preview Alert",
-                    edge: {
-                        ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
-                        stroke: "#777"
-                    },
-                    yValue,
-                    id: _.uniqueId('alert_'),
-                    draggable: true
-                };
-                this.handleChoosePosition(newAlert, morePropsForChart, e);
-                setTimeout(() => {
-                    this.setState({
-                        showModal: true,
-                        alertToEdit: {
-                            alert: newAlert,
-                            chartId: morePropsForChart.chartConfig.id,
-                        }
-                    })
-                }, 200)
-            }
-        } else {
-            const state = toObject(interactives, each => {
+        if (interactives[0].type === "Trendline") {
+            const state = toObject([interactives[0]], each => {
                 return [
                     `trends_${each.chartId}`,
-                    `yCoordinateList_${each.chartId}`,
                     each.objects
-                ];
-            });
-            this.setState(state);
+                ]
+            })
+            this.setState(state)
+        }
+
+        if (interactives[1].type === "InteractiveYCoordinate") {
+            if (this.props.enableNewOrder) {
+                const independentCharts = moreProps.currentCharts.filter(d => d !== 2);
+                if (independentCharts.length > 0) {
+                    const first = head(independentCharts);
+
+                    const morePropsForChart = getMorePropsForChart(moreProps, first);
+                    const {
+                        mouseXY: [, mouseY],
+                        chartConfig: {yScale},
+                    } = morePropsForChart;
+
+                    const yValue = round(yScale.invert(mouseY), 2);
+                    const newAlert = {
+                        ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+                        stroke: "#777",
+                        textFill: "#777",
+                        text: "Preview Alert",
+                        edge: {
+                            ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
+                            stroke: "#777"
+                        },
+                        yValue,
+                        id: _.uniqueId('alert_'),
+                        draggable: true
+                    };
+                    this.handleChoosePosition(newAlert, morePropsForChart, e);
+                    setTimeout(() => {
+                        this.setState({
+                            showModal: true,
+                            alertToEdit: {
+                                alert: newAlert,
+                                chartId: morePropsForChart.chartConfig.id,
+                            }
+                        })
+                    }, 200)
+                }
+            } else {
+                const state = toObject([interactives[1]], each => {
+                    return [
+                        `yCoordinateList_${each.chartId}`,
+                        each.objects
+                    ]
+                })
+                this.setState(state);
+            }
         }
     };
 
@@ -301,13 +319,17 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     }
 
     handleDoubleClickAlert = (item) => {
-        this.setState({
-            showModal: true,
-            alertToEdit: {
-                alert: item.object,
-                chartId: item.chartId,
-            },
-        });
+        if (item.type === 'Trendline') {
+
+        } else if (item.type === 'InteractiveYCoordinate') {
+            this.setState({
+                showModal: true,
+                alertToEdit: {
+                    alert: item.object,
+                    chartId: item.chartId,
+                },
+            });
+        }
     }
 
     handleChangeAlert = (alert, chartId, manageOrder: ChartManageOrder) => {
@@ -358,7 +380,6 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
     handleDialogClose = () => {
         // cancel alert edit
-
         const {originalAlertList, alertToEdit} = this.state;
 
         const key = `yCoordinateList_${alertToEdit.chartId}`;
@@ -366,22 +387,46 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
         this.setState({
             showModal: false,
-            // [key]: list,
-        });
+            yCoordinateList_1: list
+        })
     }
 
-    onDelete = (yCoordinate, moreProps) => {
+    onDelete = (yCoordinate, moreProps?) => {
+        this.deleteOrderView(yCoordinate.id)
+    }
+
+    onDragComplete = (yCoordinateList, moreProps, draggedAlert) => {
+        // this gets called on drag complete of drawing object
+        const {onEnableNewOrder} = this.props
+        const {id: chartId} = moreProps.chartConfig
+
+        const key = `yCoordinateList_${chartId}`
+        const alertDragged = draggedAlert != null
+
+        this.setState({
+            yCoordinateList_1: yCoordinateList,
+            showModal: alertDragged,
+            alertToEdit: {
+                alert: draggedAlert,
+                chartId,
+            },
+            originalAlertList: this.state[key]
+        })
+        onEnableNewOrder(false)
+    }
+
+    deleteOrderView = (interactiveOrderId: string) => {
         const {yCoordinateList_1} = this.state
 
-        if (yCoordinate.id.startsWith("alert_")) {
+        if (interactiveOrderId.startsWith("alert_")) {
             this.setState({
                 yCoordinateList_1: yCoordinateList_1.filter(d => {
-                    return d.id !== yCoordinate.id;
+                    return d.id !== interactiveOrderId
                 })
             })
         } else {
             const deleteAlert = yCoordinateList_1.find(d => {
-                return d.id === yCoordinate.id;
+                return d.id === interactiveOrderId
             })
 
             deleteAlert.stroke = "#777"
@@ -393,28 +438,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                 yCoordinateList_1: [...yCoordinateList_1]
             })
 
-            this.deleteOrder(yCoordinate.id)
+            this.deleteOrder(interactiveOrderId)
         }
-    }
-
-    onDragComplete = (yCoordinateList, moreProps, draggedAlert) => {
-        // this gets called on drag complete of drawing object
-        const {onEnableNewOrder} = this.props
-        const {id: chartId} = moreProps.chartConfig;
-
-        const key = `yCoordinateList_${chartId}`;
-        const alertDragged = draggedAlert != null;
-
-        this.setState({
-            // [key]: yCoordinateList,
-            showModal: alertDragged,
-            alertToEdit: {
-                alert: draggedAlert,
-                chartId,
-            },
-            originalAlertList: this.state[key],
-        })
-        onEnableNewOrder(false)
     }
 
     deleteOrder = (interactiveOrderId: string) => {
@@ -468,8 +493,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         }
 
         if (props.orders && props.stops && Object.keys(state.interactiveOrderMap).length !== (props.orders.length + props.stops.length)
-                || props.orders && props.orders.some(order => !state.interactiveOrderMap[order.transId])
-                    ||  props.stops && props.stops.some(stop => !state.interactiveOrderMap[stop.transId])) {
+            || props.orders && props.orders.some(order => !state.interactiveOrderMap[order.transId])
+            || props.stops && props.stops.some(stop => !state.interactiveOrderMap[stop.transId])) {
             return CandleStickChartForDiscontinuousIntraDay.getInteractiveOrderMap(
                 props.orders, props.stops, state.yCoordinateList_1)
         }
@@ -744,7 +769,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                     </Chart>
                     <CrossHairCursor/>
                     <DrawingObjectSelector
-                        enabled={!this.props.enableTrendLine}
+                        enabled={!(this.props.enableTrendLine && this.props.enableNewOrder)}
                         getInteractiveNodes={this.getInteractiveNodes}
                         drawingObjectMap={{
                             Trendline: "trends",

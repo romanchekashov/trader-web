@@ -178,7 +178,6 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     componentDidMount = () => {
-
         this.candlesSetupSubscription = WebsocketService.getInstance()
             .on<Candle[]>(WSEvent.CANDLES).subscribe(lastCandles => {
                 const {innerInterval, candles, trendLines} = this.state;
@@ -220,15 +219,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                     this.requestCandles(this.props.security);
                 }
             });
-
-        const {security, interval, start} = this.props;
-        const {numberOfCandles} = this.state;
-
-        if (security) {
-            this.fetchCandles(security, interval, start, numberOfCandles);
-            this.fetchTrendLines(interval);
-        }
-    };
+    }
 
     componentDidUpdate = (prevProps) => {
         const {security, interval, start, orders, activeTrade} = this.props;
@@ -250,6 +241,10 @@ export class ChartWrapper extends React.Component<Props, States> {
 
         if (start !== innerStart) {
             this.setState({innerStart: start});
+        }
+
+        if (prevProps.security !== security && prevProps.security?.secCode !== security.secCode) {
+            this.fetchTrendLines(interval)
         }
     };
 
