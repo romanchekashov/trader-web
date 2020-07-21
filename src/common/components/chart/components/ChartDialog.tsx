@@ -56,7 +56,7 @@ export class ChartDialog extends React.Component<Props, State> {
 
     componentWillReceiveProps = (nextProps) => {
         const {showModal, securityInfo} = this.props;
-        if (showModal != nextProps.showModal) {
+        if (nextProps.alert && showModal != nextProps.showModal) {
             nextProps.alert.yValue = round(nextProps.alert.yValue, securityInfo.scale)
             this.setState({
                 alert: nextProps.alert,

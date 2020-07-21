@@ -45,6 +45,8 @@ import {ChartDialog} from "./components/ChartDialog";
 import {getMorePropsForChart} from "react-financial-charts/lib/interactive/utils";
 import {Security} from "../../data/Security";
 import {Order} from "../../data/Order";
+import {StopOrder} from "../../data/StopOrder";
+import {OperationType} from "../../data/OperationType";
 
 const _ = require("lodash");
 
@@ -55,9 +57,9 @@ type Props = {
     chartHeight?: number
     type: ChartDrawType
     htSRLevels?: ChartLevel[]
-    orders?: ChartLevel[]
+    stops?: StopOrder[]
+    orders?: Order[]
     trades?: Trade[]
-    stops?: ChartLevel[]
     zones?: SRZone[]
     srLevels?: SRLevel[]
     candlePatternsUp?: any
@@ -79,6 +81,7 @@ type State = {
     showModal: boolean,
     alertToEdit: any,
     originalAlertList: any[]
+    interactiveOrderMap: any
 }
 
 export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Props, State> {
@@ -109,18 +112,12 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         this.state = {
             trends_1: [],
             enableInteractiveObject: false,
-            yCoordinateList_1: [
-                {
-                    ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
-                    yValue: 43,
-                    id: _.uniqueId('order_'),
-                    draggable: true
-                }
-            ],
+            yCoordinateList_1: [],
             yCoordinateList_3: [],
             showModal: false,
             alertToEdit: {},
-            originalAlertList: []
+            originalAlertList: [],
+            interactiveOrderMap: {}
         };
         this.trendRef = React.createRef();
         this.canvasNode = React.createRef();
@@ -244,6 +241,13 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                 const yValue = round(yScale.invert(mouseY), 2);
                 const newAlert = {
                     ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+                    stroke: "#777",
+                    textFill: "#777",
+                    text: "Preview Alert",
+                    edge: {
+                        ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
+                        stroke: "#777"
+                    },
                     yValue,
                     id: _.uniqueId('order_'),
                     draggable: true
@@ -298,16 +302,15 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     }
 
     handleDeleteAlert = () => {
-        const {alertToEdit} = this.state;
-        const key = `yCoordinateList_${alertToEdit.chartId}`;
-        const yCoordinateList = this.state[key].filter(d => {
+        const {alertToEdit, yCoordinateList_1} = this.state;
+        const yCoordinateList = yCoordinateList_1.filter(d => {
             return d.id !== alertToEdit.alert.id;
         });
-        // this.setState({
-        //     showModal: false,
-        //     alertToEdit: {},
-        //     [key]: yCoordinateList
-        // });
+        this.setState({
+            showModal: false,
+            alertToEdit: {},
+            yCoordinateList_1: yCoordinateList
+        })
     }
 
     handleDialogClose = () => {
@@ -325,15 +328,15 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     }
 
     onDelete = (yCoordinate, moreProps) => {
-        // this.setState(state => {
-        //     const chartId = moreProps.chartConfig.id;
-        //     const key = `yCoordinateList_${chartId}`;
-        //
-        //     const list = state[key];
-        //     return {
-        //         [key]: list.filter(d => d.id !== yCoordinate.id)
-        //     };
-        // });
+        this.setState(state => {
+            const chartId = moreProps.chartConfig.id;
+            const key = `yCoordinateList_${chartId}`;
+
+            const list = state[key];
+            return {
+                yCoordinateList_1: list.filter(d => d.id !== yCoordinate.id)
+            };
+        });
     }
 
     onDragComplete = (yCoordinateList, moreProps, draggedAlert) => {
@@ -382,7 +385,82 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                 };
             }
         }
+
+        if (props.orders && props.orders.length > 0 && props.orders.some(order => !state.interactiveOrderMap[order.transId])) {
+            return this.getInteractiveOrderMap(props.orders, props.stops, state.yCoordinateList_1)
+        }
+
+        if (props.stops && props.stops.length > 0 && props.stops.some(order => !state.interactiveOrderMap[order.transId])) {
+            return this.getInteractiveOrderMap(props.orders, props.stops, state.yCoordinateList_1)
+        }
+
         return null;
+    }
+
+    static getInteractiveOrderMap = (orders, stops, yCoordinateList_1: any[]): any => {
+        const interactiveOrderMap = {}
+
+        if (orders) {
+            for (const order of orders) {
+                if (OperationType.BUY === order.operation) {
+                    interactiveOrderMap[order.transId] = {
+                        interactiveYCoordinateItem: {
+                            ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+                            stroke: "#1F9D55",
+                            textFill: "#1F9D55",
+                            text: "Buy " + order.quantity,
+                            edge: {
+                                ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
+                                stroke: "#1F9D55"
+                            },
+                            yValue: order.price,
+                            id: _.uniqueId('order_'),
+                            draggable: true
+                        },
+                        type: 'order',
+                        orderOrStop: order
+                    }
+                } else {
+                    interactiveOrderMap[order.transId] = {
+                        interactiveYCoordinateItem: {
+                            ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+                            stroke: "#E3342F",
+                            textFill: "#E3342F",
+                            text: "Sell " + order.quantity,
+                            edge: {
+                                ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
+                                stroke: "#E3342F"
+                            },
+                            yValue: order.price,
+                            id: _.uniqueId('order_'),
+                            draggable: true
+                        },
+                        type: 'order',
+                        orderOrStop: order
+                    }
+                }
+            }
+        }
+
+        if (stops) {
+            for (const stop of stops) {
+                interactiveOrderMap[stop.transId] = {
+                    interactiveYCoordinateItem: {
+                        ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+                        yValue: stop.conditionPrice,
+                        id: _.uniqueId('order_'),
+                        draggable: true
+                    },
+                    type: 'stop',
+                    orderOrStop: stop
+                }
+            }
+        }
+
+        return {
+            interactiveOrderMap,
+            yCoordinateList_1: [...yCoordinateList_1]
+        }
     }
 
     render() {
@@ -391,6 +469,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
             swingHighsLows, showGrid, zones, candlePatternsUp, candlePatternsDown, securityInfo, srLevels
         } = this.props;
         const {trends_1, showModal, alertToEdit} = this.state;
+        const scale = securityInfo ? securityInfo.scale : 4
+        const scaleFormat = `.${scale}s`
 
         const volumeHeight = 100;
         const height = chartHeight || 500;
@@ -436,7 +516,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         const xExtents = [start, end];
 
         let key = 0;
-        const formatInput = `.${securityInfo.scale}f`;
+        const formatInput = `.${scale}f`;
         let timeFormatInput = "%H:%M:%S";
         if (initialData && initialData.length > 0 && initialData[0]) {
             const interval = initialData[0].interval;
@@ -449,38 +529,6 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                 key={lvl.price.toString() + key++}
                 at="left"
                 orient="left"
-                price={lvl.price}
-                stroke={lvl.appearance.stroke || 'grey'}
-                lineStroke={lvl.appearance.stroke || 'grey'}
-                lineOpacity={1}
-                strokeWidth={1}
-                fontSize={12}
-                fill={lvl.appearance.stroke || "#FFFFFF"}
-                arrowWidth={7}
-                displayFormat={format(formatInput)}
-            />
-        ));
-        const ordersView = orders.map(lvl => (
-            <PriceCoordinate
-                key={lvl.price.toString() + key++}
-                at="right"
-                orient="right"
-                price={lvl.price}
-                stroke={lvl.appearance.stroke || 'grey'}
-                lineStroke={lvl.appearance.stroke || 'grey'}
-                lineOpacity={1}
-                strokeWidth={1}
-                fontSize={12}
-                fill={lvl.appearance.stroke || "#FFFFFF"}
-                arrowWidth={7}
-                displayFormat={format(formatInput)}
-            />
-        ));
-        const stopsView = stops.map(lvl => (
-            <PriceCoordinate
-                key={lvl.price.toString() + key++}
-                at="right"
-                orient="right"
                 price={lvl.price}
                 stroke={lvl.appearance.stroke || 'grey'}
                 lineStroke={lvl.appearance.stroke || 'grey'}
@@ -517,14 +565,16 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                         <MouseCoordinateY
                             at="left"
                             orient="left"
-                            displayFormat={format(".4s")}/>
+                            displayFormat={format(scaleFormat)}/>
 
                         <BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
 
                         <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47"/>
 
                         <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-                                       yAccessor={d => d.volume} displayFormat={format(".4s")} fill="#0F0F0F"/>
+                                       yAccessor={d => d.volume}
+                                       displayFormat={format(scaleFormat)}
+                                       fill="#0F0F0F"/>
                     </Chart>
 
                     <Chart id={1}
@@ -543,21 +593,21 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                             orient="right"
                             displayFormat={format(formatInput)}/>
 
-                        <ChartZones zones={zones}/>
-                        <ChartLevels srLevels={srLevels}/>
+                        <ChartZones zones={zones} scale={scale}/>
+                        <ChartLevels srLevels={srLevels} scale={scale}/>
                         <ChartSwingHighsLows swingHighsLows={swingHighsLows}/>
 
                         <CandlestickSeries fill={(d) => d.close > d.open ? "#ecf0f1" : "#000"}
                                            stroke="#000"
                                            wickStroke="#000"/>
                         <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-                                       yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
+                                       yAccessor={d => d.close}
+                                       displayFormat={format(`.${scale}f`)}
+                                       fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
 
                         <OHLCTooltip origin={[-40, 0]} xDisplayFormat={timeFormat("%Y-%m-%d %H:%M:%S")}/>
 
                         {htSRLevelsView}
-                        {ordersView}
-                        {stopsView}
 
                         {
                             candlePatternsUp ?

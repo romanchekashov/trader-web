@@ -6,9 +6,10 @@ import {IntervalColor} from "../../../utils/utils";
 
 type Props = {
     srLevels: SRLevel[]
+    scale: number
 };
 
-export const ChartLevels: React.FC<Props> = ({srLevels}) => {
+export const ChartLevels: React.FC<Props> = ({srLevels, scale}) => {
 
     if (!srLevels || srLevels.length === 0) return null;
 
@@ -20,6 +21,8 @@ export const ChartLevels: React.FC<Props> = ({srLevels}) => {
         H2: "DashDot",
         M60: "Dash"
     };
+
+    const scaleFormat = scale ? `.${scale}f` : ".4f"
 
     return (
         <>
@@ -40,7 +43,7 @@ export const ChartLevels: React.FC<Props> = ({srLevels}) => {
                             fontSize={12}
                             fill={color}
                             arrowWidth={7}
-                            displayFormat={format(".2f")}
+                            displayFormat={format(scaleFormat)}
                         />
                     );
                 })

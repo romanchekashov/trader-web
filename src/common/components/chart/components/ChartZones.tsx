@@ -6,12 +6,14 @@ import {format} from "d3-format";
 
 type Props = {
     zones: SRZone[]
+    scale: number
 };
 
-const ChartZones: React.FC<Props> = ({zones}) => {
+const ChartZones: React.FC<Props> = ({zones, scale}) => {
 
     if (!zones || zones.length === 0) return null;
 
+    const scaleFormat = scale ? `.${scale}f` : ".4f"
     const zoneYAccessor = (d, zone) => zone.end;
     const zoneYAccessorBase = (scale, d, zone) => {
         const diff = zone.start - zone.end;
@@ -66,7 +68,7 @@ const ChartZones: React.FC<Props> = ({zones}) => {
                             fontSize={12}
                             fill={color}
                             arrowWidth={getArrowWidth(zone.intersects)}
-                            displayFormat={format(".2f")}
+                            displayFormat={format(scaleFormat)}
                         />
                     );
                 })

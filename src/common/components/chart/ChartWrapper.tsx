@@ -33,6 +33,8 @@ import {InputText} from "primereact/inputtext";
 import {Trade} from "../../data/Trade";
 import moment = require("moment");
 
+const _ = require("lodash");
+
 type Props = {
     interval: Interval,
     onIntervalChanged: (interval: Interval) => void
@@ -214,7 +216,7 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     componentDidUpdate = (prevProps) => {
-        const {security, interval, start} = this.props;
+        const {security, interval, start, orders, activeTrade} = this.props;
         const {candles, innerInterval, innerStart, numberOfCandles} = this.state;
         if (security) {
             if (!this.fetchingCandles) {
@@ -600,7 +602,7 @@ export class ChartWrapper extends React.Component<Props, States> {
             candles, nodata, innerInterval, innerStart, enableTrendLine, needSave, trends_1, showSRLevels,
             showSRZones, numberOfCandles, startCalendarVisible
         } = this.state;
-        const {width, chartHeight, showGrid, premise, security, start, onStartChanged, trades} = this.props;
+        const {width, chartHeight, showGrid, premise, security, start, onStartChanged, trades, orders, activeTrade} = this.props;
 
         if (!security) {
             return (<>Select security for chart</>)
@@ -692,11 +694,11 @@ export class ChartWrapper extends React.Component<Props, States> {
                             chartHeight={chartHeight}
                             ratio={1}
                             htSRLevels={this.getHighTimeFrameSRLevels()}
-                            orders={this.getOrdersLevels()}
+                            stops={activeTrade && activeTrade.stopOrder ? [activeTrade.stopOrder] : []}
+                            orders={orders}
                             trades={trades}
                             swingHighsLows={this.getSwingHighsLowsMap()}
                             showGrid={showGrid}
-                            stops={this.getStops()}
                             zones={premise && showSRZones ? premise.analysis.srZones : null}
                             srLevels={this.getSRLevels()}
                             candlePatternsUp={this.getCandlePatternsUp()}
