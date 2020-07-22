@@ -41,5 +41,6 @@ const audioMap = {
 
 export function playSound(num: number): void {
     const audioFile = audioMap[num];
+    audioFile.volume = 0.4;
     if (audioFile) audioFile.play();
 }
