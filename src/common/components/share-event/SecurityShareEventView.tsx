@@ -1,17 +1,17 @@
-import * as React from "react";
-import {useEffect, useState} from "react";
-import {SecurityShareEvent} from "../../data/news/SecurityShareEvent";
-import {getSecurityShareEvents} from "../../api/rest/analysisRestApi";
+import * as React from "react"
+import {useEffect, useState} from "react"
+import {SecurityShareEvent} from "../../data/news/SecurityShareEvent"
+import {getSecurityShareEvents} from "../../api/rest/analysisRestApi"
 import "./SecurityShareEventView.css"
-import moment = require("moment");
+import moment = require("moment")
 
 type Props = {
     secCode: string
-};
+}
 
 export const SecurityShareEventView: React.FC<Props> = ({secCode}) => {
-    const [events, setEvents] = useState<SecurityShareEvent[]>([]);
-    const [selectedEvent, setSelectedEvent] = useState<SecurityShareEvent>(null);
+    const [events, setEvents] = useState<SecurityShareEvent[]>([])
+    const [selectedEvent, setSelectedEvent] = useState<SecurityShareEvent>(null)
 
     useEffect(() => {
         if (secCode) {
@@ -19,13 +19,13 @@ export const SecurityShareEventView: React.FC<Props> = ({secCode}) => {
                 .then(events => {
                     setEvents(events)
                     if (events.length > 0) setSelectedEvent(events[0])
-                });
+                })
         }
-    }, [secCode]);
+    }, [secCode])
 
     const formatEvent = (event: SecurityShareEvent) => {
-        const date = moment(event.date).format("DD-MM-YYYY");
-        const published = moment(event.published).format("DD-MM-YYYY HH:mm");
+        const date = moment(event.date).format("DD-MM-YYYY")
+        const published = moment(event.published).format("DD-MM-YYYY HH:mm")
 
         return (
             <>
@@ -70,4 +70,4 @@ export const SecurityShareEventView: React.FC<Props> = ({secCode}) => {
             </div>
         </div>
     )
-};
+}

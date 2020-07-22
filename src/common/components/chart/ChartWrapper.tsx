@@ -742,6 +742,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                             orders={orders}
                             onManageOrder={this.manageOrder}
                             trades={trades}
+                            activeTrade={activeTrade}
                             swingHighsLows={this.getSwingHighsLowsMap()}
                             showGrid={showGrid}
                             zones={premise && showSRZones ? premise.analysis.srZones : null}

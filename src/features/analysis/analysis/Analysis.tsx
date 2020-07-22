@@ -20,7 +20,7 @@ import {TradingPlatform} from "../../../common/data/TradingPlatform";
 import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {adjustTradePremise} from "../../../common/utils/DataUtils";
 import {TabPanel, TabView} from "primereact/tabview";
-import {SecurityShareEventView} from "../../../common/components/news/SecurityShareEventView";
+import {SecurityShareEventView} from "../../../common/components/share-event/SecurityShareEventView";
 import {ClassCode} from "../../../common/data/ClassCode";
 import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
 import {News} from "../../../common/components/news/News";

@@ -1,8 +1,8 @@
-import * as React from "react";
-import {useEffect, useState} from "react";
+import * as React from "react"
+import {useEffect, useState} from "react"
 import "./News.css"
-import {NewsItem} from "../../data/news/NewsItem";
-import {getNews} from "../../api/rest/newsRestApi";
+import {NewsItem} from "../../data/news/NewsItem"
+import {getNews} from "../../api/rest/newsRestApi"
 import moment = require("moment");
 
 type Props = {
@@ -11,9 +11,9 @@ type Props = {
 }
 
 export const News: React.FC<Props> = ({secId, onItemSelected}) => {
-    const [items, setItems] = useState<NewsItem[]>([]);
-    const [selectedItem, setSelectedItem] = useState<NewsItem>(null);
-    const [height, setHeight] = useState<number>(200);
+    const [items, setItems] = useState<NewsItem[]>([])
+    const [selectedItem, setSelectedItem] = useState<NewsItem>(null)
+    const [height, setHeight] = useState<number>(200)
     const FETCH_NEWS_TIMEOUT = 5 * 60000
 
     useEffect(() => {
@@ -30,7 +30,7 @@ export const News: React.FC<Props> = ({secId, onItemSelected}) => {
             window.removeEventListener('resize', updateSize)
             clearInterval(setIntervalIdToFetchNews)
         }
-    }, [secId]);
+    }, [secId])
 
     const fetchNews = () => {
         getNews(null, secId)
@@ -45,7 +45,7 @@ export const News: React.FC<Props> = ({secId, onItemSelected}) => {
     }
 
     const formatNews = (item: NewsItem) => {
-        const published = moment(item.timestamp).format("DD-MM-YYYY HH:mm");
+        const published = moment(item.timestamp).format("DD-MM-YYYY HH:mm")
 
         return (
             <>
@@ -101,4 +101,4 @@ export const News: React.FC<Props> = ({secId, onItemSelected}) => {
             </div>
         </div>
     )
-};
+}

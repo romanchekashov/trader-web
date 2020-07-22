@@ -120,7 +120,7 @@ export class ChartDialog extends React.Component<Props, State> {
         const map = {}
         if (orders && orders.length > 0) {
             for (const order of orders) {
-                map["order_" + order.transId] = order
+                map["order_" + order.orderNum] = order
             }
         }
         if (stops && stops.length > 0) {

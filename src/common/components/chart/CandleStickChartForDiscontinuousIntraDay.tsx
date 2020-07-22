@@ -48,6 +48,7 @@ import {Order} from "../../data/Order";
 import {StopOrder} from "../../data/StopOrder";
 import {OperationType} from "../../data/OperationType";
 import {ChartManageOrder} from "./data/ChartManageOrder";
+import {ActiveTrade} from "../../data/ActiveTrade";
 
 const _ = require("lodash");
 
@@ -61,6 +62,7 @@ type Props = {
     stops?: StopOrder[]
     orders?: Order[]
     trades?: Trade[]
+    activeTrade?: ActiveTrade
     zones?: SRZone[]
     srLevels?: SRLevel[]
     candlePatternsUp?: any
@@ -137,7 +139,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         const map = {}
         if (orders && orders.length > 0) {
             for (const order of orders) {
-                map["order_" + order.transId] = order
+                map["order_" + order.orderNum] = order
             }
         }
         if (stops && stops.length > 0) {
@@ -493,7 +495,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         }
 
         if (props.orders && props.stops && Object.keys(state.interactiveOrderMap).length !== (props.orders.length + props.stops.length)
-            || props.orders && props.orders.some(order => !state.interactiveOrderMap[order.transId])
+            || props.orders && props.orders.some(order => !state.interactiveOrderMap[order.orderNum])
             || props.stops && props.stops.some(stop => !state.interactiveOrderMap[stop.transId])) {
             return CandleStickChartForDiscontinuousIntraDay.getInteractiveOrderMap(
                 props.orders, props.stops, state.yCoordinateList_1)
@@ -508,7 +510,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         if (orders) {
             for (const order of orders) {
                 if (OperationType.BUY === order.operation) {
-                    interactiveOrderMap[order.transId] = {
+                    interactiveOrderMap[order.orderNum] = {
                         interactiveYCoordinateItem: {
                             ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
                             stroke: "#1F9D55",
@@ -519,14 +521,14 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                                 stroke: "#1F9D55"
                             },
                             yValue: order.price,
-                            id: "order_" + order.transId,
+                            id: "order_" + order.orderNum,
                             draggable: true
                         },
                         type: 'order',
                         orderOrStop: order
                     }
                 } else {
-                    interactiveOrderMap[order.transId] = {
+                    interactiveOrderMap[order.orderNum] = {
                         interactiveYCoordinateItem: {
                             ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
                             stroke: "#E3342F",
@@ -537,7 +539,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                                 stroke: "#E3342F"
                             },
                             yValue: order.price,
-                            id: "order_" + order.transId,
+                            id: "order_" + order.orderNum,
                             draggable: true
                         },
                         type: 'order',
@@ -580,7 +582,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     render() {
         const {
             type, data: initialData, width, ratio, chartHeight, htSRLevels, orders, trades, stops,
-            swingHighsLows, showGrid, zones, candlePatternsUp, candlePatternsDown, securityInfo, srLevels, enableNewOrder
+            swingHighsLows, showGrid, zones, candlePatternsUp, candlePatternsDown, securityInfo, srLevels,
+            enableNewOrder, activeTrade
         } = this.props;
         const {trends_1, showModal, alertToEdit} = this.state;
         const scale = securityInfo ? securityInfo.scale : 4
@@ -722,6 +725,23 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                         <OHLCTooltip origin={[-40, 0]} xDisplayFormat={timeFormat("%Y-%m-%d %H:%M:%S")}/>
 
                         {htSRLevelsView}
+                        {
+                            activeTrade ?
+                                <PriceCoordinate
+                                    at="right"
+                                    orient="right"
+                                    price={activeTrade.avgPrice}
+                                    stroke={"#0000FF"}
+                                    lineStroke={"#0000FF"}
+                                    lineOpacity={1}
+                                    strokeWidth={1}
+                                    fontSize={12}
+                                    fill={"#0000FF"}
+                                    arrowWidth={7}
+                                    displayFormat={format(formatInput)}
+                                />
+                                : null
+                        }
 
                         {
                             candlePatternsUp ?
