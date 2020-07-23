@@ -129,11 +129,124 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
     componentDidMount = () => {
         document.addEventListener("keyup", this.onKeyPress);
-    };
+    }
 
     componentWillUnmount = () => {
         document.removeEventListener("keyup", this.onKeyPress);
-    };
+    }
+
+    static getDerivedStateFromProps = (props, state) => {
+        // Any time the current user changes,
+        // Reset any parts of state that are tied to that user.
+        // In this simple example, that's just the email.
+        if (props.trends !== state.trends_1) {
+            const trends = props.trends;
+            const trends_1 = state.trends_1;
+            let update = trends_1.length !== trends.length;
+            if (!update) {
+                for (let i = 0; i < trends.length; i++) {
+                    const trendStartEndSum = trends_1[i].start[1] + trends_1[i].end[1]
+                        + trends_1[i].start[0] + trends_1[i].end[0];
+                    const trendLineStartEndSum = trends[i].start[1] + trends[i].end[1]
+                        + trends[i].start[0] + trends[i].end[0];
+                    if (trendStartEndSum !== trendLineStartEndSum) {
+                        update = true;
+                    }
+                    trends[i].selected = trends_1[i].selected;
+                }
+            }
+
+            if (update) {
+                return {
+                    trends_1: props.trends
+                };
+            }
+        }
+
+        if (props.orders && props.stops && Object.keys(state.interactiveOrderMap).length !== (props.orders.length + props.stops.length)
+            || props.orders && props.orders.some(order => !state.interactiveOrderMap[order.orderNum])
+            || props.stops && props.stops.some(stop => !state.interactiveOrderMap[stop.transId])) {
+            return CandleStickChartForDiscontinuousIntraDay.getInteractiveOrderMap(
+                props.orders, props.stops, state.yCoordinateList_1)
+        }
+
+        return null;
+    }
+
+    static getInteractiveOrderMap = (orders, stops, yCoordinateList_1: any[]): any => {
+        const interactiveOrderMap = {}
+
+        if (orders) {
+            for (const order of orders) {
+                if (OperationType.BUY === order.operation) {
+                    interactiveOrderMap[order.orderNum] = {
+                        interactiveYCoordinateItem: {
+                            ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+                            stroke: "#1F9D55",
+                            textFill: "#1F9D55",
+                            text: "Buy " + order.quantity,
+                            edge: {
+                                ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
+                                stroke: "#1F9D55"
+                            },
+                            yValue: order.price,
+                            id: "order_" + order.orderNum,
+                            draggable: true
+                        },
+                        type: 'order',
+                        orderOrStop: order
+                    }
+                } else {
+                    interactiveOrderMap[order.orderNum] = {
+                        interactiveYCoordinateItem: {
+                            ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+                            stroke: "#E3342F",
+                            textFill: "#E3342F",
+                            text: "Sell " + order.quantity,
+                            edge: {
+                                ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
+                                stroke: "#E3342F"
+                            },
+                            yValue: order.price,
+                            id: "order_" + order.orderNum,
+                            draggable: true
+                        },
+                        type: 'order',
+                        orderOrStop: order
+                    }
+                }
+            }
+        }
+
+        if (stops) {
+            for (const stop of stops) {
+                interactiveOrderMap[stop.transId] = {
+                    interactiveYCoordinateItem: {
+                        ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
+                        textFill: stop.operation === OperationType.BUY ? "#1F9D55" : "#E3342F",
+                        text: (stop.operation === OperationType.BUY ? "Stop Buy " : "Stop Sell ") + stop.quantity,
+                        yValue: stop.conditionPrice,
+                        id: "stop_" + stop.transId,
+                        draggable: true
+                    },
+                    type: 'stop',
+                    orderOrStop: stop
+                }
+            }
+        }
+
+        const interactiveOrders = Object.values(interactiveOrderMap)
+        // const list = yCoordinateList_1.filter(value => value.id.startsWith('alert_'))
+        const list = []
+        for (const interOrder of interactiveOrders) {
+            list.push(interOrder['interactiveYCoordinateItem'])
+        }
+
+        return {
+            interactiveOrderMap,
+            yCoordinateList_1: list
+        }
+    }
 
     getOrderAndStopMap = _.memoize((orders: Order[], stops: StopOrder[]) => {
         const map = {}
@@ -463,119 +576,6 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                 type: "stop",
                 cancelStopOrder
             })
-        }
-    }
-
-    static getDerivedStateFromProps = (props, state) => {
-        // Any time the current user changes,
-        // Reset any parts of state that are tied to that user.
-        // In this simple example, that's just the email.
-        if (props.trends !== state.trends_1) {
-            const trends = props.trends;
-            const trends_1 = state.trends_1;
-            let update = trends_1.length !== trends.length;
-            if (!update) {
-                for (let i = 0; i < trends.length; i++) {
-                    const trendStartEndSum = trends_1[i].start[1] + trends_1[i].end[1]
-                        + trends_1[i].start[0] + trends_1[i].end[0];
-                    const trendLineStartEndSum = trends[i].start[1] + trends[i].end[1]
-                        + trends[i].start[0] + trends[i].end[0];
-                    if (trendStartEndSum !== trendLineStartEndSum) {
-                        update = true;
-                    }
-                    trends[i].selected = trends_1[i].selected;
-                }
-            }
-
-            if (update) {
-                return {
-                    trends_1: props.trends
-                };
-            }
-        }
-
-        if (props.orders && props.stops && Object.keys(state.interactiveOrderMap).length !== (props.orders.length + props.stops.length)
-            || props.orders && props.orders.some(order => !state.interactiveOrderMap[order.orderNum])
-            || props.stops && props.stops.some(stop => !state.interactiveOrderMap[stop.transId])) {
-            return CandleStickChartForDiscontinuousIntraDay.getInteractiveOrderMap(
-                props.orders, props.stops, state.yCoordinateList_1)
-        }
-
-        return null;
-    }
-
-    static getInteractiveOrderMap = (orders, stops, yCoordinateList_1: any[]): any => {
-        const interactiveOrderMap = {}
-
-        if (orders) {
-            for (const order of orders) {
-                if (OperationType.BUY === order.operation) {
-                    interactiveOrderMap[order.orderNum] = {
-                        interactiveYCoordinateItem: {
-                            ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
-                            stroke: "#1F9D55",
-                            textFill: "#1F9D55",
-                            text: "Buy " + order.quantity,
-                            edge: {
-                                ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
-                                stroke: "#1F9D55"
-                            },
-                            yValue: order.price,
-                            id: "order_" + order.orderNum,
-                            draggable: true
-                        },
-                        type: 'order',
-                        orderOrStop: order
-                    }
-                } else {
-                    interactiveOrderMap[order.orderNum] = {
-                        interactiveYCoordinateItem: {
-                            ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
-                            stroke: "#E3342F",
-                            textFill: "#E3342F",
-                            text: "Sell " + order.quantity,
-                            edge: {
-                                ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
-                                stroke: "#E3342F"
-                            },
-                            yValue: order.price,
-                            id: "order_" + order.orderNum,
-                            draggable: true
-                        },
-                        type: 'order',
-                        orderOrStop: order
-                    }
-                }
-            }
-        }
-
-        if (stops) {
-            for (const stop of stops) {
-                interactiveOrderMap[stop.transId] = {
-                    interactiveYCoordinateItem: {
-                        ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
-                        textFill: stop.operation === OperationType.BUY ? "#1F9D55" : "#E3342F",
-                        text: (stop.operation === OperationType.BUY ? "Stop Buy " : "Stop Sell ") + stop.quantity,
-                        yValue: stop.conditionPrice,
-                        id: "stop_" + stop.transId,
-                        draggable: true
-                    },
-                    type: 'stop',
-                    orderOrStop: stop
-                }
-            }
-        }
-
-        const interactiveOrders = Object.values(interactiveOrderMap)
-        // const list = yCoordinateList_1.filter(value => value.id.startsWith('alert_'))
-        const list = []
-        for (const interOrder of interactiveOrders) {
-            list.push(interOrder['interactiveYCoordinateItem'])
-        }
-
-        return {
-            interactiveOrderMap,
-            yCoordinateList_1: list
         }
     }
 

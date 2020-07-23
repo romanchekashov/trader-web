@@ -97,7 +97,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                 if (security) {
                     const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
                     if (newSecurityLastInfo) {
-                        newSecurityLastInfo.timeLastTrade = new Date(newSecurityLastInfo.timeLastTrade);
+                        newSecurityLastInfo.lastTradeTime = new Date(newSecurityLastInfo.lastTradeTime);
                         setSecurityLastInfo(newSecurityLastInfo);
                     }
                 }

@@ -88,10 +88,10 @@ export const loadSecurityShares = () => (dispatch: AppDispatch) => {
     getAllSecurityShares()
         .then(shares => {
             if (shares.length > 0) {
-                if (shares[0].todayMoneyTurnover !== null) {
+                if (shares[0].valueToday !== null) {
                     shares = shares
-                        .filter(value => value.todayMoneyTurnover > 0)
-                        .sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover);
+                        .filter(value => value.valueToday > 0)
+                        .sort((a, b) => b.valueToday - a.valueToday);
                     // shares.forEach(share => share.lastTradeTime = moment(share.lastTradeTime).format("HH:mm:ss DD-MM-YY"));
                 } else {
                     shares = shares.sort((a, b) => {
@@ -145,7 +145,7 @@ export const loadSecurityCurrencySuccess = (currencies: SecurityCurrency[]): Loa
 export const loadSecurityCurrency = () => (dispatch: AppDispatch) => {
     getAllSecurityCurrencies()
         .then(currencies => {
-            dispatch(loadSecurityCurrencySuccess(currencies.sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover)));
+            dispatch(loadSecurityCurrencySuccess(currencies.sort((a, b) => b.valueToday - a.valueToday)));
         })
         .catch(error => {
             throw error;
@@ -159,7 +159,7 @@ export const loadSecurityFutureSuccess = (futures: SecurityFuture[]): LoadSecuri
 export const loadSecurityFuture = () => (dispatch: AppDispatch) => {
     getAllSecurityFutures()
         .then(futures => {
-            dispatch(loadSecurityFutureSuccess(futures.sort((a, b) => b.todayMoneyTurnover - a.todayMoneyTurnover)));
+            dispatch(loadSecurityFutureSuccess(futures.sort((a, b) => b.valueToday - a.valueToday)));
         })
         .catch(error => {
             throw error;

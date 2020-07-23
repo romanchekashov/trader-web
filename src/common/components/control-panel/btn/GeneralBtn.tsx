@@ -85,11 +85,11 @@ export class GeneralBtn extends React.Component<Props, States> {
             }
         ];
 
-        if (operation === OperationType.BUY && price > security.priceLastTrade) {
+        if (operation === OperationType.BUY && price > security.lastTradePrice) {
             growl.show({severity: 'error', summary: 'Error Message', detail: 'Cannot buy greater then current price!'});
             return;
         }
-        if (operation === OperationType.SELL && price < security.priceLastTrade) {
+        if (operation === OperationType.SELL && price < security.lastTradePrice) {
             growl.show({
                 severity: 'error', summary: 'Error Message',
                 detail: 'Cannot sell chipper then current price!'

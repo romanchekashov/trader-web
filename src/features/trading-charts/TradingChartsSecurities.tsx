@@ -22,7 +22,7 @@ export const TradingChartsSecurities: React.FC<Props> = ({classCode, securities,
         {field: 'futureSellDepoPerContract', header: 'ГО прод'},
         {field: 'futureBuyDepoPerContract', header: 'ГО покуп'},
         {field: 'valueToday', header: 'Оборот'},
-        {field: 'numberOfTradesToday', header: 'Кол сдел'}
+        {field: 'numTradesToday', header: 'Кол сдел'}
     ];
 
     const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);

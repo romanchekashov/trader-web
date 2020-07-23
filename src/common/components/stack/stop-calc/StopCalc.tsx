@@ -28,9 +28,9 @@ export const StopCalc: React.FC<Props> = ({securityLastInfo, showSmall}) => {
         const priceForQuantity = stop / quantity;
         const priceDiff = priceForQuantity / minStepPrice;
 
-        let stopPrice = securityLastInfo.priceLastTrade - priceDiff;
+        let stopPrice = securityLastInfo.lastTradePrice - priceDiff;
         if (isShort) {
-            stopPrice = securityLastInfo.priceLastTrade + priceDiff;
+            stopPrice = securityLastInfo.lastTradePrice + priceDiff;
         }
 
         const arr = ("" + security.secPriceStep).split(".");
@@ -89,7 +89,7 @@ export const StopCalc: React.FC<Props> = ({securityLastInfo, showSmall}) => {
             {calcStopPriceView(15, true)}
             {!showSmall ? calcStopPriceView(20, true) : null}
             <div className="td__stop-calc-price">
-                {securityLastInfo ? securityLastInfo.priceLastTrade : 0}
+                {securityLastInfo ? securityLastInfo.lastTradePrice : 0}
             </div>
             {!showSmall ? calcStopPriceView(20, false) : null}
             {calcStopPriceView(15, false)}

@@ -2,25 +2,27 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
-import {getSecurities} from "../../../common/api/rest/analysisRestApi";
-import {SecurityAnalysis} from "../../../common/data/SecurityAnalysis";
 import {Button} from "primereact/button";
+import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
+import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import moment = require("moment");
 
 type Props = {
-    onSelectRow: (e: SecurityAnalysis) => void
-};
+    onSelectRow: (e: SecurityLastInfo) => void
+}
 
 export const Securities: React.FC<Props> = ({onSelectRow}) => {
-    const [securities, setSecurities] = useState<SecurityAnalysis[]>([]);
-    const [selectedSecurity, setSelectedSecurity] = useState<SecurityAnalysis>(null);
+    const [lastTimeUpdate, setLastTimeUpdate] = useState<string>(null)
+    const [securities, setSecurities] = useState<SecurityLastInfo[]>([])
+    const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
 
     const columns = [
         {field: 'shortName', header: 'Наз'},
         {field: 'secCode', header: 'Тикер'},
         {field: 'lastChange', header: '% изм'},
         {field: 'lastTradePrice', header: 'Цен посл'},
-        {field: 'todayMoneyTurnover', header: 'Оборот'},
-        {field: 'numberOfTradesToday', header: 'Кол-во сделок'},
+        {field: 'valueToday', header: 'Оборот'},
+        {field: 'numTradesToday', header: 'Кол-во сделок'},
         {field: 'percentOfFloatTradedToday', header: '% Flt Traded'},
         {field: 'atrDayPercent', header: 'ATR(D)%'},
         {field: 'atrM60Percent', header: 'ATR(M60)%'},
@@ -31,7 +33,7 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
         {field: 'volumeM5Percent', header: 'Vol(M5)%'},
         {field: 'volumeToday', header: 'Vol Today'},
         {field: 'relativeVolumeDay', header: 'Rel Vol(D)'}
-    ];
+    ]
 
     const lessColumns = [
         {field: 'shortName', header: 'Наз'},
@@ -39,30 +41,26 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
         {field: 'atrM5Percent', header: 'ATR(M5)%'},
         {field: 'volumeM5Percent', header: 'Vol(M5)%'},
         {field: 'relativeVolumeDay', header: 'Rel Vol(D)'}
-    ];
-
-    const FETCH_TIMEOUT = 60000
-
-    const fetchSecurities = () => {
-        getSecurities().then(setSecurities)
-    }
+    ]
 
     useEffect(() => {
-        fetchSecurities()
-        const setIntervalIdToFetchSecurities = setInterval(() => {
-            fetchSecurities()
-        }, FETCH_TIMEOUT)
+        const lastSecuritiesSubscription = WebsocketService.getInstance()
+            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+            .subscribe(securities => {
+                setSecurities(securities)
+                setLastTimeUpdate(moment().format("HH:mm:ss DD-MM-YYYY"))
+            })
 
         // Specify how to clean up after this effect:
         return function cleanup() {
-            clearInterval(setIntervalIdToFetchSecurities)
+            lastSecuritiesSubscription.unsubscribe()
         }
-    }, []);
+    }, [])
 
-    const selectedColumns = selectedSecurity ? lessColumns : columns;
+    const selectedColumns = selectedSecurity ? lessColumns : columns
     const columnComponents = selectedColumns.map(col => {
-        return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}/>;
-    });
+        return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}/>
+    })
 
     const onSelect = (e) => {
         if (!Array.isArray(e.value)) {
@@ -70,14 +68,17 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
         }
     }
 
-    const selectSecurity = (sec: SecurityAnalysis) => {
+    const selectSecurity = (sec: SecurityLastInfo) => {
         setSelectedSecurity(sec)
         onSelectRow(sec)
     }
 
     return (
         <>
-            <Button label="Show All" icon="pi pi-caret-right" onClick={(e) => selectSecurity(null)}/>
+            <div className="p-col-2">
+                <Button label="Show All" icon="pi pi-caret-right" onClick={(e) => selectSecurity(null)}/>
+            </div>
+            <div className="p-col-2">{lastTimeUpdate}</div>
             <DataTable value={securities} responsive
                        selectionMode="single"
                        selection={selectedSecurity}
@@ -88,4 +89,4 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
             </DataTable>
         </>
     )
-};
+}

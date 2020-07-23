@@ -24,7 +24,6 @@ import {SecurityShareEventView} from "../../../common/components/share-event/Sec
 import {ClassCode} from "../../../common/data/ClassCode";
 import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
 import {News} from "../../../common/components/news/News";
-import {SecurityAnalysis} from "../../../common/data/SecurityAnalysis";
 import moment = require("moment");
 
 export interface AnalysisState {
@@ -32,7 +31,7 @@ export interface AnalysisState {
 }
 
 type Props = {
-    security: SecurityAnalysis
+    security: SecurityLastInfo
 }
 
 const Analysis: React.FC<Props> = ({security}) => {
@@ -109,20 +108,7 @@ const Analysis: React.FC<Props> = ({security}) => {
             fetchPremise(timeFrameTrading);
 
             if (!securityLastInfo) {
-                setSecurityLastInfo({
-                    classCode: security.classCode,
-                    secCode: security.secCode,
-                    valueToday: null,
-                    priceLastTrade: security.lastTradePrice,
-                    timeLastTrade: security.lastTradeTime,
-                    quantityLastTrade: security.lastTradeQuantity,
-                    valueLastTrade: null,
-                    numTrades: security.numberOfTradesToday,
-                    futureTotalDemand: null,
-                    futureTotalSupply: null,
-                    futureSellDepoPerContract: null,
-                    futureBuyDepoPerContract: null
-                });
+                setSecurityLastInfo(security);
             }
         }
 
@@ -140,7 +126,7 @@ const Analysis: React.FC<Props> = ({security}) => {
                 if (security) {
                     const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
                     if (newSecurityLastInfo) {
-                        newSecurityLastInfo.timeLastTrade = new Date(newSecurityLastInfo.timeLastTrade);
+                        newSecurityLastInfo.lastTradeTime = new Date(newSecurityLastInfo.lastTradeTime);
                         setSecurityLastInfo(newSecurityLastInfo);
                     }
                 }
@@ -169,6 +155,7 @@ const Analysis: React.FC<Props> = ({security}) => {
 
         setTimeout(updateSize, 1000);
         window.addEventListener('resize', updateSize);
+
         return function cleanup() {
             window.removeEventListener('resize', updateSize);
             wsStatusSub.unsubscribe();
@@ -267,8 +254,8 @@ const Analysis: React.FC<Props> = ({security}) => {
                                 <Column field="lotSize" header="Лот"/>
                                 <Column field="issueSize" header="Объем обр"/>
                                 <Column field="weightedAveragePrice" header="Ср. взв. цена"/>
-                                <Column field="todayMoneyTurnover" header="Оборот"/>
-                                <Column field="numberOfTradesToday" header="Кол-во сделок"/>
+                                <Column field="valueToday" header="Оборот"/>
+                                <Column field="numTradesToday" header="Кол-во сделок"/>
                             </DataTable>
                         </div>
                     </div>

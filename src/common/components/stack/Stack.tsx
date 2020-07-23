@@ -18,7 +18,6 @@ import {playSound} from "../../assets/assets";
 import {StopOrder} from "../../data/StopOrder";
 import {getSelectedSecurity} from "../../utils/Cache";
 import {ToggleButton} from "primereact/togglebutton";
-import {Security} from "../../data/Security";
 
 type Props = {};
 
@@ -33,7 +32,6 @@ type States = {
     activeTrade: ActiveTrade
     history?: boolean
     securityLastInfo: SecurityLastInfo
-    securityInfo: Security
     visible: string
 };
 
@@ -76,7 +74,7 @@ export class Stack extends React.Component<Props, States> {
         super(props);
         this.state = {
             stackItemsHeight: 400, items: [], stackItems: [], ordersMap: {}, position: 1, orders: [],
-            volumes: [], activeTrade: null, history: false, securityLastInfo: null, securityInfo: null,
+            volumes: [], activeTrade: null, history: false, securityLastInfo: null,
             visible: this.VisibleType.HIDE
         };
     }
@@ -100,16 +98,13 @@ export class Stack extends React.Component<Props, States> {
         this.lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
-                const {activeTrade, securityInfo} = this.state;
+                const {activeTrade} = this.state;
                 const selectedSecurity = getSelectedSecurity();
-                if (!securityInfo || securityInfo.secCode !== selectedSecurity.secCode) {
-                    this.setState({securityInfo: selectedSecurity});
-                }
                 let secCode = activeTrade ? activeTrade.secCode : selectedSecurity ? selectedSecurity.secCode : null;
                 if (secCode) {
                     const securityLastInfo = securities.find(o => o.secCode === secCode);
                     if (securityLastInfo) {
-                        securityLastInfo.timeLastTrade = new Date(securityLastInfo.timeLastTrade);
+                        securityLastInfo.lastTradeTime = new Date(securityLastInfo.lastTradeTime);
                     }
                     this.setState({securityLastInfo});
                 }
@@ -232,7 +227,7 @@ export class Stack extends React.Component<Props, States> {
             {
                 price: val.price,
                 quantity: position,
-                operation: val.price > securityLastInfo.priceLastTrade ? OperationType.SELL : OperationType.BUY,
+                operation: val.price > securityLastInfo.lastTradePrice ? OperationType.SELL : OperationType.BUY,
                 type: OrderType.LIMIT,
                 classCode: securityLastInfo.classCode,
                 secCode: securityLastInfo.secCode
@@ -262,16 +257,16 @@ export class Stack extends React.Component<Props, States> {
     };
 
     createStackViewNew = (): StackItemWrapper[] => {
-        const {ordersMap, stackItems, activeTrade, securityInfo} = this.state;
+        const {ordersMap, stackItems, activeTrade, securityLastInfo} = this.state;
 
-        if (stackItems.length === 0 || !securityInfo) return [];
+        if (stackItems.length === 0 || !securityLastInfo) return [];
         const stackItemMap = {};
         for (const stackItem of stackItems) {
             stackItemMap[stackItem.price] = stackItem;
         }
 
-        const multiplier = Math.pow(10, securityInfo.scale);
-        const step = securityInfo.secPriceStep * multiplier;
+        const multiplier = Math.pow(10, securityLastInfo.scale);
+        const step = securityLastInfo.secPriceStep * multiplier;
         const offset = 20 * step;
         const stackItemsStartPrice = Math.round(stackItems[0].price * multiplier);
         const stackItemsEndPrice = Math.round(stackItems[stackItems.length - 1].price * multiplier);

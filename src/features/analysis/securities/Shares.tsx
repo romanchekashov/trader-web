@@ -23,15 +23,15 @@ const Shares: React.FC<Props> = ({shares, selectedShare, onSelectRow}) => {
         {field: 'issueSize', header: 'Объем обр.'},
         {field: 'voltoday', header: 'Общее кол-во'},
         {field: 'weightedAveragePrice', header: 'Ср. взв. цена'},
-        {field: 'todayMoneyTurnover', header: 'Оборот'},
-        {field: 'numberOfTradesToday', header: 'Кол-во сделок'},
+        {field: 'valueToday', header: 'Оборот'},
+        {field: 'numTradesToday', header: 'Кол-во сделок'},
         {field: 'percentOfFloatTradedToday', header: '% Flt Traded'}
     ];
 
     const lessColumns = [
         {field: 'shortName', header: 'Наз'},
         {field: 'lastChange', header: '% изм'},
-        {field: 'numberOfTradesToday', header: 'Кол-во сделок'}
+        {field: 'numTradesToday', header: 'Кол-во сделок'}
     ];
 
     useEffect(() => {

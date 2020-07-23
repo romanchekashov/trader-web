@@ -31,12 +31,11 @@ import {TabPanel, TabView} from "primereact/tabview";
 import {MoexOpenInterestChart} from "./MoexOpenInterestChart";
 import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
 import {News} from "../../../common/components/news/News";
-import {SecurityAnalysis} from "../../../common/data/SecurityAnalysis";
-import moment = require("moment");
 import {StopOrder} from "../../../common/data/StopOrder";
+import moment = require("moment");
 
 type Props = {
-    security: SecurityAnalysis
+    security: SecurityLastInfo
 };
 
 const AnalysisFutures: React.FC<Props> = ({security}) => {
@@ -133,7 +132,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                     timeLastTrade: security.lastTradeTime,
                     quantityLastTrade: security.lastTradeQuantity,
                     valueLastTrade: null,
-                    numTrades: security.numberOfTradesToday,
+                    numTrades: security.numTradesToday,
                     futureTotalDemand: null,
                     futureTotalSupply: null,
                     futureSellDepoPerContract: null,
@@ -163,7 +162,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                 if (security) {
                     const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
                     if (newSecurityLastInfo) {
-                        newSecurityLastInfo.timeLastTrade = new Date(newSecurityLastInfo.timeLastTrade);
+                        newSecurityLastInfo.lastTradeTime = new Date(newSecurityLastInfo.lastTradeTime);
                         setSecurityLastInfo(newSecurityLastInfo);
                     }
                 }

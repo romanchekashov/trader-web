@@ -9,6 +9,5 @@ export class SecurityAnalysis extends Security {
     public gapDayPercent: number;
     public volumeM60Percent: number;
     public volumeM5Percent: number;
-    public volumeToday: number;
     public relativeVolumeDay: number;
 }

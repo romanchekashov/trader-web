@@ -2,7 +2,7 @@ import {ClassCode} from "../data/ClassCode";
 import {getAllSecurityCurrencies, getAllSecurityFutures, getAllSecurityShares} from "../api/rest/traderRestApi";
 import {Security} from "../data/Security";
 import {sortAlphabetically} from "./utils";
-import {SecurityAnalysis} from "../data/SecurityAnalysis";
+import {SecurityLastInfo} from "../data/SecurityLastInfo";
 
 const securityMap = {};
 let futures = [];
@@ -49,13 +49,16 @@ export const getSecurity = (classCode: ClassCode, secCode: string): Security => 
 
 export const getSecuritiesByClassCode = (classCode: ClassCode): Security[] => {
     switch (classCode) {
-        case ClassCode.SPBFUT: return futures;
-        case ClassCode.TQBR: return shares;
-        case ClassCode.CETS: return currencies;
+        case ClassCode.SPBFUT:
+            return futures;
+        case ClassCode.TQBR:
+            return shares;
+        case ClassCode.CETS:
+            return currencies;
     }
 };
 
-let SELECTED_SECURITY: SecurityAnalysis = null;
+let SELECTED_SECURITY: SecurityLastInfo = null;
 
 export const getSelectedSecurity = () => SELECTED_SECURITY;
-export const setSelectedSecurity = (security: SecurityAnalysis) => SELECTED_SECURITY = security;
+export const setSelectedSecurity = (security: SecurityLastInfo) => SELECTED_SECURITY = security;

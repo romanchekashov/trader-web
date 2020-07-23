@@ -7,7 +7,6 @@ import {loadFilterData, loadSecurityCurrency, loadSecurityFuture, loadSecuritySh
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
 import {SecurityShare} from "../../common/data/SecurityShare";
-import Filter from "./filter/Filter";
 import {ClassCode} from "../../common/data/ClassCode";
 import Analysis from "./analysis/Analysis";
 import {TradePremise} from "../../common/data/strategy/TradePremise";
@@ -21,7 +20,6 @@ import {SubscriptionLike} from "rxjs";
 import {getTradePremise} from "../../common/api/rest/analysisRestApi";
 import {setSelectedSecurity} from "../../common/utils/Cache";
 import {Securities} from "./securities/Securities";
-import {SecurityAnalysis} from "../../common/data/SecurityAnalysis";
 
 function mapStateToProps(state: RootState) {
     return {
@@ -44,7 +42,7 @@ function mapDispatchToProps(dispatch: AppDispatch) {
 }
 
 interface TradeStrategyAnalysisState {
-    selectedSecurity: SecurityAnalysis
+    selectedSecurity: SecurityLastInfo
     isDetailsShown: boolean
     filter: MarketBotStartDto
     securityLastInfo: SecurityLastInfo
@@ -87,7 +85,7 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(value => {
                 const securities = value.map(c => {
-                    c.timeLastTrade = new Date(c.timeLastTrade);
+                    c.lastTradeTime = new Date(c.lastTradeTime);
                     return c;
                 });
                 let securityLastInfo = this.state.securityLastInfo;
@@ -138,7 +136,7 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
         // }
     };
 
-    onSelectRow = (selectedSecurity: SecurityAnalysis) => {
+    onSelectRow = (selectedSecurity: SecurityLastInfo) => {
         if (selectedSecurity) {
             const {securities} = this.state;
             const securityLastInfo = securities.find(o => o.secCode === selectedSecurity.secCode);

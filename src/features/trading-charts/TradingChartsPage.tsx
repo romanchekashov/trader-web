@@ -54,7 +54,7 @@ export const TradingChartsPage: React.FC = () => {
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
                 for (const sec of securities) {
-                    sec.timeLastTrade = new Date(sec.timeLastTrade);
+                    sec.lastTradeTime = new Date(sec.lastTradeTime);
                 }
                 setSecurities(securities)
             });

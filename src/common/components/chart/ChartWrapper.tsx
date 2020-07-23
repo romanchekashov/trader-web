@@ -7,9 +7,7 @@ import {Candle} from "../../data/Candle";
 import {SecurityLastInfo} from "../../data/SecurityLastInfo";
 import {TradePremise} from "../../data/strategy/TradePremise";
 import {ChartElementAppearance} from "./data/ChartElementAppearance";
-import {ChartLevel} from "./data/ChartLevel";
 import {Order} from "../../data/Order";
-import {OperationType} from "../../data/OperationType";
 import {getHistoryCandles} from "../../api/rest/historyRestApi";
 import {Trend} from "../../data/strategy/Trend";
 import {ActiveTrade} from "../../data/ActiveTrade";
@@ -117,6 +115,83 @@ export class ChartWrapper extends React.Component<Props, States> {
         }
     }
 
+    componentDidMount = () => {
+        this.candlesSetupSubscription = WebsocketService.getInstance()
+            .on<Candle[]>(WSEvent.CANDLES).subscribe(lastCandles => {
+                const {innerInterval, candles, trendLines} = this.state;
+                if (candles.length > 2 && lastCandles.length > 0 && innerInterval === lastCandles[0].interval) {
+                    const candlesIndexMap = {};
+                    let newCandles = null;
+                    let needUpdateTrendLines = false;
+                    candlesIndexMap[candles[candles.length - 2].timestamp.getTime()] = candles.length - 2;
+                    candlesIndexMap[candles[candles.length - 1].timestamp.getTime()] = candles.length - 1;
+
+                    for (const candle of lastCandles) {
+                        candle.timestamp = new Date(candle.timestamp);
+                        const index = candlesIndexMap[candle.timestamp.getTime()];
+                        if (index) {
+                            candles[index] = candle;
+                        } else {
+                            newCandles = candles.slice(1);
+                            newCandles.push(candle);
+                            needUpdateTrendLines = true;
+                        }
+                    }
+
+                    newCandles = newCandles ? newCandles : [...candles];
+
+                    if (needUpdateTrendLines) {
+                        this.setState({
+                            candles: newCandles,
+                            trends_1: this.mapTrendLinesFromPropsToState(trendLines, newCandles)
+                        });
+                    } else {
+                        this.setState({candles: newCandles});
+                    }
+                }
+            });
+
+        this.wsStatusSub = WebsocketService.getInstance().connectionStatus()
+            .subscribe(isConnected => {
+                if (isConnected) {
+                    this.requestCandles(this.props.security);
+                }
+            });
+    }
+
+    componentWillUnmount = (): void => {
+        this.candlesSetupSubscription.unsubscribe();
+        this.wsStatusSub.unsubscribe();
+    }
+
+    componentDidUpdate = (prevProps) => {
+        const {security, interval, start} = this.props;
+        const {candles, innerInterval, innerStart, numberOfCandles} = this.state;
+
+        if (security) {
+            if (!this.fetchingCandles) {
+                if (!prevProps.security || candles.length === 0 || security.secCode !== prevProps.security.secCode) {
+                    this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
+                }
+                if (prevProps.security && security.lastTradePrice !== prevProps.security.priceLastTrade) {
+                    this.updateLastCandle();
+                }
+            }
+        }
+
+        if (interval !== innerInterval) {
+            this.setState({innerInterval: interval});
+        }
+
+        if (start !== innerStart) {
+            this.setState({innerStart: start});
+        }
+
+        if (prevProps.security !== security && prevProps.security?.secCode !== security.secCode) {
+            this.fetchTrendLines(interval)
+        }
+    };
+
     getNewCandles = (security: SecurityLastInfo, interval: Interval, start: Date, numberOfCandles: number): Promise<Candle[]> => {
         const {history} = this.props;
         const {startCalendarVisible} = this.state;
@@ -177,85 +252,14 @@ export class ChartWrapper extends React.Component<Props, States> {
         }
     };
 
-    componentDidMount = () => {
-        this.candlesSetupSubscription = WebsocketService.getInstance()
-            .on<Candle[]>(WSEvent.CANDLES).subscribe(lastCandles => {
-                const {innerInterval, candles, trendLines} = this.state;
-                if (candles.length > 2 && lastCandles.length > 0 && innerInterval === lastCandles[0].interval) {
-                    const candlesIndexMap = {};
-                    let newCandles = null;
-                    let needUpdateTrendLines = false;
-                    candlesIndexMap[candles[candles.length - 2].timestamp.getTime()] = candles.length - 2;
-                    candlesIndexMap[candles[candles.length - 1].timestamp.getTime()] = candles.length - 1;
-
-                    for (const candle of lastCandles) {
-                        candle.timestamp = new Date(candle.timestamp);
-                        const index = candlesIndexMap[candle.timestamp.getTime()];
-                        if (index) {
-                            candles[index] = candle;
-                        } else {
-                            newCandles = candles.slice(1);
-                            newCandles.push(candle);
-                            needUpdateTrendLines = true;
-                        }
-                    }
-
-                    newCandles = newCandles ? newCandles : [...candles];
-
-                    if (needUpdateTrendLines) {
-                        this.setState({
-                            candles: newCandles,
-                            trends_1: this.mapTrendLinesFromPropsToState(trendLines, newCandles)
-                        });
-                    } else {
-                        this.setState({candles: newCandles});
-                    }
-                }
-            });
-
-        this.wsStatusSub = WebsocketService.getInstance().connectionStatus()
-            .subscribe(isConnected => {
-                if (isConnected) {
-                    this.requestCandles(this.props.security);
-                }
-            });
-    }
-
-    componentDidUpdate = (prevProps) => {
-        const {security, interval, start, orders, activeTrade} = this.props;
-        const {candles, innerInterval, innerStart, numberOfCandles} = this.state;
-        if (security) {
-            if (!this.fetchingCandles) {
-                if (!prevProps.security || candles.length === 0 || security.secCode !== prevProps.security.secCode) {
-                    this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
-                }
-                if (prevProps.security && security.priceLastTrade !== prevProps.security.priceLastTrade) {
-                    this.updateLastCandle();
-                }
-            }
-        }
-
-        if (interval !== innerInterval) {
-            this.setState({innerInterval: interval});
-        }
-
-        if (start !== innerStart) {
-            this.setState({innerStart: start});
-        }
-
-        if (prevProps.security !== security && prevProps.security?.secCode !== security.secCode) {
-            this.fetchTrendLines(interval)
-        }
-    };
-
     fetchTrendLines = (interval: Interval): void => {
         const {security} = this.props;
         getTrendLines({
             classCode: security.classCode,
             secCode: security.secCode,
             interval
-        }).then(this.setTrendLinesFromServer).catch(console.error);
-    };
+        }).then(this.setTrendLinesFromServer).catch((e) => console.error(e));
+    }
 
     setTrendLinesFromServer = (trendLines: TrendLineDto[]): void => {
         const {candles} = this.state;
@@ -294,24 +298,19 @@ export class ChartWrapper extends React.Component<Props, States> {
         return newTrends;
     };
 
-    componentWillUnmount = (): void => {
-        this.candlesSetupSubscription.unsubscribe();
-        this.wsStatusSub.unsubscribe();
-    };
-
     updateLastCandle = () => {
         const {security} = this.props;
         const {candles} = this.state;
 
         const lastCandle = candles[candles.length - 1];
         if (lastCandle) {
-            if (security.priceLastTrade > lastCandle.high) {
-                lastCandle.high = security.priceLastTrade
-            } else if (security.priceLastTrade < lastCandle.low) {
-                lastCandle.low = security.priceLastTrade
+            if (security.lastTradePrice > lastCandle.high) {
+                lastCandle.high = security.lastTradePrice
+            } else if (security.lastTradePrice < lastCandle.low) {
+                lastCandle.low = security.lastTradePrice
             }
-            lastCandle.close = security.priceLastTrade;
-            lastCandle.volume += security.quantityLastTrade;
+            lastCandle.close = security.lastTradePrice;
+            lastCandle.volume += security.lastTradeQuantity;
             this.setState({candles: [...candles], nodata: false});
         }
     };
@@ -329,23 +328,6 @@ export class ChartWrapper extends React.Component<Props, States> {
         }
     };
 
-    static mapChartSRLevels = (levels: number[], appearance: ChartElementAppearance): ChartLevel[] => {
-        const lines = [];
-        const MAX_COUNT = 4;
-
-        for (let i = 0; i < levels.length; i++) {
-            if (i === MAX_COUNT) break;
-
-            const line = new ChartLevel();
-            line.price = levels[i];
-            line.appearance = appearance;
-
-            lines.push(line);
-        }
-
-        return lines;
-    };
-
     getHighTimeFrameSRLevels = () => {
         // const {premise} = this.props;
         //
@@ -357,22 +339,6 @@ export class ChartWrapper extends React.Component<Props, States> {
         //         ...ChartWrapper.mapChartSRLevels(supportLevels, {stroke: "green"})
         //     ];
         // }
-        return [];
-    };
-
-    getOrdersLevels = () => {
-        const {orders} = this.props;
-
-        if (orders) {
-            return [
-                ...ChartWrapper.mapChartSRLevels(orders
-                    .filter(value => OperationType.SELL === value.operation)
-                    .map(value => value.price), {stroke: "red"}),
-                ...ChartWrapper.mapChartSRLevels(orders
-                    .filter(value => OperationType.SELL !== value.operation)
-                    .map(value => value.price), {stroke: "green"})
-            ];
-        }
         return [];
     };
 
@@ -433,17 +399,6 @@ export class ChartWrapper extends React.Component<Props, States> {
         }
 
         return null;
-    };
-
-    getStops = () => {
-        const {activeTrade} = this.props;
-
-        if (activeTrade && activeTrade.stopOrder) {
-            return [
-                ...ChartWrapper.mapChartSRLevels([activeTrade.stopOrder.price], {stroke: "#3498db"})
-            ];
-        }
-        return [];
     };
 
     getCandlePatternsUp = () => {
@@ -640,7 +595,7 @@ export class ChartWrapper extends React.Component<Props, States> {
             candles, nodata, innerInterval, innerStart, enableTrendLine, enableNewOrder, needSave, trends_1, showSRLevels,
             showSRZones, numberOfCandles, startCalendarVisible
         } = this.state;
-        const {width, chartHeight, showGrid, premise, security, start, onStartChanged, trades, orders, stops, activeTrade} = this.props;
+        const {width, chartHeight, showGrid, premise, security, trades, orders, stops, activeTrade} = this.props;
 
         if (!security) {
             return (<>Select security for chart</>)

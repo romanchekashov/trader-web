@@ -85,7 +85,7 @@ export class ControlPanel extends React.Component<Props, States> {
                 if (secCode) {
                     const security = securities.find(o => o.secCode === secCode);
                     if (security) {
-                        security.timeLastTrade = new Date(security.timeLastTrade);
+                        security.lastTradeTime = new Date(security.lastTradeTime);
                     }
                     this.setState({security});
                 }

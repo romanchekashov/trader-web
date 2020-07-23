@@ -62,7 +62,7 @@ export class BotControlHistory extends React.Component<Props, States> {
             .subscribe(value => {
                 if (value.length > 0) {
                     const securities = value.map(c => {
-                        c.timeLastTrade = new Date(c.timeLastTrade);
+                        c.lastTradeTime = new Date(c.lastTradeTime);
                         return c;
                     });
                     let security = this.state.security;
@@ -70,7 +70,7 @@ export class BotControlHistory extends React.Component<Props, States> {
                         security = securities.find(o => o.secCode === security.secCode);
                     }
                     // console.log(securities[0]);
-                    this.setState({securities, security, timeInHistory: security?.timeLastTrade});
+                    this.setState({securities, security, timeInHistory: security?.lastTradeTime});
                 } else {
                     this.setState({securities: [], security: null, timeInHistory: null});
                 }

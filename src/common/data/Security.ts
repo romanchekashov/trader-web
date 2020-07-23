@@ -7,12 +7,16 @@ export class Security {
     public secCode: string;
     public name: string;
     public shortName: string;
+    public secPriceStep: number;
+    public scale: number;
+
     public lastTradePrice: number;
     public lastTradeTime: Date;
     public lastTradeQuantity: number;
-    public todayMoneyTurnover: number;
-    public numberOfTradesToday: number;
-    public secPriceStep: number;
+    public lastTradeValue: number;
+
     public lastChange: number;
-    public scale: number;
+    public numTradesToday: number;
+    public valueToday: number;
+    public volumeToday: number;
 }
