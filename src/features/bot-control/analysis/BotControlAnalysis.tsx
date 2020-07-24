@@ -137,8 +137,8 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                             <Column field="futureTotalSupply" header="Общ предл"/>
                             <Column field="futureSellDepoPerContract" header="ГО прод"/>
                             <Column field="futureBuyDepoPerContract" header="ГО покуп"/>
-                            <Column field="priceLastTrade" header="Цена"/>
-                            <Column field="numTrades" header="Кол-во сделок"/>
+                            <Column field="lastTradePrice" header="Цена"/>
+                            <Column field="numTradesToday" header="Кол-во сделок"/>
                         </DataTable>
                     </div>
                 </div>

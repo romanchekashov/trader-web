@@ -16,7 +16,7 @@ export const TradingChartsSecurities: React.FC<Props> = ({classCode, securities,
     const columns = [
         {field: 'shortName', header: 'Наз'},
         {field: 'lastChange', header: '% изм'},
-        {field: 'priceLastTrade', header: 'Цен посл'},
+        {field: 'lastTradePrice', header: 'Цен посл'},
         {field: 'futureTotalDemand', header: 'Об спр'},
         {field: 'futureTotalSupply', header: 'Об пред'},
         {field: 'futureSellDepoPerContract', header: 'ГО прод'},

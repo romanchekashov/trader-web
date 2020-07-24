@@ -31,7 +31,7 @@ export const BotControlAnalysisInfo: React.FC<Props> = ({security}) => {
         return (
             <>
                 <div className="p-grid analysis-head">
-                    <MoexOpenInterestView moexOpenInterest={moexOpenInterest}/>
+                    <MoexOpenInterestView security={security}/>
                 </div>
             </>
         )

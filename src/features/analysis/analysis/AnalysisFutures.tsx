@@ -2,11 +2,7 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Interval} from "../../../common/data/Interval";
-import {
-    getMoexApiOpenInterestList,
-    getMoexOpenInterests,
-    getTradePremise
-} from "../../../common/api/rest/analysisRestApi";
+import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
 import {Dropdown} from "primereact/dropdown";
@@ -22,21 +18,19 @@ import {ActiveTrade} from "../../../common/data/ActiveTrade";
 import Alerts from "../../../common/components/alerts/Alerts";
 import MarketState from "../../../common/components/market-state/MarketState";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
-import {MoexOpenInterest} from "../../../common/data/open-interest/MoexOpenInterest";
 import {adjustTradePremise} from "../../../common/utils/DataUtils";
 import {MoexOpenInterestView} from "./MoexOpenInterestView";
 import {Trade} from "../../../common/data/Trade";
-import {getTrades} from "../../../common/api/rest/quikRestApi";
 import {TabPanel, TabView} from "primereact/tabview";
-import {MoexOpenInterestChart} from "./MoexOpenInterestChart";
 import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
 import {News} from "../../../common/components/news/News";
 import {StopOrder} from "../../../common/data/StopOrder";
 import moment = require("moment");
+import {getTrades} from "../../../common/api/rest/quikRestApi";
 
 type Props = {
     security: SecurityLastInfo
-};
+}
 
 const AnalysisFutures: React.FC<Props> = ({security}) => {
     const timeFrameTradingIntervals = {
@@ -51,23 +45,25 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
         "DAY": [Interval.DAY, Interval.H2],
         "WEEK": [Interval.WEEK, Interval.DAY],
         "MONTH": [Interval.MONTH, Interval.WEEK]
-    };
+    }
+    const MIN_CHART_WIDTH = 400
+    const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
 
     const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate());
     const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
     const [timeFrameMin, setTimeFrameMin] = useState(Interval.M1);
     const [premise, setPremise] = useState(null);
-    const [orders, setOrders] = useState<Order[]>(null);
-    const [stopOrders, setStopOrders] = useState<StopOrder[]>(null);
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [stopOrders, setStopOrders] = useState<StopOrder[]>([]);
     const [activeTrade, setActiveTrade] = useState(null);
 
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [chartNumber, setChartNumber] = useState(1);
 
     const [securityLastInfo, setSecurityLastInfo] = useState(null);
-    const [chart1Width, setChart1Width] = useState(200);
-    const [chart2Width, setChart2Width] = useState(200);
-    const [chartAlertsWidth, setChartAlertsWidth] = useState(200);
+    const [chart1Width, setChart1Width] = useState(MIN_CHART_WIDTH);
+    const [chart2Width, setChart2Width] = useState(MIN_CHART_WIDTH);
+    const [chartAlertsWidth, setChartAlertsWidth] = useState(MIN_CHART_WIDTH);
     const chart1Ref = useRef(null);
     const chart2Ref = useRef(null);
     const chartAlertsRef = useRef(null);
@@ -76,32 +72,52 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
     const [marketStateFilterDto, setMarketStateFilterDto] = useState(null);
     const [alert, setAlert] = useState(null);
     const [trades, setTrades] = useState<Trade[]>([]);
-    const [moexOpenInterestsForDays, setMoexOpenInterestsForDays] = useState<MoexOpenInterest[]>([]);
-    const [moexOpenInterests, setMoexOpenInterests] = useState<MoexOpenInterest[]>([]);
 
     const updateSize = () => {
-        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200);
-        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : 200);
-        setChartAlertsWidth(chartAlertsRef.current ? chartAlertsRef.current.clientWidth : 200);
-    };
+        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : MIN_CHART_WIDTH)
+        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : MIN_CHART_WIDTH)
+        setChartAlertsWidth(chartAlertsRef.current ? chartAlertsRef.current.clientWidth : MIN_CHART_WIDTH)
+    }
+
+    useEffect(() => {
+        console.log("orders: ", orders)
+
+        const ordersSetupSubscription = WebsocketService.getInstance()
+            .on<Order[]>(WSEvent.ORDERS)
+            .subscribe(newOrders => {
+                if (orders.length !== newOrders.length) {
+                    setOrders(newOrders)
+                }
+            })
+
+        // Specify how to clean up after this effect:
+        return function cleanup() {
+            ordersSetupSubscription.unsubscribe()
+        }
+    }, [orders])
+
+    useEffect(() => {
+        console.log("stopOrders: ", stopOrders)
+
+        const stopOrdersSubscription = WebsocketService.getInstance()
+            .on<StopOrder[]>(WSEvent.STOP_ORDERS)
+            .subscribe(newStopOrders => {
+                if (stopOrders.length !== newStopOrders.length) {
+                    setStopOrders(newStopOrders)
+                }
+            })
+
+        // Specify how to clean up after this effect:
+        return function cleanup() {
+            stopOrdersSubscription.unsubscribe()
+        }
+    }, [stopOrders])
 
     useEffect(() => {
         if (security) {
             console.log("AnalysisFutures: ", security);
             informServerAboutRequiredData();
 
-            // if (!trendLowTF && !trendLowTFLoading) {
-            //     trendLowTFLoading = true;
-            //     getTrend(future.classCode, future.secCode, timeFrameLow, 540)
-            //         .then(trend => {
-            //             setTrendLowTF(trend);
-            //             trendLowTFLoading = false;
-            //         })
-            //         .catch(reason => {
-            //             trendLowTFLoading = false;
-            //         });
-            // }
-            //
             if (!filterDto || filterDto.secCode !== security.secCode) {
                 setFilterDto({
                     classCode: security.classCode,
@@ -109,44 +125,18 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                     fetchByWS: true,
                     history: false,
                     all: false
-                });
+                })
             }
-            updateMarketStateFilterDto(timeFrameTrading);
+            updateMarketStateFilterDto(timeFrameTrading)
 
-            fetchPremise(timeFrameTrading);
+            fetchPremise(timeFrameTrading)
 
-            getMoexOpenInterests(security.classCode, security.secCode, moment().subtract(100, 'days').format("YYYY-MM-DD"))
-                .then(setMoexOpenInterestsForDays);
-
-            getMoexApiOpenInterestList(security.classCode, security.secCode)
-                .then(setMoexOpenInterests);
-
-            getTrades(40).then(setTrades);
+            getTrades(40).then(setTrades)
 
             if (!securityLastInfo) {
-                setSecurityLastInfo({
-                    classCode: security.classCode,
-                    secCode: security.secCode,
-                    valueToday: null,
-                    priceLastTrade: security.lastTradePrice,
-                    timeLastTrade: security.lastTradeTime,
-                    quantityLastTrade: security.lastTradeQuantity,
-                    valueLastTrade: null,
-                    numTrades: security.numTradesToday,
-                    futureTotalDemand: null,
-                    futureTotalSupply: null,
-                    futureSellDepoPerContract: null,
-                    futureBuyDepoPerContract: null
-                });
+                setSecurityLastInfo(security)
             }
         }
-
-        const intervalToFetchOpenInterest = setInterval(() => {
-            if (security) {
-                getMoexApiOpenInterestList(security.classCode, security.secCode)
-                    .then(setMoexOpenInterests)
-            }
-        }, 120000)
 
         const wsStatusSub = WebsocketService.getInstance()
             .connectionStatus()
@@ -154,61 +144,50 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                 if (isConnected && security) {
                     informServerAboutRequiredData();
                 }
-            });
+            })
 
         const lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
                 if (security) {
-                    const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
+                    const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode)
                     if (newSecurityLastInfo) {
-                        newSecurityLastInfo.lastTradeTime = new Date(newSecurityLastInfo.lastTradeTime);
-                        setSecurityLastInfo(newSecurityLastInfo);
+                        newSecurityLastInfo.lastTradeTime = new Date(newSecurityLastInfo.lastTradeTime)
+                        setSecurityLastInfo(newSecurityLastInfo)
                     }
                 }
-            });
+            })
 
         const tradePremiseSubscription = WebsocketService.getInstance()
             .on<TradePremise>(WSEvent.TRADE_PREMISE)
             .subscribe(newPremise => {
-                adjustTradePremise(newPremise);
-                setPremise(newPremise);
-            });
-
-        const ordersSetupSubscription = WebsocketService.getInstance()
-            .on<Order[]>(WSEvent.ORDERS)
-            .subscribe(setOrders);
-
-        const stopOrdersSubscription = WebsocketService.getInstance()
-            .on<StopOrder[]>(WSEvent.STOP_ORDERS)
-            .subscribe(setStopOrders);
+                adjustTradePremise(newPremise)
+                setPremise(newPremise)
+            })
 
         const activeTradeSubscription = WebsocketService.getInstance()
             .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
             .subscribe(activeTrades => {
                 if (security) {
                     const activeTrade = activeTrades
-                        .find(at => at && at.classCode === security.classCode && at.secCode === security.secCode);
-                    setActiveTrade(activeTrade);
+                        .find(at => at && at.classCode === security.classCode && at.secCode === security.secCode)
+                    setActiveTrade(activeTrade)
                 }
-            });
+            })
 
 
-        setTimeout(updateSize, 1000);
-        window.addEventListener('resize', updateSize);
+        setTimeout(updateSize, 1000)
+        window.addEventListener('resize', updateSize)
 
         // Specify how to clean up after this effect:
         return function cleanup() {
-            window.removeEventListener('resize', updateSize);
-            wsStatusSub.unsubscribe();
-            lastSecuritiesSubscription.unsubscribe();
-            tradePremiseSubscription.unsubscribe();
-            ordersSetupSubscription.unsubscribe();
-            stopOrdersSubscription.unsubscribe();
-            activeTradeSubscription.unsubscribe();
-            clearInterval(intervalToFetchOpenInterest)
-        };
-    }, [security]);
+            window.removeEventListener('resize', updateSize)
+            wsStatusSub.unsubscribe()
+            lastSecuritiesSubscription.unsubscribe()
+            tradePremiseSubscription.unsubscribe()
+            activeTradeSubscription.unsubscribe()
+        }
+    }, [security])
 
     const updateMarketStateFilterDto = (interval: Interval) => {
         setMarketStateFilterDto({
@@ -277,12 +256,27 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
 
     const onStartChanged = (start: Date) => {
         setStart(start);
-    };
+    }
+
+    const onTabChanged = (tabIndex: number) => {
+        switch (tabIndex) {
+            case 0:
+                break
+            case 1:
+                break
+            case 2:
+                break
+            case 3:
+                break
+        }
+
+        setActiveTabIndex(tabIndex)
+    }
 
     if (security) {
 
         return (
-            <TabView>
+            <TabView activeIndex={activeTabIndex} onTabChange={(e) => onTabChanged(e.index)}>
                 <TabPanel header="Chart">
                     <div className="p-grid analysis-head">
                         <div className="p-col-12">
@@ -297,8 +291,8 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                                 <Column field="futureTotalSupply" header="Общ предл"/>
                                 <Column field="futureSellDepoPerContract" header="ГО прод"/>
                                 <Column field="futureBuyDepoPerContract" header="ГО покуп"/>
-                                <Column field="priceLastTrade" header="Цена"/>
-                                <Column field="numTrades" header="Кол-во сделок"/>
+                                <Column field="lastTradePrice" header="Цена"/>
+                                <Column field="numTradesToday" header="Кол-во сделок"/>
                             </DataTable>
                         </div>
                     </div>
@@ -383,27 +377,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                     </div>
                 </TabPanel>
                 <TabPanel header="Open Interest">
-                    <div className="p-grid analysis-head">
-                        <div className="p-col-6">
-                            <MoexOpenInterestView moexOpenInterest={moexOpenInterestsForDays.length > 0
-                                ? moexOpenInterestsForDays[moexOpenInterestsForDays.length - 1] : null}/>
-                        </div>
-                        <div className="p-col-6">
-                            <MoexOpenInterestChart moexOpenInterests={moexOpenInterests}
-                                                   title={"Real-time OI for last date"}
-                                                   dateTimeFormat={"HH:mm/DD MMM YY"}
-                                                   width={500} height={400}/>
-                        </div>
-                        <div className="p-col-12">
-                            <MoexOpenInterestChart moexOpenInterests={moexOpenInterestsForDays}
-                                                   title={"OI history"}
-                                                   dateTimeFormat={"DD MMM YY"}
-                                                   width={1000} height={600}/>
-                        </div>
-                    </div>
-                    <div className="p-grid">
-
-                    </div>
+                    <MoexOpenInterestView security={security}/>
                 </TabPanel>
                 <TabPanel header="News">
                     <News secId={security.id}/>

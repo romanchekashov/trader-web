@@ -9,15 +9,11 @@ import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
 import {SecurityShare} from "../../common/data/SecurityShare";
 import {ClassCode} from "../../common/data/ClassCode";
 import Analysis from "./analysis/Analysis";
-import {TradePremise} from "../../common/data/strategy/TradePremise";
 import {SecurityCurrency} from "../../common/data/SecurityCurrency";
 import {SecurityFuture} from "../../common/data/SecurityFuture";
 import AnalysisFutures from "./analysis/AnalysisFutures";
 import "./Analysis.css";
 import {SecurityLastInfo} from "../../common/data/SecurityLastInfo";
-import {WebsocketService, WSEvent} from "../../common/api/WebsocketService";
-import {SubscriptionLike} from "rxjs";
-import {getTradePremise} from "../../common/api/rest/analysisRestApi";
 import {setSelectedSecurity} from "../../common/utils/Cache";
 import {Securities} from "./securities/Securities";
 
@@ -27,7 +23,7 @@ function mapStateToProps(state: RootState) {
         shares: state.tradeStrategyAnalysis.shares,
         currencies: state.tradeStrategyAnalysis.currencies,
         futures: state.tradeStrategyAnalysis.futures
-    };
+    }
 }
 
 function mapDispatchToProps(dispatch: AppDispatch) {
@@ -38,16 +34,13 @@ function mapDispatchToProps(dispatch: AppDispatch) {
             loadSecurityCurrency: bindActionCreators(loadSecurityCurrency, dispatch),
             loadSecurityFuture: bindActionCreators(loadSecurityFuture, dispatch)
         }
-    };
+    }
 }
 
 interface TradeStrategyAnalysisState {
     selectedSecurity: SecurityLastInfo
     isDetailsShown: boolean
     filter: MarketBotStartDto
-    securityLastInfo: SecurityLastInfo
-    securities: SecurityLastInfo[],
-    premise: TradePremise
 }
 
 type Props = {
@@ -55,124 +48,65 @@ type Props = {
     shares: SecurityShare[]
     currencies: SecurityCurrency[]
     futures: SecurityFuture[]
-} & ReturnType<typeof mapDispatchToProps>;
+} & ReturnType<typeof mapDispatchToProps>
 
 class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
-    private lastSecuritiesSubscription: SubscriptionLike = null;
-
     constructor(props) {
-        super(props);
+        super(props)
 
         this.state = {
             selectedSecurity: null,
             isDetailsShown: false,
-            filter: null,
-            securityLastInfo: null,
-            securities: [],
-            premise: null
-        };
+            filter: null
+        }
     }
 
     componentDidMount(): void {
-        const {actions, filterData} = this.props;
+        const {actions, filterData} = this.props
 
         if (!filterData) {
-            actions.loadFilterData();
+            actions.loadFilterData()
         }
-
-        this.lastSecuritiesSubscription = WebsocketService.getInstance()
-            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-            .subscribe(value => {
-                const securities = value.map(c => {
-                    c.lastTradeTime = new Date(c.lastTradeTime);
-                    return c;
-                });
-                let securityLastInfo = this.state.securityLastInfo;
-                if (securityLastInfo) {
-                    securityLastInfo = securities.find(o => o.secCode === securityLastInfo.secCode);
-                }
-                this.setState({securities, securityLastInfo});
-            });
     }
 
     componentWillUnmount = (): void => {
-        this.lastSecuritiesSubscription.unsubscribe();
-    };
-
-    loadPremise = (share: SecurityShare) => {
-        const {filter} = this.state;
-
-        if (filter && share) {
-            if (ClassCode.SPBFUT !== filter.classCode) {
-                getTradePremise({
-                    brokerId: filter.brokerId,
-                    tradingPlatform: filter.tradingPlatform,
-                    classCode: filter.classCode,
-                    secCode: share.secCode,
-                    timeFrameTrading: filter.timeFrameTrading,
-                    timeFrameMin: filter.timeFrameMin
-                })
-                    .then(premise => this.setState({premise}))
-                    .catch(console.error);
-            }
-        }
-    };
-
-    onStart = (filter: MarketBotStartDto): void => {
-        this.setState({filter, selectedSecurity: null, isDetailsShown: false});
-        // if (filter) {
-        //     switch (filter.classCode) {
-        //         case ClassCode.CETS:
-        //             this.props.actions.loadSecurityCurrency();
-        //             break;
-        //         case ClassCode.TQBR:
-        //             this.props.actions.loadSecurityShares();
-        //             break;
-        //         case ClassCode.SPBFUT:
-        //             this.props.actions.loadSecurityFuture();
-        //             break;
-        //     }
-        // }
-    };
+    }
 
     onSelectRow = (selectedSecurity: SecurityLastInfo) => {
         if (selectedSecurity) {
-            const {securities} = this.state;
-            const securityLastInfo = securities.find(o => o.secCode === selectedSecurity.secCode);
-            this.setState({selectedSecurity, isDetailsShown: true, securityLastInfo});
-            setSelectedSecurity(selectedSecurity);
+            this.setState({selectedSecurity, isDetailsShown: true})
+            setSelectedSecurity(selectedSecurity)
         } else {
-            this.setState({selectedSecurity, isDetailsShown: false});
+            this.setState({selectedSecurity, isDetailsShown: false})
         }
-    };
+    }
 
     render() {
-        const {filterData, shares, currencies, futures} = this.props;
-        const {selectedSecurity, isDetailsShown, filter} = this.state;
-        let selectedSecuritiesView = null;
+        const {selectedSecurity, isDetailsShown} = this.state
+        let selectedSecuritiesView = null
 
         if (selectedSecurity) {
             selectedSecuritiesView = (
                 <div key={selectedSecurity.secCode}>{selectedSecurity.secCode}</div>
-            );
+            )
         }
-        const classDataTable = isDetailsShown ? 'p-col-3' : 'p-col-12';
-        const classDetails = isDetailsShown ? 'p-col-9' : 'hidden';
+        const classDataTable = isDetailsShown ? 'p-col-3' : 'p-col-12'
+        const classDetails = isDetailsShown ? 'p-col-9' : 'hidden'
 
-        let analysis = <div>Select security</div>;
+        let analysis = <div>Select security</div>
         if (selectedSecurity) {
             switch (selectedSecurity.classCode) {
                 case ClassCode.TQBR:
                 case ClassCode.CETS:
                     analysis = (
                         <Analysis security={selectedSecurity}/>
-                    );
+                    )
                     break;
                 case ClassCode.SPBFUT:
                     analysis = (
                         <AnalysisFutures security={selectedSecurity}/>
-                    );
+                    )
                     break;
             }
         }
@@ -206,11 +140,11 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                     </div>
                 </div>
             </div>
-        );
+        )
     }
 }
 
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(AnalysisPage);
+)(AnalysisPage)

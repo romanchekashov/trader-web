@@ -28,6 +28,7 @@ export const ChartSwingHighsLows: React.FC<Props> = ({swingHighsLows}) => {
             {
                 swingHighsLows.map(trendWrapper => {
                     const all = {};
+                    let keyAll: string = trendWrapper.trend.interval
                     let color = IntervalColor[trendWrapper.trend.interval];
 
                     if (trendWrapper.isSelectedTimeFrame) {
@@ -35,29 +36,45 @@ export const ChartSwingHighsLows: React.FC<Props> = ({swingHighsLows}) => {
                         const up = {};
                         const down = {};
                         const side = {};
-                        const unknown = {};
+                        const unknown = {}
+
+                        let keyUp: string = trendWrapper.trend.interval
+                        let keyDown: string = trendWrapper.trend.interval
+                        let keySide: string = trendWrapper.trend.interval
+                        let keyUnknown: string = trendWrapper.trend.interval
 
                         for (const trendPoint of trendWrapper.trend.swingHighsLows) {
                             switch (trendPoint.trendDirection) {
                                 case TrendDirection.DOWN:
                                     down[trendPoint.dateTime.getTime()] = trendPoint.swingHL;
+                                    keyDown += trendPoint.dateTime.getTime()
+                                    keyDown += trendPoint.swingHL
                                     break;
                                 case TrendDirection.UP:
-                                    up[trendPoint.dateTime.getTime()] = trendPoint.swingHL;
+                                    up[trendPoint.dateTime.getTime()] = trendPoint.swingHL
+                                    keyUp += trendPoint.dateTime.getTime()
+                                    keyUp += trendPoint.swingHL
                                     break;
                                 case TrendDirection.SIDE:
-                                    side[trendPoint.dateTime.getTime()] = trendPoint.swingHL;
+                                    side[trendPoint.dateTime.getTime()] = trendPoint.swingHL
+                                    keySide += trendPoint.dateTime.getTime()
+                                    keySide += trendPoint.swingHL
                                     break;
                                 default:
-                                    unknown[trendPoint.dateTime.getTime()] = trendPoint.swingHL;
+                                    unknown[trendPoint.dateTime.getTime()] = trendPoint.swingHL
+                                    keyUnknown += trendPoint.dateTime.getTime()
+                                    keyUnknown += trendPoint.swingHL
                                     break;
                             }
-                            all[trendPoint.dateTime.getTime()] = trendPoint.swingHL;
+                            all[trendPoint.dateTime.getTime()] = trendPoint.swingHL
+                            keyAll += trendPoint.dateTime.getTime()
+                            keyAll += trendPoint.swingHL
                         }
 
                         return (
                             <>
                                 <ScatterSeries
+                                    key={keyDown + "-ScatterSeries"}
                                     yAccessor={d => down[d.timestamp.getTime()]}
                                     marker={Circle}
                                     markerProps={{
@@ -67,6 +84,7 @@ export const ChartSwingHighsLows: React.FC<Props> = ({swingHighsLows}) => {
                                     }}/>
 
                                 <ScatterSeries
+                                    key={keyUp + "-ScatterSeries"}
                                     yAccessor={d => up[d.timestamp.getTime()]}
                                     marker={Circle}
                                     markerProps={{
@@ -76,6 +94,7 @@ export const ChartSwingHighsLows: React.FC<Props> = ({swingHighsLows}) => {
                                     }}/>
 
                                 <ScatterSeries
+                                    key={keySide + "-ScatterSeries"}
                                     yAccessor={d => side[d.timestamp.getTime()]}
                                     marker={Circle}
                                     markerProps={{
@@ -84,27 +103,33 @@ export const ChartSwingHighsLows: React.FC<Props> = ({swingHighsLows}) => {
                                         fill: TrendDirectionColor[TrendDirection.SIDE]
                                     }}/>
 
+                                <ScatterSeries
+                                    key={keyUnknown + "-ScatterSeries"}
+                                    yAccessor={d => unknown[d.timestamp.getTime()]}
+                                    marker={Circle}
+                                    markerProps={{r: 3, stroke: color, fill: color}}/>
+
                                 <LineSeries
+                                    key={keyAll + "-LineSeries"}
                                     yAccessor={d => all[d.timestamp.getTime()]}
                                     stroke={color}
                                     strokeDasharray="Solid"
                                     connectNulls={true}/>
-                                <ScatterSeries
-                                    yAccessor={d => unknown[d.timestamp.getTime()]}
-                                    marker={Circle}
-                                    markerProps={{r: 3, stroke: color, fill: color}}/>
                             </>
                         )
                     } else {
                         color = color || defaultColorStroke;
 
                         for (const trendPoint of trendWrapper.trend.swingHighsLows) {
-                            all[trendPoint.dateTime.getTime()] = trendPoint.swingHL;
+                            all[trendPoint.dateTime.getTime()] = trendPoint.swingHL
+                            keyAll += trendPoint.dateTime.getTime()
+                            keyAll += trendPoint.swingHL
                         }
 
                         return (
                             <>
                                 <LineSeries
+                                    key={keyAll + "-LineSeries"}
                                     yAccessor={d => all[d.timestamp.getTime()]}
                                     stroke={color}
                                     strokeDasharray="Solid"

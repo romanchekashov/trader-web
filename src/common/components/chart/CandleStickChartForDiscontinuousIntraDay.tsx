@@ -37,7 +37,6 @@ import {
 import {TrendLineDto} from "../../data/TrendLineDto";
 import {round, StoreData} from "../../utils/utils";
 import {ChartTrendLine} from "./data/ChartTrendLine";
-import {ChartSwingHighsLows} from "./components/ChartSwingHighsLows";
 import {TrendWrapper} from "../../data/TrendWrapper";
 import {ChartTrades} from "./components/ChartTrades";
 import {Trade} from "../../data/Trade";
@@ -128,38 +127,38 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     }
 
     componentDidMount = () => {
-        document.addEventListener("keyup", this.onKeyPress);
+        document.addEventListener("keyup", this.onKeyPress)
     }
 
     componentWillUnmount = () => {
-        document.removeEventListener("keyup", this.onKeyPress);
+        document.removeEventListener("keyup", this.onKeyPress)
     }
 
-    static getDerivedStateFromProps = (props, state) => {
+    static getDerivedStateFromProps = (props: Props, state: State) => {
         // Any time the current user changes,
         // Reset any parts of state that are tied to that user.
         // In this simple example, that's just the email.
         if (props.trends !== state.trends_1) {
-            const trends = props.trends;
-            const trends_1 = state.trends_1;
-            let update = trends_1.length !== trends.length;
+            const trends = props.trends
+            const trends_1 = state.trends_1
+            let update = trends_1.length !== trends.length
             if (!update) {
                 for (let i = 0; i < trends.length; i++) {
                     const trendStartEndSum = trends_1[i].start[1] + trends_1[i].end[1]
-                        + trends_1[i].start[0] + trends_1[i].end[0];
+                        + trends_1[i].start[0] + trends_1[i].end[0]
                     const trendLineStartEndSum = trends[i].start[1] + trends[i].end[1]
-                        + trends[i].start[0] + trends[i].end[0];
+                        + trends[i].start[0] + trends[i].end[0]
                     if (trendStartEndSum !== trendLineStartEndSum) {
                         update = true;
                     }
-                    trends[i].selected = trends_1[i].selected;
+                    trends[i].selected = trends_1[i].selected
                 }
             }
 
             if (update) {
                 return {
                     trends_1: props.trends
-                };
+                }
             }
         }
 
@@ -170,7 +169,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                 props.orders, props.stops, state.yCoordinateList_1)
         }
 
-        return null;
+        return null
     }
 
     static getInteractiveOrderMap = (orders, stops, yCoordinateList_1: any[]): any => {
@@ -712,7 +711,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
                         <ChartZones zones={zones} scale={scale}/>
                         <ChartLevels srLevels={srLevels} scale={scale}/>
-                        <ChartSwingHighsLows swingHighsLows={swingHighsLows}/>
+                        {/*<ChartSwingHighsLows swingHighsLows={swingHighsLows}/>*/}
 
                         <CandlestickSeries fill={(d) => d.close > d.open ? "#ecf0f1" : "#000"}
                                            stroke="#000"

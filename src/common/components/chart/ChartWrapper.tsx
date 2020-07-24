@@ -160,31 +160,31 @@ export class ChartWrapper extends React.Component<Props, States> {
     }
 
     componentWillUnmount = (): void => {
-        this.candlesSetupSubscription.unsubscribe();
-        this.wsStatusSub.unsubscribe();
+        this.candlesSetupSubscription.unsubscribe()
+        this.wsStatusSub.unsubscribe()
     }
 
-    componentDidUpdate = (prevProps) => {
-        const {security, interval, start} = this.props;
-        const {candles, innerInterval, innerStart, numberOfCandles} = this.state;
+    componentDidUpdate = (prevProps: Props) => {
+        const {security, interval, start} = this.props
+        const {candles, innerInterval, innerStart, numberOfCandles} = this.state
 
         if (security) {
             if (!this.fetchingCandles) {
                 if (!prevProps.security || candles.length === 0 || security.secCode !== prevProps.security.secCode) {
-                    this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
+                    this.fetchCandles(security, innerInterval, innerStart, numberOfCandles)
                 }
-                if (prevProps.security && security.lastTradePrice !== prevProps.security.priceLastTrade) {
-                    this.updateLastCandle();
+                if (prevProps.security && security.lastTradePrice !== prevProps.security.lastTradePrice) {
+                    this.updateLastCandle()
                 }
             }
         }
 
         if (interval !== innerInterval) {
-            this.setState({innerInterval: interval});
+            this.setState({innerInterval: interval})
         }
 
         if (start !== innerStart) {
-            this.setState({innerStart: start});
+            this.setState({innerStart: start})
         }
 
         if (prevProps.security !== security && prevProps.security?.secCode !== security.secCode) {
@@ -261,18 +261,23 @@ export class ChartWrapper extends React.Component<Props, States> {
         }).then(this.setTrendLinesFromServer).catch((e) => console.error(e));
     }
 
-    setTrendLinesFromServer = (trendLines: TrendLineDto[]): void => {
-        const {candles} = this.state;
-        for (const t of trendLines) {
-            t.startTimestamp = new Date(t.startTimestamp);
-            t.endTimestamp = new Date(t.endTimestamp);
+    setTrendLinesFromServer = (trendLinesFromServer: TrendLineDto[]): void => {
+        const {candles, trendLines} = this.state
+
+        if (trendLines.length !== trendLinesFromServer.length) {
+
+            for (const t of trendLinesFromServer) {
+                t.startTimestamp = new Date(t.startTimestamp);
+                t.endTimestamp = new Date(t.endTimestamp);
+            }
+
+            this.initialStateTrendLines = trendLinesFromServer;
+            this.setState({
+                trendLines: trendLinesFromServer,
+                trends_1: this.mapTrendLinesFromPropsToState(trendLinesFromServer, candles)
+            })
         }
-        this.initialStateTrendLines = trendLines;
-        this.setState({
-            trendLines,
-            trends_1: this.mapTrendLinesFromPropsToState(trendLines, candles)
-        });
-    };
+    }
 
     mapTrendLinesFromPropsToState = (trendLines: TrendLineDto[], candles: Candle[]): ChartTrendLine[] => {
         const {innerInterval} = this.state;

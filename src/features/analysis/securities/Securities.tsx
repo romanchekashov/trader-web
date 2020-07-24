@@ -75,10 +75,14 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
 
     return (
         <>
-            <div className="p-col-2">
-                <Button label="Show All" icon="pi pi-caret-right" onClick={(e) => selectSecurity(null)}/>
+            <div className="p-col-12">
+                <div className="p-grid">
+                    <div className="p-col-6">
+                        <Button label="Show All" icon="pi pi-caret-right" onClick={(e) => selectSecurity(null)}/>
+                    </div>
+                    <div className="p-col-6">{lastTimeUpdate}</div>
+                </div>
             </div>
-            <div className="p-col-2">{lastTimeUpdate}</div>
             <DataTable value={securities} responsive
                        selectionMode="single"
                        selection={selectedSecurity}

@@ -1,63 +1,63 @@
 import * as React from "react";
+import {useEffect, useState} from "react";
 import {MoexOpenInterest} from "../../../common/data/open-interest/MoexOpenInterest";
+import {getMoexApiOpenInterestList, getMoexOpenInterests} from "../../../common/api/rest/analysisRestApi";
+import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import {MoexOpenInterestChart} from "./MoexOpenInterestChart";
+import {MoexOpenInterestTable} from "./MoexOpenInterestTable";
+import moment = require("moment");
 
 type Props = {
-    moexOpenInterest: MoexOpenInterest
-};
+    security: SecurityLastInfo
+}
 
-export const MoexOpenInterestView: React.FC<Props> = ({moexOpenInterest}) => {
+export const MoexOpenInterestView: React.FC<Props> = ({security}) => {
 
-    if (moexOpenInterest) {
-        return (
+    const [moexOpenInterestsForDays, setMoexOpenInterestsForDays] = useState<MoexOpenInterest[]>([])
+    const [moexOpenInterests, setMoexOpenInterests] = useState<MoexOpenInterest[]>([])
+
+    useEffect(() => {
+        if (security) {
+            const from = moment().subtract(100, 'days').format("YYYY-MM-DD")
+
+            getMoexOpenInterests(security.classCode, security.secCode, from)
+                .then(setMoexOpenInterestsForDays)
+
+            getMoexApiOpenInterestList(security.classCode, security.secCode)
+                .then(setMoexOpenInterests)
+        }
+
+        const intervalToFetchOpenInterest = setInterval(() => {
+            if (security) {
+                getMoexApiOpenInterestList(security.classCode, security.secCode)
+                    .then(setMoexOpenInterests)
+            }
+        }, 60000)
+
+        // Specify how to clean up after this effect:
+        return function cleanup() {
+            clearInterval(intervalToFetchOpenInterest)
+        };
+    }, [security])
+
+    return (
+        <div className="p-grid analysis-head">
             <div className="p-col-6">
-                <table className="contract-open-positions">
-                    <tbody>
-                    <tr>
-                        <th rowSpan={2}>Открытые позиции</th>
-                        <th colSpan={2} className="white-border-column">Физические лица</th>
-                        <th colSpan={2} className="white-border-column">Юридические лица</th>
-                        <th rowSpan={2}>Итого</th>
-                    </tr>
-                    <tr>
-                        <th>Длинные</th>
-                        <th>Короткие</th>
-                        <th>Длинные</th>
-                        <th>Короткие</th>
-                    </tr>
-                    <tr>
-                        <td>Открытые позиции</td>
-                        <td className="text_right">{moexOpenInterest.fizPosLong.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.fizPosShort.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.yurPosLong.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.yurPosShort.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.posTotal.toLocaleString()}</td>
-                    </tr>
-                    <tr>
-                        <td>Изменение</td>
-                        <td className="text_right">{moexOpenInterest.changeFizPosLong
-                            ? moexOpenInterest.changeFizPosLong.toLocaleString() : null}</td>
-                        <td className="text_right">{moexOpenInterest.changeFizPosShort
-                            ? moexOpenInterest.changeFizPosShort.toLocaleString() : null}</td>
-                        <td className="text_right">{moexOpenInterest.changeYurPosLong
-                            ? moexOpenInterest.changeYurPosLong.toLocaleString() : null}</td>
-                        <td className="text_right">{moexOpenInterest.changeYurPosShort
-                            ? moexOpenInterest.changeYurPosShort.toLocaleString() : null}</td>
-                        <td className="text_right">{moexOpenInterest.changePosTotal
-                            ? moexOpenInterest.changePosTotal.toLocaleString() : null}</td>
-                    </tr>
-                    <tr>
-                        <td>Количество лиц</td>
-                        <td className="text_right">{moexOpenInterest.fizPosLongHolders.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.fizPosShortHolders.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.yurPosLongHolders.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.yurPosShortHolders.toLocaleString()}</td>
-                        <td className="text_right">{moexOpenInterest.posHoldersTotal.toLocaleString()}</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <MoexOpenInterestTable moexOpenInterest={moexOpenInterestsForDays.length > 0
+                    ? moexOpenInterestsForDays[moexOpenInterestsForDays.length - 1] : null}/>
             </div>
-        )
-    } else {
-        return null
-    }
-};
+            <div className="p-col-6">
+                <MoexOpenInterestChart moexOpenInterests={moexOpenInterests}
+                                       title={"Real-time OI for last date"}
+                                       dateTimeFormat={"HH:mm/DD MMM YY"}
+                                       width={500} height={400}/>
+            </div>
+            <div className="p-col-12">
+                <MoexOpenInterestChart moexOpenInterests={moexOpenInterestsForDays}
+                                       title={"OI history"}
+                                       dateTimeFormat={"DD MMM YY"}
+                                       width={1000} height={600}/>
+            </div>
+        </div>
+    )
+}

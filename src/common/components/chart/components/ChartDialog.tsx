@@ -66,38 +66,51 @@ export class ChartDialog extends React.Component<Props, State> {
         this.handleSave = this.handleSave.bind(this);
     }
 
-    componentWillReceiveProps = (nextProps) => {
-        const {showModal, securityInfo} = this.props
-        const {operationType} = this.state
-
-        if (nextProps.alert && showModal != nextProps.showModal) {
-            nextProps.alert.yValue = round(nextProps.alert.yValue, securityInfo.scale)
-            this.setState({
-                alert: nextProps.alert,
-                type: nextProps.alert.id.startsWith("stop_") ? 'stop' : 'order',
-                stopPrice: this.calcStopPrice(operationType, nextProps.alert.yValue)
-            })
+    static getDerivedStateFromProps = (props, state) => {
+        if (props.alert && props.alert.id !== state.alert.id) {
+            return {
+                alert: props.alert,
+                type: props.alert.id.startsWith("stop_") ? 'stop' : 'order',
+                stopPrice: ChartDialog.calcStopPrice(state.operationType, props.alert.yValue, props.securityInfo)
+            }
         }
+
+        return null
     }
 
-    calcStopPrice = (operationType: OperationType, price: number) => {
-        const {securityInfo} = this.props;
+    static calcStopPrice = (operationType: OperationType, price: number, securityInfo: Security) => {
         const priceDiff = securityInfo.secPriceStep * 2
         const stopPrice = (operationType === OperationType.BUY) ? price + priceDiff : price - priceDiff
 
         return round(stopPrice, securityInfo.scale)
     }
 
+    // componentWillReceiveProps = (nextProps) => {
+    //     const {showModal, securityInfo} = this.props
+    //     const {operationType} = this.state
+    //
+    //     if (nextProps.alert && showModal != nextProps.showModal) {
+    //         nextProps.alert.yValue = round(nextProps.alert.yValue, securityInfo.scale)
+    //         this.setState({
+    //             alert: nextProps.alert,
+    //             type: nextProps.alert.id.startsWith("stop_") ? 'stop' : 'order',
+    //             stopPrice: ChartDialog.calcStopPrice(operationType, nextProps.alert.yValue, securityInfo)
+    //         })
+    //     }
+    // }
+
     handleOperationTypeChange = (operationType: OperationType) => {
+        const {securityInfo} = this.props
         const {alert} = this.state;
 
         this.setState({
             operationType,
-            stopPrice: this.calcStopPrice(operationType, alert.yValue)
+            stopPrice: ChartDialog.calcStopPrice(operationType, alert.yValue, securityInfo)
         })
     }
 
     handleChange = (e) => {
+        const {securityInfo} = this.props
         const {alert, operationType} = this.state
         const price = Number(e.target.value)
 
@@ -106,7 +119,7 @@ export class ChartDialog extends React.Component<Props, State> {
                 ...alert,
                 yValue: price
             },
-            stopPrice: this.calcStopPrice(operationType, price)
+            stopPrice: ChartDialog.calcStopPrice(operationType, price, securityInfo)
         })
     }
 
