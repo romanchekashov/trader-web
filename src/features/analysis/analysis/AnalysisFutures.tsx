@@ -118,15 +118,14 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
             console.log("AnalysisFutures: ", security);
             informServerAboutRequiredData();
 
-            if (!filterDto || filterDto.secCode !== security.secCode) {
-                setFilterDto({
-                    classCode: security.classCode,
-                    secCode: security.secCode,
-                    fetchByWS: true,
-                    history: false,
-                    all: false
-                })
-            }
+            setFilterDto({
+                classCode: security.classCode,
+                secCode: security.secCode,
+                fetchByWS: true,
+                history: false,
+                all: false
+            })
+
             updateMarketStateFilterDto(timeFrameTrading)
 
             fetchPremise(timeFrameTrading)

@@ -278,7 +278,7 @@ const MarketState: React.FC<Props> = ({filter, initMarketState, viewHeight}) => 
             className += "reversal-pattern-doji-" + sInterval.toLowerCase();
         }
         return className;
-    };
+    }
 
     const nameTemplate = (signal: Signal) => {
         let className = "alert-icon ";
@@ -305,7 +305,7 @@ const MarketState: React.FC<Props> = ({filter, initMarketState, viewHeight}) => 
         return <div key={signal.description}
                     className={className}
                     title={title}></div>;
-    };
+    }
 
     if (!filter) {
         return (<>Filter for market state is not set.</>);
