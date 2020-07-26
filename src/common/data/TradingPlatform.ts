@@ -1,4 +1,4 @@
 export enum TradingPlatform {
     QUIK = "QUIK",
-    API = "API"
+    API_TINKOFF = "API_TINKOFF"
 }
