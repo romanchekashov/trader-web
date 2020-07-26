@@ -15,6 +15,7 @@ type Props = {
 export const Securities: React.FC<Props> = ({onSelectRow}) => {
     const [lastTimeUpdate, setLastTimeUpdate] = useState<string>(null)
     const [platform, setPlatform] = useState<TradingPlatform>(TradingPlatform.QUIK);
+    const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
 
     useEffect(() => {
         // Specify how to clean up after this effect:
@@ -23,6 +24,7 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
     }, [])
 
     const selectSecurity = (sec: SecurityLastInfo) => {
+        setSelectedSecurity(sec)
         onSelectRow(sec)
     }
 
@@ -38,7 +40,8 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
                               onPlatformChange={setPlatform}/>
             {
                 platform === TradingPlatform.QUIK ?
-                    <SecuritiesQuik onSelectRow={onSelectRow}
+                    <SecuritiesQuik selectedSecurity={selectedSecurity}
+                                    onSelectRow={selectSecurity}
                                     onLastTimeUpdate={onLastTimeUpdate}/>
                     : null
             }

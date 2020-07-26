@@ -7,15 +7,16 @@ import {SecurityLastInfo} from "../../../../common/data/SecurityLastInfo";
 import {Signal} from "../../../../common/data/Signal";
 import {PatternName} from "../../../../common/components/alerts/data/PatternName";
 import moment = require("moment");
+import {getLastSecurities} from "../../../../common/api/rest/analysisRestApi";
 
 type Props = {
+    selectedSecurity: SecurityLastInfo
     onSelectRow: (e: SecurityLastInfo) => void
     onLastTimeUpdate: (lastTimeUpdate: Date) => void
 }
 
-export const SecuritiesQuik: React.FC<Props> = ({onSelectRow, onLastTimeUpdate}) => {
+export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, onLastTimeUpdate}) => {
     const [securities, setSecurities] = useState<SecurityLastInfo[]>([])
-    const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
 
     const columns = [
         {field: 'shortName', header: 'Наз'},
@@ -46,6 +47,12 @@ export const SecuritiesQuik: React.FC<Props> = ({onSelectRow, onLastTimeUpdate})
     ]
 
     useEffect(() => {
+
+        getLastSecurities().then(securities => {
+            setSecurities(securities)
+            onLastTimeUpdate(new Date())
+        })
+
         const lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
@@ -147,7 +154,6 @@ export const SecuritiesQuik: React.FC<Props> = ({onSelectRow, onLastTimeUpdate})
     }
 
     const selectSecurity = (sec: SecurityLastInfo) => {
-        setSelectedSecurity(sec)
         onSelectRow(sec)
     }
 

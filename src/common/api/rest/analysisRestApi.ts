@@ -21,6 +21,7 @@ import {
 } from "../../utils/DataUtils";
 import {SecurityShareEvent} from "../../data/news/SecurityShareEvent";
 import {SecurityAnalysis} from "../../data/SecurityAnalysis";
+import {SecurityLastInfo} from "../../data/SecurityLastInfo";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
@@ -135,6 +136,13 @@ export function getSecurityShareEvents(secCode: string): Promise<SecurityShareEv
 
 export function getSecurities(): Promise<SecurityAnalysis[]> {
     return fetch(`${baseUrl}securities`)
+        .then(response => handleResponse(response)
+            .then(adjustSecurities))
+        .catch(handleError);
+}
+
+export function getLastSecurities(): Promise<SecurityLastInfo[]> {
+    return fetch(`${baseUrl}last-securities`)
         .then(response => handleResponse(response)
             .then(adjustSecurities))
         .catch(handleError);
