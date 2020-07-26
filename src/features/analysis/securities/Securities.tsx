@@ -6,6 +6,7 @@ import "./Securities.css"
 import {SecuritiesFilter} from "./filter/SecuritiesFilter";
 import {TradingPlatform} from "../../../common/data/TradingPlatform";
 import {SecuritiesQuik} from "./quik/SecuritiesQuik";
+import {SecuritiesTinkoffApi} from "./tinkoff/SecuritiesTinkoffApi";
 import moment = require("moment");
 
 type Props = {
@@ -43,7 +44,10 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
                     <SecuritiesQuik selectedSecurity={selectedSecurity}
                                     onSelectRow={selectSecurity}
                                     onLastTimeUpdate={onLastTimeUpdate}/>
-                    : null
+                    :
+                    <SecuritiesTinkoffApi selectedSecurity={selectedSecurity}
+                                          onSelectRow={selectSecurity}
+                                          onLastTimeUpdate={onLastTimeUpdate}/>
             }
         </>
     )

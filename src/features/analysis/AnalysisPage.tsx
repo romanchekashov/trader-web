@@ -96,18 +96,14 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
         let analysis = <div>Select security</div>
         if (selectedSecurity) {
-            switch (selectedSecurity.classCode) {
-                case ClassCode.TQBR:
-                case ClassCode.CETS:
-                    analysis = (
-                        <Analysis security={selectedSecurity}/>
-                    )
-                    break;
-                case ClassCode.SPBFUT:
-                    analysis = (
-                        <AnalysisFutures security={selectedSecurity}/>
-                    )
-                    break;
+            if (ClassCode.SPBFUT === selectedSecurity.classCode) {
+                analysis = (
+                    <AnalysisFutures security={selectedSecurity}/>
+                )
+            } else {
+                analysis = (
+                    <Analysis security={selectedSecurity}/>
+                )
             }
         }
 

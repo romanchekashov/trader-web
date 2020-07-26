@@ -12,6 +12,7 @@ import {SecurityShareEvent} from "../data/news/SecurityShareEvent";
 import {NewsItem} from "../data/news/NewsItem";
 import {EconomicCalendarEvent} from "../data/news/EconomicCalendarEvent";
 import {Security} from "../data/Security";
+import {Candle} from "../data/Candle";
 
 export const adjustTradingStrategyResultArray = (results: TradingStrategyResult[]): TradingStrategyResult[] => {
     for (const result of results) {
@@ -157,4 +158,12 @@ export const adjustSecurities = (list: Security[]): any => {
     }
 
     return list
+}
+
+export const adjustCandles = (candles: Candle[]): any => {
+    if (candles && candles.length > 0) {
+        for (const candle of candles) candle.timestamp = new Date(candle.timestamp)
+    }
+
+    return candles
 }
