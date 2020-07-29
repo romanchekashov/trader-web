@@ -39,9 +39,9 @@ const fetchSecurityCurrencies = () => {
         })
         .catch(fetchSecurityCurrencies);
 };
-fetchSecurityFutures();
-fetchSecurityShares();
-fetchSecurityCurrencies();
+// fetchSecurityFutures();
+// fetchSecurityShares();
+// fetchSecurityCurrencies();
 
 export const getSecurity = (classCode: ClassCode, secCode: string): Security => {
     return securityMap[classCode + secCode];

@@ -4,9 +4,10 @@ import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import "../../../common/components/notifications/Signals.css";
 import "./Securities.css"
 import {SecuritiesFilter} from "./filter/SecuritiesFilter";
-import {TradingPlatform} from "../../../common/data/TradingPlatform";
+import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
 import {SecuritiesQuik} from "./quik/SecuritiesQuik";
 import {SecuritiesTinkoffApi} from "./tinkoff/SecuritiesTinkoffApi";
+import {BrokerId} from "../../../common/data/BrokerId";
 import moment = require("moment");
 
 type Props = {
@@ -16,6 +17,7 @@ type Props = {
 export const Securities: React.FC<Props> = ({onSelectRow}) => {
     const [lastTimeUpdate, setLastTimeUpdate] = useState<string>(null)
     const [platform, setPlatform] = useState<TradingPlatform>(TradingPlatform.QUIK);
+    const [brokerId, setBrokerId] = useState<BrokerId>(BrokerId.ALFA_DIRECT);
     const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
 
     useEffect(() => {
@@ -33,14 +35,20 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
         setLastTimeUpdate(moment(updateDate).format("HH:mm:ss DD-MM-YYYY"))
     }
 
+    const selectBrokerId = (brokerId: BrokerId) => {
+        setBrokerId(brokerId)
+        setPlatform(brokerId === BrokerId.ALFA_DIRECT ? TradingPlatform.QUIK : TradingPlatform.API)
+    }
+
     return (
         <>
             <SecuritiesFilter lastTimeUpdate={lastTimeUpdate}
                               onShowAll={() => selectSecurity(null)}
-                              platform={platform}
-                              onPlatformChange={setPlatform}/>
+                              brokerId={brokerId}
+                              onBrokerId={selectBrokerId}
+                              platform={platform}/>
             {
-                platform === TradingPlatform.QUIK ?
+                brokerId === BrokerId.ALFA_DIRECT ?
                     <SecuritiesQuik selectedSecurity={selectedSecurity}
                                     onSelectRow={selectSecurity}
                                     onLastTimeUpdate={onLastTimeUpdate}/>

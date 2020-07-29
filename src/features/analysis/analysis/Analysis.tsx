@@ -16,7 +16,7 @@ import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {Order} from "../../../common/data/Order";
 import {ActiveTrade} from "../../../common/data/ActiveTrade";
-import {TradingPlatform} from "../../../common/data/TradingPlatform";
+import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
 import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {adjustTradePremise} from "../../../common/utils/DataUtils";
 import {TabPanel, TabView} from "primereact/tabview";
@@ -24,7 +24,10 @@ import {SecurityShareEventView} from "../../../common/components/share-event/Sec
 import {ClassCode} from "../../../common/data/ClassCode";
 import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
 import {News} from "../../../common/components/news/News";
+import {Market} from "../../../common/data/Market";
 import moment = require("moment");
+import {BrokerId} from "../../../common/data/BrokerId";
+import {MarketStateFilterDto} from "../../../common/components/market-state/data/MarketStateFilterDto";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -50,8 +53,8 @@ const Analysis: React.FC<Props> = ({security}) => {
     };
 
     const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate());
-    const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
-    const [timeFrameMin, setTimeFrameMin] = useState(Interval.M1);
+    const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M60);
+    const [timeFrameMin, setTimeFrameMin] = useState(Interval.M5);
     const [premise, setPremise] = useState(null);
     const [orders, setOrders] = useState(null);
     const [activeTrade, setActiveTrade] = useState(null);
@@ -68,7 +71,7 @@ const Analysis: React.FC<Props> = ({security}) => {
     const chartAlertsRef = useRef(null);
     const [trendLowTF, setTrendLowTF] = useState(null);
     const [filterDto, setFilterDto] = useState(null);
-    const [marketStateFilterDto, setMarketStateFilterDto] = useState(null);
+    const [marketStateFilterDto, setMarketStateFilterDto] = useState<MarketStateFilterDto>(null);
     const [alert, setAlert] = useState(null);
 
     const updateSize = () => {
@@ -168,6 +171,9 @@ const Analysis: React.FC<Props> = ({security}) => {
 
     const updateMarketStateFilterDto = (interval: Interval) => {
         setMarketStateFilterDto({
+            brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+            tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+            secId: security.id,
             classCode: security.classCode,
             secCode: security.secCode,
             intervals: timeFrameTradingIntervals[interval],
@@ -209,8 +215,9 @@ const Analysis: React.FC<Props> = ({security}) => {
 
     const fetchPremise = (timeFrameTrading: Interval) => {
         getTradePremise({
-            brokerId: 1,
-            tradingPlatform: TradingPlatform.QUIK,
+            brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+            tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+            secId: security.id,
             classCode: security.classCode,
             secCode: security.secCode,
             timeFrameTrading,

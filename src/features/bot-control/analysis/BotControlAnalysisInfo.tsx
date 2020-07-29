@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {getMoexOpenInterests} from "../../../common/api/rest/analysisRestApi";
 import {MoexOpenInterest} from "../../../common/data/open-interest/MoexOpenInterest";
-import {MoexOpenInterestView} from "../../analysis/analysis/MoexOpenInterestView";
+import {MoexOpenInterestView} from "../../analysis/analysis/moex-open-interest/MoexOpenInterestView";
 
 export interface AnalysisState {
     realDepo: boolean

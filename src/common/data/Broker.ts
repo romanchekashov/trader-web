@@ -1,5 +1,5 @@
 import {Currency} from "./Currency";
-import {TradingPlatform} from "./TradingPlatform";
+import {TradingPlatform} from "./trading/TradingPlatform";
 
 export class Broker {
     public id: number;

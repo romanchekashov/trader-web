@@ -1,8 +1,8 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {Chart} from "primereact/chart";
-import {ClientGroup} from "../../../common/data/open-interest/ClientGroup";
-import {MoexOpenInterest} from "../../../common/data/open-interest/MoexOpenInterest";
+import {ClientGroup} from "../../../../common/data/open-interest/ClientGroup";
+import {MoexOpenInterest} from "../../../../common/data/open-interest/MoexOpenInterest";
 import moment = require("moment");
 
 type Props = {

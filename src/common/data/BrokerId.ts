@@ -1,0 +1,4 @@
+export enum BrokerId {
+    ALFA_DIRECT = 'ALFA_DIRECT',
+    TINKOFF_INVEST = 'TINKOFF_INVEST'
+}

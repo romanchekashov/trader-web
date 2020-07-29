@@ -6,7 +6,7 @@ import {Dropdown} from "primereact/dropdown";
 import {Checkbox} from "primereact/checkbox";
 import {Broker} from "../../../common/data/Broker";
 import {MarketBotFilterDataDto} from "../../../common/data/bot/MarketBotFilterDataDto";
-import {TradingPlatform} from "../../../common/data/TradingPlatform";
+import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
 import {SecurityInfo} from "../../../common/data/SecurityInfo";
 import {Interval} from "../../../common/data/Interval";
 import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";

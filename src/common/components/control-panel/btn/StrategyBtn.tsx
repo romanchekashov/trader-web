@@ -4,8 +4,9 @@ import {Dropdown} from "primereact/components/dropdown/Dropdown";
 import {Button} from "primereact/components/button/Button";
 import {TradeStrategyAnalysisFilterDto} from "../../../data/TradeStrategyAnalysisFilterDto";
 import {Interval} from "../../../data/Interval";
-import {TradingPlatform} from "../../../data/TradingPlatform";
+import {TradingPlatform} from "../../../data/trading/TradingPlatform";
 import {PrimeDropdownItem} from "../../../utils/utils";
+import {BrokerId} from "../../../data/BrokerId";
 
 type Props = {
     onSelectStrategy: (filter: TradeStrategyAnalysisFilterDto) => void
@@ -25,8 +26,9 @@ const StrategyBtn: React.FC<Props> = ({onSelectStrategy}) => {
 
     const selectStrategy = () => {
         onSelectStrategy({
-            brokerId: 1,
+            brokerId: BrokerId.ALFA_DIRECT,
             tradingPlatform: TradingPlatform.QUIK,
+            secId: null,
             classCode: null,
             secCode: null,
             timeFrameTrading: tradingTimeFrame,

@@ -4,7 +4,7 @@ import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Interval} from "../../../common/data/Interval";
 import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
-import {TradingPlatform} from "../../../common/data/TradingPlatform";
+import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
 import {Dropdown} from "primereact/dropdown";
 import {PrimeDropdownItem} from "../../../common/utils/utils";
 import {Column} from "primereact/column";
@@ -19,7 +19,7 @@ import Alerts from "../../../common/components/alerts/Alerts";
 import MarketState from "../../../common/components/market-state/MarketState";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
 import {adjustTradePremise} from "../../../common/utils/DataUtils";
-import {MoexOpenInterestView} from "./MoexOpenInterestView";
+import {MoexOpenInterestView} from "./moex-open-interest/MoexOpenInterestView";
 import {Trade} from "../../../common/data/Trade";
 import {TabPanel, TabView} from "primereact/tabview";
 import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
@@ -27,6 +27,7 @@ import {News} from "../../../common/components/news/News";
 import {StopOrder} from "../../../common/data/StopOrder";
 import moment = require("moment");
 import {getTrades} from "../../../common/api/rest/quikRestApi";
+import {BrokerId} from "../../../common/data/BrokerId";
 
 type Props = {
     security: SecurityLastInfo
@@ -231,8 +232,9 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
 
     const fetchPremise = (timeFrameTrading: Interval) => {
         getTradePremise({
-            brokerId: 1,
+            brokerId: BrokerId.ALFA_DIRECT,
             tradingPlatform: TradingPlatform.QUIK,
+            secId: security.id,
             classCode: security.classCode,
             secCode: security.secCode,
             timeFrameTrading,

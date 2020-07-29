@@ -1,5 +1,5 @@
 import * as React from "react";
-import {MoexOpenInterest} from "../../../common/data/open-interest/MoexOpenInterest";
+import {MoexOpenInterest} from "../../../../common/data/open-interest/MoexOpenInterest";
 
 type Props = {
     moexOpenInterest: MoexOpenInterest

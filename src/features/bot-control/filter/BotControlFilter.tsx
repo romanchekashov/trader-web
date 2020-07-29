@@ -4,7 +4,7 @@ import {Button} from "primereact/button";
 import {Dropdown} from "primereact/dropdown";
 import {MarketBotFilterDataDto} from "../../../common/data/bot/MarketBotFilterDataDto";
 import {Broker} from "../../../common/data/Broker";
-import {TradingPlatform} from "../../../common/data/TradingPlatform";
+import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
 import {SecurityInfo} from "../../../common/data/SecurityInfo";
 import {Interval} from "../../../common/data/Interval";
 import "./BotControlFilter.css";

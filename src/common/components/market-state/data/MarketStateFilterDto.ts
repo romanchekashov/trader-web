@@ -1,7 +1,8 @@
 import {ClassCode} from "../../../data/ClassCode";
 import {Interval} from "../../../data/Interval";
+import {SecurityFilter} from "../../../data/SecurityFilter";
 
-export class MarketStateFilterDto {
+export class MarketStateFilterDto extends SecurityFilter {
     public classCode: ClassCode;
     public secCode: string;
     public intervals: Interval[];

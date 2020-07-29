@@ -32,6 +32,7 @@ import {Trade} from "../../data/Trade";
 import {ChartManageOrder} from "./data/ChartManageOrder";
 import {StopOrder} from "../../data/StopOrder";
 import moment = require("moment");
+import {Market} from "../../data/Market";
 
 const _ = require("lodash");
 
@@ -79,7 +80,6 @@ export class ChartWrapper extends React.Component<Props, States> {
     private wsStatusSub: SubscriptionLike = null;
     private fetchingCandles: boolean = false;
     private intervals: PrimeDropdownItem<Interval>[] = Intervals.map(val => ({label: val, value: val}));
-    private securityInfo: Security;
     private initialStateTrendLines: TrendLineDto[] = [];
     private chartTrendLineDefaultAppearance: ChartElementAppearance = {
         edgeFill: "#FFFFFF",
@@ -200,8 +200,12 @@ export class ChartWrapper extends React.Component<Props, States> {
             return getHistoryCandles(security.classCode, security.secCode, interval, numberOfCandles);
         } else {
             return getCandles({
-                classCode: security.classCode,
+                secId: security.id,
+                ticker: security.ticker,
+                type: security.type,
+                market: security.market,
                 secCode: security.secCode,
+                classCode: security.classCode,
                 interval,
                 numberOfCandles,
                 startTimestamp: startCalendarVisible ? start : null
@@ -234,7 +238,6 @@ export class ChartWrapper extends React.Component<Props, States> {
             this.setState({
                 candles: []
             });
-            this.securityInfo = getSecurity(security.classCode, security.secCode);
 
             this.getNewCandles(security, interval, start, numberOfCandles)
                 .then(data => {
@@ -323,10 +326,13 @@ export class ChartWrapper extends React.Component<Props, States> {
     requestCandles = (security: SecurityLastInfo): void => {
         const {innerInterval} = this.state;
 
-        if (security && innerInterval) {
+        if (security && innerInterval && Market.SPB !== security.market) {
             WebsocketService.getInstance().send(WSEvent.GET_CANDLES, {
                 classCode: security.classCode,
                 secCode: security.secCode,
+                ticker: security.ticker,
+                securityType: security.type,
+                market: security.market,
                 interval: innerInterval,
                 numberOfCandles: 2
             });
@@ -709,7 +715,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                             srLevels={this.getSRLevels()}
                             candlePatternsUp={this.getCandlePatternsUp()}
                             candlePatternsDown={this.getCandlePatternsDown()}
-                            securityInfo={this.securityInfo}
+                            securityInfo={security}
                             enableTrendLine={enableTrendLine}
                             onEnableTrendLine={this.onEnableTrendLine}
                             enableNewOrder={enableNewOrder}

@@ -15,7 +15,7 @@ import {adjustTradePremise} from "../../common/utils/DataUtils";
 import {Order} from "../../common/data/Order";
 import {ActiveTrade} from "../../common/data/ActiveTrade";
 import {TradingChartsSecurities} from "./TradingChartsSecurities";
-import {TradingPlatform} from "../../common/data/TradingPlatform";
+import {TradingPlatform} from "../../common/data/trading/TradingPlatform";
 
 export const TradingChartsPage: React.FC = () => {
     const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null);

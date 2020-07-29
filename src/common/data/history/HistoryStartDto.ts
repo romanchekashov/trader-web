@@ -1,4 +1,4 @@
-import {TradingPlatform} from "../TradingPlatform";
+import {TradingPlatform} from "../trading/TradingPlatform";
 import {Interval} from "../Interval";
 import {ClassCode} from "../ClassCode";
 import {DepositSetup} from "../DepositSetup";

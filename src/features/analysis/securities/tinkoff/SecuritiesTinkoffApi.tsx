@@ -56,7 +56,7 @@ export const SecuritiesTinkoffApi: React.FC<Props> = ({selectedSecurity, onSelec
         })
 
         const lastSecuritiesSubscription = WebsocketService.getInstance()
-            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES_TINKOFF)
             .subscribe(securities => {
                 setSecurities(securities)
                 onLastTimeUpdate(new Date())
@@ -166,7 +166,12 @@ export const SecuritiesTinkoffApi: React.FC<Props> = ({selectedSecurity, onSelec
                        selection={selectedSecurity}
                        onSelectionChange={onSelect}
                        scrollable={!!selectedSecurity}
-                       scrollHeight="600px">
+                       scrollHeight="600px"
+                       paginator={true}
+                       paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                       currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                       rows={10}
+                       rowsPerPageOptions={[10,15,25,50,100]}>
                 {columnComponents}
             </DataTable>
         </>
