@@ -25,9 +25,12 @@ import {TabPanel, TabView} from "primereact/tabview";
 import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
 import {News} from "../../../common/components/news/News";
 import {StopOrder} from "../../../common/data/StopOrder";
-import moment = require("moment");
 import {getTrades} from "../../../common/api/rest/quikRestApi";
 import {BrokerId} from "../../../common/data/BrokerId";
+import {MarketStateFilterDto} from "../../../common/components/market-state/data/MarketStateFilterDto";
+import {Market} from "../../../common/data/Market";
+import {TradeStrategyAnalysisFilterDto} from "../../../common/data/TradeStrategyAnalysisFilterDto";
+import moment = require("moment");
 
 type Props = {
     security: SecurityLastInfo
@@ -190,45 +193,47 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
     }, [security])
 
     const updateMarketStateFilterDto = (interval: Interval) => {
-        setMarketStateFilterDto({
+        const marketStateFilter: MarketStateFilterDto = {
+            brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+            tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+            secId: security.id,
             classCode: security.classCode,
             secCode: security.secCode,
             intervals: timeFrameTradingIntervals[interval],
             fetchByWS: true,
             // history: false,
             numberOfCandles: 100
-        });
-        WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
-            classCode: security.classCode,
-            secCode: security.secCode,
-            intervals: timeFrameTradingIntervals[interval],
-            fetchByWS: true,
-            // history: false,
-            numberOfCandles: 100
-        });
-    };
+        }
+
+        setMarketStateFilterDto(marketStateFilter)
+        WebsocketService.getInstance().send<MarketStateFilterDto>(WSEvent.GET_MARKET_STATE, marketStateFilter)
+    }
 
     const informServerAboutRequiredData = (): void => {
         if (security) {
-            WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
-                brokerId: 1,
-                tradingPlatform: TradingPlatform.QUIK,
+            WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
+                brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+                tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+                secId: security.id,
                 classCode: security.classCode,
                 secCode: security.secCode,
                 timeFrameTrading: Interval.M5,
                 timeFrameMin: Interval.M1
-            });
-            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, security.secCode);
-            WebsocketService.getInstance().send(WSEvent.GET_MARKET_STATE, {
+            })
+            WebsocketService.getInstance().send<string>(WSEvent.GET_TRADES_AND_ORDERS, security.secCode)
+            WebsocketService.getInstance().send<MarketStateFilterDto>(WSEvent.GET_MARKET_STATE, {
+                brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+                tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+                secId: security.id,
                 classCode: security.classCode,
                 secCode: security.secCode,
                 intervals: timeFrameTradingIntervals[timeFrameTrading],
                 fetchByWS: true,
                 // history: false,
                 numberOfCandles: 100
-            });
+            })
         }
-    };
+    }
 
     const fetchPremise = (timeFrameTrading: Interval) => {
         getTradePremise({

@@ -8,7 +8,6 @@ export enum WSEvent {
     TRADING_STRATEGY_STATE = 'TRADING_STRATEGY_STATE',
     TRADING_STRATEGIES_RESULTS = 'TRADING_STRATEGIES_RESULTS',
     LAST_SECURITIES = 'LAST_SECURITIES',
-    LAST_SECURITIES_TINKOFF = 'LAST_SECURITIES_TINKOFF',
     GET_TRADE_PREMISE_AND_SETUP = 'GET_TRADE_PREMISE_AND_SETUP',
     TRADE_PREMISE = 'TRADE_PREMISE',
     TRADE_SETUP = 'TRADE_SETUP',
@@ -58,7 +57,15 @@ export enum WSEvent {
     HISTORY_CANDLES = 'HISTORY_CANDLES',
     HISTORY_MARKET_STATES = 'HISTORY_MARKET_STATES',
     HISTORY_SWING_STATES = 'HISTORY_SWING_STATES',
-    HISTORY_TRADING_STRATEGY_STATE = 'HISTORY_TRADING_STRATEGY_STATE'
+    HISTORY_TRADING_STRATEGY_STATE = 'HISTORY_TRADING_STRATEGY_STATE',
+
+    LAST_SECURITIES_TINKOFF = 'LAST_SECURITIES_TINKOFF',
+    TRADE_PREMISE_TINKOFF = 'TRADE_PREMISE_TINKOFF',
+    ORDERS_TINKOFF = 'ORDERS_TINKOFF',
+    ACTIVE_TRADES_TINKOFF = 'ACTIVE_TRADES_TINKOFF',
+    GET_MARKET_STATE_TINKOFF = 'GET_MARKET_STATE_TINKOFF',
+    GET_TRADE_PREMISE_AND_SETUP_TINKOFF = 'GET_TRADE_PREMISE_AND_SETUP_TINKOFF',
+    GET_TRADES_AND_ORDERS_TINKOFF = 'GET_TRADES_AND_ORDERS_TINKOFF'
 }
 
 export interface WsMessage<T> {
@@ -123,9 +130,12 @@ export class WebsocketService {
         }
     }
 
-    public send(event: WSEvent, data: any = {}): void {
+    public send<T>(event: WSEvent, data?: T): void {
         if (event && this.isConnected) {
-            this.sock.send(JSON.stringify({event, data}));
+            this.sock.send(JSON.stringify({
+                event,
+                data: data || {}
+            }));
         } else {
             console.error('Send error!');
         }

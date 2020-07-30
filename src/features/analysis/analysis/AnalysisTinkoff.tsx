@@ -38,7 +38,7 @@ type Props = {
     security: SecurityLastInfo
 }
 
-const Analysis: React.FC<Props> = ({security}) => {
+export const AnalysisTinkoff: React.FC<Props> = ({security}) => {
     const timeFrameTradingIntervals = {
         "M1": [Interval.M1],
         "M3": [Interval.M3, Interval.M1],
@@ -125,7 +125,7 @@ const Analysis: React.FC<Props> = ({security}) => {
             });
 
         const lastSecuritiesSubscription = WebsocketService.getInstance()
-            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES_TINKOFF)
             .subscribe(securities => {
                 if (security) {
                     const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
@@ -137,18 +137,18 @@ const Analysis: React.FC<Props> = ({security}) => {
             });
 
         const tradePremiseSubscription = WebsocketService.getInstance()
-            .on<TradePremise>(WSEvent.TRADE_PREMISE)
+            .on<TradePremise>(WSEvent.TRADE_PREMISE_TINKOFF)
             .subscribe(newPremise => {
                 adjustTradePremise(newPremise);
                 setPremise(newPremise);
             });
 
         const ordersSetupSubscription = WebsocketService.getInstance()
-            .on<Order[]>(WSEvent.ORDERS)
+            .on<Order[]>(WSEvent.ORDERS_TINKOFF)
             .subscribe(setOrders);
 
         const activeTradeSubscription = WebsocketService.getInstance()
-            .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
+            .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES_TINKOFF)
             .subscribe(activeTrades => {
                 if (securityLastInfo) {
                     const activeTrade = activeTrades
@@ -184,22 +184,22 @@ const Analysis: React.FC<Props> = ({security}) => {
         }
 
         setMarketStateFilterDto(marketStateFilter)
-        WebsocketService.getInstance().send<MarketStateFilterDto>(WSEvent.GET_MARKET_STATE, marketStateFilter)
+        WebsocketService.getInstance().send<MarketStateFilterDto>(WSEvent.GET_MARKET_STATE_TINKOFF, marketStateFilter)
     }
 
     const informServerAboutRequiredData = (): void => {
         if (security) {
-            WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
+            WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(WSEvent.GET_TRADE_PREMISE_AND_SETUP_TINKOFF, {
                 brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
                 tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
                 secId: security.id,
                 classCode: security.classCode,
                 secCode: security.secCode,
-                timeFrameTrading: Interval.M5,
-                timeFrameMin: Interval.M1
+                timeFrameTrading,
+                timeFrameMin
             })
-            WebsocketService.getInstance().send<string>(WSEvent.GET_TRADES_AND_ORDERS, security.secCode)
-            WebsocketService.getInstance().send<MarketStateFilterDto>(WSEvent.GET_MARKET_STATE, {
+            WebsocketService.getInstance().send<string>(WSEvent.GET_TRADES_AND_ORDERS_TINKOFF, security.secCode)
+            WebsocketService.getInstance().send<MarketStateFilterDto>(WSEvent.GET_MARKET_STATE_TINKOFF, {
                 brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
                 tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
                 secId: security.id,
@@ -365,6 +365,4 @@ const Analysis: React.FC<Props> = ({security}) => {
             <div>Select security for analysis</div>
         )
     }
-};
-
-export default Analysis;
+}

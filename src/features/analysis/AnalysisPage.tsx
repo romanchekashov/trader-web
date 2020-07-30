@@ -16,6 +16,8 @@ import "./Analysis.css";
 import {SecurityLastInfo} from "../../common/data/SecurityLastInfo";
 import {setSelectedSecurity} from "../../common/utils/Cache";
 import {Securities} from "./securities/Securities";
+import {Market} from "../../common/data/Market";
+import {AnalysisTinkoff} from "./analysis/AnalysisTinkoff";
 
 function mapStateToProps(state: RootState) {
     return {
@@ -84,28 +86,8 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
     render() {
         const {selectedSecurity, isDetailsShown} = this.state
-        let selectedSecuritiesView = null
-
-        if (selectedSecurity) {
-            selectedSecuritiesView = (
-                <div key={selectedSecurity.secCode}>{selectedSecurity.secCode}</div>
-            )
-        }
         const classDataTable = isDetailsShown ? 'p-col-3' : 'p-col-12'
         const classDetails = isDetailsShown ? 'p-col-9' : 'hidden'
-
-        let analysis = <div>Select security</div>
-        if (selectedSecurity) {
-            if (ClassCode.SPBFUT === selectedSecurity.classCode) {
-                analysis = (
-                    <AnalysisFutures security={selectedSecurity}/>
-                )
-            } else {
-                analysis = (
-                    <Analysis security={selectedSecurity}/>
-                )
-            }
-        }
 
         return (
             <div className="p-grid sample-layout analysis">
@@ -122,7 +104,14 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                                     </div>
                                 </div>
                                 <div className={classDetails}>
-                                    {analysis}
+                                    {
+                                        !selectedSecurity ? <div>Select security</div>
+                                            : Market.SPB === selectedSecurity.market ?
+                                            <AnalysisTinkoff security={selectedSecurity}/>
+                                            : ClassCode.SPBFUT === selectedSecurity.classCode ?
+                                                <AnalysisFutures security={selectedSecurity}/> :
+                                                <Analysis security={selectedSecurity}/>
+                                    }
                                 </div>
                             </div>
                         </div>
