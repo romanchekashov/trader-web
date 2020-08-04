@@ -193,8 +193,6 @@ export const AnalysisTinkoff: React.FC<Props> = ({security}) => {
                 brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
                 tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
                 secId: security.id,
-                classCode: security.classCode,
-                secCode: security.secCode,
                 timeFrameTrading,
                 timeFrameMin
             })
@@ -216,8 +214,6 @@ export const AnalysisTinkoff: React.FC<Props> = ({security}) => {
             brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
             tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
             secId: security.id,
-            classCode: security.classCode,
-            secCode: security.secCode,
             timeFrameTrading,
             timeFrameMin
         }).then(setPremise).catch(reason => {

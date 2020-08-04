@@ -29,8 +29,6 @@ const StrategyBtn: React.FC<Props> = ({onSelectStrategy}) => {
             brokerId: BrokerId.ALFA_DIRECT,
             tradingPlatform: TradingPlatform.QUIK,
             secId: null,
-            classCode: null,
-            secCode: null,
             timeFrameTrading: tradingTimeFrame,
             timeFrameMin: lowTimeFrame
         })
