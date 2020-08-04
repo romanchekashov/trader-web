@@ -28,6 +28,7 @@ import {Market} from "../../../common/data/Market";
 import {BrokerId} from "../../../common/data/BrokerId";
 import {MarketStateFilterDto} from "../../../common/components/market-state/data/MarketStateFilterDto";
 import {TradeStrategyAnalysisFilterDto} from "../../../common/data/TradeStrategyAnalysisFilterDto";
+import {FilterDto} from "../../../common/data/FilterDto";
 import moment = require("moment");
 
 export interface AnalysisState {
@@ -71,7 +72,7 @@ const Analysis: React.FC<Props> = ({security}) => {
     const chart2Ref = useRef(null);
     const chartAlertsRef = useRef(null);
     const [trendLowTF, setTrendLowTF] = useState(null);
-    const [filterDto, setFilterDto] = useState(null);
+    const [filterDto, setFilterDto] = useState<FilterDto>(null);
     const [marketStateFilterDto, setMarketStateFilterDto] = useState<MarketStateFilterDto>(null);
     const [alert, setAlert] = useState(null);
 
@@ -98,10 +99,11 @@ const Analysis: React.FC<Props> = ({security}) => {
             //         });
             // }
             //
-            if (!filterDto || filterDto.secCode !== security.secCode) {
+            if (!filterDto || filterDto.secId !== security.id) {
                 setFilterDto({
-                    classCode: security.classCode,
-                    secCode: security.secCode,
+                    brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+                    tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+                    secId: security.id,
                     fetchByWS: true,
                     history: false,
                     all: false

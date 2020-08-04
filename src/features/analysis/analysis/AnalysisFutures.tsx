@@ -30,6 +30,7 @@ import {BrokerId} from "../../../common/data/BrokerId";
 import {MarketStateFilterDto} from "../../../common/components/market-state/data/MarketStateFilterDto";
 import {Market} from "../../../common/data/Market";
 import {TradeStrategyAnalysisFilterDto} from "../../../common/data/TradeStrategyAnalysisFilterDto";
+import {FilterDto} from "../../../common/data/FilterDto";
 import moment = require("moment");
 
 type Props = {
@@ -64,7 +65,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [chartNumber, setChartNumber] = useState(1);
 
-    const [securityLastInfo, setSecurityLastInfo] = useState(null);
+    const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
     const [chart1Width, setChart1Width] = useState(MIN_CHART_WIDTH);
     const [chart2Width, setChart2Width] = useState(MIN_CHART_WIDTH);
     const [chartAlertsWidth, setChartAlertsWidth] = useState(MIN_CHART_WIDTH);
@@ -72,7 +73,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
     const chart2Ref = useRef(null);
     const chartAlertsRef = useRef(null);
     const [trendLowTF, setTrendLowTF] = useState(null);
-    const [filterDto, setFilterDto] = useState(null);
+    const [filterDto, setFilterDto] = useState<FilterDto>(null);
     const [marketStateFilterDto, setMarketStateFilterDto] = useState(null);
     const [alert, setAlert] = useState(null);
     const [trades, setTrades] = useState<Trade[]>([]);
@@ -123,8 +124,9 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
             informServerAboutRequiredData();
 
             setFilterDto({
-                classCode: security.classCode,
-                secCode: security.secCode,
+                brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+                tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+                secId: security.id,
                 fetchByWS: true,
                 history: false,
                 all: false

@@ -22,7 +22,7 @@ export const ChartLevels: React.FC<Props> = ({srLevels, scale}) => {
         M60: "Dash"
     };
 
-    const scaleFormat = scale ? `.${scale}f` : ".4f"
+    const scaleFormat = `.${scale}f`
 
     return (
         <>

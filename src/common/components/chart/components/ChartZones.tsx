@@ -13,7 +13,7 @@ const ChartZones: React.FC<Props> = ({zones, scale}) => {
 
     if (!zones || zones.length === 0) return null;
 
-    const scaleFormat = scale ? `.${scale}f` : ".4f"
+    const scaleFormat = `.${scale}f`
     const zoneYAccessor = (d, zone) => zone.end;
     const zoneYAccessorBase = (scale, d, zone) => {
         const diff = zone.start - zone.end;

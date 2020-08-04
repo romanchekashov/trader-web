@@ -32,6 +32,7 @@ import {StopOrder} from "../../data/StopOrder";
 import {Market} from "../../data/Market";
 import {BrokerId} from "../../data/BrokerId";
 import {TradingPlatform} from "../../data/trading/TradingPlatform";
+import {FilterDto} from "../../data/FilterDto";
 import moment = require("moment");
 
 const _ = require("lodash");
@@ -327,13 +328,11 @@ export class ChartWrapper extends React.Component<Props, States> {
     requestCandles = (security: SecurityLastInfo): void => {
         const {innerInterval} = this.state;
 
-        if (security && innerInterval && Market.SPB !== security.market) {
-            WebsocketService.getInstance().send(WSEvent.GET_CANDLES, {
-                classCode: security.classCode,
-                secCode: security.secCode,
-                ticker: security.ticker,
-                securityType: security.type,
-                market: security.market,
+        if (security && innerInterval) {
+            WebsocketService.getInstance().send<FilterDto>(WSEvent.GET_CANDLES, {
+                brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+                tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+                secId: security.id,
                 interval: innerInterval,
                 numberOfCandles: 2
             });
