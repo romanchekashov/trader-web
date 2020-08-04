@@ -1,12 +1,15 @@
-import {ClassCode} from "../ClassCode";
 import {Interval} from "../Interval";
 import {DepositSetup} from "../DepositSetup";
+import {SecurityFilter} from "../SecurityFilter";
+import {TradeSystemType} from "../trading/TradeSystemType";
+import {TradingStrategyName} from "../trading/TradingStrategyName";
 
-export class TradingStrategyConfig {
-    public classCode: ClassCode;
-    public secCode: string;
-    public timeFrameTrading: Interval;
-    public timeFrameMin: Interval;
-    public depositSetup: DepositSetup;
-    public key: string;
+export class TradingStrategyConfig extends SecurityFilter {
+    public timeFrameTrading: Interval
+    public timeFrameMin: Interval
+    public depositSetup: DepositSetup
+    public systemType: TradeSystemType
+    public tradingStrategyId: number
+    public strategyName: TradingStrategyName
+    public key: string
 }

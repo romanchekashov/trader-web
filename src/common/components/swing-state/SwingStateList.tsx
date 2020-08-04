@@ -22,7 +22,7 @@ const SwingStateList: React.FC<Props> = ({filter, initSwingStates}) => {
     const [fetchDataStatus, setFetchDataStatus] = useState(null);
 
     const fetchAlerts = () => {
-        setFetchDataStatus("Loading swing states for " + filter.secCode + "...");
+        setFetchDataStatus("Loading swing states for " + filter.secId + "...");
         getSwingStates(filter)
             .then(states => {
                 setDataReceivedFromServer(states);
@@ -30,7 +30,7 @@ const SwingStateList: React.FC<Props> = ({filter, initSwingStates}) => {
             })
             .catch(reason => {
                 setSwingStates([]);
-                setFetchDataStatus("Cannot get swing states for " + filter.secCode);
+                setFetchDataStatus("Cannot get swing states for " + filter.secId);
                 if (fetchAlertsAttempt < 3) {
                     fetchAlertsAttempt++;
                     fetchAlerts();

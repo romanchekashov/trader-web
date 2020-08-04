@@ -125,7 +125,7 @@ export const SecuritiesTinkoffApi: React.FC<Props> = ({selectedSecurity, onSelec
             }
         }
 
-        return <div key={signal.classCode + signal.secCode + signal.price + title}
+        return <div key={signal.securityType + signal.ticker + signal.price + title}
                     className={className}
                     title={signal.description}></div>
     }
@@ -171,7 +171,7 @@ export const SecuritiesTinkoffApi: React.FC<Props> = ({selectedSecurity, onSelec
                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                        rows={10}
-                       rowsPerPageOptions={[10,15,25,50,100]}>
+                       rowsPerPageOptions={[10, 15, 25, 50, 100]}>
                 {columnComponents}
             </DataTable>
         </>

@@ -1,8 +1,8 @@
-import {ClassCode} from "../ClassCode";
 import {SecurityHistoryDatesDto} from "./SecurityHistoryDatesDto";
+import {SecurityType} from "../SecurityType";
 
 export class MarketSecuritiesDto {
     market: string
-    classCode: ClassCode
+    securityType: SecurityType
     securityHistoryDates: SecurityHistoryDatesDto[]
 }

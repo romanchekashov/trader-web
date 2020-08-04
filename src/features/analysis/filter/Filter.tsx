@@ -97,10 +97,9 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
 
     const onStartClicked = () => {
         onStart({
-            brokerId: broker.id,
+            brokerId: broker.name,
             tradingPlatform: platform,
-            classCode: market.classCode,
-            secCode: security ? security["code"] : null,
+            secId: security ? security["id"] : null,
             timeFrameTrading: tradingTimeFrame,
             timeFrameMin: lowTimeFrame,
 

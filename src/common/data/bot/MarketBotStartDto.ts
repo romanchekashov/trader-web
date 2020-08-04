@@ -1,15 +1,10 @@
-import {TradingPlatform} from "../trading/TradingPlatform";
 import {Interval} from "../Interval";
-import {ClassCode} from "../ClassCode";
 import {DepositSetup} from "../DepositSetup";
 import {TradingStrategyName} from "../trading/TradingStrategyName";
 import {TradeSystemType} from "../trading/TradeSystemType";
+import {SecurityFilter} from "../SecurityFilter";
 
-export class MarketBotStartDto {
-    public brokerId: number
-    public tradingPlatform: TradingPlatform
-    public classCode: ClassCode
-    public secCode: string
+export class MarketBotStartDto extends SecurityFilter {
     public strategy: TradingStrategyName
     public systemType: TradeSystemType
 

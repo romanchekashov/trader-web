@@ -3,15 +3,13 @@ import {useEffect, useState} from "react";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import {SecurityLastInfo} from "../../common/data/SecurityLastInfo";
-import {ClassCode} from "../../common/data/ClassCode";
 
 type Props = {
-    classCode: ClassCode
     securities: SecurityLastInfo[]
     onSelectRow: (e: any) => void
 };
 
-export const TradingChartsSecurities: React.FC<Props> = ({classCode, securities, onSelectRow}) => {
+export const TradingChartsSecurities: React.FC<Props> = ({securities, onSelectRow}) => {
 
     const columns = [
         {field: 'shortName', header: 'Наз'},

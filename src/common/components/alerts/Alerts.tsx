@@ -54,7 +54,7 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
             .catch(reason => {
                 setAlerts([]);
                 setVisibleAlerts([]);
-                setFetchAlertsError("Cannot get alerts for " + filter.secCode);
+                setFetchAlertsError("Cannot get alerts for " + filter.secId);
                 if (fetchAlertsAttempt < 3) {
                     fetchAlertsAttempt++;
                     fetchAlerts(newClassCode, newSecCode, newInterval, newStart);
@@ -74,8 +74,8 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
         if (filter) {
             fetchAlertsAttempt = 0;
 
-            onClassCodeChanged(filter.classCode);
-            onSecCodeChanged(filter.secCode);
+            // onClassCodeChanged(filter.classCode);
+            // onSecCodeChanged(filter.secCode);
             onIntervalChanged(null);
 
             if (filter.fetchByWS) {
@@ -88,7 +88,7 @@ const Alerts: React.FC<Props> = ({filter, onAlertSelected, alertsHeight}) => {
                         setAlertsReceivedFromServer(newAlerts, classCode, secCode, interval, start);
                     });
             } else {
-                fetchAlerts(filter.classCode, filter.secCode, null, start);
+                // fetchAlerts(filter.classCode, filter.secCode, null, start);
             }
         }
 

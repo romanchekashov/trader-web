@@ -15,8 +15,8 @@ import {PatternResult} from "../alerts/data/PatternResult";
 import {MarketStateInterval} from "./data/MarketStateInterval";
 import {PatternName} from "../alerts/data/PatternName";
 import {Signal} from "../../data/Signal";
-import moment = require("moment");
 import {Button} from "primereact/button";
+import moment = require("moment");
 
 type Props = {
     filter: MarketStateFilterDto
@@ -76,7 +76,7 @@ const MarketState: React.FC<Props> = ({filter, initMarketState, viewHeight}) => 
         .map(val => ({label: val || "ALL", value: val}));
 
     const fetchAlerts = () => {
-        setFetchDataStatus("Loading market states for " + filter.secCode + "...");
+        setFetchDataStatus("Loading market states for " + filter.secId + "...");
         getMarketState(filter)
             .then(marketState => {
                 setDataReceivedFromServer(marketState);
@@ -84,7 +84,7 @@ const MarketState: React.FC<Props> = ({filter, initMarketState, viewHeight}) => 
             })
             .catch(reason => {
                 setMarketStateIntervals([]);
-                setFetchDataStatus("Cannot get market states for " + filter.secCode);
+                setFetchDataStatus("Cannot get market states for " + filter.secId);
                 if (fetchAlertsAttempt < 3) {
                     fetchAlertsAttempt++;
                     fetchAlerts();
@@ -315,7 +315,7 @@ const MarketState: React.FC<Props> = ({filter, initMarketState, viewHeight}) => 
         return (
             <div>
                 {fetchDataStatus}
-                <Button icon="pi pi-refresh" style={{marginLeft:'.25em'}} onClick={fetchAlerts} />
+                <Button icon="pi pi-refresh" style={{marginLeft: '.25em'}} onClick={fetchAlerts}/>
             </div>
         );
     }
@@ -353,11 +353,11 @@ const MarketState: React.FC<Props> = ({filter, initMarketState, viewHeight}) => 
                             {item.baseItem.signals
                                 .filter(signal => signal.name.indexOf("CANDLE_PATTERN") === -1)
                                 .map(signal => (
-                                <div key={signal.name + signal.price + signal.interval + signal.timestamp}
-                                     className="market-state-column-signal">
-                                    {nameTemplate(signal)}
-                                </div>
-                            ))}
+                                    <div key={signal.name + signal.price + signal.interval + signal.timestamp}
+                                         className="market-state-column-signal">
+                                        {nameTemplate(signal)}
+                                    </div>
+                                ))}
                         </div>
                     </div>
 
@@ -389,11 +389,12 @@ const MarketState: React.FC<Props> = ({filter, initMarketState, viewHeight}) => 
                                             {value.signals
                                                 .filter(signal => signal.name.indexOf("CANDLE_PATTERN") === -1)
                                                 .map(signal => (
-                                                <div key={signal.name + signal.price + signal.interval + signal.timestamp}
-                                                     className="market-state-column-signal">
-                                                    {nameTemplate(signal)}
-                                                </div>
-                                            ))}
+                                                    <div
+                                                        key={signal.name + signal.price + signal.interval + signal.timestamp}
+                                                        className="market-state-column-signal">
+                                                        {nameTemplate(signal)}
+                                                    </div>
+                                                ))}
                                         </div>
                                     </div>
                                 );

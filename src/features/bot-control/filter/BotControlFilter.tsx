@@ -22,8 +22,8 @@ import {TradeSystemType} from "../../../common/data/trading/TradeSystemType";
 import {Calendar} from "primereact/calendar";
 import {getCurrentDeposit} from "../../../common/api/rest/capitalRestApi";
 import {getSecurityHistoryDates} from "../../../common/api/rest/botControlRestApi";
-import moment = require("moment");
 import {Panel} from "primereact/panel";
+import moment = require("moment");
 
 export interface BotControlFilterState {
     broker: Broker
@@ -82,6 +82,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     const [minInterval, setMinInterval] = useState(Interval.M1);
     const [classCode, setClassCode] = useState(null);
     const [secCode, setSecCode] = useState(null);
+    const [secId, setSecId] = useState<number>(null);
     const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}]);
     const [minStartDate, setMinStartDate] = useState(null);
     const [maxEndDate, setMaxEndDate] = useState(null);
@@ -116,10 +117,9 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
 
     const getDto = (): MarketBotStartDto => {
         return {
-            brokerId: broker.id,
+            brokerId: broker.name,
             tradingPlatform: platform,
-            classCode: classCode,
-            secCode: secCode,
+            secId,
 
             timeFrameTrading: interval,
             timeFrameMin: minInterval,
@@ -182,6 +182,8 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     const onSecCodeChanged = (newSecCode: string) => {
         console.log(newSecCode);
         setSecCode(newSecCode);
+        const secId = getSecuritiesByClassCode(classCode).find(value => value.secCode === newSecCode).id
+        setSecId(secId)
         updateHistoryDates(newSecCode, minInterval);
     };
 
@@ -208,7 +210,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     };
 
     return (
-        <Panel header="Filter" style={{marginTop:0}}
+        <Panel header="Filter" style={{marginTop: 0}}
                toggleable={true}
                collapsed={panelCollapsed}
                onToggle={(e) => setPanelCollapsed(e.value)}>

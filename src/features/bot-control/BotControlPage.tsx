@@ -118,7 +118,7 @@ class BotControlPage extends React.Component<Props, BotControlState> {
             selectedTSResult: result,
             selectedSecurity: getSecurity(
                 result.tradingStrategyData.security.classCode,
-                result.tradingStrategyData.security.futureSecCode)
+                result.tradingStrategyData.security.secCode)
         })
 
         if (result.tradingStrategyData.id) {

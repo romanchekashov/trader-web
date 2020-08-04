@@ -17,8 +17,8 @@ import {FilterDto} from "../../data/FilterDto";
 import {NotificationDto} from "./data/NotificationDto";
 import {InputText} from "primereact/inputtext";
 import {PatternName} from "../alerts/data/PatternName";
-import moment = require("moment");
 import {WebsocketService, WSEvent} from "../../api/WebsocketService";
+import moment = require("moment");
 
 type Props = {
     filter: FilterDto
@@ -56,7 +56,7 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
             .catch(reason => {
                 setAlerts([]);
                 setVisibleAlerts([]);
-                setFetchAlertsError("Cannot get alerts for " + filter.secCode);
+                setFetchAlertsError("Cannot get alerts for " + filter.secId);
                 if (fetchAlertsAttempt < 3) {
                     fetchAlertsAttempt++;
                     fetchAlerts(newClassCode, newSecCode, newInterval, newStart, newTextPattern);
@@ -72,10 +72,7 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
     };
 
     const getWSNotifications = (filter: FilterDto): void => {
-        WebsocketService.getInstance().send(WSEvent.GET_NOTIFICATIONS, {
-            classCode: filter.classCode,
-            secCode: filter.secCode
-        });
+        WebsocketService.getInstance().send<FilterDto>(WSEvent.GET_NOTIFICATIONS, filter)
     };
 
     useEffect(() => {
@@ -85,12 +82,12 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
         if (filter) {
             fetchAlertsAttempt = 0;
 
-            onClassCodeChanged(filter.classCode);
-            onSecCodeChanged(filter.secCode);
+            // onClassCodeChanged(filter.classCode);
+            // onSecCodeChanged(filter.secCode);
             onIntervalChanged(null);
             onTextPatternChanged("");
 
-            fetchAlerts(filter.classCode, filter.secCode, null, start, "");
+            // fetchAlerts(filter.classCode, filter.secCode, null, start, "");
 
             if (filter.fetchByWS) {
                 setTimeout(() => getWSNotifications(filter), 500);

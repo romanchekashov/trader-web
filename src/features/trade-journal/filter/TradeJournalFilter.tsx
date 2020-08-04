@@ -34,8 +34,8 @@ export const TradeJournalFilter: React.FC<Props> = ({onFilter}) => {
         end: moment().hours(19).minutes(0).seconds(0).toDate()
     };
 
-    const [market, setMarket] = useState(initState.market);
-    const [markets, setMarkets] = useState([]);
+    const [market, setMarket] = useState<MarketSecuritiesDto>(initState.market);
+    const [markets, setMarkets] = useState<MarketSecuritiesDto[]>([]);
     const [securities, setSecurities] = useState([]);
     const [security, setSecurity] = useState(initState.security);
     const [start, setStart] = useState(initState.start);
@@ -53,8 +53,7 @@ export const TradeJournalFilter: React.FC<Props> = ({onFilter}) => {
 
     const onFilterClicked = () => {
         onFilter({
-            classCode: market.classCode,
-            secCode: security["code"],
+            secId: security["id"],
             start: start,
             end: end
         });

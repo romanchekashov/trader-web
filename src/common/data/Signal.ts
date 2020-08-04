@@ -1,12 +1,16 @@
-import {ClassCode} from "./ClassCode";
 import {Interval} from "./Interval";
+import {SecurityType} from "./SecurityType";
+import {Market} from "./Market";
 
 export class Signal {
-    public name: string;
-    public classCode: ClassCode;
-    public secCode: string;
-    public interval: Interval;
-    public timestamp: Date;
-    public price: number;
-    public description: string;
+    public secId: number
+    public name: string
+    public strength: string
+    public ticker: string
+    public securityType: SecurityType
+    public market: Market
+    public interval: Interval
+    public price: number
+    public timestamp: Date
+    public description: string
 }

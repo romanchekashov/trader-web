@@ -16,8 +16,6 @@ import {SubscriptionLike} from "rxjs";
 import {PatternResult} from "../alerts/data/PatternResult";
 import "./ChartWrapper.css";
 import {Dropdown} from "primereact/dropdown";
-import {Security} from "../../data/Security";
-import {getSecurity} from "../../utils/Cache";
 import {IntervalColor, Intervals, PrimeDropdownItem, StoreData} from "../../utils/utils";
 import {ToggleButton} from "primereact/togglebutton";
 import {TrendLineDto} from "../../data/TrendLineDto";
@@ -31,8 +29,10 @@ import {InputText} from "primereact/inputtext";
 import {Trade} from "../../data/Trade";
 import {ChartManageOrder} from "./data/ChartManageOrder";
 import {StopOrder} from "../../data/StopOrder";
-import moment = require("moment");
 import {Market} from "../../data/Market";
+import {BrokerId} from "../../data/BrokerId";
+import {TradingPlatform} from "../../data/trading/TradingPlatform";
+import moment = require("moment");
 
 const _ = require("lodash");
 
@@ -258,8 +258,9 @@ export class ChartWrapper extends React.Component<Props, States> {
     fetchTrendLines = (interval: Interval): void => {
         const {security} = this.props;
         getTrendLines({
-            classCode: security.classCode,
-            secCode: security.secCode,
+            brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+            tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+            secId: security.id,
             interval
         }).then(this.setTrendLinesFromServer).catch((e) => console.error(e));
     }
@@ -475,43 +476,43 @@ export class ChartWrapper extends React.Component<Props, States> {
     }
 
     onSave = () => {
-        const {security} = this.props;
-        const {storeData} = this.state;
+        const {security} = this.props
+        const {storeData} = this.state
         if (storeData) {
-            console.log(storeData);
-            const saving = [];
+            console.log(storeData)
+            const saving = []
             if (storeData.save && storeData.save.length > 0) {
                 for (const trendLine of storeData.save) {
-                    trendLine.classCode = security.classCode;
-                    saving.push(trendLine);
+                    trendLine.secId = security.id
+                    saving.push(trendLine)
                 }
             }
             if (storeData.delete && storeData.delete.length > 0) {
                 for (const trendLine of storeData.delete) {
-                    trendLine.classCode = security.classCode;
-                    trendLine.deleted = new Date();
-                    saving.push(trendLine);
+                    trendLine.secId = security.id
+                    trendLine.deleted = new Date()
+                    saving.push(trendLine)
                 }
             }
             if (saving.length > 0) {
                 saveTrendLines(saving)
                     .then(this.setTrendLinesFromServer)
-                    .catch(console.error);
+                    .catch(console.error)
             }
         }
-        this.setState({needSave: false});
-    };
+        this.setState({needSave: false})
+    }
 
     onCancel = () => {
-        const {candles} = this.state;
+        const {candles} = this.state
 
         this.setState({
             needSave: false,
             storeData: null,
             trendLines: this.initialStateTrendLines,
             trends_1: this.mapTrendLinesFromPropsToState(this.initialStateTrendLines, candles)
-        });
-    };
+        })
+    }
 
     onNeedSave = (storeData: StoreData<TrendLineDto[]>): void => {
         const {candles} = this.state;

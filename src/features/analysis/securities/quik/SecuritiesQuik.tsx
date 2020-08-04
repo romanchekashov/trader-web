@@ -6,8 +6,8 @@ import {WebsocketService, WSEvent} from "../../../../common/api/WebsocketService
 import {SecurityLastInfo} from "../../../../common/data/SecurityLastInfo";
 import {Signal} from "../../../../common/data/Signal";
 import {PatternName} from "../../../../common/components/alerts/data/PatternName";
-import moment = require("moment");
 import {getLastSecurities} from "../../../../common/api/rest/analysisRestApi";
+import moment = require("moment");
 
 type Props = {
     selectedSecurity: SecurityLastInfo
@@ -123,7 +123,7 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
             }
         }
 
-        return <div key={signal.classCode + signal.secCode + signal.price + title}
+        return <div key={signal.securityType + signal.ticker + signal.price + title}
                     className={className}
                     title={signal.description}></div>
     }

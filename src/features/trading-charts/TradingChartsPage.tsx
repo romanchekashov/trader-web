@@ -4,9 +4,7 @@ import {getFilterData} from "../../common/api/rest/botControlRestApi";
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
 import Filter from "../analysis/filter/Filter";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
-import {ClassCode} from "../../common/data/ClassCode";
 import {ChartWrapper} from "../../common/components/chart/ChartWrapper";
-import {Security} from "../../common/data/Security";
 import {TradePremise} from "../../common/data/strategy/TradePremise";
 import {SecurityLastInfo} from "../../common/data/SecurityLastInfo";
 import {Interval} from "../../common/data/Interval";
@@ -133,15 +131,16 @@ export const TradingChartsPage: React.FC = () => {
             <div className="p-col-12">
                 <div className="p-grid">
                     <div className="p-col-6">
-                        <TradingChartsSecurities classCode={filter?.classCode}
-                                                 securities={securities}
-                                                 onSelectRow={onSecuritySelected} />
+                        <TradingChartsSecurities securities={securities}
+                                                 onSelectRow={onSecuritySelected}/>
                     </div>
                     <div className="p-col-6" ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrame1}
                                       initialNumberOfCandles={500}
-                                      onIntervalChanged={()=>{}}
-                                      onStartChanged={()=>{}}
+                                      onIntervalChanged={() => {
+                                      }}
+                                      onStartChanged={() => {
+                                      }}
                                       width={chart1Width}
                                       chartHeight={400}
                                       security={securityLastInfo}
@@ -153,8 +152,10 @@ export const TradingChartsPage: React.FC = () => {
                     <div className="p-col-4" ref={chart2Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrame2}
                                       initialNumberOfCandles={500}
-                                      onIntervalChanged={()=>{}}
-                                      onStartChanged={()=>{}}
+                                      onIntervalChanged={() => {
+                                      }}
+                                      onStartChanged={() => {
+                                      }}
                                       width={chart2Width}
                                       chartHeight={400}
                                       security={securityLastInfo}
@@ -166,8 +167,10 @@ export const TradingChartsPage: React.FC = () => {
                     <div className="p-col-4" ref={chart3Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrame3}
                                       initialNumberOfCandles={500}
-                                      onIntervalChanged={()=>{}}
-                                      onStartChanged={()=>{}}
+                                      onIntervalChanged={() => {
+                                      }}
+                                      onStartChanged={() => {
+                                      }}
                                       width={chart3Width}
                                       chartHeight={400}
                                       security={securityLastInfo}
@@ -179,8 +182,10 @@ export const TradingChartsPage: React.FC = () => {
                     <div className="p-col-4" ref={chart4Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrame4}
                                       initialNumberOfCandles={120}
-                                      onIntervalChanged={()=>{}}
-                                      onStartChanged={()=>{}}
+                                      onIntervalChanged={() => {
+                                      }}
+                                      onStartChanged={() => {
+                                      }}
                                       width={chart4Width}
                                       chartHeight={400}
                                       security={securityLastInfo}

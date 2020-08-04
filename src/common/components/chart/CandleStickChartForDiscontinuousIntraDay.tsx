@@ -317,7 +317,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
         return {
             id: trend.id,
-            secCode: startCandle.symbol,
+            secId: startCandle.secId,
             interval: startCandle.interval,
             start: trend.start[1],
             startTimestamp: startCandle.timestamp,
