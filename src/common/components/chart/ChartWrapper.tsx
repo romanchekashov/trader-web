@@ -140,6 +140,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                     }
 
                     newCandles = newCandles ? newCandles : [...candles];
+                    // console.log('componentDidMount', lastCandles)
 
                     if (needUpdateTrendLines) {
                         this.setState({
@@ -215,6 +216,7 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     updateCandles = (candles: Candle[], security: SecurityLastInfo) => {
+        // console.log('updateCandles', candles)
         if (candles && candles.length <= 1) {
             this.setState({
                 candles: [],
