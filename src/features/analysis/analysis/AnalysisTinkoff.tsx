@@ -184,12 +184,12 @@ export const AnalysisTinkoff: React.FC<Props> = ({security}) => {
         }
 
         setMarketStateFilterDto(marketStateFilter)
-        WebsocketService.getInstance().send<MarketStateFilterDto>(WSEvent.GET_MARKET_STATE_TINKOFF, marketStateFilter)
+        WebsocketService.getInstance().send<MarketStateFilterDto>(WSEvent.GET_MARKET_STATE, marketStateFilter)
     }
 
     const informServerAboutRequiredData = (): void => {
         if (security) {
-            WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(WSEvent.GET_TRADE_PREMISE_AND_SETUP_TINKOFF, {
+            WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
                 brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
                 tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
                 secId: security.id,
@@ -197,7 +197,7 @@ export const AnalysisTinkoff: React.FC<Props> = ({security}) => {
                 timeFrameMin
             })
             WebsocketService.getInstance().send<string>(WSEvent.GET_TRADES_AND_ORDERS_TINKOFF, security.secCode)
-            WebsocketService.getInstance().send<MarketStateFilterDto>(WSEvent.GET_MARKET_STATE_TINKOFF, {
+            WebsocketService.getInstance().send<MarketStateFilterDto>(WSEvent.GET_MARKET_STATE, {
                 brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
                 tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
                 secId: security.id,
