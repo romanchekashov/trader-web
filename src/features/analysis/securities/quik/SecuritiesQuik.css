@@ -1,0 +1,12 @@
+.demand-supply {
+    height: 20px;
+    display: flex;
+}
+
+.demand {
+    background-color: #16a085
+}
+
+.supply {
+    background-color: #e74c3c
+}

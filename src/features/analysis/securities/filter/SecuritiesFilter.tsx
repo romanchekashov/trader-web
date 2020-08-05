@@ -28,6 +28,7 @@ export const SecuritiesFilter: React.FC<Props> = ({lastTimeUpdate, onShowAll, br
         <Toolbar className="filter">
             <div className="p-toolbar-group-left">
                 <Dropdown value={brokerId} options={brokerIds} onChange={(e) => {
+                    onShowAll()
                     onBrokerId(e.value)
                 }} placeholder="Select a broker" style={{width: '120px'}}/>
                 <Dropdown value={platform} options={platforms} onChange={(e) => {

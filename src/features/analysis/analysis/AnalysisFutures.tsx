@@ -287,8 +287,8 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                         </div>
                         <div className="p-col-12">
                             <DataTable value={[securityLastInfo]}>
-                                <Column field="futureTotalDemand" header="Общ спрос"/>
-                                <Column field="futureTotalSupply" header="Общ предл"/>
+                                <Column field="totalDemand" header="Общ спрос"/>
+                                <Column field="totalSupply" header="Общ предл"/>
                                 <Column field="futureSellDepoPerContract" header="ГО прод"/>
                                 <Column field="futureBuyDepoPerContract" header="ГО покуп"/>
                                 <Column field="lastTradePrice" header="Цена"/>

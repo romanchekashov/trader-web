@@ -25,4 +25,7 @@ export class Security {
     public numTradesToday: number
     public valueToday: number
     public volumeToday: number
+
+    public totalDemand: number
+    public totalSupply: number
 }

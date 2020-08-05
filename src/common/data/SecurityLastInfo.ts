@@ -5,8 +5,6 @@ export class SecurityLastInfo extends SecurityAnalysis {
     public issueSize: number
     public weightedAveragePrice: number
 
-    public futureTotalDemand: number
-    public futureTotalSupply: number
     public futureSellDepoPerContract: number
     public futureBuyDepoPerContract: number
     public futureStepPrice: number

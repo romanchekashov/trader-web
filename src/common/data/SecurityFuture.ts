@@ -3,8 +3,6 @@ import {Security} from "./Security";
 export class SecurityFuture extends Security {
     public lastTradeMoneyTurnover: number;
     public numberOfInstrumentsInAnonymousTransactions: number;
-    public totalDemand: number;
-    public totalSupply: number;
     public buyDepoPerContract: number;
     public sellDepoPerContract: number;
     public stepPrice: number;

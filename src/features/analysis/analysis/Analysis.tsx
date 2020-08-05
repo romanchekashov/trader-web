@@ -250,7 +250,9 @@ const Analysis: React.FC<Props> = ({security}) => {
                             </div>
                         </div>
                         <div className="p-col-12">
-                            <DataTable value={[security]}>
+                            <DataTable value={[securityLastInfo]}>
+                                <Column field="totalDemand" header="Общ спрос"/>
+                                <Column field="totalSupply" header="Общ предл"/>
                                 <Column field="lastTradeQuantity" header="Кол-во посл"/>
                                 <Column field="lotSize" header="Лот"/>
                                 <Column field="issueSize" header="Объем обр"/>

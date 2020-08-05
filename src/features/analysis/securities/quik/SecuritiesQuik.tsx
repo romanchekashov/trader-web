@@ -8,6 +8,8 @@ import {Signal} from "../../../../common/data/Signal";
 import {PatternName} from "../../../../common/components/alerts/data/PatternName";
 import {getLastSecurities} from "../../../../common/api/rest/analysisRestApi";
 import moment = require("moment");
+import "./SecuritiesQuik.css"
+import {round100} from "../../../../common/utils/utils";
 
 type Props = {
     selectedSecurity: SecurityLastInfo
@@ -23,6 +25,7 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
         {field: 'secCode', header: 'Тикер'},
         {field: 'lastChange', header: '% изм'},
         {field: 'lastTradePrice', header: 'Цен посл'},
+        {field: 'totalDemand', header: 'Об спр/пред'},
         {field: 'valueToday', header: 'Оборот'},
         {field: 'numTradesToday', header: 'Кол-во сделок'},
         {field: 'percentOfFloatTradedToday', header: '% Flt Traded'},
@@ -41,8 +44,8 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
     const lessColumns = [
         {field: 'shortName', header: 'Наз'},
         {field: 'lastChange', header: '% изм'},
-        {field: 'atrM5Percent', header: 'ATR(M5)%'},
-        {field: 'volumeM5Percent', header: 'Vol(M5)%'},
+        {field: 'lastTradePrice', header: 'Цен посл'},
+        {field: 'totalDemand', header: 'Об спр/пред'},
         {field: 'relativeVolumeDay', header: 'Rel Vol(D)'}
     ]
 
@@ -137,9 +140,36 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
         return ""
     }
 
+    const demandSupplyTemplate = (rowData, column) => {
+        const totalDemand: number = rowData.totalDemand
+        const totalSupply: number = rowData.totalSupply
+        const sum = totalDemand + totalSupply
+        const demandWidth = totalDemand * 100 / sum
+        const supplyWidth = 100 - demandWidth
+        const ratio = round100(totalDemand / totalSupply)
+
+        return (
+            <div className="demand-supply" title={`Общ спрос: ${totalDemand} / Общ предл: ${totalSupply} = ${ratio}`}>
+                <div className="demand" style={{width: demandWidth + '%'}}></div>
+                <div className="supply" style={{width: supplyWidth + '%'}}></div>
+            </div>
+        )
+    }
+
+    const demandSupplySort = (e: any) => {
+        if (e.order > 0) {
+            return securities.sort((a, b) => a.totalDemand / a.totalSupply - b.totalDemand / b.totalSupply)
+        }
+        return securities.sort((a, b) => b.totalDemand / b.totalSupply - a.totalDemand / a.totalSupply)
+    }
+
     const selectedColumns = selectedSecurity ? lessColumns : columns
     const columnComponents = selectedColumns.map(col => {
-        if ("signals" === col.field) {
+        if ("totalDemand" === col.field) {
+            return <Column key={col.field} field={col.field} header={col.header} sortable={true}
+                           body={demandSupplyTemplate} sortFunction={demandSupplySort}
+                           style={{width: '100px'}}/>
+        } else if ("signals" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} body={signalsTemplate}
                            style={{width: '300px'}}/>
         } else {
