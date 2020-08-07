@@ -57,7 +57,7 @@ export const AnalysisTinkoff: React.FC<Props> = ({security}) => {
     const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate());
     const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M60);
     const [timeFrameMin, setTimeFrameMin] = useState(Interval.M5);
-    const [premise, setPremise] = useState(null);
+    const [premise, setPremise] = useState<TradePremise>(null);
     const [orders, setOrders] = useState(null);
     const [activeTrade, setActiveTrade] = useState(null);
 

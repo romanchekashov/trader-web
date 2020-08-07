@@ -58,18 +58,22 @@ export const adjustTradePremise = (premise: TradePremise): void => {
 };
 
 export const adjustMarketState = (marketState: MarketStateDto): any => {
-    for (const marketStateInterval of marketState.marketStateIntervals) {
-        for (const item of marketStateInterval.items) {
-            item.candle.timestamp = new Date(item.candle.timestamp);
+    if (marketState) {
+        for (const marketStateInterval of marketState.marketStateIntervals) {
+            for (const item of marketStateInterval.items) {
+                item.candle.timestamp = new Date(item.candle.timestamp);
+            }
         }
     }
     return marketState;
 }
 
 export const adjustSwingStateDto = (state: SwingStateDto): SwingStateDto => {
-    for (const item of state.items) {
-        item.start = new Date(item.start);
-        item.end = new Date(item.end);
+    if (state) {
+        for (const item of state.items) {
+            item.start = new Date(item.start);
+            item.end = new Date(item.end);
+        }
     }
     return state;
 }
