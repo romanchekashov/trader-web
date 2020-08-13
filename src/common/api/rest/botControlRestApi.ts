@@ -2,10 +2,10 @@ import {handleError, handleResponse} from "../apiUtils";
 import {MarketBotFilterDataDto} from "../../data/bot/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../data/bot/MarketBotStartDto";
 import {TradingStrategyResult} from "../../data/history/TradingStrategyResult";
-import {adjustMarketState, adjustTradingStrategyResult} from "../../utils/DataUtils";
+import {adjustTradingStrategyResult} from "../../utils/DataUtils";
 import {TradingStrategyStatus} from "../../data/trading/TradingStrategyStatus";
-import {ClassCode} from "../../data/ClassCode";
 import {SecurityHistoryDatesDto} from "../../data/bot/SecurityHistoryDatesDto";
+import {SecurityType} from "../../data/SecurityType";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 
@@ -15,8 +15,8 @@ export function getFilterData(history: boolean): Promise<MarketBotFilterDataDto>
         .catch(handleError);
 }
 
-export function getSecurityHistoryDates(classCode: ClassCode, secCode: string): Promise<SecurityHistoryDatesDto> {
-    return fetch(`${baseUrl}security-history-dates?classCode=${classCode}&secCode=${secCode}`)
+export function getSecurityHistoryDates(type: SecurityType, secCode: string): Promise<SecurityHistoryDatesDto> {
+    return fetch(`${baseUrl}security-history-dates?type=${type}&secCode=${secCode}`)
         .then(handleResponse)
         .catch(handleError);
 }

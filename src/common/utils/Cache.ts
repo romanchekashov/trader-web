@@ -1,13 +1,21 @@
 import {ClassCode} from "../data/ClassCode";
-import {getAllSecurityCurrencies, getAllSecurityFutures, getAllSecurityShares} from "../api/rest/traderRestApi";
+import {
+    getAllSecurityCurrencies,
+    getAllSecurityFutures,
+    getAllSecurityShares,
+    getLastSecurities
+} from "../api/rest/traderRestApi";
 import {Security} from "../data/Security";
 import {sortAlphabetically} from "./utils";
 import {SecurityLastInfo} from "../data/SecurityLastInfo";
+import {SecurityType} from "../data/SecurityType";
+import {Market} from "../data/Market";
 
 const securityMap = {};
 let futures = [];
 let shares = [];
 let currencies = [];
+let lastSecurities: SecurityLastInfo[] = []
 
 const fetchSecurityFutures = () => {
     getAllSecurityFutures()
@@ -43,9 +51,26 @@ const fetchSecurityCurrencies = () => {
 // fetchSecurityShares();
 // fetchSecurityCurrencies();
 
+
+const fetchLastSecurities = () => {
+    getLastSecurities()
+        .then(securities => {
+            lastSecurities = sortAlphabetically(securities, "secCode");
+            for (const security of securities) {
+                securityMap[security.classCode + security.secCode] = security;
+            }
+        })
+        .catch(fetchSecurityCurrencies);
+}
+fetchLastSecurities()
+
+export const getSecuritiesByTypeAndMarket = (market: Market, type: SecurityType): Security[] => {
+    return lastSecurities.filter(value => market === value.market && type === value.type)
+}
+
 export const getSecurity = (classCode: ClassCode, secCode: string): Security => {
-    return securityMap[classCode + secCode];
-};
+    return securityMap[classCode + secCode]
+}
 
 export const getSecuritiesByClassCode = (classCode: ClassCode): Security[] => {
     switch (classCode) {
@@ -56,7 +81,7 @@ export const getSecuritiesByClassCode = (classCode: ClassCode): Security[] => {
         case ClassCode.CETS:
             return currencies;
     }
-};
+}
 
 let SELECTED_SECURITY: SecurityLastInfo = null;
 

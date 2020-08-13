@@ -40,8 +40,8 @@ interface PrimeDropdownItem<T> {
 
 const Filter: React.FC<Props> = ({filter, onStart}) => {
     let initState: FilterState = {
-        broker: filter ? filter.broker : null,
-        platform: filter ? filter.broker.tradingPlatform : null,
+        broker: filter ? filter.brokers[0] : null,
+        platform: filter ? filter.brokers[0].tradingPlatform : null,
         market: filter ? filter.marketSecurities[0] : null,
         security: null,
         realDepo: false,
@@ -51,10 +51,10 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
         systemType: TradeSystemType.HISTORY
     };
 
-    const brokers = filter ? [filter.broker] : [];
+    const brokers = filter ? filter.brokers : [];
     const [broker, setBroker] = useState(initState.broker);
 
-    const platforms = filter ? [filter.broker.tradingPlatform].map(val => ({label: val, value: val})) : [];
+    const platforms = filter ? [filter.brokers[0].tradingPlatform].map(val => ({label: val, value: val})) : [];
     const [platform, setPlatform] = useState(initState.platform);
 
     const markets = filter ? filter.marketSecurities : [];
@@ -97,7 +97,7 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
 
     const onStartClicked = () => {
         onStart({
-            brokerId: broker.name,
+            brokerId: broker.id,
             tradingPlatform: platform,
             secId: security ? security["id"] : null,
             timeFrameTrading: tradingTimeFrame,

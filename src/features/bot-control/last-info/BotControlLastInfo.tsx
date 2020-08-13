@@ -22,10 +22,11 @@ export const BotControlLastInfo: React.FC<Props> =
         const [selectedResult, setSelectedResult] = useState<TradingStrategyResult>(null);
 
         useEffect(() => {
-            const resultsMap = {}
-            if (results.length === 0) {
+            if (!selectedResult) {
                 getAllStrategies()
                     .then(results => {
+                        const resultsMap = {}
+
                         results
                             .filter(result => result.tradingStrategyData)
                             .forEach(result => resultsMap[result.tradingStrategyData.id] = result)
@@ -35,8 +36,6 @@ export const BotControlLastInfo: React.FC<Props> =
                             .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id));
                     })
                     .catch(console.error);
-            } else {
-                results.forEach(result => resultsMap[result.tradingStrategyData.id] = result)
             }
 
             const wsStatusSub = WebsocketService.getInstance()
@@ -45,39 +44,30 @@ export const BotControlLastInfo: React.FC<Props> =
                     if (isConnected) {
                         // informServerAboutRequiredData();
                     }
-                });
+                })
 
             const tradingStrategiesStatesSubscription = WebsocketService.getInstance()
                 .on<TradingStrategyResult[]>(WSEvent.TRADING_STRATEGIES_RESULTS)
                 .subscribe(data => {
-                    const results = adjustTradingStrategyResultArray(data)
-                    results.forEach(result => resultsMap[result.tradingStrategyData.id] = result)
+                    const newResults = adjustTradingStrategyResultArray(data)
+                    const resultsMap = {}
+                    newResults.forEach(result => resultsMap[result.tradingStrategyData.id] = result)
                     setResults(Object.keys(resultsMap)
                         .map(key => resultsMap[key])
-                        .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id));
-                    for (const result of results) {
+                        .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id))
+                    for (const result of newResults) {
                         if (selectedResult === null || selectedResult.tradingStrategyData.id === result.tradingStrategyData.id) {
-                            onSelectedTSResultUpdate(result);
+                            onSelectedTSResultUpdate(result)
                         }
                     }
-                });
+                })
 
             // Specify how to clean up after this effect:
             return function cleanup() {
-                if (wsStatusSub) wsStatusSub.unsubscribe();
-                if (tradingStrategiesStatesSubscription) tradingStrategiesStatesSubscription.unsubscribe();
-            };
-        }, [results, selectedResult]);
-
-        if (results.length === 0) {
-            return (
-                <div className="p-grid">
-                    <div className="p-col-12">
-                        No Finished Trading Strategy Bots
-                    </div>
-                </div>
-            );
-        }
+                if (wsStatusSub) wsStatusSub.unsubscribe()
+                if (tradingStrategiesStatesSubscription) tradingStrategiesStatesSubscription.unsubscribe()
+            }
+        }, [selectedResult])
 
         const onResultSelected = (result: TradingStrategyResult): void => {
             setSelectedResult(result)
@@ -117,21 +107,31 @@ export const BotControlLastInfo: React.FC<Props> =
             );
         };
 
-        return (
-            <div className="p-grid bot-control-demo" style={{height: outerHeight || 200}}>
-                <AutoSizer>
-                    {({height, width}) => (
-                        <List
-                            className="List"
-                            height={height}
-                            itemCount={results.length}
-                            itemSize={50}
-                            width={width}
-                        >
-                            {Row}
-                        </List>
-                    )}
-                </AutoSizer>
-            </div>
-        )
+        if (results.length > 0) {
+            return (
+                <div className="p-grid bot-control-demo" style={{height: outerHeight || 200}}>
+                    <AutoSizer>
+                        {({height, width}) => (
+                            <List
+                                className="List"
+                                height={height}
+                                itemCount={results.length}
+                                itemSize={50}
+                                width={width}
+                            >
+                                {Row}
+                            </List>
+                        )}
+                    </AutoSizer>
+                </div>
+            )
+        } else {
+            return (
+                <div className="p-grid">
+                    <div className="p-col-12">
+                        No Finished Trading Strategy Bots
+                    </div>
+                </div>
+            );
+        }
     };

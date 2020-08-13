@@ -29,7 +29,7 @@ export const BotState: React.FC<Props> = ({tsTrade, tradingStrategyResult}) => {
                     <div className="p-grid bot-control-analysis-info">
                         <div className="p-col-2">
                             <div>{tradingStrategyResult.tradingStrategyData.name}-{tradingStrategyResult.tradingStrategyData.id}</div>
-                            <div>{tradingStrategyResult.tradingStrategyData.broker.name}-{tradingStrategyResult.tradingStrategyData.tradingPlatform}</div>
+                            <div>{tradingStrategyResult.tradingStrategyData.broker.id}-{tradingStrategyResult.tradingStrategyData.tradingPlatform}</div>
                         </div>
                         <div
                             className="p-col-1">{tradingStrategyResult.tradingStrategyData.security.classCode}-{tradingStrategyResult.tradingStrategyData.security.code}</div>

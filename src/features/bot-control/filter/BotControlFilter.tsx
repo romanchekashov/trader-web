@@ -10,9 +10,8 @@ import {Interval} from "../../../common/data/Interval";
 import "./BotControlFilter.css";
 import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
 import {Intervals, PrimeDropdownItem} from "../../../common/utils/utils";
-import {ClassCode} from "../../../common/data/ClassCode";
 import {Security} from "../../../common/data/Security";
-import {getSecuritiesByClassCode} from "../../../common/utils/Cache";
+import {getSecuritiesByClassCode, getSecuritiesByTypeAndMarket} from "../../../common/utils/Cache";
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
 import {HistoryDateDto} from "../../../common/data/bot/HistoryDateDto";
 import {TradingStrategyName} from "../../../common/data/trading/TradingStrategyName";
@@ -23,6 +22,9 @@ import {Calendar} from "primereact/calendar";
 import {getCurrentDeposit} from "../../../common/api/rest/capitalRestApi";
 import {getSecurityHistoryDates} from "../../../common/api/rest/botControlRestApi";
 import {Panel} from "primereact/panel";
+import {BrokerId} from "../../../common/data/BrokerId";
+import {SecurityType} from "../../../common/data/SecurityType";
+import {Market} from "../../../common/data/Market";
 import moment = require("moment");
 
 export interface BotControlFilterState {
@@ -46,12 +48,12 @@ type Props = {
     onStart: (data: MarketBotStartDto) => void
     onSearch: (data: MarketBotStartDto) => void
     onStopHistory: (data: MarketBotStartDto) => void
-};
+}
 
 export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHistory}) => {
     let initState: BotControlFilterState = {
-        broker: filter ? filter.broker : null,
-        platform: filter ? filter.broker.tradingPlatform : null,
+        broker: filter ? filter.brokers[0] : null,
+        platform: filter ? filter.brokers[0].tradingPlatform : null,
         market: filter ? filter.marketSecurities[0] : null,
         security: null,
         highTimeFrame: Interval.M30,
@@ -63,13 +65,18 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
         debug: false,
         systemType: TradeSystemType.HISTORY,
         strategy: TradingStrategyName.TWO_EMA_CROSS
-    };
+    }
 
-    const brokers = filter ? [filter.broker] : [];
-    const [broker, setBroker] = useState(initState.broker);
+    const brokers = filter ? filter.brokers : []
+    const [broker, setBroker] = useState<Broker>(initState.broker)
 
-    const platforms = filter ? [filter.broker.tradingPlatform].map(val => ({label: val, value: val})) : [];
-    const [platform, setPlatform] = useState(initState.platform);
+    const [platforms, setPlatforms] = useState<PrimeDropdownItem<TradingPlatform>[]>([TradingPlatform.QUIK, TradingPlatform.API]
+        .map(val => ({label: val, value: val})))
+    const [platform, setPlatform] = useState<TradingPlatform>(initState.platform)
+
+    const [markets, setMarkets] = useState<PrimeDropdownItem<Market>[]>([Market.MOEX, Market.SPB]
+        .map(val => ({label: val, value: val})))
+    const [market, setMarket] = useState<Market>(null)
 
     const [depositSetup, setDepositSetup] = useState<DepositSetup>({
         amount: 100000,
@@ -77,47 +84,47 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
         maxRiskPerSessionInPercent: 3,
         takeProfitPerTradeFactorFirst: 3,
         takeProfitPerTradeFactorSecond: 6
-    });
-    const [interval, setInterval] = useState(null);
-    const [minInterval, setMinInterval] = useState(Interval.M1);
-    const [classCode, setClassCode] = useState(null);
-    const [secCode, setSecCode] = useState(null);
-    const [secId, setSecId] = useState<number>(null);
-    const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}]);
-    const [minStartDate, setMinStartDate] = useState(null);
-    const [maxEndDate, setMaxEndDate] = useState(null);
-    const [realDeposit, setRealDeposit] = useState(null);
-    const [panelCollapsed, setPanelCollapsed] = useState(true);
+    })
+    const [interval, setInterval] = useState<Interval>(null)
+    const [minInterval, setMinInterval] = useState<Interval>(Interval.M1)
+    const [securityType, setSecurityType] = useState<SecurityType>(null)
+    const [secCode, setSecCode] = useState(null)
+    const [secId, setSecId] = useState<number>(null)
+    const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}])
+    const [minStartDate, setMinStartDate] = useState(null)
+    const [maxEndDate, setMaxEndDate] = useState(null)
+    const [realDeposit, setRealDeposit] = useState(null)
+    const [panelCollapsed, setPanelCollapsed] = useState(true)
 
     const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals].map(val => ({
         label: val || "ALL",
         value: val
-    }));
+    }))
     const minIntervals: PrimeDropdownItem<Interval>[] = [Interval.M1, Interval.M3, Interval.M5]
-        .map(val => ({label: val || "ALL", value: val}));
-    const classCodes: PrimeDropdownItem<ClassCode>[] = [null, ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
-        .map(val => ({label: val || "ALL", value: val}));
+        .map(val => ({label: val || "ALL", value: val}))
+    const securityTypes: PrimeDropdownItem<SecurityType>[] = [null, SecurityType.FUTURE, SecurityType.STOCK, SecurityType.CURRENCY]
+        .map(val => ({label: val || "ALL", value: val}))
 
     const systemTypes: PrimeDropdownItem<TradeSystemType>[] = [TradeSystemType.HISTORY,
-        TradeSystemType.DEMO, TradeSystemType.REAL].map(val => ({label: val, value: val}));
-    const [systemType, setSystemType] = useState(initState.systemType);
+        TradeSystemType.DEMO, TradeSystemType.REAL].map(val => ({label: val, value: val}))
+    const [systemType, setSystemType] = useState(initState.systemType)
 
     const strategies: PrimeDropdownItem<TradingStrategyName>[] = [TradingStrategyName.TWO_EMA_CROSS]
-        .map(val => ({label: val, value: val}));
-    const [strategy, setStrategy] = useState(initState.strategy);
+        .map(val => ({label: val, value: val}))
+    const [strategy, setStrategy] = useState(initState.strategy)
 
     useEffect(() => {
         if (brokers.length === 1) {
-            // console.log(['arguments'], initState.broker, broker);
-            setBroker(initState.broker);
-            setPlatform(initState.platform);
+            // console.log(['arguments'], initState.broker, broker)
+            setBroker(initState.broker)
+            setPlatform(initState.platform)
         }
 
-    }, [filter]);
+    }, [filter])
 
     const getDto = (): MarketBotStartDto => {
         return {
-            brokerId: broker.name,
+            brokerId: broker.id,
             tradingPlatform: platform,
             secId,
 
@@ -129,85 +136,84 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
             start,
             end,
             strategy
-        };
-    };
+        }
+    }
 
     const onStartClicked = () => {
-        console.log(getDto());
-        onStart(getDto());
-    };
+        console.log(getDto())
+        onStart(getDto())
+    }
 
     const onSearchClicked = () => {
-        console.log(getDto());
-        onSearch(getDto());
-    };
+        console.log(getDto())
+        onSearch(getDto())
+    }
 
-    const [start, setStart] = useState(initState.start);
-    const [end, setEnd] = useState(initState.end);
+    const [start, setStart] = useState(initState.start)
+    const [end, setEnd] = useState(initState.end)
 
     const onStopHistoryClicked = () => {
-        onStopHistory(getDto());
-    };
+        onStopHistory(getDto())
+    }
 
     const onIntervalChanged = (newInterval: Interval) => {
-        console.log(newInterval);
-        setInterval(newInterval);
-    };
+        console.log(newInterval)
+        setInterval(newInterval)
+    }
 
     const onMinIntervalChanged = (newInterval: Interval) => {
-        console.log(newInterval);
-        setMinInterval(newInterval);
-        updateHistoryDates(secCode, newInterval);
-    };
+        console.log(newInterval)
+        setMinInterval(newInterval)
+        updateHistoryDates(secCode, newInterval)
+    }
 
-    const onClassCodeChanged = (newClassCode: ClassCode) => {
-        console.log(newClassCode);
-        getCurrentDeposit(newClassCode)
-            .then(setRealDeposit);
+    const onSecurityTypeChanged = (type: SecurityType) => {
+        getCurrentDeposit(type)
+            .then(setRealDeposit)
 
-        const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}];
-        if (newClassCode) {
-            const securities: Security[] = getSecuritiesByClassCode(newClassCode);
+        const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}]
+        if (type) {
+            const securities: Security[] = getSecuritiesByTypeAndMarket(market, type)
             for (const sec of securities) {
-                newSecCodes.push({label: sec.secCode, value: sec.secCode});
+                newSecCodes.push({label: sec.secCode, value: sec.secCode})
             }
         } else {
-            setSecCode(null);
+            setSecCode(null)
         }
-        setClassCode(newClassCode);
-        setSecCodes(newSecCodes);
-        setSecCode(null);
-    };
+        setSecurityType(type)
+        setSecCodes(newSecCodes)
+        setSecCode(null)
+    }
 
     const onSecCodeChanged = (newSecCode: string) => {
-        console.log(newSecCode);
-        setSecCode(newSecCode);
-        const secId = getSecuritiesByClassCode(classCode).find(value => value.secCode === newSecCode).id
+        setSecCode(newSecCode)
+        const secId = getSecuritiesByTypeAndMarket(market, securityType)
+            .find(value => value.secCode === newSecCode).id
         setSecId(secId)
-        updateHistoryDates(newSecCode, minInterval);
-    };
+        updateHistoryDates(newSecCode, minInterval)
+    }
 
     const onStrategyChanged = (newStrategy: TradingStrategyName) => {
-        console.log(newStrategy);
-        setStrategy(newStrategy);
-    };
+        console.log(newStrategy)
+        setStrategy(newStrategy)
+    }
 
     const updateHistoryDates = (newSecCode: string, minInterval: Interval) => {
-        getSecurityHistoryDates(classCode, newSecCode)
+        getSecurityHistoryDates(securityType, newSecCode)
             .then(value => {
-                const dto: HistoryDateDto = value.historyDates.find(value => value.interval === minInterval);
-                const min = moment(dto.start).toDate();
-                const max = moment(dto.end).toDate();
-                setMinStartDate(min);
-                setMaxEndDate(max);
-                setStart(min);
-                setEnd(max);
+                const dto: HistoryDateDto = value.historyDates.find(value => value.interval === minInterval)
+                const min = moment(dto.start).toDate()
+                const max = moment(dto.end).toDate()
+                setMinStartDate(min)
+                setMaxEndDate(max)
+                setStart(min)
+                setEnd(max)
             })
-    };
+    }
 
     const onDepositSetupChanged = (newSetup: DepositSetup): void => {
-        setDepositSetup(Object.assign({}, newSetup));
-    };
+        setDepositSetup(Object.assign({}, newSetup))
+    }
 
     return (
         <Panel header="Filter" style={{marginTop: 0}}
@@ -219,14 +225,24 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
                     <div className="p-grid">
                         <div className="p-col-2">
                             <div style={{fontSize: "10px"}}>Broker</div>
-                            <Dropdown optionLabel="name"
+                            <Dropdown optionLabel="id"
                                       value={broker}
                                       options={brokers}
                                       onChange={(e) => {
-                                          setBroker(e.value)
+                                          const broker: Broker = e.value
+                                          setBroker(broker)
+                                          setPlatforms([broker.tradingPlatform].map(val => ({label: val, value: val})))
+                                          setPlatform(broker.tradingPlatform)
+                                          if (BrokerId.ALFA_DIRECT === broker.id) {
+                                              setMarkets([Market.MOEX].map(val => ({label: val, value: val})))
+                                              setMarket(Market.MOEX)
+                                          } else if (BrokerId.TINKOFF_INVEST === broker.id) {
+                                              setMarkets([Market.SPB].map(val => ({label: val, value: val})))
+                                              setMarket(Market.SPB)
+                                          }
                                       }}
                                       placeholder="Select a broker"
-                                      style={{width: '130px'}}/>
+                                      style={{width: '150px'}}/>
                         </div>
                         <div className="p-col-1">
                             <div style={{fontSize: "10px"}}>Trading platform</div>
@@ -239,11 +255,21 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
                                       style={{width: '80px'}}/>
                         </div>
                         <div className="p-col-1">
-                            <div style={{fontSize: "10px"}}>Class code</div>
-                            <Dropdown value={classCode}
-                                      options={classCodes}
+                            <div style={{fontSize: "10px"}}>Market</div>
+                            <Dropdown value={market}
+                                      options={markets}
                                       onChange={(e) => {
-                                          onClassCodeChanged(e.value);
+                                          setMarket(e.value)
+                                      }}
+                                      placeholder="Select a market"
+                                      style={{width: '80px'}}/>
+                        </div>
+                        <div className="p-col-1">
+                            <div style={{fontSize: "10px"}}>Security type</div>
+                            <Dropdown value={securityType}
+                                      options={securityTypes}
+                                      onChange={(e) => {
+                                          onSecurityTypeChanged(e.value);
                                       }}
                                       style={{width: '90px'}}/>
                         </div>
@@ -329,4 +355,4 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
             </div>
         </Panel>
     )
-};
+}
