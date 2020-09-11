@@ -14,7 +14,7 @@ import {EconomicCalendarEvent} from "../data/news/EconomicCalendarEvent";
 import {Security} from "../data/Security";
 import {Candle} from "../data/Candle";
 
-export const adjustTradingStrategyResultArray = (results: TradingStrategyResult[]): TradingStrategyResult[] => {
+export const adjustTradingStrategyResultArray = (results: TradingStrategyResult[]): any => {
     for (const result of results) {
         adjustTradingStrategyResult(result)
     }
@@ -29,6 +29,11 @@ export const adjustTradingStrategyResult = (result: TradingStrategyResult): any 
         }
         if (result.tradeSetup && result.tradeSetup.premise) {
             adjustTradePremise(result.tradeSetup.premise)
+        }
+        if (result.tradingStrategyData) {
+            result.tradingStrategyData.trades
+                .forEach(tsTrade => tsTrade.trades
+                    .forEach(trade => trade.dateTime = new Date(trade.dateTime)))
         }
     }
 

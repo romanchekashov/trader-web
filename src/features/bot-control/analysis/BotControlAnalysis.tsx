@@ -18,6 +18,7 @@ import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {BotState} from "./BotState";
 import moment = require("moment");
+import {Trade} from "../../../common/data/Trade";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -67,6 +68,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
     const [swingStates, setSwingStates] = useState<SwingStateDto[]>([]);
     const [hasData, setHasData] = useState(false);
     const [tsTrade, setTsTrade] = useState<TradingStrategyTrade>(null);
+    const [trades, setTrades] = useState<Trade[]>([]);
 
     const updateSize = () => {
         setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200);
@@ -89,6 +91,16 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             setTsTrade(trades.length > 0 ? trades[0] : null);
         } else {
             setHasData(false);
+        }
+
+        if (tradingStrategyResult && tradingStrategyResult.tradingStrategyData) {
+            const trades = []
+            for (const tsTrade of tradingStrategyResult.tradingStrategyData.trades) {
+                if (tsTrade.trades && tsTrade.trades.length > 0) {
+                    trades.push(...tsTrade.trades)
+                }
+            }
+            setTrades(trades)
         }
 
         const lastSecuritiesSubscription = WebsocketService.getInstance()
@@ -155,6 +167,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                                       security={security}
                                       premise={premise}
                                       orders={orders}
+                                      trades={trades}
                                       activeTrade={activeTrade}
                                       showGrid={true}/>
                     </div>

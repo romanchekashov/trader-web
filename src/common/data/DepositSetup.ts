@@ -1,7 +1,8 @@
 export class DepositSetup {
-    amount: number;
-    maxRiskPerTradeInPercent: number;
-    maxRiskPerSessionInPercent: number;
-    takeProfitPerTradeFactorFirst: number;
-    takeProfitPerTradeFactorSecond: number;
+    initAmount: number
+    amount: number
+    maxRiskPerTradeInPercent: number
+    maxRiskPerSessionInPercent: number
+    takeProfitPerTradeFactorFirst: number
+    takeProfitPerTradeFactorSecond: number
 }

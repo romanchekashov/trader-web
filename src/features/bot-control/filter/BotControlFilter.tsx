@@ -79,6 +79,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     const [market, setMarket] = useState<Market>(null)
 
     const [depositSetup, setDepositSetup] = useState<DepositSetup>({
+        initAmount: 100000,
         amount: 100000,
         maxRiskPerTradeInPercent: 1,
         maxRiskPerSessionInPercent: 3,

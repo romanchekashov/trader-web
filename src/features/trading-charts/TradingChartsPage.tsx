@@ -14,6 +14,11 @@ import {Order} from "../../common/data/Order";
 import {ActiveTrade} from "../../common/data/ActiveTrade";
 import {TradingChartsSecurities} from "./TradingChartsSecurities";
 import {TradingPlatform} from "../../common/data/trading/TradingPlatform";
+import {TrendsView} from "../../common/components/trend/TrendsView";
+import {TabPanel} from "primereact/tabview";
+import {TradeStrategyAnalysisFilterDto} from "../../common/data/TradeStrategyAnalysisFilterDto";
+import {Market} from "../../common/data/Market";
+import {BrokerId} from "../../common/data/BrokerId";
 
 export const TradingChartsPage: React.FC = () => {
     const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null);
@@ -28,14 +33,17 @@ export const TradingChartsPage: React.FC = () => {
     const chart2Ref = useRef(null);
     const chart3Ref = useRef(null);
     const chart4Ref = useRef(null);
+    const chart5Ref = useRef(null);
     const [chart1Width, setChart1Width] = useState(200);
     const [chart2Width, setChart2Width] = useState(200);
     const [chart3Width, setChart3Width] = useState(200);
     const [chart4Width, setChart4Width] = useState(200);
+    const [chart5Width, setChart5Width] = useState(200);
     const [timeFrame1, setTimeFrame1] = useState<Interval>(Interval.M3);
-    const [timeFrame2, setTimeFrame2] = useState<Interval>(Interval.DAY);
-    const [timeFrame3, setTimeFrame3] = useState<Interval>(Interval.M30);
-    const [timeFrame4, setTimeFrame4] = useState<Interval>(Interval.M1);
+    const [timeFrame2, setTimeFrame2] = useState<Interval>(Interval.M1);
+    const [timeFrame3, setTimeFrame3] = useState<Interval>(Interval.DAY);
+    const [timeFrame4, setTimeFrame4] = useState<Interval>(Interval.H2);
+    const [timeFrame5, setTimeFrame5] = useState<Interval>(Interval.M30);
 
     useEffect(() => {
         getFilterData(false).then(setFilterData);
@@ -94,25 +102,25 @@ export const TradingChartsPage: React.FC = () => {
     }, []);
 
     const updateSize = () => {
-        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200);
-        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : 200);
-        setChart3Width(chart3Ref.current ? chart3Ref.current.clientWidth : 200);
-        setChart4Width(chart4Ref.current ? chart4Ref.current.clientWidth : 200);
-    };
+        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200)
+        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : 200)
+        setChart3Width(chart3Ref.current ? chart3Ref.current.clientWidth : 200)
+        setChart4Width(chart4Ref.current ? chart4Ref.current.clientWidth : 200)
+        setChart5Width(chart5Ref.current ? chart5Ref.current.clientWidth : 200)
+    }
 
     const informServerAboutRequiredData = (securityLastInfo: SecurityLastInfo): void => {
         if (securityLastInfo) {
-            WebsocketService.getInstance().send(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
-                brokerId: 1,
-                tradingPlatform: TradingPlatform.QUIK,
-                classCode: securityLastInfo.classCode,
-                secCode: securityLastInfo.secCode,
+            WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(WSEvent.GET_TRADE_PREMISE_AND_SETUP, {
+                brokerId: securityLastInfo.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+                tradingPlatform: securityLastInfo.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+                secId: securityLastInfo.id,
                 timeFrameTrading: timeFrame1,
                 timeFrameMin: timeFrame4
-            });
-            WebsocketService.getInstance().send(WSEvent.GET_TRADES_AND_ORDERS, securityLastInfo.secCode);
+            })
+            WebsocketService.getInstance().send<string>(WSEvent.GET_TRADES_AND_ORDERS, securityLastInfo.secCode)
         }
-    };
+    }
 
     const onStart = (filter: MarketBotStartDto): void => {
         setFilter(filter)
@@ -125,16 +133,19 @@ export const TradingChartsPage: React.FC = () => {
 
     return (
         <div className="p-grid sample-layout analysis">
-            <div className="p-col-12" style={{padding: 0}}>
+            {/*<div className="p-col-12" style={{padding: 0}}>
                 <Filter filter={filterData} onStart={onStart}/>
+            </div>*/}
+            <div className="p-col-12">
+                <TrendsView trends={premise ? premise.analysis.trends : []}/>
             </div>
             <div className="p-col-12">
                 <div className="p-grid">
-                    <div className="p-col-6">
+                    <div className="p-col-4">
                         <TradingChartsSecurities securities={securities}
                                                  onSelectRow={onSecuritySelected}/>
                     </div>
-                    <div className="p-col-6" ref={chart1Ref} style={{padding: '0'}}>
+                    <div className="p-col-4" ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrame1}
                                       initialNumberOfCandles={500}
                                       onIntervalChanged={() => {
@@ -151,7 +162,7 @@ export const TradingChartsPage: React.FC = () => {
                     </div>
                     <div className="p-col-4" ref={chart2Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrame2}
-                                      initialNumberOfCandles={500}
+                                      initialNumberOfCandles={120}
                                       onIntervalChanged={() => {
                                       }}
                                       onStartChanged={() => {
@@ -181,12 +192,27 @@ export const TradingChartsPage: React.FC = () => {
                     </div>
                     <div className="p-col-4" ref={chart4Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrame4}
-                                      initialNumberOfCandles={120}
+                                      initialNumberOfCandles={500}
                                       onIntervalChanged={() => {
                                       }}
                                       onStartChanged={() => {
                                       }}
                                       width={chart4Width}
+                                      chartHeight={400}
+                                      security={securityLastInfo}
+                                      premise={premise}
+                                      orders={orders}
+                                      activeTrade={activeTrade}
+                                      showGrid={true}/>
+                    </div>
+                    <div className="p-col-4" ref={chart5Ref} style={{padding: '0'}}>
+                        <ChartWrapper interval={timeFrame5}
+                                      initialNumberOfCandles={500}
+                                      onIntervalChanged={() => {
+                                      }}
+                                      onStartChanged={() => {
+                                      }}
+                                      width={chart5Width}
                                       chartHeight={400}
                                       security={securityLastInfo}
                                       premise={premise}

@@ -49,7 +49,7 @@ export const BotControlLastInfo: React.FC<Props> =
             const tradingStrategiesStatesSubscription = WebsocketService.getInstance()
                 .on<TradingStrategyResult[]>(WSEvent.TRADING_STRATEGIES_RESULTS)
                 .subscribe(data => {
-                    const newResults = adjustTradingStrategyResultArray(data)
+                    const newResults: TradingStrategyResult[] = adjustTradingStrategyResultArray(data)
                     const resultsMap = {}
                     newResults.forEach(result => resultsMap[result.tradingStrategyData.id] = result)
                     setResults(Object.keys(resultsMap)

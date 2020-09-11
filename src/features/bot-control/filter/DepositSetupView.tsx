@@ -50,9 +50,10 @@ export const DepositSetupView: React.FC<Props> = ({realDeposit, setup, onChange}
                            min={0}
                            value={setup.amount}
                            onChange={(e) => {
-                               setup.amount = e.target['value'];
-                               setStop(getStopByAmount(setup.amount));
-                               onChange(setup);
+                               setup.initAmount = e.target['value']
+                               setup.amount = setup.initAmount
+                               setStop(getStopByAmount(setup.amount))
+                               onChange(setup)
                            }}
                            style={{width: '90px'}}/>
             </div>

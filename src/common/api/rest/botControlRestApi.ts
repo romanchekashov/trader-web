@@ -2,7 +2,7 @@ import {handleError, handleResponse} from "../apiUtils";
 import {MarketBotFilterDataDto} from "../../data/bot/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../data/bot/MarketBotStartDto";
 import {TradingStrategyResult} from "../../data/history/TradingStrategyResult";
-import {adjustTradingStrategyResult} from "../../utils/DataUtils";
+import {adjustTradingStrategyResult, adjustTradingStrategyResultArray} from "../../utils/DataUtils";
 import {TradingStrategyStatus} from "../../data/trading/TradingStrategyStatus";
 import {SecurityHistoryDatesDto} from "../../data/bot/SecurityHistoryDatesDto";
 import {SecurityType} from "../../data/SecurityType";
@@ -40,7 +40,8 @@ export function switchBotStatus(tradingStrategyId: number,
 
 export function getAllStrategies(): Promise<TradingStrategyResult[]> {
     return fetch(baseUrl + 'all-strategies')
-        .then(handleResponse)
+        .then(response => handleResponse(response)
+            .then(adjustTradingStrategyResultArray))
         .catch(handleError);
 }
 

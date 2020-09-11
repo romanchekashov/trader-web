@@ -31,7 +31,7 @@ export const BotControlRunningStrategies: React.FC<Props> =
         const tradingStrategiesStatesSubscription = WebsocketService.getInstance()
             .on<TradingStrategyResult[]>(WSEvent.TRADING_STRATEGIES_RESULTS)
             .subscribe(data => {
-                const results = adjustTradingStrategyResultArray(data)
+                const results: TradingStrategyResult[] = adjustTradingStrategyResultArray(data)
                 setResults(results);
                 for (const result of results) {
                     if (selectedResult === null || selectedResult.tradingStrategyData.id === result.tradingStrategyData.id) {
