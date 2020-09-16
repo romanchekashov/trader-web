@@ -33,6 +33,7 @@ import {Market} from "../../data/Market";
 import {BrokerId} from "../../data/BrokerId";
 import {TradingPlatform} from "../../data/trading/TradingPlatform";
 import {FilterDto} from "../../data/FilterDto";
+import {PremiseBeforeDate} from "./toolbar/PremiseBeforeDate";
 import moment = require("moment");
 
 const _ = require("lodash");
@@ -41,7 +42,8 @@ type Props = {
     interval: Interval,
     onIntervalChanged: (interval: Interval) => void
     onStartChanged: (start: Date) => void
-    width: number,
+    onPremiseBeforeChanged?: (before: Date) => void
+    width: number
     chartHeight?: number
     start?: Date,
     initialNumberOfCandles?: number,
@@ -91,7 +93,8 @@ export class ChartWrapper extends React.Component<Props, States> {
         strokeDasharray: "Solid",
         strokeOpacity: 1,
         strokeWidth: 1
-    };
+    }
+    private wsCandleFilter: FilterDto
 
     constructor(props) {
         super(props)
@@ -165,6 +168,7 @@ export class ChartWrapper extends React.Component<Props, States> {
     componentWillUnmount = (): void => {
         this.candlesSetupSubscription.unsubscribe()
         this.wsStatusSub.unsubscribe()
+        WebsocketService.getInstance().send<FilterDto>(WSEvent.REMOVE_CANDLES, this.wsCandleFilter)
     }
 
     componentDidUpdate = (prevProps: Props) => {
@@ -329,18 +333,19 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     requestCandles = (security: SecurityLastInfo): void => {
-        const {innerInterval} = this.state;
+        const {innerInterval} = this.state
 
         if (security && innerInterval) {
-            WebsocketService.getInstance().send<FilterDto>(WSEvent.GET_CANDLES, {
+            this.wsCandleFilter = {
                 brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
                 tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
                 secId: security.id,
                 interval: innerInterval,
                 numberOfCandles: 2
-            });
+            }
+            WebsocketService.getInstance().send<FilterDto>(WSEvent.GET_CANDLES, this.wsCandleFilter)
         }
-    };
+    }
 
     getHighTimeFrameSRLevels = () => {
         // const {premise} = this.props;
@@ -608,8 +613,12 @@ export class ChartWrapper extends React.Component<Props, States> {
         const {
             candles, nodata, innerInterval, innerStart, enableTrendLine, enableNewOrder, needSave, trends_1, showSRLevels,
             showSRZones, numberOfCandles, startCalendarVisible
-        } = this.state;
-        const {width, chartHeight, showGrid, premise, security, trades, orders, stops, activeTrade} = this.props;
+        } = this.state
+
+        const {
+            width, chartHeight, showGrid, premise, security, trades, orders, stops, activeTrade,
+            onPremiseBeforeChanged
+        } = this.props
 
         if (!security) {
             return (<>Select security for chart</>)
@@ -642,6 +651,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                                 : null
                         }
                     </div>
+                    <PremiseBeforeDate onBeforeChanged={onPremiseBeforeChanged}/>
                     <div className="chart-wrapper-head-trendline">
                         <ToggleButton onLabel="New Order"
                                       offLabel="New Order"

@@ -55,6 +55,8 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0)
 
     const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate());
+    const [premiseBefore, setPremiseBefore] = useState<Date>(null)
+
     const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
     const [timeFrameMin, setTimeFrameMin] = useState(Interval.M1);
     const [premise, setPremise] = useState(null);
@@ -231,17 +233,18 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
         }
     }
 
-    const fetchPremise = (timeFrameTrading: Interval) => {
+    const fetchPremise = (timeFrameTrading: Interval, before?: Date) => {
         getTradePremise({
             brokerId: BrokerId.ALFA_DIRECT,
             tradingPlatform: TradingPlatform.QUIK,
             secId: security.id,
             timeFrameTrading,
-            timeFrameMin
+            timeFrameMin,
+            timestamp: before
         }).then(setPremise).catch(reason => {
-            fetchPremise(timeFrameTrading);
-        });
-    };
+            fetchPremise(timeFrameTrading, before)
+        })
+    }
 
     const onChartNumberChanged = (num: number) => {
         setChartNumber(num);
@@ -249,13 +252,18 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
     };
 
     const onTradingIntervalChanged = (interval: Interval) => {
-        setTimeFrameTrading(interval);
-        fetchPremise(interval);
-        updateMarketStateFilterDto(interval);
-    };
+        setTimeFrameTrading(interval)
+        fetchPremise(interval)
+        updateMarketStateFilterDto(interval)
+    }
 
     const onStartChanged = (start: Date) => {
-        setStart(start);
+        setStart(start)
+    }
+
+    const onPremiseBeforeChanged = (before: Date) => {
+        setPremiseBefore(before)
+        fetchPremise(timeFrameTrading, before)
     }
 
     const onTabChanged = (tabIndex: number) => {
@@ -304,6 +312,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                                           initialNumberOfCandles={500}
                                           onIntervalChanged={onTradingIntervalChanged}
                                           onStartChanged={onStartChanged}
+                                          onPremiseBeforeChanged={onPremiseBeforeChanged}
                                           width={chart1Width}
                                           security={securityLastInfo}
                                           premise={premise}

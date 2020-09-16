@@ -6,4 +6,5 @@ export class TradeStrategyAnalysisFilterDto extends SecurityFilter {
     public timeFrameTrading: Interval
     public timeFrameMin: Interval
     public tradeSystemType?: TradeSystemType
+    public timestamp?: Date
 }
