@@ -26,6 +26,7 @@ import {BotControlAnalysis} from "./analysis/BotControlAnalysis";
 import {getSecurity} from "../../common/utils/Cache";
 import {BotControlAnalysisInfo} from "./analysis/BotControlAnalysisInfo";
 import {BotControlRunningStrategies} from "./last-info/BotControlRunningStrategies";
+import {RunningStrategy} from "./running-strategy/RunningStrategy";
 
 
 function mapStateToProps(state: RootState) {
@@ -143,9 +144,16 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                 <div className="p-col-12">
                     <div className="p-grid">
                         <div className="p-col-2">
-                            <BotControlLastInfo outerHeight={400}
-                                                onStrategyResultSelected={this.onStrategyResultSelected}
-                                                onSelectedTSResultUpdate={this.onSelectedTSResultUpdate}/>
+                            <TabView>
+                                <TabPanel header="History">
+                                    <BotControlLastInfo outerHeight={400}
+                                                        onStrategyResultSelected={this.onStrategyResultSelected}
+                                                        onSelectedTSResultUpdate={this.onSelectedTSResultUpdate}/>
+                                </TabPanel>
+                                <TabPanel header="Running">
+                                    <RunningStrategy tradingStrategyResult={selectedTSResult}/>
+                                </TabPanel>
+                            </TabView>
                         </div>
                         <div className="p-col-10" style={{padding: 0}}>
                             <TabView>

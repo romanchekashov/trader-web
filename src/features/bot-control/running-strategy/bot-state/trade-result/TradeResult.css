@@ -1,0 +1,20 @@
+.trade-result {
+    font-size: 12px;
+    margin: 5px 0;
+    cursor: pointer;
+    height: 30px;
+    overflow: hidden;
+}
+
+.trade-result:hover {
+    height: auto;
+}
+
+.trade-result-short-info {
+    display: flex;
+    justify-content: space-between;
+    /*display: grid;*/
+    /*grid-template-columns: 1fr 1fr 1fr;*/
+    /*grid-column-gap: 5px;*/
+    /*grid-row-gap: 1px;*/
+}

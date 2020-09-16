@@ -16,9 +16,8 @@ import {TradingStrategyTrade} from "../../../common/data/history/TradingStrategy
 import "./BotControlAnalysis.css";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
-import {BotState} from "./BotState";
-import moment = require("moment");
 import {Trade} from "../../../common/data/Trade";
+import moment = require("moment");
 
 export interface AnalysisState {
     realDepo: boolean
@@ -134,8 +133,6 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
 
         return (
             <>
-                <BotState tsTrade={tsTrade} tradingStrategyResult={tradingStrategyResult}/>
-
                 <div className="p-grid analysis-head">
                     <div className="p-col-12">
                         <div className="analysis-head-chart-number">
