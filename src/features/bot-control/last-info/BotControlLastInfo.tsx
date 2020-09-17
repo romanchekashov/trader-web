@@ -19,6 +19,7 @@ export const BotControlLastInfo: React.FC<Props> =
     ({onStrategyResultSelected, onSelectedTSResultUpdate, outerHeight}) => {
 
         const [results, setResults] = useState<TradingStrategyResult[]>([]);
+        const [resultsMap, setResultsMap] = useState({});
         const [selectedResult, setSelectedResult] = useState<TradingStrategyResult>(null);
 
         useEffect(() => {
@@ -26,18 +27,16 @@ export const BotControlLastInfo: React.FC<Props> =
                 getAllStrategies()
                     .then(results => {
                         const resultsMap = {}
-
-                        results
-                            .filter(result => result.tradingStrategyData)
-                            .forEach(result => resultsMap[result.tradingStrategyData.id] = result)
-
-                        setResults(Object.keys(resultsMap)
-                            .map(key => resultsMap[key])
-                            .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id));
+                        results.forEach(result => resultsMap[result.tradingStrategyData.id] = result)
+                        setResultsMap(resultsMap)
+                        setResults(results
+                            .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id))
                     })
                     .catch(console.error);
             }
+        }, [selectedResult])
 
+        useEffect(() => {
             const wsStatusSub = WebsocketService.getInstance()
                 .connectionStatus()
                 .subscribe(isConnected => {
@@ -50,11 +49,12 @@ export const BotControlLastInfo: React.FC<Props> =
                 .on<TradingStrategyResult[]>(WSEvent.TRADING_STRATEGIES_RESULTS)
                 .subscribe(data => {
                     const newResults: TradingStrategyResult[] = adjustTradingStrategyResultArray(data)
-                    const resultsMap = {}
                     newResults.forEach(result => resultsMap[result.tradingStrategyData.id] = result)
+
                     setResults(Object.keys(resultsMap)
                         .map(key => resultsMap[key])
                         .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id))
+
                     for (const result of newResults) {
                         if (selectedResult === null || selectedResult.tradingStrategyData.id === result.tradingStrategyData.id) {
                             onSelectedTSResultUpdate(result)
@@ -67,7 +67,7 @@ export const BotControlLastInfo: React.FC<Props> =
                 if (wsStatusSub) wsStatusSub.unsubscribe()
                 if (tradingStrategiesStatesSubscription) tradingStrategiesStatesSubscription.unsubscribe()
             }
-        }, [selectedResult])
+        }, [selectedResult, resultsMap])
 
         const onResultSelected = (result: TradingStrategyResult): void => {
             setSelectedResult(result)

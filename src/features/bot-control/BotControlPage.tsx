@@ -27,6 +27,7 @@ import {getSecurity} from "../../common/utils/Cache";
 import {BotControlAnalysisInfo} from "./analysis/BotControlAnalysisInfo";
 import {BotControlRunningStrategies} from "./last-info/BotControlRunningStrategies";
 import {RunningStrategy} from "./running-strategy/RunningStrategy";
+import {EconomicCalendar} from "../../common/components/economic-calendar/EconomicCalendar";
 
 
 function mapStateToProps(state: RootState) {
@@ -177,6 +178,9 @@ class BotControlPage extends React.Component<Props, BotControlState> {
                                 </TabPanel>
                                 <TabPanel header="Info">
                                     <BotControlAnalysisInfo security={selectedSecurity}/>
+                                </TabPanel>
+                                <TabPanel header="Calendar">
+                                    <EconomicCalendar secId={selectedSecurity?.id}/>
                                 </TabPanel>
                             </TabView>
                         </div>
