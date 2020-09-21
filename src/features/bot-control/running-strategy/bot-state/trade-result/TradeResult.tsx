@@ -34,7 +34,7 @@ export const TradeResult: React.FC<Props> = ({tsTrade}) => {
             }
         }
 
-        return round100(tsTrade.operation === OperationType.BUY ? selVal - buyVal : buyVal - selVal)
+        return round100(selVal - buyVal)
     }
 
     let className = "p-grid trade-result"

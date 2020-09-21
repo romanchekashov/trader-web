@@ -85,17 +85,17 @@ export const BotControlLastInfo: React.FC<Props> =
                      key={result.tradingStrategyData.id}
                      onClick={event => onResultSelected(result)}>
                     <div>
-                        {result.tradingStrategyData.name}-{result.tradingStrategyData.id}-{result.tradingStrategyData.interval}
+                        <strong>{result.tradingStrategyData.id}</strong> {result.tradingStrategyData.name}
                     </div>
                     <div>
-                        {result.tradingStrategyData.security.classCode}-{result.tradingStrategyData.security.code}-{result.tradingStrategyData.systemType}-{result.tradingStrategyData.interval}
+                        <strong>{result.tradingStrategyData.security.secCode}</strong>
                     </div>
                     <div>
-                        D:{result.tradingStrategyData.deposit}-S%:{result.tradingStrategyData.maxRiskPerTradeInPercent}
+                        D:<strong>{result.tradingStrategyData.deposit}</strong>-S%:{result.tradingStrategyData.maxRiskPerTradeInPercent}
                         -T1:{result.tradingStrategyData.firstTakeProfitPerTradeFactor}-T2:{result.tradingStrategyData.secondTakeProfitPerTradeFactor}
                     </div>
                     <div>
-                        {result.tradingStrategyData.status}
+                        <strong>{result.tradingStrategyData.systemType.substr(0, 4)} {result.tradingStrategyData.interval} {result.tradingStrategyData.status.substr(0, 4)}</strong>
                     </div>
                     <div>
                         Start: {moment(result.tradingStrategyData.start).format("HH:mm DD-MM")}
@@ -116,7 +116,7 @@ export const BotControlLastInfo: React.FC<Props> =
                                 className="List"
                                 height={height}
                                 itemCount={results.length}
-                                itemSize={50}
+                                itemSize={60}
                                 width={width}
                             >
                                 {Row}
