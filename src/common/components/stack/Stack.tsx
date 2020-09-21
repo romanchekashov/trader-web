@@ -225,6 +225,7 @@ export class Stack extends React.Component<Props, States> {
 
         const orders: Order[] = [
             {
+                secId: securityLastInfo.id,
                 price: val.price,
                 quantity: position,
                 operation: val.price > securityLastInfo.lastTradePrice ? OperationType.SELL : OperationType.BUY,

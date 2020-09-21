@@ -76,6 +76,7 @@ export class GeneralBtn extends React.Component<Props, States> {
 
         const orders: Order[] = [
             {
+                secId: security.id,
                 price,
                 quantity,
                 operation,

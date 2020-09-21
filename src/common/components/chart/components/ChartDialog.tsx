@@ -156,6 +156,7 @@ export class ChartDialog extends React.Component<Props, State> {
             onSave(alert, chartId, {
                 type,
                 createOrder: {
+                    secId: securityInfo.id,
                     price: alert.yValue,
                     quantity,
                     operation: operationType,

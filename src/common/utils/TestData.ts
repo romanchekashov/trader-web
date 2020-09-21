@@ -21,7 +21,7 @@ export const activeTrade: ActiveTrade = {
     stopOrder: {
         transId: 1,
         number: 2,
-        linkedOrderNum: 2,
+        linkedOrderNum: "2",
         classCode: ClassCode.SPBFUT,
         secCode: "BRM0",
         operation: OperationType.BUY,
