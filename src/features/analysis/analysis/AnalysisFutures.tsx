@@ -32,6 +32,7 @@ import {Market} from "../../../common/data/Market";
 import {TradeStrategyAnalysisFilterDto} from "../../../common/data/TradeStrategyAnalysisFilterDto";
 import {FilterDto} from "../../../common/data/FilterDto";
 import moment = require("moment");
+import {SupplyAndDemand} from "./supply-and-demand/SupplyAndDemand";
 
 type Props = {
     security: SecurityLastInfo
@@ -348,6 +349,9 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                         </div>
                         <div className="p-col-12">
                             <SwingStateList filter={marketStateFilterDto}/>
+                        </div>
+                        <div className="p-col-12">
+                            <SupplyAndDemand security={securityLastInfo}/>
                         </div>
                         <div className="p-col-12">
                             <div className="p-grid">
