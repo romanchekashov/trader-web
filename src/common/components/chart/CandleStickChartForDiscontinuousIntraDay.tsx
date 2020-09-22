@@ -27,7 +27,7 @@ import {Interval} from "../../data/Interval";
 import {SRLevel} from "../../data/strategy/SRLevel";
 import {ChartLevels} from "./components/ChartLevels";
 import {DrawingObjectSelector, InteractiveYCoordinate, TrendLine} from "react-financial-charts/lib/interactive";
-import {ema} from "react-financial-charts/lib/indicator";
+import {atr, ema} from "react-financial-charts/lib/indicator";
 import {
     getInteractiveNodes,
     isCurrentChartInteractingId,
@@ -48,6 +48,7 @@ import {StopOrder} from "../../data/StopOrder";
 import {OperationType} from "../../data/OperationType";
 import {ChartManageOrder} from "./data/ChartManageOrder";
 import {ActiveTrade} from "../../data/ActiveTrade";
+import {KeltnerChannelSeries} from "./components/keltner-channel/KeltnerChannelSeries";
 
 const _ = require("lodash");
 
@@ -617,7 +618,14 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
             })
             .accessor(d => d.ema20);
 
-        const calculatedData = ema20(ema7(initialData));
+        const atr7 = atr()
+            .options({windowSize: 7})
+            .merge((d, c) => {
+                d.atr7 = c;
+            })
+            .accessor(d => d.atr7);
+
+        const calculatedData = ema20(ema7(atr7(initialData)));
         const xScaleProvider = discontinuousTimeScaleProvider
             .inputDateAccessor(d => d.timestamp);
         const {
@@ -694,7 +702,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                     </Chart>
 
                     <Chart id={1}
-                           yExtents={[d => [d.high, d.low], ema20.accessor(), ema7.accessor()]}
+                           yExtents={[d => [d.high, d.low], ema20.accessor(), ema7.accessor(), atr7.accessor()]}
                            padding={{top: 40, bottom: 20}}>
                         <XAxis axisAt="bottom" orient="bottom" {...xGrid}/>
                         <YAxis axisAt="right" orient="right" ticks={5}/>
@@ -764,7 +772,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
                         <ChartTrades candles={data} trades={trades}/>
 
-                        <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>
+                        <KeltnerChannelSeries yAccessor={d => ({ema: ema20.accessor(), atr: atr7.accessor()})}/>
+                        {/*<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>*/}
                         <LineSeries yAccessor={ema7.accessor()} stroke={ema7.stroke()}/>
 
                         <TrendLine ref={this.saveInteractiveNodes("Trendline", 1)}
