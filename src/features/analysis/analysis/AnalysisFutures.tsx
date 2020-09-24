@@ -166,13 +166,6 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                 }
             })
 
-        const tradePremiseSubscription = WebsocketService.getInstance()
-            .on<TradePremise>(WSEvent.TRADE_PREMISE)
-            .subscribe(newPremise => {
-                adjustTradePremise(newPremise)
-                setPremise(newPremise)
-            })
-
         const activeTradeSubscription = WebsocketService.getInstance()
             .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
             .subscribe(activeTrades => {
@@ -192,10 +185,26 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
             window.removeEventListener('resize', updateSize)
             wsStatusSub.unsubscribe()
             lastSecuritiesSubscription.unsubscribe()
-            tradePremiseSubscription.unsubscribe()
             activeTradeSubscription.unsubscribe()
         }
     }, [security])
+
+    useEffect(() => {
+
+        const tradePremiseSubscription = WebsocketService.getInstance()
+            .on<TradePremise>(WSEvent.TRADE_PREMISE)
+            .subscribe(newPremise => {
+                if (!premiseBefore) {
+                    adjustTradePremise(newPremise)
+                    setPremise(newPremise)
+                }
+            })
+
+        // Specify how to clean up after this effect:
+        return function cleanup() {
+            tradePremiseSubscription.unsubscribe()
+        }
+    }, [security, premiseBefore])
 
     const updateMarketStateFilterDto = (interval: Interval) => {
         const marketStateFilter: MarketStateFilterDto = {

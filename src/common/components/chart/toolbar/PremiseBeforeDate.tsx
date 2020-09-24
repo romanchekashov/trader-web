@@ -13,20 +13,29 @@ export const PremiseBeforeDate: React.FC<Props> = ({onBeforeChanged}) => {
     const [calendarVisible, setCalendarVisible] = useState<boolean>(false)
     const [before, setBefore] = useState<Date>(new Date())
 
+    const changeCalendarVisible = (visible: boolean) => {
+        setCalendarVisible(visible)
+        if (!visible) {
+            changeDate(null)
+        }
+    }
+
+    const changeDate = (date: Date) => {
+        setBefore(date)
+        onBeforeChanged(date)
+    }
+
     return (
         <div className="premise-before-date">
             <Button label="P"
                     className={calendarVisible ? "" : "p-button-secondary"}
-                    onClick={event => setCalendarVisible(!calendarVisible)}/>
+                    onClick={event => changeCalendarVisible(!calendarVisible)}/>
             {
                 calendarVisible ?
                     <Calendar value={before}
                               dateFormat={'dd/mm'}
                               showTime={true}
-                              onSelect={(e) => {
-                                  setBefore(e.value as Date)
-                                  onBeforeChanged(e.value as Date)
-                              }}/>
+                              onSelect={(e) => changeDate(e.value as Date)}/>
                     : null
             }
         </div>

@@ -6,6 +6,7 @@ import "./BotState.css"
 import {StrategyInfo} from "./strategy-info/StrategyInfo";
 import {CurrentTrade} from "./current-trade/CurrentTrade";
 import {TradeResult} from "./trade-result/TradeResult";
+import {TradingStrategyStatus} from "../../../../common/data/trading/TradingStrategyStatus";
 
 type Props = {
     tsTrade: TradingStrategyTrade
@@ -23,7 +24,10 @@ export const BotState: React.FC<Props> = ({tsTrade, tradingStrategyResult}) => {
     return (
         <>
             <StrategyInfo tradingStrategyResult={tradingStrategyResult}/>
-            <CurrentTrade tsTrade={tsTrade}/>
+            {
+                TradingStrategyStatus.FINISHED === tradingStrategyResult?.tradingStrategyData?.status
+                    ? null : <CurrentTrade tsTrade={tsTrade}/>
+            }
             {
                 tradingStrategyResult && tradingStrategyResult.tradingStrategyData ?
                     tradingStrategyResult.tradingStrategyData.trades

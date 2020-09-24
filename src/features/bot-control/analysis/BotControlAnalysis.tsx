@@ -129,6 +129,14 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
         setTimeout(updateSize, 1000);
     };
 
+    const getAdjustedStart = (): Date => {
+        if (tradingStrategyResult?.tradingStrategyData) {
+            const start = new Date(tradingStrategyResult.tradingStrategyData.start.getTime())
+            start.setHours(9)
+            return start
+        }
+    }
+
     if (hasData) {
 
         return (
@@ -156,6 +164,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                     <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
                         <ChartWrapper interval={timeFrameTrading}
                                       initialNumberOfCandles={500}
+                                      start={getAdjustedStart()}
                                       onIntervalChanged={interval => {
                                       }}
                                       onStartChanged={start => {

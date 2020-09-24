@@ -18,3 +18,8 @@
     /*grid-column-gap: 5px;*/
     /*grid-row-gap: 1px;*/
 }
+
+.trade-result-trade {
+    display: flex;
+    justify-content: space-between;
+}

@@ -4,6 +4,7 @@ import {TradingStrategyTrade} from "../../../../../common/data/history/TradingSt
 import {OperationType} from "../../../../../common/data/OperationType";
 import "./TradeResult.css"
 import {round100} from "../../../../../common/utils/utils";
+import moment = require("moment");
 
 type Props = {
     tsTrade: TradingStrategyTrade
@@ -87,6 +88,18 @@ export const TradeResult: React.FC<Props> = ({tsTrade}) => {
                     Real Kill
                     Exception: {OperationType.BUY === tsTrade.operation ? 'SELL' : 'BUY'} {tsTrade.killExceptionRealQuantity} by {tsTrade.killExceptionRealPrice}
                 </div>
+            </div>
+            <div className="p-col-12">
+                {
+                    tsTrade.trades.map(trade => {
+                        return <div className="trade-result-trade">
+                            <div>{trade.operation}</div>
+                            <div>{trade.price}</div>
+                            <div>{trade.quantity}</div>
+                            <div>{moment(trade.dateTime).format("DD-MM HH:mm:ss")}</div>
+                        </div>
+                    })
+                }
             </div>
         </div>
     )

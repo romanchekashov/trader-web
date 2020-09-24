@@ -31,6 +31,12 @@ export const adjustTradingStrategyResult = (result: TradingStrategyResult): any 
             adjustTradePremise(result.tradeSetup.premise)
         }
         if (result.tradingStrategyData) {
+            if (result.tradingStrategyData.start) {
+                result.tradingStrategyData.start = new Date(result.tradingStrategyData.start)
+            }
+            if (result.tradingStrategyData.end) {
+                result.tradingStrategyData.end = new Date(result.tradingStrategyData.end)
+            }
             result.tradingStrategyData.trades
                 .forEach(tsTrade => tsTrade.trades
                     .forEach(trade => trade.dateTime = new Date(trade.dateTime)))

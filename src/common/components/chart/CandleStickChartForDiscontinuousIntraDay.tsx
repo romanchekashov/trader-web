@@ -770,11 +770,11 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                                     markerProps={{width: 16, stroke: "#e53935", fill: "#e53935"}}/> : null
                         }
 
-                        <ChartTrades candles={data} trades={trades}/>
-
                         <KeltnerChannelSeries yAccessor={d => ({ema: ema20.accessor(), atr: atr7.accessor()})}/>
                         {/*<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>*/}
                         <LineSeries yAccessor={ema7.accessor()} stroke={ema7.stroke()}/>
+
+                        <ChartTrades candles={data} trades={trades}/>
 
                         <TrendLine ref={this.saveInteractiveNodes("Trendline", 1)}
                                    enabled={this.props.enableTrendLine}
