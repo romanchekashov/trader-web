@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {Interval} from "../../../common/data/Interval";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
-import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
+import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {Dropdown} from "primereact/dropdown";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
@@ -18,6 +18,9 @@ import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {Trade} from "../../../common/data/Trade";
 import moment = require("moment");
+import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
+import {BrokerId} from "../../../common/data/BrokerId";
+import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -41,7 +44,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
         "DAY": [Interval.DAY, Interval.H2],
         "WEEK": [Interval.WEEK, Interval.DAY],
         "MONTH": [Interval.MONTH, Interval.WEEK]
-    };
+    }
 
     const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate());
     const [timeFrameTrading, setTimeFrameTrading] = useState(null);
@@ -54,9 +57,9 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
     const [chartNumber, setChartNumber] = useState(1);
 
     const [securityLastInfo, setSecurityLastInfo] = useState(null);
-    const [chart1Width, setChart1Width] = useState(200);
-    const [chart2Width, setChart2Width] = useState(200);
-    const [chartAlertsWidth, setChartAlertsWidth] = useState(200);
+    const [chart1Width, setChart1Width] = useState(CHART_MIN_WIDTH);
+    const [chart2Width, setChart2Width] = useState(CHART_MIN_WIDTH);
+    const [chartAlertsWidth, setChartAlertsWidth] = useState(CHART_MIN_WIDTH);
     const chart1Ref = useRef(null);
     const chart2Ref = useRef(null);
     const chartAlertsRef = useRef(null);
@@ -68,11 +71,12 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
     const [hasData, setHasData] = useState(false);
     const [tsTrade, setTsTrade] = useState<TradingStrategyTrade>(null);
     const [trades, setTrades] = useState<Trade[]>([]);
+    const [premiseBefore, setPremiseBefore] = useState<Date>(null)
 
     const updateSize = () => {
-        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200);
-        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : 200);
-        setChartAlertsWidth(chartAlertsRef.current ? chartAlertsRef.current.clientWidth : 200);
+        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : CHART_MIN_WIDTH);
+        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : CHART_MIN_WIDTH);
+        setChartAlertsWidth(chartAlertsRef.current ? chartAlertsRef.current.clientWidth : CHART_MIN_WIDTH);
     };
 
     useEffect(() => {
@@ -137,6 +141,24 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
         }
     }
 
+    const fetchPremise = (timeFrameTrading: Interval, before?: Date) => {
+        getTradePremise({
+            brokerId: BrokerId.ALFA_DIRECT,
+            tradingPlatform: TradingPlatform.QUIK,
+            secId: security.id,
+            timeFrameTrading,
+            timeFrameMin,
+            timestamp: before
+        }).then(setPremise).catch(reason => {
+            fetchPremise(timeFrameTrading, before)
+        })
+    }
+
+    const onPremiseBeforeChanged = (before: Date) => {
+        setPremiseBefore(before)
+        fetchPremise(timeFrameTrading, before)
+    }
+
     if (hasData) {
 
         return (
@@ -165,6 +187,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                         <ChartWrapper interval={timeFrameTrading}
                                       initialNumberOfCandles={500}
                                       start={getAdjustedStart()}
+                                      onPremiseBeforeChanged={onPremiseBeforeChanged}
                                       onIntervalChanged={interval => {
                                       }}
                                       onStartChanged={start => {

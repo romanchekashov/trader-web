@@ -77,6 +77,8 @@ type States = {
     startCalendarVisible: boolean
 };
 
+export const CHART_MIN_WIDTH = 200
+
 export class ChartWrapper extends React.Component<Props, States> {
 
     private candlesSetupSubscription: SubscriptionLike = null;

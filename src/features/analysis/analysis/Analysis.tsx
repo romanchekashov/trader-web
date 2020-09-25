@@ -3,7 +3,7 @@ import {useEffect, useRef, useState} from "react";
 import {TradePremise} from "../../../common/data/strategy/TradePremise";
 import {Interval} from "../../../common/data/Interval";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
-import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
+import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import Alerts from "../../../common/components/alerts/Alerts";
 import {Dropdown} from "primereact/dropdown";
 import {DataTable} from "primereact/datatable";
@@ -65,9 +65,9 @@ const Analysis: React.FC<Props> = ({security}) => {
     const [chartNumber, setChartNumber] = useState(1);
 
     const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
-    const [chart1Width, setChart1Width] = useState(200);
-    const [chart2Width, setChart2Width] = useState(200);
-    const [chartAlertsWidth, setChartAlertsWidth] = useState(200);
+    const [chart1Width, setChart1Width] = useState(CHART_MIN_WIDTH);
+    const [chart2Width, setChart2Width] = useState(CHART_MIN_WIDTH);
+    const [chartAlertsWidth, setChartAlertsWidth] = useState(CHART_MIN_WIDTH);
     const chart1Ref = useRef(null);
     const chart2Ref = useRef(null);
     const chartAlertsRef = useRef(null);
@@ -77,9 +77,9 @@ const Analysis: React.FC<Props> = ({security}) => {
     const [alert, setAlert] = useState(null);
 
     const updateSize = () => {
-        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200);
-        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : 200);
-        setChartAlertsWidth(chartAlertsRef.current ? chartAlertsRef.current.clientWidth : 200);
+        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : CHART_MIN_WIDTH);
+        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : CHART_MIN_WIDTH);
+        setChartAlertsWidth(chartAlertsRef.current ? chartAlertsRef.current.clientWidth : CHART_MIN_WIDTH);
     };
 
     useEffect(() => {

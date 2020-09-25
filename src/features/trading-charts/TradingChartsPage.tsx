@@ -2,9 +2,8 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {getFilterData} from "../../common/api/rest/botControlRestApi";
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
-import Filter from "../analysis/filter/Filter";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
-import {ChartWrapper} from "../../common/components/chart/ChartWrapper";
+import {CHART_MIN_WIDTH, ChartWrapper} from "../../common/components/chart/ChartWrapper";
 import {TradePremise} from "../../common/data/strategy/TradePremise";
 import {SecurityLastInfo} from "../../common/data/SecurityLastInfo";
 import {Interval} from "../../common/data/Interval";
@@ -15,7 +14,6 @@ import {ActiveTrade} from "../../common/data/ActiveTrade";
 import {TradingChartsSecurities} from "./TradingChartsSecurities";
 import {TradingPlatform} from "../../common/data/trading/TradingPlatform";
 import {TrendsView} from "../../common/components/trend/TrendsView";
-import {TabPanel} from "primereact/tabview";
 import {TradeStrategyAnalysisFilterDto} from "../../common/data/TradeStrategyAnalysisFilterDto";
 import {Market} from "../../common/data/Market";
 import {BrokerId} from "../../common/data/BrokerId";
@@ -34,11 +32,11 @@ export const TradingChartsPage: React.FC = () => {
     const chart3Ref = useRef(null);
     const chart4Ref = useRef(null);
     const chart5Ref = useRef(null);
-    const [chart1Width, setChart1Width] = useState(200);
-    const [chart2Width, setChart2Width] = useState(200);
-    const [chart3Width, setChart3Width] = useState(200);
-    const [chart4Width, setChart4Width] = useState(200);
-    const [chart5Width, setChart5Width] = useState(200);
+    const [chart1Width, setChart1Width] = useState(CHART_MIN_WIDTH);
+    const [chart2Width, setChart2Width] = useState(CHART_MIN_WIDTH);
+    const [chart3Width, setChart3Width] = useState(CHART_MIN_WIDTH);
+    const [chart4Width, setChart4Width] = useState(CHART_MIN_WIDTH);
+    const [chart5Width, setChart5Width] = useState(CHART_MIN_WIDTH);
     const [timeFrame1, setTimeFrame1] = useState<Interval>(Interval.M3);
     const [timeFrame2, setTimeFrame2] = useState<Interval>(Interval.M1);
     const [timeFrame3, setTimeFrame3] = useState<Interval>(Interval.DAY);
@@ -102,11 +100,11 @@ export const TradingChartsPage: React.FC = () => {
     }, []);
 
     const updateSize = () => {
-        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : 200)
-        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : 200)
-        setChart3Width(chart3Ref.current ? chart3Ref.current.clientWidth : 200)
-        setChart4Width(chart4Ref.current ? chart4Ref.current.clientWidth : 200)
-        setChart5Width(chart5Ref.current ? chart5Ref.current.clientWidth : 200)
+        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : CHART_MIN_WIDTH)
+        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : CHART_MIN_WIDTH)
+        setChart3Width(chart3Ref.current ? chart3Ref.current.clientWidth : CHART_MIN_WIDTH)
+        setChart4Width(chart4Ref.current ? chart4Ref.current.clientWidth : CHART_MIN_WIDTH)
+        setChart5Width(chart5Ref.current ? chart5Ref.current.clientWidth : CHART_MIN_WIDTH)
     }
 
     const informServerAboutRequiredData = (securityLastInfo: SecurityLastInfo): void => {

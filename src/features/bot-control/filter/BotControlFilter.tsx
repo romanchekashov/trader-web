@@ -110,7 +110,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
         TradeSystemType.DEMO, TradeSystemType.REAL].map(val => ({label: val, value: val}))
     const [systemType, setSystemType] = useState(initState.systemType)
 
-    const strategies: PrimeDropdownItem<TradingStrategyName>[] = [TradingStrategyName.TWO_EMA_CROSS]
+    const strategies: PrimeDropdownItem<TradingStrategyName>[] = [TradingStrategyName.TWO_EMA_CROSS, TradingStrategyName.KELTNER_CHANNEL]
         .map(val => ({label: val, value: val}))
     const [strategy, setStrategy] = useState(initState.strategy)
 

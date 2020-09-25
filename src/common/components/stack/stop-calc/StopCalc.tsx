@@ -6,6 +6,7 @@ import {SecurityLastInfo} from "../../../data/SecurityLastInfo";
 import {SecurityFuture} from "../../../data/SecurityFuture";
 import {roundByMultiplier} from "../../../utils/utils";
 import {getSecurity} from "../../../utils/Cache";
+import {ClassCode} from "../../../data/ClassCode";
 
 type Props = {
     securityLastInfo: SecurityLastInfo
@@ -14,33 +15,24 @@ type Props = {
 
 export const StopCalc: React.FC<Props> = ({securityLastInfo, showSmall}) => {
 
-    const [stop, setStop] = useState(500);
+    const [stop, setStop] = useState(500)
 
     const calcStopPrice = (quantity: number, isShort: boolean): number => {
-        if (!securityLastInfo) return null;
-        const security = getSecurity(securityLastInfo.classCode, securityLastInfo.secCode);
+        if (!securityLastInfo || ClassCode.SPBFUT !== securityLastInfo.classCode) return null
+        const stepPrice = securityLastInfo.futureStepPrice
+        const secPriceStep = securityLastInfo.secPriceStep
+        const minStepPrice = stepPrice / secPriceStep
+        const priceForQuantity = stop / quantity
+        const priceDiff = priceForQuantity / minStepPrice
 
-        if (!security) return null;
-
-        const securityFuture = security as SecurityFuture;
-        const minStepPrice = securityFuture.stepPrice / securityFuture.secPriceStep;
-
-        const priceForQuantity = stop / quantity;
-        const priceDiff = priceForQuantity / minStepPrice;
-
-        let stopPrice = securityLastInfo.lastTradePrice - priceDiff;
+        let stopPrice = securityLastInfo.lastTradePrice - priceDiff
         if (isShort) {
-            stopPrice = securityLastInfo.lastTradePrice + priceDiff;
+            stopPrice = securityLastInfo.lastTradePrice + priceDiff
         }
 
-        const arr = ("" + security.secPriceStep).split(".");
-        if (arr.length > 1) {
-            const multiplier = Math.pow(10, arr[1].length);
-            return roundByMultiplier(stopPrice, multiplier);
-        }
-
-        return stopPrice;
-    };
+        const multiplier = Math.pow(10, securityLastInfo.scale)
+        return roundByMultiplier(stopPrice, multiplier)
+    }
 
     const calcStopPriceView = (quantity: number, isShort: boolean) => {
         return (

@@ -2,7 +2,7 @@ import * as React from "react";
 import {SubscriptionLike} from "rxjs";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {Interval} from "../../../common/data/Interval";
-import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
+import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {TradingStrategyState} from "../../../common/data/strategy/TradingStrategyState";
 import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
@@ -43,7 +43,9 @@ export class BotControlHistory extends React.Component<Props, States> {
     constructor(props) {
         super(props);
         this.state = {
-            chart1Width: 200, chart2Width: 200, security: null, securities: [], setup: null,
+            chart1Width: CHART_MIN_WIDTH,
+            chart2Width: CHART_MIN_WIDTH,
+            security: null, securities: [], setup: null,
             orders: [], activeTrade: null, result: null,
             start: moment().hours(10).minutes(0).seconds(0).toDate(),
             end: moment().hours(23).minutes(50).seconds(0).toDate(), timeInHistory: null,
