@@ -55,7 +55,7 @@ const TrendView: React.FC<Props> = ({trend, position}) => {
             labels: trend.swingHighsLows.map(value => moment(value.dateTime).format(dateTimeFormat)),
             datasets: [
                 {
-                    label: `${trend.interval} - Trend ${trend.direction}`,
+                    label: `${trend.interval} - Trend ${trend.direction} - ${trend.power}`,
                     data: trend.swingHighsLows.map(value => value.swingHL),
                     fill: false,
                     backgroundColor: color,
