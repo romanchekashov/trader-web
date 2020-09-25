@@ -49,6 +49,7 @@ import {OperationType} from "../../data/OperationType";
 import {ChartManageOrder} from "./data/ChartManageOrder";
 import {ActiveTrade} from "../../data/ActiveTrade";
 import {KeltnerChannelSeries} from "./components/keltner-channel/KeltnerChannelSeries";
+import {ChartSwingHighsLows} from "./components/ChartSwingHighsLows";
 
 const _ = require("lodash");
 
@@ -719,7 +720,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
                         <ChartZones zones={zones} scale={scale}/>
                         <ChartLevels srLevels={srLevels} scale={scale}/>
-                        {/*<ChartSwingHighsLows swingHighsLows={swingHighsLows}/>*/}
+                        <ChartSwingHighsLows swingHighsLows={swingHighsLows}/>
 
                         <CandlestickSeries fill={(d) => d.close > d.open ? "#ecf0f1" : "#000"}
                                            stroke="#000"

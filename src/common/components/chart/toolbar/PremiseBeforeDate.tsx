@@ -3,6 +3,7 @@ import {useState} from "react";
 import {Button} from "primereact/button";
 import {Calendar} from "primereact/calendar";
 import "./PremiseBeforeDate.css"
+import moment = require("moment");
 
 type Props = {
     onBeforeChanged: (before: Date) => void
@@ -10,8 +11,16 @@ type Props = {
 
 export const PremiseBeforeDate: React.FC<Props> = ({onBeforeChanged}) => {
 
+    const getInitDate = () => {
+        const date = new Date()
+        date.setHours(10)
+        date.setMinutes(0)
+        date.setSeconds(0)
+        date.setMilliseconds(0)
+        return date
+    }
     const [calendarVisible, setCalendarVisible] = useState<boolean>(false)
-    const [before, setBefore] = useState<Date>(new Date())
+    const [before, setBefore] = useState<Date>(getInitDate())
 
     const changeCalendarVisible = (visible: boolean) => {
         setCalendarVisible(visible)
