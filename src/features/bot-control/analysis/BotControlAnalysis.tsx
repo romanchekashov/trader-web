@@ -17,10 +17,10 @@ import "./BotControlAnalysis.css";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
 import {Trade} from "../../../common/data/Trade";
-import moment = require("moment");
 import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {BrokerId} from "../../../common/data/BrokerId";
 import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
+import moment = require("moment");
 
 export interface AnalysisState {
     realDepo: boolean
@@ -135,9 +135,9 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
 
     const getAdjustedStart = (): Date => {
         if (tradingStrategyResult?.tradingStrategyData) {
-            const start = new Date(tradingStrategyResult.tradingStrategyData.start.getTime())
-            start.setHours(9)
-            return start
+            let mDate = moment(tradingStrategyResult.tradingStrategyData.start).subtract(1, 'days')
+            while (mDate.day() === 0 || mDate.day() === 6) mDate.subtract(1, 'days')
+            return mDate.toDate()
         }
     }
 

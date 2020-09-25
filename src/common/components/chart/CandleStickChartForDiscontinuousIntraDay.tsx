@@ -702,7 +702,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                     </Chart>
 
                     <Chart id={1}
-                           yExtents={[d => [d.high, d.low], ema20.accessor(), ema7.accessor(), atr7.accessor()]}
+                           yExtents={[d => [d.high, d.low], ema20.accessor(), ema7.accessor()]}
                            padding={{top: 40, bottom: 20}}>
                         <XAxis axisAt="bottom" orient="bottom" {...xGrid}/>
                         <YAxis axisAt="right" orient="right" ticks={5}/>
@@ -771,7 +771,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                         }
 
                         <KeltnerChannelSeries yAccessor={d => ({ema: ema20.accessor(), atr: atr7.accessor()})}/>
-                        <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>
+                        {/*<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>*/}
                         <LineSeries yAccessor={ema7.accessor()} stroke={ema7.stroke()}/>
 
                         <ChartTrades candles={data} trades={trades}/>
