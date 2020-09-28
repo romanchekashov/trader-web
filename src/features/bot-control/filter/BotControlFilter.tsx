@@ -11,7 +11,7 @@ import "./BotControlFilter.css";
 import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
 import {Intervals, PrimeDropdownItem} from "../../../common/utils/utils";
 import {Security} from "../../../common/data/Security";
-import {getSecuritiesByClassCode, getSecuritiesByTypeAndMarket} from "../../../common/utils/Cache";
+import {getSecuritiesByTypeAndMarket} from "../../../common/utils/Cache";
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
 import {HistoryDateDto} from "../../../common/data/bot/HistoryDateDto";
 import {TradingStrategyName} from "../../../common/data/trading/TradingStrategyName";
@@ -64,7 +64,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
         end: null,
         debug: false,
         systemType: TradeSystemType.HISTORY,
-        strategy: TradingStrategyName.TWO_EMA_CROSS
+        strategy: TradingStrategyName.UNIVERSAL_2EMA_KEL
     }
 
     const brokers = filter ? filter.brokers : []
@@ -110,8 +110,10 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
         TradeSystemType.DEMO, TradeSystemType.REAL].map(val => ({label: val, value: val}))
     const [systemType, setSystemType] = useState(initState.systemType)
 
-    const strategies: PrimeDropdownItem<TradingStrategyName>[] = [TradingStrategyName.TWO_EMA_CROSS, TradingStrategyName.KELTNER_CHANNEL]
-        .map(val => ({label: val, value: val}))
+    const strategies: PrimeDropdownItem<TradingStrategyName>[] = [
+        TradingStrategyName.UNIVERSAL_2EMA_KEL,
+        TradingStrategyName.TWO_EMA_CROSS,
+        TradingStrategyName.KELTNER_CHANNEL].map(val => ({label: val, value: val}))
     const [strategy, setStrategy] = useState(initState.strategy)
 
     useEffect(() => {

@@ -107,7 +107,7 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
             systemType,
             start: null,
             end: null,
-            strategy: TradingStrategyName.TWO_EMA_CROSS
+            strategy: TradingStrategyName.UNIVERSAL_2EMA_KEL
         });
     };
 
