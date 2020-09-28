@@ -559,10 +559,21 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     getSRLevels = () => {
-        const {innerInterval, showSRLevels} = this.state;
-        const {premise} = this.props;
+        const {innerInterval, showSRLevels} = this.state
+        const {premise} = this.props
 
-        if (!premise || !showSRLevels) return null;
+        if (!premise || !showSRLevels) return null
+
+        // return premise.analysis.srLevels.filter(value => {
+        //     switch (innerInterval) {
+        //         case Interval.M3:
+        //             return Interval.M30 === value.interval
+        //         case Interval.M5:
+        //             return Interval.M60 === value.interval
+        //         default:
+        //             return true
+        //     }
+        // })
 
         return premise.analysis.srLevels.filter(value => {
             switch (innerInterval) {
@@ -584,7 +595,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                 default:
                     return true;
             }
-        });
+        })
     }
 
     manageOrder = (order: ChartManageOrder) => {
