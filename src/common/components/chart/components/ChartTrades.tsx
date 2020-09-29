@@ -71,10 +71,13 @@ export const ChartTrades: React.FC<Props> = ({candles, trades}) => {
 
         for (const trade of trades) {
             const dateTime = new Date(trade.dateTime.getTime())
-            let minutes = dateTime.getMinutes()
-            while (minutes % del !== 0) minutes--
-
-            dateTime.setMinutes(minutes)
+            if (del) {
+                let minutes = dateTime.getMinutes()
+                while (minutes % del !== 0) minutes--
+                dateTime.setMinutes(minutes)
+            } else {
+                dateTime.setMinutes(0)
+            }
             dateTime.setSeconds(0)
 
             if (OperationType.BUY === trade.operation) {
