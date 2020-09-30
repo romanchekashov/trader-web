@@ -297,7 +297,7 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
                         {nameTemplate(alert)}
                     </div>
                     <div className="alerts-cell alerts-symbol" title={alert.securityCode}>
-                        {alert.securityCode.substr(0, 8)}
+                        {alert.securityCode?.substr(0, 8)}
                     </div>
                     {/*<div className="alerts-cell alerts-strength">
                         {strengthTemplate(alert)}
