@@ -5,7 +5,7 @@ export const Header = () => {
     const activeStyle = {color: "#f15b2a"};
 
     return (
-        <nav>
+        <nav id="main-nav">
             <NavLink to="/" activeStyle={activeStyle} exact>
                 Home
             </NavLink>

@@ -12,10 +12,9 @@ import TradeStrategyAnalysisPage from "../features/analysis/AnalysisPage";
 import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
 import {ControlPanel} from "../common/components/control-panel/ControlPanel";
 import {Stack} from "../common/components/stack/Stack";
-import {BotControl} from "../common/components/bot-control/BotControl";
 import {EconomicCalendarPage} from "../features/economic-calendar/EconomicCalendarPage";
-import {TradingChartsPage} from "../features/trading-charts/TradingChartsPage";
 import {NewsPage} from "../features/news/NewsPage";
+import {TradingCharts} from "../features/trading-charts/TradingCharts";
 
 export const App = () => {
     return (
@@ -28,7 +27,7 @@ export const App = () => {
                 <Route exact path="/" component={HomePage}/>
                 <Route path="/news" component={NewsPage}/>
                 <Route path="/analysis" component={TradeStrategyAnalysisPage}/>
-                <Route path="/trading-charts" component={TradingChartsPage}/>
+                <Route path="/trading-charts" component={TradingCharts}/>
                 <Route path="/bot-control" component={TradeStrategyBotControlPage}/>
                 <Route path="/trade-journal" component={TradeJournalPage}/>
                 <Route path="/economic-calendar" component={EconomicCalendarPage}/>

@@ -194,7 +194,7 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
                        selection={selectedSecurity}
                        onSelectionChange={onSelect}
                        scrollable={!!selectedSecurity}
-                       scrollHeight="600px">
+                       scrollHeight="400px">
                 {columnComponents}
             </DataTable>
         </>

@@ -165,6 +165,11 @@ export class ChartWrapper extends React.Component<Props, States> {
                     this.requestCandles(this.props.security);
                 }
             });
+
+        setTimeout(() => {
+            const {numberOfCandles} = this.state
+            this.onNumberOfCandlesUpdated(numberOfCandles)
+        }, 1000)
     }
 
     componentWillUnmount = (): void => {
