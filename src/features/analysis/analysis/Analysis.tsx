@@ -84,7 +84,7 @@ const Analysis: React.FC<Props> = ({security}) => {
 
     useEffect(() => {
         if (security) {
-            // console.log("AnalysisFutures: ", future);
+            console.log("Analysis: ", security);
             informServerAboutRequiredData();
 
             // if (!trendLowTF && !trendLowTFLoading) {
@@ -113,9 +113,7 @@ const Analysis: React.FC<Props> = ({security}) => {
 
             fetchPremise(timeFrameTrading);
 
-            if (!securityLastInfo) {
-                setSecurityLastInfo(security);
-            }
+            setSecurityLastInfo(security);
         }
 
         const wsStatusSub = WebsocketService.getInstance()

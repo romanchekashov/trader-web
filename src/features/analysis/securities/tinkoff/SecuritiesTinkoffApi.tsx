@@ -31,6 +31,7 @@ export const SecuritiesTinkoffApi: React.FC<Props> = ({selectedSecurity, onSelec
         {field: 'atrDayPercent', header: 'ATR(D)%'},
         {field: 'atrM60Percent', header: 'ATR(M60)%'},
         {field: 'atrM5Percent', header: 'ATR(M5)%'},
+        {field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GerATRDis(D)%'},
         {field: 'gapDay', header: 'Gap(D)'},
         {field: 'gapDayPercent', header: 'Gap(D)%'},
         {field: 'volumeM60Percent', header: 'Vol(M60)%'},

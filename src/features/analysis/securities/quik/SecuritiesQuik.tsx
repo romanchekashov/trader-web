@@ -10,6 +10,7 @@ import {getLastSecurities} from "../../../../common/api/rest/analysisRestApi";
 import moment = require("moment");
 import "./SecuritiesQuik.css"
 import {round100} from "../../../../common/utils/utils";
+import {SecurityType} from "../../../../common/data/SecurityType";
 
 type Props = {
     selectedSecurity: SecurityLastInfo
@@ -21,17 +22,20 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
     const [securities, setSecurities] = useState<SecurityLastInfo[]>([])
 
     const columns = [
+        {field: 'type', header: 'Type'},
         {field: 'shortName', header: 'Наз'},
         {field: 'secCode', header: 'Тикер'},
         {field: 'lastChange', header: '% изм'},
         {field: 'lastTradePrice', header: 'Цен посл'},
         {field: 'totalDemand', header: 'Об спр/пред'},
         {field: 'valueToday', header: 'Оборот'},
-        {field: 'numTradesToday', header: 'Кол-во сделок'},
-        {field: 'percentOfFloatTradedToday', header: '% Flt Traded'},
+        {field: 'numTradesToday', header: 'Кол сд'},
+        {field: 'percentOfFloatTradedToday', header: '% Flt Tr'},
         {field: 'atrDayPercent', header: 'ATR(D)%'},
         {field: 'atrM60Percent', header: 'ATR(M60)%'},
         {field: 'atrM5Percent', header: 'ATR(M5)%'},
+        {field: 'distancePassedSinceLastDayCloseRelativeToAtrAvg', header: 'GAtrDis AVG(D)%'},
+        {field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GAtrDis (D)%'},
         {field: 'gapDay', header: 'Gap(D)'},
         {field: 'gapDayPercent', header: 'Gap(D)%'},
         {field: 'volumeM60Percent', header: 'Vol(M60)%'},
@@ -42,11 +46,13 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
     ]
 
     const lessColumns = [
+        {field: 'type', header: 'Type'},
         {field: 'shortName', header: 'Наз'},
         {field: 'lastChange', header: '% изм'},
         {field: 'lastTradePrice', header: 'Цен посл'},
         {field: 'totalDemand', header: 'Об спр/пред'},
-        {field: 'relativeVolumeDay', header: 'Rel Vol(D)'}
+        {field: 'distancePassedSinceLastDayCloseRelativeToAtrAvg', header: 'GAtrDis AVG(D)%'},
+        {field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GAtrDis (D)%'}
     ]
 
     useEffect(() => {
@@ -172,6 +178,23 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
         } else if ("signals" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} body={signalsTemplate}
                            style={{width: '300px'}}/>
+        } else if ("valueToday" === col.field) {
+            return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
+                           style={{width: '105px'}}/>
+        } else if ("volumeToday" === col.field) {
+            return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
+                           style={{width: '105px'}}/>
+        } else if ("secCode" === col.field) {
+            return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
+                           body={(rowData, column) => <div style={{overflowX: "hidden", fontWeight: SecurityType.STOCK !== rowData.type ? 'bold' : 'normal'}}>{rowData.secCode}</div>}/>
+        } else if ("shortName" === col.field) {
+            return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
+                           style={{overflowX: "hidden"}}
+                           body={(rowData, column) => <div style={{width: '105px', fontWeight: SecurityType.FUTURE === rowData.type ? 'bold' : 'normal'}}>{rowData.shortName}</div>}/>
+        } else if ("type" === col.field) {
+            return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
+                           style={{width: '30px'}}
+                           body={(rowData, column) => <div style={{overflowX: "hidden", fontWeight: SecurityType.CURRENCY === rowData.type ? 'bold' : 'normal'}}>{rowData.type}</div>}/>
         } else {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}/>
         }

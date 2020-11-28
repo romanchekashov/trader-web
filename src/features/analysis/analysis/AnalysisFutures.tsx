@@ -141,9 +141,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
 
             getTrades(40).then(setTrades)
 
-            if (!securityLastInfo) {
-                setSecurityLastInfo(security)
-            }
+            setSecurityLastInfo(security)
         }
 
         const wsStatusSub = WebsocketService.getInstance()
