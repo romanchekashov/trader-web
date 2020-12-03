@@ -18,7 +18,7 @@ export const StrategyStat: React.FC<Props> = ({stat}) => {
     useEffect(() => {
         if (stat) {
             updateData(stat);
-        }
+        } else setData(null)
     }, [stat]);
 
     const timeDuration = (seconds: number): any => {

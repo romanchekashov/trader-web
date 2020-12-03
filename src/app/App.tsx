@@ -3,7 +3,6 @@ import {Route, Switch} from "react-router-dom";
 import {HomePage} from "../features/home/HomePage";
 import {Header} from "../components/Header";
 import {PageNotFound} from "./PageNotFound";
-import TradeStrategyBotControlPage from "../features/bot-control/BotControlPage";
 import 'primereact/resources/primereact.css';
 import 'primereact/resources/themes/nova-light/theme.css';
 import 'primeicons/primeicons.css';
@@ -15,6 +14,7 @@ import {Stack} from "../common/components/stack/Stack";
 import {EconomicCalendarPage} from "../features/economic-calendar/EconomicCalendarPage";
 import {NewsPage} from "../features/news/NewsPage";
 import {TradingCharts} from "../features/trading-charts/TradingCharts";
+import {BotControlPage} from "../features/bot-control/BotControlPage";
 
 export const App = () => {
     return (
@@ -28,7 +28,7 @@ export const App = () => {
                 <Route path="/news" component={NewsPage}/>
                 <Route path="/analysis" component={TradeStrategyAnalysisPage}/>
                 <Route path="/trading-charts" component={TradingCharts}/>
-                <Route path="/bot-control" component={TradeStrategyBotControlPage}/>
+                <Route path="/bot-control" component={BotControlPage}/>
                 <Route path="/trade-journal" component={TradeJournalPage}/>
                 <Route path="/economic-calendar" component={EconomicCalendarPage}/>
                 <Route component={PageNotFound}/>

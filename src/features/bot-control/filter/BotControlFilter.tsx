@@ -64,7 +64,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
         end: null,
         debug: false,
         systemType: TradeSystemType.HISTORY,
-        strategy: TradingStrategyName.GERCHIK
+        strategy: TradingStrategyName.SWING
     }
 
     const brokers = filter ? filter.brokers : []
@@ -111,6 +111,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     const [systemType, setSystemType] = useState(initState.systemType)
 
     const strategies: PrimeDropdownItem<TradingStrategyName>[] = [
+        TradingStrategyName.SWING,
         TradingStrategyName.GERCHIK,
         TradingStrategyName.UNIVERSAL_2EMA_KEL,
         TradingStrategyName.TWO_EMA_CROSS,

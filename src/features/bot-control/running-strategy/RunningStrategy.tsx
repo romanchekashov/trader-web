@@ -1,61 +1,25 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import "./RunningStrategy.css";
 import {TradingStrategyResult} from "../../../common/data/history/TradingStrategyResult";
 import {BotState} from "./bot-state/BotState";
-import {TradingStrategyTrade} from "../../../common/data/history/TradingStrategyTrade";
-import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
-import {adjustTradingStrategyResultArray} from "../../../common/utils/DataUtils";
+import {RunningStrategyTable} from "./table/RunningStrategyTable";
 
 type Props = {
-    tradingStrategyResult: TradingStrategyResult
+    results: TradingStrategyResult[]
 }
 
-export const RunningStrategy: React.FC<Props> = ({tradingStrategyResult}) => {
+export const RunningStrategy: React.FC<Props> = ({results}) => {
 
-    const [tsTrade, setTsTrade] = useState<TradingStrategyTrade>(null);
-    const [tsResult, setTsResult] = useState<TradingStrategyResult>(null);
+    const [selectedTsId, setSelectedTsId] = useState<number>(null)
 
-    useEffect(() => {
-
-        if (tradingStrategyResult) {
-            const trades = tradingStrategyResult.tradingStrategyData.trades
-            setTsTrade(trades.length > 0 ? trades[0] : null)
-            setTsResult(tradingStrategyResult)
-        }
-
-        const wsStatusSub = WebsocketService.getInstance()
-            .connectionStatus()
-            .subscribe(isConnected => {
-                if (isConnected) {
-                    // informServerAboutRequiredData();
-                }
-            })
-
-        const tradingStrategiesStatesSubscription = WebsocketService.getInstance()
-            .on<TradingStrategyResult[]>(WSEvent.TRADING_STRATEGIES_RESULTS)
-            .subscribe(data => {
-                const newResults: TradingStrategyResult[] = adjustTradingStrategyResultArray(data)
-                for (const result of newResults) {
-                    if (tradingStrategyResult.tradingStrategyData.id === result.tradingStrategyData.id) {
-                        const trades = result.tradingStrategyData.trades
-                        setTsTrade(trades.length > 0 ? trades[0] : null)
-                        setTsResult(result)
-                    }
-                }
-            })
-
-        // Specify how to clean up after this effect:
-        return function cleanup() {
-            if (wsStatusSub) wsStatusSub.unsubscribe()
-            if (tradingStrategiesStatesSubscription) tradingStrategiesStatesSubscription.unsubscribe()
-        }
-    }, [tradingStrategyResult])
+    const selectedTs = results.find(value => value.tradingStrategyData.id === selectedTsId)
 
     return (
-        <>
-            <BotState tsTrade={tsTrade}
-                      tradingStrategyResult={tsResult}/>
-        </>
+        <div>
+            <RunningStrategyTable results={results}
+                                  onSelectedTsId={setSelectedTsId}/>
+            <BotState tradingStrategyResult={selectedTs}/>
+        </div>
     )
 }

@@ -1,13 +1,11 @@
 import * as React from "react";
-import {connect} from "react-redux";
+import {useEffect, useState} from "react";
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
-import {bindActionCreators} from "redux";
-import {loadFilterData} from "./BotControlActions";
-import {AppDispatch} from "../../app/store";
-import {RootState} from "../../app/rootReducer";
 import {BotControlFilter} from "./filter/BotControlFilter";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
 import {
+    getAllStrategies,
+    getFilterData,
     runHistory,
     search,
     searchByTradingStrategyId,
@@ -25,173 +23,161 @@ import {TabPanel, TabView} from "primereact/tabview";
 import {BotControlAnalysis} from "./analysis/BotControlAnalysis";
 import {getSecurity} from "../../common/utils/Cache";
 import {BotControlAnalysisInfo} from "./analysis/BotControlAnalysisInfo";
-import {BotControlRunningStrategies} from "./last-info/BotControlRunningStrategies";
 import {RunningStrategy} from "./running-strategy/RunningStrategy";
 import {EconomicCalendar} from "../../common/components/economic-calendar/EconomicCalendar";
+import {WebsocketService, WSEvent} from "../../common/api/WebsocketService";
+import {adjustTradingStrategyResultArray} from "../../common/utils/DataUtils";
+import {TradingStrategyStatus} from "../../common/data/trading/TradingStrategyStatus";
 
+type Props = {}
 
-function mapStateToProps(state: RootState) {
-    return {
-        filterData: state.tradeStrategyBotControl.filter
-    };
-}
+export const BotControlPage: React.FC<Props> = ({}) => {
 
-function mapDispatchToProps(dispatch: AppDispatch) {
-    return {
-        actions: {
-            loadFilterData: bindActionCreators(loadFilterData, dispatch)
-        }
-    };
-}
-
-interface BotControlState {
-    filterData: MarketBotFilterDataDto
-    items: any[]
-    activeItem: any
-    selectedSecurity: any
-    selectedTSResult: TradingStrategyResult
-}
-
-type Props = ReturnType<typeof mapStateToProps> &
-    ReturnType<typeof mapDispatchToProps>;
-
-class BotControlPage extends React.Component<Props, BotControlState> {
-
-    private items = [
+    const items = [
         {label: 'Current State', icon: 'pi pi-fw pi-home'},
         {label: 'Real Deposit Stats', icon: 'pi pi-fw pi-calendar'},
         {label: 'Demo Deposit Stats', icon: 'pi pi-fw pi-pencil'},
         {label: 'History Stats', icon: 'pi pi-fw pi-file'}
     ]
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            filterData: null,
-            items: this.items,
-            activeItem: this.items[0],
-            selectedSecurity: null,
-            selectedTSResult: null
-        };
-    }
+    const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null)
+    const [activeItem, setActiveItem] = useState<any>(items[0])
+    const [selectedSecurity, setSelectedSecurity] = useState<any>(null)
+    const [selectedTSResult, setSelectedTSResult] = useState<any>(null)
+    const [results, setResults] = useState<TradingStrategyResult[]>([])
+    const [selectedTsId, setSelectedTsId] = useState<number>(null)
 
-    componentDidMount = (): void => {
-        const {actions, filterData} = this.props;
+    useEffect(() => {
+        getFilterData(false)
+            .then(setFilterData)
 
-        if (!filterData) {
-            actions.loadFilterData();
+        getAllStrategies()
+            .then(results => {
+                setResults(results
+                    .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id))
+            })
+            .catch(console.error)
+    }, [])
+
+    useEffect(() => {
+        const wsStatusSub = WebsocketService.getInstance()
+            .connectionStatus()
+            .subscribe(isConnected => {
+                if (isConnected) {
+                    // informServerAboutRequiredData();
+                }
+            })
+
+        const tradingStrategiesStatesSubscription = WebsocketService.getInstance()
+            .on<TradingStrategyResult[]>(WSEvent.TRADING_STRATEGIES_RESULTS)
+            .subscribe(data => {
+                const newResults: TradingStrategyResult[] = adjustTradingStrategyResultArray(data)
+                setResults(newResults)
+                if (selectedTsId) setSelectedTSResult(newResults
+                    .find(value => value.tradingStrategyData.id === selectedTsId))
+            })
+
+        // Specify how to clean up after this effect:
+        return function cleanup() {
+            if (wsStatusSub) wsStatusSub.unsubscribe()
+            if (tradingStrategiesStatesSubscription) tradingStrategiesStatesSubscription.unsubscribe()
         }
-    }
+    }, [selectedTsId])
 
-    onStart = (data: MarketBotStartDto): void => {
+    const onStart = (data: MarketBotStartDto): void => {
         if (data.systemType === TradeSystemType.HISTORY) {
             runHistory(data)
-                .then(selectedTSResult => this.setState({selectedTSResult}))
-                .catch(console.error);
+                .then(setSelectedTSResult)
+                .catch(console.error)
         } else {
             startBot(data).then(value => {
                 console.log(data, value);
-            }).catch(console.error);
+            }).catch(console.error)
         }
     }
 
-    onSearch = (data: MarketBotStartDto): void => {
+    const onSearch = (data: MarketBotStartDto): void => {
         search(data)
-            .then(selectedTSResult => this.setState({selectedTSResult}))
-            .catch(console.error);
+            .then(setSelectedTSResult)
+            .catch(console.error)
     }
 
-    onStopHistory = (data: MarketBotStartDto): void => {
+    const onStopHistory = (data: MarketBotStartDto): void => {
         if (data.systemType === TradeSystemType.HISTORY) {
-            stopHistory(data).then(value => {
-                console.log(data, value);
-            }).catch(console.error);
+            stopHistory(data)
+                .then(value => {
+                    console.log(data, value)
+                })
+                .catch(console.error)
         }
     }
 
-    onSelectedTSResultUpdate = (result: TradingStrategyResult): void => {
-        this.setState({
-            selectedTSResult: result
-        });
-    }
-
-    onStrategyResultSelected = (result: TradingStrategyResult): void => {
-        this.setState({
-            selectedTSResult: result,
-            selectedSecurity: getSecurity(
-                result.tradingStrategyData.security.classCode,
-                result.tradingStrategyData.security.secCode)
-        })
+    const onStrategyResultSelected = (result: TradingStrategyResult): void => {
+        setSelectedTSResult(result)
+        setSelectedSecurity(getSecurity(result.tradingStrategyData.security.classCode,
+            result.tradingStrategyData.security.secCode))
 
         if (result.tradingStrategyData.id) {
             searchByTradingStrategyId(result.tradingStrategyData.id)
-                .then(selectedTSResult => this.setState({selectedTSResult}))
-                .catch(console.error);
+                .then(setSelectedTSResult)
+                .catch(console.error)
         }
     }
 
-    render() {
-        const {filterData} = this.props;
-        const {selectedTSResult, selectedSecurity} = this.state;
-
-        return (
-            <div className="p-grid sample-layout">
-                <div className="p-col-12">
-                    <BotControlFilter filter={filterData}
-                                      onStart={this.onStart}
-                                      onSearch={this.onSearch}
-                                      onStopHistory={this.onStopHistory}/>
-                </div>
-                <div className="p-col-12">
-                    <div className="p-grid">
-                        <div className="p-col-2">
-                            <TabView>
-                                <TabPanel header="History">
-                                    <BotControlLastInfo outerHeight={400}
-                                                        onStrategyResultSelected={this.onStrategyResultSelected}
-                                                        onSelectedTSResultUpdate={this.onSelectedTSResultUpdate}/>
-                                </TabPanel>
-                                <TabPanel header="Running">
-                                    <RunningStrategy tradingStrategyResult={selectedTSResult}/>
-                                </TabPanel>
-                            </TabView>
-                        </div>
-                        <div className="p-col-10" style={{padding: 0}}>
-                            <TabView>
-                                <TabPanel header="Analysis">
-                                    <BotControlAnalysis security={selectedSecurity}
-                                                        tradingStrategyResult={selectedTSResult}/>
-                                </TabPanel>
-                                <TabPanel header="Strategy Stat">
-                                    <HistoryStrategyResultTable stat={selectedTSResult}/>
-                                </TabPanel>
-                                <TabPanel header="Profit Loss Stat">
-                                    <div className="p-col-12">
-                                        <ProfitLossChart stat={selectedTSResult?.stat}/>
-                                    </div>
-                                    <div className="p-col-12">
-                                        <TradeJournalStatistic stat={selectedTSResult?.stat}/>
-                                    </div>
-                                </TabPanel>
-                                <TabPanel header="Trades">
-                                    <TradeJournalTable stat={selectedTSResult?.stat}/>
-                                </TabPanel>
-                                <TabPanel header="Info">
-                                    <BotControlAnalysisInfo security={selectedSecurity}/>
-                                </TabPanel>
-                                <TabPanel header="Calendar">
-                                    <EconomicCalendar secId={selectedSecurity?.id}/>
-                                </TabPanel>
-                            </TabView>
-                        </div>
+    return (
+        <div className="p-grid sample-layout">
+            <div className="p-col-12">
+                <BotControlFilter filter={filterData}
+                                  onStart={onStart}
+                                  onSearch={onSearch}
+                                  onStopHistory={onStopHistory}/>
+            </div>
+            <div className="p-col-12">
+                <div className="p-grid">
+                    <div className="p-col-4">
+                        <TabView>
+                            <TabPanel header="History">
+                                <BotControlLastInfo
+                                    results={results.filter(value => value.tradingStrategyData.status !== TradingStrategyStatus.RUNNING)}
+                                    outerHeight={400}
+                                    onStrategyResultSelected={onStrategyResultSelected}/>
+                            </TabPanel>
+                            <TabPanel header="Running">
+                                <RunningStrategy
+                                    results={results.filter(value => value.tradingStrategyData.status === TradingStrategyStatus.RUNNING)}/>
+                            </TabPanel>
+                        </TabView>
+                    </div>
+                    <div className="p-col-8" style={{padding: 0}}>
+                        <TabView>
+                            <TabPanel header="Analysis">
+                                <BotControlAnalysis security={selectedSecurity}
+                                                    tradingStrategyResult={selectedTSResult}/>
+                            </TabPanel>
+                            <TabPanel header="Strategy Stat">
+                                <HistoryStrategyResultTable stat={selectedTSResult}/>
+                            </TabPanel>
+                            <TabPanel header="Profit Loss Stat">
+                                <div className="p-col-12">
+                                    <ProfitLossChart stat={selectedTSResult?.stat}/>
+                                </div>
+                                <div className="p-col-12">
+                                    <TradeJournalStatistic stat={selectedTSResult?.stat}/>
+                                </div>
+                            </TabPanel>
+                            <TabPanel header="Trades">
+                                <TradeJournalTable stat={selectedTSResult?.stat}/>
+                            </TabPanel>
+                            <TabPanel header="Info">
+                                <BotControlAnalysisInfo security={selectedSecurity}/>
+                            </TabPanel>
+                            <TabPanel header="Calendar">
+                                <EconomicCalendar secId={selectedSecurity?.id}/>
+                            </TabPanel>
+                        </TabView>
                     </div>
                 </div>
             </div>
-        );
-    }
+        </div>
+    )
 }
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(BotControlPage);
