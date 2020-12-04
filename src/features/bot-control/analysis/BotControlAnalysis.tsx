@@ -82,7 +82,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
     useEffect(() => {
         if (security && tradingStrategyResult && (tradingStrategyResult.tradePremise || tradingStrategyResult.tradeSetup)) {
 
-            const premise = tradingStrategyResult.tradeSetup ?
+            const premise = tradingStrategyResult.tradeSetup && tradingStrategyResult.tradeSetup.premise ?
                 tradingStrategyResult.tradeSetup.premise : tradingStrategyResult.tradePremise;
 
             setPremise(premise)
