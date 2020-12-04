@@ -1,8 +1,8 @@
 import {handleError, handleResponse} from "../apiUtils";
 import {adjustCandles, adjustSecurities} from "../../utils/DataUtils";
-import {SecurityLastInfo} from "../../data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
 import {Candle} from "../../data/Candle";
-import {SecurityType} from "../../data/SecurityType";
+import {SecurityType} from "../../data/security/SecurityType";
 import {Interval} from "../../data/Interval";
 
 const baseUrl = process.env.API_URL + "/api/v1/tinkoff-invest/";

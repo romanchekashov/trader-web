@@ -1,12 +1,12 @@
 import {AppDispatch} from "../../app/store";
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
-import {SecurityShare} from "../../common/data/SecurityShare";
+import {SecurityShare} from "../../common/data/security/SecurityShare";
 import {getFilterData} from "../../common/api/rest/botControlRestApi";
 import {TradePremise} from "../../common/data/strategy/TradePremise";
 import {getTradePremise} from "../../common/api/rest/analysisRestApi";
 import {TradeStrategyAnalysisFilterDto} from "../../common/data/TradeStrategyAnalysisFilterDto";
-import {SecurityCurrency} from "../../common/data/SecurityCurrency";
-import {SecurityFuture} from "../../common/data/SecurityFuture";
+import {SecurityCurrency} from "../../common/data/security/SecurityCurrency";
+import {SecurityFuture} from "../../common/data/security/SecurityFuture";
 import {
     getAllSecurityCurrencies,
     getAllSecurityFutures,

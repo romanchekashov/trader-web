@@ -3,14 +3,14 @@ import {useEffect, useState} from "react";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import {WebsocketService, WSEvent} from "../../../../common/api/WebsocketService";
-import {SecurityLastInfo} from "../../../../common/data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../../../common/data/security/SecurityLastInfo";
 import {Signal} from "../../../../common/data/Signal";
 import {PatternName} from "../../../../common/components/alerts/data/PatternName";
 import {getLastSecurities} from "../../../../common/api/rest/analysisRestApi";
 import moment = require("moment");
 import "./SecuritiesQuik.css"
 import {round100} from "../../../../common/utils/utils";
-import {SecurityType} from "../../../../common/data/SecurityType";
+import {SecurityType} from "../../../../common/data/security/SecurityType";
 
 type Props = {
     selectedSecurity: SecurityLastInfo

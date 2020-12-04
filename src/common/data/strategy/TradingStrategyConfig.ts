@@ -1,6 +1,6 @@
 import {Interval} from "../Interval";
 import {DepositSetup} from "../DepositSetup";
-import {SecurityFilter} from "../SecurityFilter";
+import {SecurityFilter} from "../security/SecurityFilter";
 import {TradeSystemType} from "../trading/TradeSystemType";
 import {TradingStrategyName} from "../trading/TradingStrategyName";
 

@@ -6,7 +6,7 @@ import {Calendar} from "primereact/calendar";
 import {TradeJournalFilterDto} from "./TradeJournalFilterDto";
 import {Dropdown} from "primereact/dropdown";
 import {getFilterData} from "../../../common/api/rest/botControlRestApi";
-import {SecurityInfo} from "../../../common/data/SecurityInfo";
+import {SecurityInfo} from "../../../common/data/security/SecurityInfo";
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
 import moment = require("moment");
 

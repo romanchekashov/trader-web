@@ -42,7 +42,7 @@ import {ChartTrades} from "./components/ChartTrades";
 import {Trade} from "../../data/Trade";
 import {ChartDialog} from "./components/ChartDialog";
 import {getMorePropsForChart} from "react-financial-charts/lib/interactive/utils";
-import {Security} from "../../data/Security";
+import {Security} from "../../data/security/Security";
 import {Order} from "../../data/Order";
 import {StopOrder} from "../../data/StopOrder";
 import {OperationType} from "../../data/OperationType";

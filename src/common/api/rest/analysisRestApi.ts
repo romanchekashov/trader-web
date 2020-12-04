@@ -20,8 +20,8 @@ import {
     adjustTradePremise
 } from "../../utils/DataUtils";
 import {SecurityShareEvent} from "../../data/news/SecurityShareEvent";
-import {SecurityAnalysis} from "../../data/SecurityAnalysis";
-import {SecurityLastInfo} from "../../data/SecurityLastInfo";
+import {SecurityAnalysis} from "../../data/security/SecurityAnalysis";
+import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 

@@ -1,5 +1,5 @@
 import {Interval} from "../../../data/Interval";
-import {SecurityFilter} from "../../../data/SecurityFilter";
+import {SecurityFilter} from "../../../data/security/SecurityFilter";
 
 export class MarketStateFilterDto extends SecurityFilter {
     public intervals: Interval[]

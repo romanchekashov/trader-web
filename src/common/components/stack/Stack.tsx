@@ -5,7 +5,7 @@ import {SubscriptionLike} from "rxjs";
 import {StackItemView} from "./StackItemView";
 import {StackItemWrapper} from "./data/StackItemWrapper";
 import {StackSwitcher} from "./StackSwitcher";
-import {SecurityLastInfo} from "../../data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
 import {Order} from "../../data/Order";
 import {SecurityVolume} from "./volumes/data/SecurityVolume";
 import {StackItem} from "./data/StackItem";

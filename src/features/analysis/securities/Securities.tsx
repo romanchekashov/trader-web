@@ -1,6 +1,6 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
-import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
 import "../../../common/components/notifications/Signals.css";
 import "./Securities.css"
 import {SecuritiesFilter} from "./filter/SecuritiesFilter";

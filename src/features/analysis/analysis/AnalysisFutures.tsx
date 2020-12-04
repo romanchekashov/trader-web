@@ -11,7 +11,7 @@ import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
 import Notifications from "../../../common/components/notifications/Notifications";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
-import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
 import {TradePremise} from "../../../common/data/strategy/TradePremise";
 import {Order} from "../../../common/data/Order";
 import {ActiveTrade} from "../../../common/data/ActiveTrade";

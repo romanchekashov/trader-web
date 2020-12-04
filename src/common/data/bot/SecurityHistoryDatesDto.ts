@@ -1,7 +1,7 @@
-import {SecurityInfo} from "../SecurityInfo";
 import {HistoryDateDto} from "./HistoryDateDto";
+import {Security} from "../security/Security";
 
 export class SecurityHistoryDatesDto {
-    security: SecurityInfo
+    security: Security
     historyDates: HistoryDateDto[]
 }

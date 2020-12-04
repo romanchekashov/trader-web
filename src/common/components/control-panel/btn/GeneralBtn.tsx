@@ -2,7 +2,7 @@ import * as React from "react";
 import {Button} from "primereact/components/button/Button";
 import {InputText} from "primereact/components/inputtext/InputText";
 import {Dropdown} from "primereact/components/dropdown/Dropdown";
-import {SecurityLastInfo} from "../../../data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../../data/security/SecurityLastInfo";
 import {PrimeDropdownItem, round100} from "../../../utils/utils";
 import {OperationType} from "../../../data/OperationType";
 import {Order} from "../../../data/Order";

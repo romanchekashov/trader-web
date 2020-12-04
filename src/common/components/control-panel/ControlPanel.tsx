@@ -7,7 +7,7 @@ import {FastBtn} from "./btn/FastBtn";
 import {GeneralBtn} from "./btn/GeneralBtn";
 import {CatchBtn} from "./btn/CatchBtn";
 import StrategyBtn from "./btn/StrategyBtn";
-import {SecurityLastInfo} from "../../data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
 import {ActiveTrade} from "../../data/ActiveTrade";
 import {WebsocketService, WSEvent} from "../../api/WebsocketService";
 import {SubscriptionLike} from "rxjs";

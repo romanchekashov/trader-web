@@ -2,7 +2,7 @@ import {Interval} from "../Interval";
 import {DepositSetup} from "../DepositSetup";
 import {TradingStrategyName} from "../trading/TradingStrategyName";
 import {TradeSystemType} from "../trading/TradeSystemType";
-import {SecurityFilter} from "../SecurityFilter";
+import {SecurityFilter} from "../security/SecurityFilter";
 
 export class MarketBotStartDto extends SecurityFilter {
     public strategy: TradingStrategyName

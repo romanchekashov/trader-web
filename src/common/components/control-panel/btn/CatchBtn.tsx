@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Button} from "primereact/components/button/Button";
-import {SecurityLastInfo} from "../../../data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../../data/security/SecurityLastInfo";
 import {round100} from "../../../utils/utils";
 import {OperationType} from "../../../data/OperationType";
 import {Order} from "../../../data/Order";

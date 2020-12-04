@@ -5,10 +5,10 @@ import {
     getAllSecurityShares,
     getLastSecurities
 } from "../api/rest/traderRestApi";
-import {Security} from "../data/Security";
+import {Security} from "../data/security/Security";
 import {sortAlphabetically} from "./utils";
-import {SecurityLastInfo} from "../data/SecurityLastInfo";
-import {SecurityType} from "../data/SecurityType";
+import {SecurityLastInfo} from "../data/security/SecurityLastInfo";
+import {SecurityType} from "../data/security/SecurityType";
 import {Market} from "../data/Market";
 
 const securityMap = {};

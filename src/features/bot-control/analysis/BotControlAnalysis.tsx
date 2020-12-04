@@ -15,7 +15,7 @@ import {MarketStateDto} from "../../../common/components/market-state/data/Marke
 import {TradingStrategyTrade} from "../../../common/data/history/TradingStrategyTrade";
 import "./BotControlAnalysis.css";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
-import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
 import {Trade} from "../../../common/data/Trade";
 import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {BrokerId} from "../../../common/data/BrokerId";

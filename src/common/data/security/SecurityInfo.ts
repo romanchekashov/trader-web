@@ -1,7 +1,7 @@
-import {ClassCode} from "./ClassCode";
+import {ClassCode} from "../ClassCode";
 import {SecurityType} from "./SecurityType";
-import {Market} from "./Market";
-import {Currency} from "./Currency";
+import {Market} from "../Market";
+import {Currency} from "../Currency";
 
 export class SecurityInfo {
     public id: number

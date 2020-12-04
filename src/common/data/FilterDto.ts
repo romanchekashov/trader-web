@@ -1,5 +1,5 @@
 import {Interval} from "./Interval";
-import {SecurityFilter} from "./SecurityFilter";
+import {SecurityFilter} from "./security/SecurityFilter";
 import {SignalType} from "./SignalType";
 
 export class FilterDto extends SecurityFilter {

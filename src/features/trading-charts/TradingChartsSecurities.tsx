@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
-import {SecurityLastInfo} from "../../common/data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../common/data/security/SecurityLastInfo";
 import {round100} from "../../common/utils/utils";
 
 type Props = {

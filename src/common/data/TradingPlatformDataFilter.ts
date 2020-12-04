@@ -1,6 +1,6 @@
 import {ClassCode} from "./ClassCode";
 import {Interval} from "./Interval";
-import {SecurityType} from "./SecurityType";
+import {SecurityType} from "./security/SecurityType";
 import {Market} from "./Market";
 
 export class TradingPlatformDataFilter {

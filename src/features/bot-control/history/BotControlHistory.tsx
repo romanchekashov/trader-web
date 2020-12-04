@@ -3,7 +3,7 @@ import {SubscriptionLike} from "rxjs";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
 import {Interval} from "../../../common/data/Interval";
 import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/ChartWrapper";
-import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
 import {TradingStrategyState} from "../../../common/data/strategy/TradingStrategyState";
 import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
 import {Order} from "../../../common/data/Order";

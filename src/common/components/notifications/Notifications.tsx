@@ -11,7 +11,7 @@ import {Intervals, PrimeDropdownItem} from "../../utils/utils";
 import {Interval} from "../../data/Interval";
 import {ClassCode} from "../../data/ClassCode";
 import {getSecuritiesByClassCode} from "../../utils/Cache";
-import {Security} from "../../data/Security";
+import {Security} from "../../data/security/Security";
 import {Calendar} from "primereact/calendar";
 import {FilterDto} from "../../data/FilterDto";
 import {NotificationDto} from "./data/NotificationDto";

@@ -1,5 +1,5 @@
 import {SecurityHistoryDatesDto} from "./SecurityHistoryDatesDto";
-import {SecurityType} from "../SecurityType";
+import {SecurityType} from "../security/SecurityType";
 
 export class MarketSecuritiesDto {
     market: string

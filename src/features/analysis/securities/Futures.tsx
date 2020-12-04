@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect} from "react";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
-import {SecurityFuture} from "../../../common/data/SecurityFuture";
+import {SecurityFuture} from "../../../common/data/security/SecurityFuture";
 import {useState} from "react";
 
 type Props = {

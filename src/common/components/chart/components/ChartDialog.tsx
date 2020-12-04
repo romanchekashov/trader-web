@@ -2,7 +2,7 @@ import * as React from "react";
 import {Button} from "primereact/button";
 import {Dialog} from "primereact/dialog";
 import {InputText} from "primereact/components/inputtext/InputText";
-import {Security} from "../../../data/Security";
+import {Security} from "../../../data/security/Security";
 import {round} from "../../../utils/utils";
 import {SelectButton} from "primereact/components/selectbutton/SelectButton";
 import {Order} from "../../../data/Order";

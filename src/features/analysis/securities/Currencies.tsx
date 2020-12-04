@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {Column} from "primereact/column";
 import {DataTable} from "primereact/datatable";
-import {SecurityCurrency} from "../../../common/data/SecurityCurrency";
+import {SecurityCurrency} from "../../../common/data/security/SecurityCurrency";
 
 type Props = {
     currencies: SecurityCurrency[]

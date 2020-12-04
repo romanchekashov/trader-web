@@ -1,5 +1,5 @@
 import {Interval} from "./Interval";
-import {SecurityFilter} from "./SecurityFilter";
+import {SecurityFilter} from "./security/SecurityFilter";
 import {TradeSystemType} from "./trading/TradeSystemType";
 
 export class TradeStrategyAnalysisFilterDto extends SecurityFilter {

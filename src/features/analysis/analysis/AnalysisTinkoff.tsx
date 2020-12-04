@@ -13,7 +13,7 @@ import MarketState from "../../../common/components/market-state/MarketState";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
 import Notifications from "../../../common/components/notifications/Notifications";
 import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
-import {SecurityLastInfo} from "../../../common/data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
 import {Order} from "../../../common/data/Order";
 import {ActiveTrade} from "../../../common/data/ActiveTrade";
 import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";

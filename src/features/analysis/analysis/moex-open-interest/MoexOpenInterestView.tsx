@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {MoexOpenInterest} from "../../../../common/data/open-interest/MoexOpenInterest";
 import {getMoexApiOpenInterestList, getMoexOpenInterests} from "../../../../common/api/rest/analysisRestApi";
-import {SecurityLastInfo} from "../../../../common/data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../../../common/data/security/SecurityLastInfo";
 import {MoexOpenInterestChart} from "./MoexOpenInterestChart";
 import {MoexOpenInterestTable} from "./MoexOpenInterestTable";
 import moment = require("moment");

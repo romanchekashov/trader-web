@@ -5,7 +5,7 @@ import {TradingStrategyResult} from "../../data/history/TradingStrategyResult";
 import {adjustTradingStrategyResult, adjustTradingStrategyResultArray} from "../../utils/DataUtils";
 import {TradingStrategyStatus} from "../../data/trading/TradingStrategyStatus";
 import {SecurityHistoryDatesDto} from "../../data/bot/SecurityHistoryDatesDto";
-import {SecurityType} from "../../data/SecurityType";
+import {SecurityType} from "../../data/security/SecurityType";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 

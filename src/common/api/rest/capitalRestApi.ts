@@ -1,7 +1,7 @@
 import {handleError, handleResponse} from "../apiUtils";
 import {ClassCode} from "../../data/ClassCode";
 import {Deposit} from "../../data/Deposit";
-import {SecurityType} from "../../data/SecurityType";
+import {SecurityType} from "../../data/security/SecurityType";
 
 const baseUrl = process.env.API_URL + "/api/v1/capital/";
 

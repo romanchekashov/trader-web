@@ -5,13 +5,13 @@ import {TradingStrategyResult} from "../data/history/TradingStrategyResult";
 import {Trade} from "../data/Trade";
 import {Order} from "../data/Order";
 import {StopOrder} from "../data/StopOrder";
-import {SecurityShare} from "../data/SecurityShare";
+import {SecurityShare} from "../data/security/SecurityShare";
 import {round100} from "./utils";
 import {MoexOpenInterest} from "../data/open-interest/MoexOpenInterest";
 import {SecurityShareEvent} from "../data/news/SecurityShareEvent";
 import {NewsItem} from "../data/news/NewsItem";
 import {EconomicCalendarEvent} from "../data/news/EconomicCalendarEvent";
-import {Security} from "../data/Security";
+import {Security} from "../data/security/Security";
 import {Candle} from "../data/Candle";
 
 export const adjustTradingStrategyResultArray = (results: TradingStrategyResult[]): any => {

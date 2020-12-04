@@ -1,12 +1,12 @@
 import {handleError, handleResponse} from "../apiUtils";
 import {Candle} from "../../data/Candle";
 import {CreateStopDto} from "../../data/CreateStopDto";
-import {SecurityFuture} from "../../data/SecurityFuture";
-import {SecurityShare} from "../../data/SecurityShare";
-import {SecurityCurrency} from "../../data/SecurityCurrency";
+import {SecurityFuture} from "../../data/security/SecurityFuture";
+import {SecurityShare} from "../../data/security/SecurityShare";
+import {SecurityCurrency} from "../../data/security/SecurityCurrency";
 import {TradingPlatformDataFilter} from "../../data/TradingPlatformDataFilter";
 import {adjustOrders, adjustShares} from "../../utils/DataUtils";
-import {SecurityLastInfo} from "../../data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
 
 const baseUrl = process.env.API_URL + "/api/v1/";
 

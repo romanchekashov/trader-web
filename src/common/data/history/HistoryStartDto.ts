@@ -2,7 +2,7 @@ import {Interval} from "../Interval";
 import {DepositSetup} from "../DepositSetup";
 import {HistorySetup} from "../HistorySetup";
 import {TradingStrategyName} from "../trading/TradingStrategyName";
-import {SecurityFilter} from "../SecurityFilter";
+import {SecurityFilter} from "../security/SecurityFilter";
 
 export class HistoryStartDto extends SecurityFilter {
     public timeFrameTrading: Interval

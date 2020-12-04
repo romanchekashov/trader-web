@@ -1,5 +1,5 @@
 import {Security} from "./Security";
-import {Signal} from "./Signal";
+import {Signal} from "../Signal";
 
 export class SecurityAnalysis extends Security {
     public atrDayPercent: number

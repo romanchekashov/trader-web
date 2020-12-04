@@ -44,7 +44,8 @@ export const BotControlPage: React.FC<Props> = ({}) => {
     const [activeItem, setActiveItem] = useState<any>(items[0])
     const [selectedSecurity, setSelectedSecurity] = useState<any>(null)
     const [selectedTSResult, setSelectedTSResult] = useState<any>(null)
-    const [results, setResults] = useState<TradingStrategyResult[]>([])
+    const [nonRunning, setNonRunning] = useState<TradingStrategyResult[]>([])
+    const [running, setRunning] = useState<TradingStrategyResult[]>([])
     const [selectedTsId, setSelectedTsId] = useState<number>(null)
 
     useEffect(() => {
@@ -53,7 +54,8 @@ export const BotControlPage: React.FC<Props> = ({}) => {
 
         getAllStrategies()
             .then(results => {
-                setResults(results
+                setNonRunning(results
+                    .filter(value => value.tradingStrategyData.status !== TradingStrategyStatus.RUNNING)
                     .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id))
             })
             .catch(console.error)
@@ -72,7 +74,8 @@ export const BotControlPage: React.FC<Props> = ({}) => {
             .on<TradingStrategyResult[]>(WSEvent.TRADING_STRATEGIES_RESULTS)
             .subscribe(data => {
                 const newResults: TradingStrategyResult[] = adjustTradingStrategyResultArray(data)
-                setResults(newResults)
+                    .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id)
+                setRunning(newResults)
                 if (selectedTsId) setSelectedTSResult(newResults
                     .find(value => value.tradingStrategyData.id === selectedTsId))
             })
@@ -136,15 +139,15 @@ export const BotControlPage: React.FC<Props> = ({}) => {
                 <div className="p-grid">
                     <div className="p-col-4">
                         <TabView>
-                            <TabPanel header="History">
+                            <TabPanel header={"History: " + nonRunning.length}>
                                 <BotControlLastInfo
-                                    results={results.filter(value => value.tradingStrategyData.status !== TradingStrategyStatus.RUNNING)}
+                                    results={nonRunning}
                                     outerHeight={400}
                                     onStrategyResultSelected={onStrategyResultSelected}/>
                             </TabPanel>
-                            <TabPanel header="Running">
+                            <TabPanel header={"Running: " + running.length}>
                                 <RunningStrategy
-                                    results={results.filter(value => value.tradingStrategyData.status === TradingStrategyStatus.RUNNING)}/>
+                                    results={running}/>
                             </TabPanel>
                         </TabView>
                     </div>

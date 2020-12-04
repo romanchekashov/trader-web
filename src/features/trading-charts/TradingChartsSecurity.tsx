@@ -5,7 +5,7 @@ import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataD
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
 import {CHART_MIN_WIDTH, ChartWrapper} from "../../common/components/chart/ChartWrapper";
 import {TradePremise} from "../../common/data/strategy/TradePremise";
-import {SecurityLastInfo} from "../../common/data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../common/data/security/SecurityLastInfo";
 import {Interval} from "../../common/data/Interval";
 import {TradingPlatform} from "../../common/data/trading/TradingPlatform";
 import {TrendsView} from "../../common/components/trend/TrendsView";

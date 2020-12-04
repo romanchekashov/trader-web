@@ -4,7 +4,7 @@ import {Interval} from "../../data/Interval";
 import {CandleStickChartForDiscontinuousIntraDay} from "./CandleStickChartForDiscontinuousIntraDay";
 import {ChartDrawType} from "./data/ChartDrawType";
 import {Candle} from "../../data/Candle";
-import {SecurityLastInfo} from "../../data/SecurityLastInfo";
+import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
 import {TradePremise} from "../../data/strategy/TradePremise";
 import {ChartElementAppearance} from "./data/ChartElementAppearance";
 import {Order} from "../../data/Order";

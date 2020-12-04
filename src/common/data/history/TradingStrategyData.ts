@@ -2,7 +2,7 @@ import {TradingStrategyTrade} from "./TradingStrategyTrade";
 import {TradingStrategyName} from "../trading/TradingStrategyName";
 import {Broker} from "../Broker";
 import {TradingPlatform} from "../trading/TradingPlatform";
-import {SecurityInfo} from "../SecurityInfo";
+import {SecurityInfo} from "../security/SecurityInfo";
 import {Interval} from "../Interval";
 import {TradeSystemType} from "../trading/TradeSystemType";
 import {TradingStrategyStatus} from "../trading/TradingStrategyStatus";
