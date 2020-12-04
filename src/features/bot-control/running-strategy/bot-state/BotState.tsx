@@ -4,8 +4,8 @@ import {TradingStrategyResult} from "../../../../common/data/history/TradingStra
 import "./BotState.css"
 import {StrategyInfo} from "./strategy-info/StrategyInfo";
 import {CurrentTrade} from "./current-trade/CurrentTrade";
-import {TradeResult} from "./trade-result/TradeResult";
 import {TradingStrategyStatus} from "../../../../common/data/trading/TradingStrategyStatus";
+import {TradeResultTable} from "./trade-result/TradeResultTable";
 
 type Props = {
     tradingStrategyResult: TradingStrategyResult
@@ -23,18 +23,13 @@ export const BotState: React.FC<Props> = ({tradingStrategyResult}) => {
         ? tradingStrategyResult?.tradingStrategyData?.trades[0] : null
 
     return (
-        <>
+        <div>
             <StrategyInfo tradingStrategyResult={tradingStrategyResult}/>
-            {
+            {/*{
                 TradingStrategyStatus.FINISHED === tradingStrategyResult?.tradingStrategyData?.status
                     ? null : <CurrentTrade tsTrade={tsTrade}/>
-            }
-            {
-                tradingStrategyResult && tradingStrategyResult.tradingStrategyData ?
-                    tradingStrategyResult.tradingStrategyData.trades
-                        .map(trade => <TradeResult tsTrade={trade}/>)
-                    : null
-            }
-        </>
+            }*/}
+            <TradeResultTable tsTrades={tradingStrategyResult?.tradingStrategyData?.trades}/>
+        </div>
     )
 }

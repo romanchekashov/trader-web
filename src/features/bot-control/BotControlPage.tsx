@@ -137,22 +137,22 @@ export const BotControlPage: React.FC<Props> = ({}) => {
             </div>
             <div className="p-col-12">
                 <div className="p-grid">
-                    <div className="p-col-4">
+                    <div className="p-col-6">
                         <TabView>
+                            <TabPanel header={"Running: " + running.length}>
+                                <RunningStrategy
+                                    results={running}
+                                    onStrategyResultSelected={onStrategyResultSelected}/>
+                            </TabPanel>
                             <TabPanel header={"History: " + nonRunning.length}>
                                 <BotControlLastInfo
                                     results={nonRunning}
                                     outerHeight={400}
                                     onStrategyResultSelected={onStrategyResultSelected}/>
                             </TabPanel>
-                            <TabPanel header={"Running: " + running.length}>
-                                <RunningStrategy
-                                    results={running}
-                                    onStrategyResultSelected={onStrategyResultSelected}/>
-                            </TabPanel>
                         </TabView>
                     </div>
-                    <div className="p-col-8" style={{padding: 0}}>
+                    <div className="p-col-6" style={{padding: 0}}>
                         <TabView>
                             <TabPanel header="Analysis">
                                 <BotControlAnalysis security={selectedSecurity}
