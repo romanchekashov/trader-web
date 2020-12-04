@@ -15,6 +15,7 @@ import {Intervals} from "../../../common/utils/utils";
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
 import {TradingStrategyName} from "../../../common/data/trading/TradingStrategyName";
 import {TradeSystemType} from "../../../common/data/trading/TradeSystemType";
+import {Security} from "../../../common/data/security/Security";
 
 export interface FilterState {
     broker: Broker
@@ -79,7 +80,7 @@ const Filter: React.FC<Props> = ({filter, onStart}) => {
         setMarket(val);
         setSecurity(null);
         setSecurities(val.securityHistoryDates
-            .map((securityHistoryDate): PrimeDropdownItem<SecurityInfo> => ({
+            .map((securityHistoryDate): PrimeDropdownItem<Security> => ({
                     label: `${securityHistoryDate.security.name}(${securityHistoryDate.security.code})`,
                     value: securityHistoryDate.security
                 })

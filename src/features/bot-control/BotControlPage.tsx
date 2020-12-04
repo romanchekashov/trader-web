@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
-import {BotControlFilter} from "./filter/BotControlFilter";
+import BotControlFilter from "./filter/BotControlFilter";
 import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
 import {
     getAllStrategies,
@@ -147,7 +147,8 @@ export const BotControlPage: React.FC<Props> = ({}) => {
                             </TabPanel>
                             <TabPanel header={"Running: " + running.length}>
                                 <RunningStrategy
-                                    results={running}/>
+                                    results={running}
+                                    onStrategyResultSelected={onStrategyResultSelected}/>
                             </TabPanel>
                         </TabView>
                     </div>

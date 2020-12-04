@@ -7,13 +7,16 @@ import {RunningStrategyTable} from "./table/RunningStrategyTable";
 
 type Props = {
     results: TradingStrategyResult[]
+    onStrategyResultSelected: (result: TradingStrategyResult) => void
 }
 
-export const RunningStrategy: React.FC<Props> = ({results}) => {
+export const RunningStrategy: React.FC<Props> = ({results, onStrategyResultSelected}) => {
 
     const [selectedTsId, setSelectedTsId] = useState<number>(null)
 
     const selectedTs = results.find(value => value.tradingStrategyData.id === selectedTsId)
+
+    if (selectedTs) onStrategyResultSelected(selectedTs)
 
     return (
         <div>

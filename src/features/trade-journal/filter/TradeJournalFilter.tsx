@@ -8,6 +8,7 @@ import {Dropdown} from "primereact/dropdown";
 import {getFilterData} from "../../../common/api/rest/botControlRestApi";
 import {SecurityInfo} from "../../../common/data/security/SecurityInfo";
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
+import {Security} from "../../../common/data/security/Security";
 import moment = require("moment");
 
 export interface TradeJournalFilterState {
@@ -69,7 +70,7 @@ export const TradeJournalFilter: React.FC<Props> = ({onFilter}) => {
         setMarket(val);
         setSecurity(null);
         setSecurities(val.securityHistoryDates
-            .map((securityHistoryDate): PrimeDropdownItem<SecurityInfo> => (
+            .map((securityHistoryDate): PrimeDropdownItem<Security> => (
                 {
                     label: `${securityHistoryDate.security.name}(${securityHistoryDate.security.code})`,
                     value: securityHistoryDate.security

@@ -200,8 +200,7 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
         const sum = results
             .map(value => value.stat?.totalGainAndLoss || 0)
             .reduce((a, b) => a + b, 0)
-        console.log(sum)
-        return "" + sum
+        return Math.floor(sum)
     }
 
     const footerGroup = (

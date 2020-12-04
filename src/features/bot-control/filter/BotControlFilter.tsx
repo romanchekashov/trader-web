@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {memo, useEffect, useState} from "react";
 import {Button} from "primereact/button";
 import {Dropdown} from "primereact/dropdown";
 import {MarketBotFilterDataDto} from "../../../common/data/bot/MarketBotFilterDataDto";
@@ -50,7 +50,7 @@ type Props = {
     onStopHistory: (data: MarketBotStartDto) => void
 }
 
-export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHistory}) => {
+const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHistory}) => {
     let initState: BotControlFilterState = {
         broker: filter ? filter.brokers[0] : null,
         platform: filter ? filter.brokers[0].tradingPlatform : null,
@@ -109,6 +109,9 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     const systemTypes: PrimeDropdownItem<TradeSystemType>[] = [TradeSystemType.HISTORY,
         TradeSystemType.DEMO, TradeSystemType.REAL].map(val => ({label: val, value: val}))
     const [systemType, setSystemType] = useState(initState.systemType)
+
+    const [selectedSecurity, setSelectedSecurity] = useState<Security>(null)
+    const [canTrade, setCanTrade] = useState<boolean>(false)
 
     const strategies: PrimeDropdownItem<TradingStrategyName>[] = [
         TradingStrategyName.SWING,
@@ -178,9 +181,12 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
 
         const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}]
         if (type) {
-            const securities: Security[] = getSecuritiesByTypeAndMarket(market, type)
+            const securities: Security[] = filter.marketSecurities
+                .find(value => value.securityType === type)
+                .securityHistoryDates
+                .map(value => value.security)
             for (const sec of securities) {
-                newSecCodes.push({label: sec.secCode, value: sec.secCode})
+                newSecCodes.push({label: sec.shortName, value: sec.secCode})
             }
         } else {
             setSecCode(null)
@@ -191,10 +197,14 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
     }
 
     const onSecCodeChanged = (newSecCode: string) => {
+        const security = filter.marketSecurities
+            .find(value => value.securityType === securityType)
+            .securityHistoryDates
+            .find(value => value.security.secCode === newSecCode)
+            .security
         setSecCode(newSecCode)
-        const secId = getSecuritiesByTypeAndMarket(market, securityType)
-            .find(value => value.secCode === newSecCode).id
-        setSecId(secId)
+        setSecId(security?.id)
+        setSelectedSecurity(security)
         updateHistoryDates(newSecCode, minInterval)
     }
 
@@ -228,7 +238,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
             <div className="p-grid filter">
                 <div className="p-col-12">
                     <div className="p-grid">
-                        <div className="p-col-2">
+                        <div className="p-col-1">
                             <div style={{fontSize: "10px"}}>Broker</div>
                             <Dropdown optionLabel="id"
                                       value={broker}
@@ -286,7 +296,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
                                           onSecCodeChanged(e.value);
                                       }}
                                       filter={true}
-                                      style={{width: '90px'}}/>
+                                      style={{width: '150px'}}/>
                         </div>
                         <div className="p-col-1">
                             <div style={{fontSize: "10px"}}>Trading Interval</div>
@@ -324,9 +334,11 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
                                       inputStyle={{width: "90px"}}/>
                         </div>
                     </div>
-                    <DepositSetupView realDeposit={realDeposit}
+                    <DepositSetupView security={selectedSecurity}
+                                      realDeposit={realDeposit}
                                       setup={depositSetup}
-                                      onChange={onDepositSetupChanged}/>
+                                      onChange={onDepositSetupChanged}
+                                      canTrade={setCanTrade}/>
                 </div>
                 <div className="p-col-12">
                     <div className="p-grid">
@@ -353,6 +365,7 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
                         <div className="p-col-1">
                             <Button label="Start" icon="pi pi-caret-right"
                                     className="p-button-success"
+                                    disabled={!canTrade}
                                     onClick={onStartClicked}/>
                         </div>
                     </div>
@@ -361,3 +374,5 @@ export const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, on
         </Panel>
     )
 }
+
+export default memo(BotControlFilter, (prevProps, nextProps) => !!prevProps.filter)

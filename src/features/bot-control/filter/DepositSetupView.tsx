@@ -5,14 +5,19 @@ import {InputText} from "primereact/inputtext";
 import {PrimeDropdownItem, round10} from "../../../common/utils/utils";
 import {Dropdown} from "primereact/dropdown";
 import {Deposit} from "../../../common/data/Deposit";
+import {Security} from "../../../common/data/security/Security";
+import {ClassCode} from "../../../common/data/ClassCode";
+import {SecurityFuture} from "../../../common/data/security/SecurityFuture";
 
 type Props = {
+    security: Security,
     realDeposit: Deposit
     setup: DepositSetup
     onChange: (setup: DepositSetup) => void
+    canTrade: (canTrade: boolean) => void
 };
 
-export const DepositSetupView: React.FC<Props> = ({realDeposit, setup, onChange}) => {
+export const DepositSetupView: React.FC<Props> = ({security, realDeposit, setup, onChange, canTrade}) => {
 
     const takeProfitNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [takeProfitNumber, setTakeProfitNumber] = useState(2);
@@ -40,8 +45,36 @@ export const DepositSetupView: React.FC<Props> = ({realDeposit, setup, onChange}
 
     const [stop, setStop] = useState(getStop(setup.maxRiskPerTradeInPercent));
 
+    let minDepoPerContract = 1
+
+    switch (security?.classCode) {
+        case ClassCode.CETS:
+            break
+        case ClassCode.SPBFUT:
+            const future: SecurityFuture = security as SecurityFuture
+            minDepoPerContract = future.buyDepoPerContract > future.sellDepoPerContract ? future.buyDepoPerContract : future.sellDepoPerContract
+            break
+        case ClassCode.TQBR:
+            break
+    }
+
+    let maxQuantity = 0
+    let maxDepo = 0
+
+    if (realDeposit) {
+        maxQuantity = Math.floor(realDeposit.amount / minDepoPerContract)
+        maxDepo = Math.ceil(maxQuantity * minDepoPerContract)
+        canTrade(setup.initAmount > minDepoPerContract)
+    }
+
     return (
         <div className="p-grid">
+            <div className="p-col-1">
+                <div style={{fontWeight: 700, color: "red"}}>Real deposit: {realDeposit?.amount}</div>
+                <div>Depo per Contract: {minDepoPerContract}</div>
+                <div>Max contracts: {maxQuantity}</div>
+                <div>Max deposit: {maxDepo}</div>
+            </div>
             <div className="p-col-1">
                 <div style={{fontSize: "10px"}}>
                     Deposit (<span style={{fontWeight: 700, color: "red"}}>Real: {realDeposit?.amount}</span>)
