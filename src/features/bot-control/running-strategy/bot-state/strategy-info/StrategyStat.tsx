@@ -79,13 +79,9 @@ export const StrategyStat: React.FC<Props> = ({stat}) => {
         averageWin = Math.round(averageWin * 100) / 100;
         averageLoss = Math.round(averageLoss * 100) / 100;
 
-        const newTitleFirstRow = '<div><strong>Total P/L:</strong> ' + result.totalGainAndLoss
-            + ', <strong>Profit Factor:</strong> ' + result.profitFactor + '</div>'
-            + '<div><strong>Win %:</strong> ' + winPercentage
-            + '%, <strong>Expect.:</strong> ' + expectancy
-            + ', <strong>P/L ratio:</strong> ' + profitLossRatio + '</div>'
-            + '<div><strong>Avg Win:</strong> ' + averageWin
-            + ', <strong>Avg Loss:</strong> ' + averageLoss + '</div>';
+        const newTitleFirstRow = '<span><strong>Total P/L:</strong> ' + result.totalGainAndLoss + ', <strong>Profit Factor:</strong> ' + result.profitFactor + '</span>'
+            + ', <span><strong>Win %:</strong> ' + winPercentage + '%, <strong>Expect.:</strong> ' + expectancy + ', <strong>P/L ratio:</strong> ' + profitLossRatio + '</span>'
+            + ', <span><strong>Avg Win:</strong> ' + averageWin + ', <strong>Avg Loss:</strong> ' + averageLoss + '</span>';
 
         const newTitleSecondRow = '<strong>Largest Gain:</strong> ' + result.largestGain
             + ', <strong>Largest Loss:</strong> ' + result.largestLoss
@@ -113,9 +109,9 @@ export const StrategyStat: React.FC<Props> = ({stat}) => {
             <>
                 {titleFirstRow ?
                     <>
-                        <div style={{textAlign: "center"}}
+                        <div style={{textAlign: "center", fontSize: "14px"}}
                              dangerouslySetInnerHTML={{__html: titleFirstRow}}></div>
-                        <div style={{textAlign: "center"}}
+                        <div style={{textAlign: "center", fontSize: "14px"}}
                              dangerouslySetInnerHTML={{__html: titleSecondRow}}></div>
                     </>
                     : null}

@@ -21,6 +21,7 @@ import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {BrokerId} from "../../../common/data/BrokerId";
 import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
 import moment = require("moment");
+import {getTimeFrameHigh, getTimeFrameLow} from "../../../common/utils/TimeFrameChooser";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -46,54 +47,59 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
         "MONTH": [Interval.MONTH, Interval.WEEK]
     }
 
-    const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate());
-    const [timeFrameTrading, setTimeFrameTrading] = useState(null);
-    const [timeFrameMin, setTimeFrameMin] = useState(Interval.M1);
-    const [premise, setPremise] = useState(null);
-    const [orders, setOrders] = useState(null);
-    const [activeTrade, setActiveTrade] = useState(null);
+    const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate())
+    const [tfHigh, setTFHigh] = useState<Interval>(null)
+    const [timeFrameTrading, setTimeFrameTrading] = useState<Interval>(null)
+    const [timeFrameMin, setTimeFrameMin] = useState<Interval>(null)
+    const [premise, setPremise] = useState(null)
+    const [orders, setOrders] = useState(null)
+    const [activeTrade, setActiveTrade] = useState(null)
 
-    const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
-    const [chartNumber, setChartNumber] = useState(1);
+    const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}))
+    const [chartNumber, setChartNumber] = useState<number>(2)
 
-    const [securityLastInfo, setSecurityLastInfo] = useState(null);
-    const [chart1Width, setChart1Width] = useState(CHART_MIN_WIDTH);
-    const [chart2Width, setChart2Width] = useState(CHART_MIN_WIDTH);
-    const [chartAlertsWidth, setChartAlertsWidth] = useState(CHART_MIN_WIDTH);
-    const chart1Ref = useRef(null);
-    const chart2Ref = useRef(null);
-    const chartAlertsRef = useRef(null);
-    const [trendLowTF, setTrendLowTF] = useState(null);
-    const [filterDto, setFilterDto] = useState(null);
-    const [alert, setAlert] = useState(null);
-    const [marketStateDto, setMarketStateDto] = useState<MarketStateDto>(null);
-    const [swingStates, setSwingStates] = useState<SwingStateDto[]>([]);
-    const [hasData, setHasData] = useState(false);
-    const [tsTrade, setTsTrade] = useState<TradingStrategyTrade>(null);
-    const [trades, setTrades] = useState<Trade[]>([]);
+    const [securityLastInfo, setSecurityLastInfo] = useState(null)
+    const [chart1Width, setChart1Width] = useState(CHART_MIN_WIDTH)
+    const [chart2Width, setChart2Width] = useState(CHART_MIN_WIDTH)
+    const [chartAlertsWidth, setChartAlertsWidth] = useState(CHART_MIN_WIDTH)
+    const chart1Ref = useRef(null)
+    const chart2Ref = useRef(null)
+    const chartAlertsRef = useRef(null)
+    const [filterDto, setFilterDto] = useState(null)
+    const [alert, setAlert] = useState(null)
+    const [marketStateDto, setMarketStateDto] = useState<MarketStateDto>(null)
+    const [swingStates, setSwingStates] = useState<SwingStateDto[]>([])
+    const [hasData, setHasData] = useState(false)
+    const [tsTrade, setTsTrade] = useState<TradingStrategyTrade>(null)
+    const [trades, setTrades] = useState<Trade[]>([])
     const [premiseBefore, setPremiseBefore] = useState<Date>(null)
 
     const updateSize = () => {
-        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : CHART_MIN_WIDTH);
-        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : CHART_MIN_WIDTH);
-        setChartAlertsWidth(chartAlertsRef.current ? chartAlertsRef.current.clientWidth : CHART_MIN_WIDTH);
-    };
+        setChart1Width(chart1Ref.current ? chart1Ref.current.clientWidth : CHART_MIN_WIDTH)
+        setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth : CHART_MIN_WIDTH)
+        setChartAlertsWidth(chartAlertsRef.current ? chartAlertsRef.current.clientWidth : CHART_MIN_WIDTH)
+    }
 
     useEffect(() => {
         if (security && tradingStrategyResult && (tradingStrategyResult.tradePremise || tradingStrategyResult.tradeSetup)) {
 
             const premise = tradingStrategyResult.tradeSetup && tradingStrategyResult.tradeSetup.premise ?
-                tradingStrategyResult.tradeSetup.premise : tradingStrategyResult.tradePremise;
+                tradingStrategyResult.tradeSetup.premise : tradingStrategyResult.tradePremise
 
             setPremise(premise)
-            setTimeFrameTrading(premise.analysis.tradingStrategyConfig.timeFrameTrading);
-            setMarketStateDto(premise.marketState);
-            setSwingStates([premise.swingStateTradingInterval, premise.swingStateMinInterval]);
-            setHasData(true);
-            const trades = tradingStrategyResult.tradingStrategyData.trades;
-            setTsTrade(trades.length > 0 ? trades[0] : null);
+
+            const tfTrading = premise.analysis.tradingStrategyConfig.timeFrameTrading
+            setTimeFrameTrading(tfTrading)
+            setTFHigh(getTimeFrameHigh(tfTrading))
+            setTimeFrameMin(getTimeFrameLow(tfTrading))
+
+            setMarketStateDto(premise.marketState)
+            setSwingStates([premise.swingStateTradingInterval, premise.swingStateMinInterval])
+            setHasData(true)
+            const trades = tradingStrategyResult.tradingStrategyData.trades
+            setTsTrade(trades.length > 0 ? trades[0] : null)
         } else {
-            setHasData(false);
+            setHasData(false)
         }
 
         if (tradingStrategyResult && tradingStrategyResult.tradingStrategyData) {
@@ -110,28 +116,28 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
                 if (security) {
-                    const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode);
+                    const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode)
                     if (newSecurityLastInfo) {
-                        newSecurityLastInfo.lastTradeTime = new Date(newSecurityLastInfo.lastTradeTime);
-                        setSecurityLastInfo(newSecurityLastInfo);
+                        newSecurityLastInfo.lastTradeTime = new Date(newSecurityLastInfo.lastTradeTime)
+                        setSecurityLastInfo(newSecurityLastInfo)
                     }
                 }
-            });
+            })
 
-        setTimeout(updateSize, 1000);
-        window.addEventListener('resize', updateSize);
+        setTimeout(updateSize, 1000)
+        window.addEventListener('resize', updateSize)
 
         // Specify how to clean up after this effect:
         return function cleanup() {
-            window.removeEventListener('resize', updateSize);
-            lastSecuritiesSubscription.unsubscribe();
-        };
-    }, [security, tradingStrategyResult]);
+            window.removeEventListener('resize', updateSize)
+            lastSecuritiesSubscription.unsubscribe()
+        }
+    }, [security, tradingStrategyResult])
 
     const onChartNumberChanged = (num: number) => {
-        setChartNumber(num);
-        setTimeout(updateSize, 1000);
-    };
+        setChartNumber(num)
+        setTimeout(updateSize, 1000)
+    }
 
     const getAdjustedStart = (): Date => {
         if (tradingStrategyResult?.tradingStrategyData) {
@@ -159,81 +165,75 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
         fetchPremise(timeFrameTrading, before)
     }
 
-    if (hasData) {
+    if (!hasData) return (<div>Select Trading Strategy to see analysis.</div>)
 
-        return (
-            <>
-                <div className="p-grid analysis-head">
-                    <div className="p-col-12">
-                        <div className="analysis-head-chart-number">
-                            <Dropdown value={chartNumber} options={chartNumbers}
-                                      onChange={(e) => onChartNumberChanged(e.value)}/>
+    return (
+        <>
+            <div className="p-grid analysis-head">
+                <div className="p-col-12">
+                    <div className="analysis-head-chart-number">
+                        <Dropdown value={chartNumber} options={chartNumbers}
+                                  onChange={(e) => onChartNumberChanged(e.value)}/>
+                    </div>
+                </div>
+                <div className="p-col-12">
+                    <DataTable value={[securityLastInfo]}>
+                        <Column field="totalDemand" header="Общ спрос"/>
+                        <Column field="totalSupply" header="Общ предл"/>
+                        <Column field="futureSellDepoPerContract" header="ГО прод"/>
+                        <Column field="futureBuyDepoPerContract" header="ГО покуп"/>
+                        <Column field="lastTradePrice" header="Цена"/>
+                        <Column field="numTradesToday" header="Кол-во сделок"/>
+                    </DataTable>
+                </div>
+            </div>
+            <TrendsView trends={premise ? premise.analysis.trends : []}/>
+            <div className="p-grid" style={{margin: '0'}}>
+                <div className="p-col-12" ref={chart1Ref} style={{padding: '0'}}>
+                    <ChartWrapper interval={timeFrameTrading}
+                                  initialNumberOfCandles={1000}
+                                  start={getAdjustedStart()}
+                                  onPremiseBeforeChanged={onPremiseBeforeChanged}
+                                  onIntervalChanged={interval => {
+                                  }}
+                                  onStartChanged={start => {
+                                  }}
+                                  width={chart1Width}
+                                  security={security}
+                                  premise={premise}
+                                  orders={orders}
+                                  trades={trades}
+                                  activeTrade={activeTrade}
+                                  showGrid={true}/>
+                </div>
+                {
+                    chartNumber === 2 ? (
+                        <div className="p-col-12" ref={chart2Ref} style={{padding: '0'}}>
+                            <ChartWrapper interval={tfHigh}
+                                          initialNumberOfCandles={200}
+                                          onIntervalChanged={interval => {
+                                          }}
+                                          onStartChanged={start => {
+                                          }}
+                                          width={chart2Width}
+                                          security={security}
+                                          premise={premise}
+                                          trades={trades}
+                                          showGrid={true}/>
                         </div>
-                    </div>
-                    <div className="p-col-12">
-                        <DataTable value={[securityLastInfo]}>
-                            <Column field="totalDemand" header="Общ спрос"/>
-                            <Column field="totalSupply" header="Общ предл"/>
-                            <Column field="futureSellDepoPerContract" header="ГО прод"/>
-                            <Column field="futureBuyDepoPerContract" header="ГО покуп"/>
-                            <Column field="lastTradePrice" header="Цена"/>
-                            <Column field="numTradesToday" header="Кол-во сделок"/>
-                        </DataTable>
-                    </div>
+                    ) : null
+                }
+            </div>
+            <div className="p-grid">
+                <div className="p-col-12">
+                    <MarketState filter={null}
+                                 initMarketState={marketStateDto}/>
                 </div>
-                <TrendsView trends={premise ? premise.analysis.trends : []}/>
-                <div className="p-grid" style={{margin: '0'}}>
-                    <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref} style={{padding: '0'}}>
-                        <ChartWrapper interval={timeFrameTrading}
-                                      initialNumberOfCandles={1000}
-                                      start={getAdjustedStart()}
-                                      onPremiseBeforeChanged={onPremiseBeforeChanged}
-                                      onIntervalChanged={interval => {
-                                      }}
-                                      onStartChanged={start => {
-                                      }}
-                                      width={chart1Width}
-                                      security={security}
-                                      premise={premise}
-                                      orders={orders}
-                                      trades={trades}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
-                    </div>
-                    {
-                        chartNumber === 2 ? (
-                            <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
-                                <ChartWrapper interval={timeFrameMin}
-                                              initialNumberOfCandles={1000}
-                                              onIntervalChanged={interval => {
-                                              }}
-                                              onStartChanged={start => {
-                                              }}
-                                              width={chart2Width}
-                                              security={security}
-                                              premise={premise}
-                                              trades={trades}
-                                              trend={trendLowTF}
-                                              showGrid={true}/>
-                            </div>
-                        ) : null
-                    }
+                <div className="p-col-12">
+                    <SwingStateList filter={null}
+                                    initSwingStates={swingStates}/>
                 </div>
-                <div className="p-grid">
-                    <div className="p-col-12">
-                        <MarketState filter={null}
-                                     initMarketState={marketStateDto}/>
-                    </div>
-                    <div className="p-col-12">
-                        <SwingStateList filter={null}
-                                        initSwingStates={swingStates}/>
-                    </div>
-                </div>
-            </>
-        )
-    } else {
-        return (
-            <div>Run bot to see analysis</div>
-        )
-    }
-};
+            </div>
+        </>
+    )
+}

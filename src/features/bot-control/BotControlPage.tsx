@@ -135,6 +135,7 @@ export const BotControlPage: React.FC<Props> = ({}) => {
                                   onSearch={onSearch}
                                   onStopHistory={onStopHistory}/>
             </div>
+
             <div className="p-col-12">
                 <div className="p-grid">
                     <div className="p-col-6">
@@ -152,35 +153,36 @@ export const BotControlPage: React.FC<Props> = ({}) => {
                             </TabPanel>
                         </TabView>
                     </div>
-                    <div className="p-col-6" style={{padding: 0}}>
-                        <TabView>
-                            <TabPanel header="Analysis">
-                                <BotControlAnalysis security={selectedSecurity}
-                                                    tradingStrategyResult={selectedTSResult}/>
-                            </TabPanel>
-                            <TabPanel header="Strategy Stat">
-                                <HistoryStrategyResultTable stat={selectedTSResult}/>
-                            </TabPanel>
-                            <TabPanel header="Profit Loss Stat">
-                                <div className="p-col-12">
-                                    <ProfitLossChart stat={selectedTSResult?.stat}/>
-                                </div>
-                                <div className="p-col-12">
-                                    <TradeJournalStatistic stat={selectedTSResult?.stat}/>
-                                </div>
-                            </TabPanel>
-                            <TabPanel header="Trades">
-                                <TradeJournalTable stat={selectedTSResult?.stat}/>
-                            </TabPanel>
-                            <TabPanel header="Info">
-                                <BotControlAnalysisInfo security={selectedSecurity}/>
-                            </TabPanel>
-                            <TabPanel header="Calendar">
-                                <EconomicCalendar secId={selectedSecurity?.id}/>
-                            </TabPanel>
-                        </TabView>
+                    <div className="p-col-6">
+                        <BotControlAnalysis security={selectedSecurity}
+                                            tradingStrategyResult={selectedTSResult}/>
                     </div>
                 </div>
+            </div>
+
+            <div className="p-col-12" style={{padding: 0}}>
+                <TabView>
+                    <TabPanel header="Trades">
+                        <TradeJournalTable stat={selectedTSResult?.stat}/>
+                    </TabPanel>
+                    <TabPanel header="Strategy Stat">
+                        <HistoryStrategyResultTable stat={selectedTSResult}/>
+                    </TabPanel>
+                    <TabPanel header="Profit Loss Stat">
+                        <div className="p-col-12">
+                            <ProfitLossChart stat={selectedTSResult?.stat}/>
+                        </div>
+                        <div className="p-col-12">
+                            <TradeJournalStatistic stat={selectedTSResult?.stat}/>
+                        </div>
+                    </TabPanel>
+                    <TabPanel header="Info">
+                        <BotControlAnalysisInfo security={selectedSecurity}/>
+                    </TabPanel>
+                    <TabPanel header="Calendar">
+                        <EconomicCalendar secId={selectedSecurity?.id}/>
+                    </TabPanel>
+                </TabView>
             </div>
         </div>
     )

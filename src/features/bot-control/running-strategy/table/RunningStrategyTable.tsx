@@ -229,7 +229,13 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
             // onRowToggle={onRowToggle}
             rowClassName={rowBgColor}
             // rowExpansionTemplate={rowExpansionTemplate}
-                   dataKey="id">
+                   dataKey="id"
+                   paginator
+                   paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+                   rows={15}
+                   rowsPerPageOptions={[15,20,50]}>
+
             <Column expander={true}/>
             <Column field="id" style={{width: '10px'}}/>
             <Column field="name" style={{width: '30px'}}/>

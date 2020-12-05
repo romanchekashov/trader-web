@@ -18,19 +18,19 @@ export interface TradeJournalTableState {
 
 type Props = {
     stat: ResultDto
-};
+}
 
 export const TradeJournalTable: React.FC<Props> = ({stat}) => {
     let initState: TradeJournalTableState = {
         expandedRows: []
-    };
+    }
 
-    const classCodes = [ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS];
+    const classCodes = [ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
 
-    const [expandedRows, setExpandedRows] = useState(initState.expandedRows);
+    const [expandedRows, setExpandedRows] = useState(initState.expandedRows)
 
     useEffect(() => {
-    }, []);
+    }, [])
 
     const createNodes = (trades: JournalTradeDto[]): TreeNode[] => {
         const nodes: TreeNode[] = [];
@@ -48,11 +48,11 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
             })
         });
         return nodes;
-    };
+    }
 
     const onRowToggle = (e) => {
         setExpandedRows(e.data);
-    };
+    }
 
     const rowExpansionTemplate = (data: any) => {
         return data.trades.map(trade => {
@@ -67,23 +67,23 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
                 </div>
             );
         });
-    };
+    }
 
     const isShortTemplate = (rowData: any, {field}) => {
-        return rowData[field] ? <span className="fin-short">S</span> : <span className="fin-long">L</span>;
-    };
+        return rowData[field] ? <span className="fin-short">S</span> : <span className="fin-long">L</span>
+    }
 
     const dateTemplate = (rowData: any, {field}) => {
-        return moment(rowData[field]).format("DD-MM-YYYY");
-    };
+        return moment(rowData[field]).format("DD-MM-YYYY")
+    }
 
     const dayOfWeekTemplate = (rowData: any, {field}) => {
-        return moment(rowData[field]).format("ddd");
-    };
+        return moment(rowData[field]).format("ddd")
+    }
 
     const timeTemplate = (rowData: any, {field}) => {
-        return moment(rowData[field]).format("HH:mm:ss");
-    };
+        return moment(rowData[field]).format("HH:mm:ss")
+    }
 
     const timeSpent = (rowData: any) => {
         const dates = rowData.trades.map(trade => trade.dateTime).sort((a, b) => {
@@ -92,7 +92,7 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
         // console.log(dates);
         return moment.duration(moment(dates[dates.length - 1]).diff(moment(dates[0]))).humanize();
         // return moment(rowData[field]).format("HH:mm:ss");
-    };
+    }
 
     const rowBgColor = (t: JournalTradeDto): any => {
         if (t.totalGainAndLoss > 0) {
@@ -114,7 +114,7 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
                 return {'loss-sm': true};
             }
         }
-    };
+    }
 
     const headerGroup = (
         <ColumnGroup>
@@ -168,16 +168,16 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
                 <Column header={stat?.totalGainAndLoss}/>
             </Row>
         </ColumnGroup>
-    );
+    )
 
     if (!stat) {
         return (
             <div className="p-grid">
                 <div className="p-col-12">
-                    No data
+                    Select Trading Strategy to see trades.
                 </div>
             </div>
-        );
+        )
     }
 
     return (
@@ -220,4 +220,4 @@ export const TradeJournalTable: React.FC<Props> = ({stat}) => {
             <Column body={timeSpent}/>
         </DataTable>
     )
-};
+}

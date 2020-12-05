@@ -81,8 +81,8 @@ export const TradeResultTable: React.FC<Props> = ({tsTrades}) => {
                     <div className="p-col-1">{trade.operation === OperationType.SELL ? 'SELL' : 'BUY'}</div>
                     <div className="p-col-1">{trade.price}</div>
                     <div className="p-col-1">{trade.quantity}</div>
-                    <div className="p-col-1">{trade.value}</div>
-                    <div className="p-col-1">{moment(trade.dateTime).format("DD-MM-YYYY HH:mm:ss")}</div>
+                    <div className="p-col-2">{trade.value}</div>
+                    <div className="p-col-2">{moment(trade.dateTime).format("DD-MM-YYYY HH:mm:ss")}</div>
                 </div>
             );
         });
@@ -161,6 +161,7 @@ export const TradeResultTable: React.FC<Props> = ({tsTrades}) => {
                 <Column header="№" style={{width: '10px'}}/>
                 <Column header="Op" style={{width: '10px'}}/>
                 <Column header="qty" style={{width: '10px'}}/>
+                <Column header="stop" style={{width: '30px'}}/>
                 <Column header="entry R" style={{width: '30px'}}/>
                 <Column header="stop R" style={{width: '30px'}}/>
                 <Column header="t1 R" style={{width: '30px'}}/>
@@ -178,6 +179,7 @@ export const TradeResultTable: React.FC<Props> = ({tsTrades}) => {
                 {/*<Column header="T2 Order N."/>*/}
                 {/*<Column header="Kill Order N."/>*/}
                 {/*<Column header="Kill Exc. Order N."/>*/}
+                <Column header="Left Qty" style={{width: '30px'}}/>
                 <Column header="State" style={{width: '30px'}}/>
 
                 {/*<Column header="Stop"/>*/}
@@ -225,10 +227,15 @@ export const TradeResultTable: React.FC<Props> = ({tsTrades}) => {
                    // footerColumnGroup={footerGroup}
                    expandedRows={expandedRows}
                    // onRowClick={e => onSelectedTsId(e.data.id)}
-            // onRowToggle={onRowToggle}
-            // rowClassName={rowBgColor}
-            // rowExpansionTemplate={rowExpansionTemplate}
-                   dataKey="id">
+                   onRowToggle={onRowToggle}
+                   rowClassName={rowBgColor}
+                   rowExpansionTemplate={rowExpansionTemplate}
+                   dataKey="id"
+                   paginator
+                   paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+                   rows={10}
+                   rowsPerPageOptions={[5,10,15,20,50]}>
             <Column expander={true}/>
             <Column field="id" style={{width: '10px'}}/>
             {/*<Column field="name" style={{width: '30px'}}/>*/}
@@ -240,6 +247,7 @@ export const TradeResultTable: React.FC<Props> = ({tsTrades}) => {
 
             <Column field="operation" style={{width: '10px'}}/>
             <Column field="entryQuantity" style={{width: '10px'}}/>
+            <Column field="stopPrice" style={{width: '30px'}}/>
             <Column field="entryRealPrice" style={{width: '30px'}}/>
             <Column field="stopRealPrice" style={{width: '30px'}}/>
             <Column field="firstTargetRealPrice" style={{width: '30px'}}/>
@@ -250,6 +258,7 @@ export const TradeResultTable: React.FC<Props> = ({tsTrades}) => {
             {/*<Column field="secondTargetOrderNumber" style={{overflow: 'auto'}}/>*/}
             {/*<Column field="killOrderNumber" style={{overflow: 'auto'}}/>*/}
             {/*<Column field="killExceptionOrderNumber" style={{overflow: 'auto'}}/>*/}
+            <Column field="leftQuantity" style={{width: '30px'}}/>
             <Column field="state" style={{width: '30px'}}/>
 
             {/*<Column field="stopPrice"/>*/}

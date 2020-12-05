@@ -20,41 +20,41 @@ export interface HistoryStrategyResultTableState {
 
 type Props = {
     stat: TradingStrategyResult
-};
+}
 
 export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
     let initState: HistoryStrategyResultTableState = {
         expandedRows: []
-    };
+    }
 
-    const classCodes = [ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS];
+    const classCodes = [ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
 
-    const [expandedRows, setExpandedRows] = useState(initState.expandedRows);
+    const [expandedRows, setExpandedRows] = useState(initState.expandedRows)
 
     useEffect(() => {
-    }, []);
+    }, [])
 
     const createNodes = (trades: JournalTradeDto[]): TreeNode[] => {
-        const nodes: TreeNode[] = [];
+        const nodes: TreeNode[] = []
         trades.forEach(journalTrade => {
-            const tradesNodes: TreeNode[] = [];
+            const tradesNodes: TreeNode[] = []
             journalTrade.trades.forEach(trade => {
                 tradesNodes.push({
                     data: trade, children: null
-                });
-            });
+                })
+            })
 
             nodes.push({
                 data: journalTrade,
                 children: tradesNodes
             })
-        });
-        return nodes;
-    };
+        })
+        return nodes
+    }
 
     const onRowToggle = (e) => {
-        setExpandedRows(e.data);
-    };
+        setExpandedRows(e.data)
+    }
 
     const rowExpansionTemplate = (data: any) => {
         return data.trades.map(trade => {
@@ -67,81 +67,81 @@ export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
                     <div className="p-col-1">{trade.value}</div>
                     <div className="p-col-1">{moment(trade.dateTime).format("DD-MM-YYYY HH:mm:ss")}</div>
                 </div>
-            );
-        });
-    };
+            )
+        })
+    }
 
     const isShortTemplate = (rowData: any, {field}) => {
-        return rowData[field] ? <span className="fin-short">S</span> : <span className="fin-long">L</span>;
-    };
+        return rowData[field] ? <span className="fin-short">S</span> : <span className="fin-long">L</span>
+    }
 
     const dateTemplate = (rowData: any, {field}) => {
-        return moment(rowData[field]).format("DD-MM-YYYY");
-    };
+        return moment(rowData[field]).format("DD-MM-YYYY")
+    }
 
     const dayOfWeekTemplate = (rowData: any, {field}) => {
-        return moment(rowData[field]).format("ddd");
-    };
+        return moment(rowData[field]).format("ddd")
+    }
 
     const timeTemplate = (rowData: any, {field}) => {
-        return moment(rowData[field]).format("HH:mm:ss");
-    };
+        return moment(rowData[field]).format("HH:mm:ss")
+    }
 
     const timeSpent = (rowData: any) => {
         const dates = rowData.trades.map(trade => trade.dateTime).sort((a, b) => {
-            return new Date(a).getTime() - new Date(b).getTime();
-        });
-        // console.log(dates);
-        return moment.duration(moment(dates[dates.length - 1]).diff(moment(dates[0]))).humanize();
-        // return moment(rowData[field]).format("HH:mm:ss");
-    };
+            return new Date(a).getTime() - new Date(b).getTime()
+        })
+        // console.log(dates)
+        return moment.duration(moment(dates[dates.length - 1]).diff(moment(dates[0]))).humanize()
+        // return moment(rowData[field]).format("HH:mm:ss")
+    }
 
     const getTotalGainAndLoss = (tsTrade: TradingStrategyTrade): number => {
-        let totalGainAndLoss = 0;
+        let totalGainAndLoss = 0
         tsTrade.trades.forEach(trade => {
             if (trade.operation === tsTrade.operation) {
-                totalGainAndLoss += trade.value;
+                totalGainAndLoss += trade.value
             } else {
-                totalGainAndLoss -= trade.value;
+                totalGainAndLoss -= trade.value
             }
-        });
-        return totalGainAndLoss;
+        })
+        return totalGainAndLoss
     }
 
     const rowBgColor = (tsTrade: TradingStrategyTrade): any => {
-        let totalGainAndLoss = getTotalGainAndLoss(tsTrade);
+        let totalGainAndLoss = getTotalGainAndLoss(tsTrade)
         const className = {
             'no-expander': !tsTrade.trades || tsTrade.trades.length === 0
-        };
+        }
 
         if (totalGainAndLoss > 0) {
             if (totalGainAndLoss > 3000) {
-                className['win-lg'] = true;
+                className['win-lg'] = true
             } else if (totalGainAndLoss > 1000) {
-                className['win'] = true;
+                className['win'] = true
             } else {
-                className['win-sm'] = true;
+                className['win-sm'] = true
             }
         }
 
         if (totalGainAndLoss < 0) {
             if (totalGainAndLoss < -3000) {
-                className['loss-lg'] = true;
+                className['loss-lg'] = true
             } else if (totalGainAndLoss < -1000) {
-                className['loss'] = true;
+                className['loss'] = true
             } else {
-                className['loss-sm'] = true;
+                className['loss-sm'] = true
             }
         }
 
-        return className;
-    };
+        return className
+    }
 
     const headerGroup = (
         <ColumnGroup>
             <Row>
                 <Column header="" style={{width: '30px'}}/>
-                <Column header="№" style={{width: '30px'}}/>
+                <Column header="№" style={{width: '34px'}}/>
 
                 <Column header="Op." style={{width: '30px'}}/>
                 <Column header="In Order N."/>
@@ -169,16 +169,16 @@ export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
                 <Column header="Left Qty" style={{width: '50px'}}/>
             </Row>
         </ColumnGroup>
-    );
+    )
 
     if (!stat || !stat.tradingStrategyData) {
         return (
             <div className="p-grid">
                 <div className="p-col-12">
-                    No Data
+                    Select Trading Strategy to see TS trades.
                 </div>
             </div>
-        );
+        )
     }
 
     return (
@@ -191,7 +191,7 @@ export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
                    rowExpansionTemplate={rowExpansionTemplate}
                    dataKey="id">
             <Column expander={true}/>
-            <Column field="id" style={{width: '30px'}}/>
+            <Column field="id" style={{width: '34px', padding: '0px 2px'}}/>
 
             <Column field="operation" style={{width: '30px'}}/>
             <Column field="enterOrderNumber" style={{overflow: 'auto'}}/>
@@ -219,4 +219,4 @@ export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
             <Column field="leftQuantity" style={{width: '50px'}}/>
         </DataTable>
     )
-};
+}

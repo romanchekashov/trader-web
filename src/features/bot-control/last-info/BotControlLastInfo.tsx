@@ -5,6 +5,8 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import "./BotControlLastInfo.css";
 import {TradingStrategyResult} from "../../../common/data/history/TradingStrategyResult";
 import moment = require("moment");
+import {BotState} from "../running-strategy/bot-state/BotState";
+import {RunningStrategyTable} from "../running-strategy/table/RunningStrategyTable";
 
 type Props = {
     results: TradingStrategyResult[]
@@ -17,7 +19,8 @@ export const BotControlLastInfo: React.FC<Props> = ({results, onStrategyResultSe
     const [resultsMap, setResultsMap] = useState({});
     const [selectedResult, setSelectedResult] = useState<TradingStrategyResult>(null);
 
-    const onResultSelected = (result: TradingStrategyResult): void => {
+    const onResultSelected = (tsId: number): void => {
+        const result = results.find(value => value.tradingStrategyData.id === tsId)
         setSelectedResult(result)
         onStrategyResultSelected(result)
     }
@@ -31,7 +34,7 @@ export const BotControlLastInfo: React.FC<Props> = ({results, onStrategyResultSe
             <div className={className}
                  style={style}
                  key={result.tradingStrategyData.id}
-                 onClick={event => onResultSelected(result)}>
+                 onClick={event => onResultSelected(result.tradingStrategyData.id)}>
                 <div>
                     <strong>{result.tradingStrategyData.id}</strong> {result.tradingStrategyData.name}
                 </div>
@@ -57,21 +60,26 @@ export const BotControlLastInfo: React.FC<Props> = ({results, onStrategyResultSe
 
     if (results.length > 0) {
         return (
-            <div className="p-grid bot-control-demo" style={{height: outerHeight || 200}}>
-                <AutoSizer>
-                    {({height, width}) => (
-                        <List
-                            className="List"
-                            height={height}
-                            itemCount={results.length}
-                            itemSize={60}
-                            width={width}
-                        >
-                            {Row}
-                        </List>
-                    )}
-                </AutoSizer>
-            </div>
+            <>
+                {/*<div className="p-grid bot-control-demo" style={{height: outerHeight || 200}}>
+                    <AutoSizer>
+                        {({height, width}) => (
+                            <List
+                                className="List"
+                                height={height}
+                                itemCount={results.length}
+                                itemSize={60}
+                                width={width}
+                            >
+                                {Row}
+                            </List>
+                        )}
+                    </AutoSizer>
+                </div>*/}
+                <RunningStrategyTable results={results}
+                                      onSelectedTsId={onResultSelected}/>
+                <BotState tradingStrategyResult={selectedResult}/>
+            </>
         )
     } else {
         return (

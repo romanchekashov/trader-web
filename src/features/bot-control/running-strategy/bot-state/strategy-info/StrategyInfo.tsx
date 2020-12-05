@@ -8,6 +8,7 @@ import {TradingStrategyStatus} from "../../../../../common/data/trading/TradingS
 import moment = require("moment");
 import "./StrategyInfo.css"
 import {StrategyStat} from "./StrategyStat";
+import {SecurityInfo} from "../../../../../common/data/security/SecurityInfo";
 
 type Props = {
     tradingStrategyResult: TradingStrategyResult
@@ -26,21 +27,25 @@ export const StrategyInfo: React.FC<Props> = ({tradingStrategyResult}) => {
     const momentStartDate = moment(tradingStrategyResult.tradingStrategyData.start)
     const momentEndDate = moment(tradingStrategyResult.tradingStrategyData.end || new Date())
 
+    const security: SecurityInfo = tradingStrategyResult.tradingStrategyData.security
+
     return (
         <div className="p-grid strategy-info">
-            <div className="p-col-12 strategy-info-short-info" style={{paddingBottom: "0"}}>
+            <div className="p-col-6 strategy-info-short-info" style={{paddingBottom: "0"}}>
                 <div>{tradingStrategyResult.tradingStrategyData.name}-{tradingStrategyResult.tradingStrategyData.id}</div>
-                <div>{tradingStrategyResult.tradingStrategyData.security.secCode}</div>
+                <div><strong>{security.shortName}</strong>({security.secCode})</div>
                 <div>D: {tradingStrategyResult.tradingStrategyData.deposit}</div>
             </div>
-            <div className="p-col-12">
-                {tradingStrategyResult.tradingStrategyData.status}
+            <div className="p-col-6">
+                <strong>{tradingStrategyResult.tradingStrategyData.status}</strong>
                 <Button label="Start" className="p-button-success bot-control-button"
                         onClick={(e) => switchBotStatus(tradingStrategyResult.tradingStrategyData.id, TradingStrategyStatus.RUNNING)}
                         disabled={TradingStrategyStatus.FINISHED === tradingStrategyResult.tradingStrategyData.status || TradingStrategyStatus.RUNNING === tradingStrategyResult.tradingStrategyData.status}/>
+                {/*
                 <Button label="Stop" className="p-button-warning bot-control-button"
                         onClick={(e) => switchBotStatus(tradingStrategyResult.tradingStrategyData.id, TradingStrategyStatus.STOPPED)}
                         disabled={TradingStrategyStatus.FINISHED === tradingStrategyResult.tradingStrategyData.status || TradingStrategyStatus.STOPPED === tradingStrategyResult.tradingStrategyData.status}/>
+                */}
                 <Button label="Finish" className="p-button-danger bot-control-button"
                         onClick={(e) => switchBotStatus(tradingStrategyResult.tradingStrategyData.id, TradingStrategyStatus.FINISHED)}
                         disabled={TradingStrategyStatus.FINISHED === tradingStrategyResult.tradingStrategyData.status}/>
