@@ -33,6 +33,7 @@ import {TradeStrategyAnalysisFilterDto} from "../../../common/data/TradeStrategy
 import {FilterDto} from "../../../common/data/FilterDto";
 import moment = require("moment");
 import {SupplyAndDemand} from "./supply-and-demand/SupplyAndDemand";
+import {getTimeFrameHigh, getTimeFrameLow} from "../../../common/utils/TimeFrameChooser";
 
 type Props = {
     security: SecurityLastInfo
@@ -58,15 +59,16 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
     const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate());
     const [premiseBefore, setPremiseBefore] = useState<Date>(null)
 
-    const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M3);
-    const [timeFrameMin, setTimeFrameMin] = useState(Interval.M1);
+    const [timeFrameTrading, setTimeFrameTrading] = useState<Interval>(Interval.M3);
+    const [timeFrameMin, setTimeFrameMin] = useState<Interval>(Interval.M1);
+    const [timeFrameHigh, setTimeFrameHigh] = useState<Interval>(Interval.M30);
     const [premise, setPremise] = useState(null);
     const [orders, setOrders] = useState<Order[]>([]);
     const [stopOrders, setStopOrders] = useState<StopOrder[]>([]);
     const [activeTrade, setActiveTrade] = useState(null);
 
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
-    const [chartNumber, setChartNumber] = useState(1);
+    const [chartNumber, setChartNumber] = useState<number>(2);
 
     const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
     const [chart1Width, setChart1Width] = useState(MIN_CHART_WIDTH);
@@ -261,6 +263,8 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
 
     const onTradingIntervalChanged = (interval: Interval) => {
         setTimeFrameTrading(interval)
+        setTimeFrameHigh(getTimeFrameHigh(interval))
+        setTimeFrameMin(getTimeFrameLow(interval))
         fetchPremise(interval)
         updateMarketStateFilterDto(interval)
     }
@@ -314,7 +318,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                     </div>
                     <TrendsView trends={premise ? premise.analysis.trends : []}/>
                     <div className="p-grid" style={{margin: '0'}}>
-                        <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref}
+                        <div className="p-col-12" ref={chart1Ref}
                              style={{padding: '0'}}>
                             <ChartWrapper interval={timeFrameTrading}
                                           initialNumberOfCandles={500}
@@ -332,9 +336,9 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                         </div>
                         {
                             chartNumber === 2 ? (
-                                <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
-                                    <ChartWrapper interval={timeFrameMin}
-                                                  start={start}
+                                <div className="p-col-12" ref={chart2Ref} style={{padding: '0'}}>
+                                    <ChartWrapper interval={timeFrameHigh}
+                                                  // start={start}
                                                   initialNumberOfCandles={500}
                                                   onIntervalChanged={interval => {
                                                   }}
@@ -344,7 +348,6 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                                                   security={securityLastInfo}
                                                   premise={premise}
                                                   trades={trades}
-                                                  trend={trendLowTF}
                                                   showGrid={true}/>
                                 </div>
                             ) : null

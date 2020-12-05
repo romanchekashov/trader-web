@@ -94,35 +94,20 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                 {/*<div className="p-col-12" style={{padding: 0}}>
                     <Filter filter={filterData} onStart={this.onStart}/>
                 </div>*/}
-                <div className="p-col-12">
-                    <div className="p-grid">
-                        <div className="p-col">
-                            <div className="p-grid">
-                                <div className={classDataTable}>
-                                    <div className="p-grid analysis-securities">
-                                        <Securities onSelectRow={this.onSelectRow}/>
-                                    </div>
-                                </div>
-                                <div className={classDetails}>
-                                    {
-                                        !selectedSecurity ? <div>Select security</div>
-                                            : Market.SPB === selectedSecurity.market ?
-                                            <AnalysisTinkoff security={selectedSecurity}/>
-                                            : ClassCode.SPBFUT === selectedSecurity.classCode ?
-                                                <AnalysisFutures security={selectedSecurity}/> :
-                                                <Analysis security={selectedSecurity}/>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        {
-                            isDetailsShown ?
-                                <div className="p-col-fixed" style={{width: '240px', padding: 0}}>
-
-                                </div>
-                                : null
-                        }
+                <div className={classDataTable}>
+                    <div className="p-grid analysis-securities">
+                        <Securities onSelectRow={this.onSelectRow}/>
                     </div>
+                </div>
+                <div className={classDetails}>
+                    {
+                        !selectedSecurity ? <div>Select security</div>
+                            : Market.SPB === selectedSecurity.market ?
+                            <AnalysisTinkoff security={selectedSecurity}/>
+                            : ClassCode.SPBFUT === selectedSecurity.classCode ?
+                                <AnalysisFutures security={selectedSecurity}/> :
+                                <Analysis security={selectedSecurity}/>
+                    }
                 </div>
             </div>
         )

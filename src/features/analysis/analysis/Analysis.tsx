@@ -30,6 +30,7 @@ import {MarketStateFilterDto} from "../../../common/components/market-state/data
 import {TradeStrategyAnalysisFilterDto} from "../../../common/data/TradeStrategyAnalysisFilterDto";
 import {FilterDto} from "../../../common/data/FilterDto";
 import moment = require("moment");
+import {getTimeFrameHigh, getTimeFrameLow} from "../../../common/utils/TimeFrameChooser";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -55,14 +56,15 @@ const Analysis: React.FC<Props> = ({security}) => {
     };
 
     const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate());
-    const [timeFrameTrading, setTimeFrameTrading] = useState(Interval.M60);
-    const [timeFrameMin, setTimeFrameMin] = useState(Interval.M5);
+    const [timeFrameTrading, setTimeFrameTrading] = useState<Interval>(Interval.M60);
+    const [timeFrameMin, setTimeFrameMin] = useState<Interval>(Interval.M5);
+    const [timeFrameHigh, setTimeFrameHigh] = useState<Interval>(Interval.DAY);
     const [premise, setPremise] = useState(null);
     const [orders, setOrders] = useState(null);
     const [activeTrade, setActiveTrade] = useState(null);
 
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
-    const [chartNumber, setChartNumber] = useState(1);
+    const [chartNumber, setChartNumber] = useState<number>(2);
 
     const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
     const [chart1Width, setChart1Width] = useState(CHART_MIN_WIDTH);
@@ -225,10 +227,11 @@ const Analysis: React.FC<Props> = ({security}) => {
     };
 
     const onTradingIntervalChanged = (interval: Interval) => {
-        console.log(interval);
-        setTimeFrameTrading(interval);
-        fetchPremise(interval);
-        updateMarketStateFilterDto(interval);
+        setTimeFrameTrading(interval)
+        setTimeFrameHigh(getTimeFrameHigh(interval))
+        setTimeFrameMin(getTimeFrameLow(interval))
+        fetchPremise(interval)
+        updateMarketStateFilterDto(interval)
     };
 
     const onStartChanged = (start: Date) => {
@@ -262,7 +265,7 @@ const Analysis: React.FC<Props> = ({security}) => {
                     </div>
                     <TrendsView trends={premise ? premise.analysis.trends : []}/>
                     <div className="p-grid" style={{margin: '0'}}>
-                        <div className={chartNumber === 2 ? "p-col-7" : "p-col-12"} ref={chart1Ref}
+                        <div className="p-col-12" ref={chart1Ref}
                              style={{padding: '0'}}>
                             <ChartWrapper interval={timeFrameTrading}
                                           initialNumberOfCandles={500}
@@ -277,8 +280,8 @@ const Analysis: React.FC<Props> = ({security}) => {
                         </div>
                         {
                             chartNumber === 2 ? (
-                                <div className="p-col-5" ref={chart2Ref} style={{padding: '0'}}>
-                                    <ChartWrapper interval={timeFrameMin}
+                                <div className="p-col-12" ref={chart2Ref} style={{padding: '0'}}>
+                                    <ChartWrapper interval={timeFrameHigh}
                                                   initialNumberOfCandles={500}
                                                   onIntervalChanged={interval => {
                                                   }}
@@ -287,7 +290,6 @@ const Analysis: React.FC<Props> = ({security}) => {
                                                   width={chart2Width}
                                                   security={securityLastInfo}
                                                   premise={premise}
-                                                  trend={trendLowTF}
                                                   showGrid={true}/>
                                 </div>
                             ) : null
