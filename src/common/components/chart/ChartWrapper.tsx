@@ -201,7 +201,7 @@ export class ChartWrapper extends React.Component<Props, States> {
             this.setState({innerStart: start})
         }
 
-        if (prevProps.security !== security && prevProps.security?.secCode !== security.secCode) {
+        if (prevProps.security !== security && prevProps.security?.secCode !== security?.secCode) {
             this.fetchTrendLines(interval)
         }
     };
@@ -271,13 +271,15 @@ export class ChartWrapper extends React.Component<Props, States> {
     };
 
     fetchTrendLines = (interval: Interval): void => {
-        const {security} = this.props;
-        getTrendLines({
-            brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
-            tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
-            secId: security.id,
-            interval
-        }).then(this.setTrendLinesFromServer).catch((e) => console.error(e));
+        const {security} = this.props
+        if (security) {
+            getTrendLines({
+                brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
+                tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
+                secId: security.id,
+                interval
+            }).then(this.setTrendLinesFromServer).catch((e) => console.error(e))
+        }
     }
 
     setTrendLinesFromServer = (trendLinesFromServer: TrendLineDto[]): void => {

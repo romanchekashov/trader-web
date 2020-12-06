@@ -4,8 +4,10 @@ import {MarketSecurityAnalysisInfo} from "./MarketSecurityAnalysisInfo";
 import {MarketStateDto} from "../../components/market-state/data/MarketStateDto";
 import {SwingStateDto} from "../../components/swing-state/data/SwingStateDto";
 import {MarketStateIntervalDto} from "../../components/market-state/data/MarketStateIntervalDto";
+import {SecurityLastInfo} from "../security/SecurityLastInfo";
 
 export class TradePremise {
+    public security: SecurityLastInfo
     public analysis: MarketSecurityAnalysisInfo
     public sentiment: OngoingAnalysis
     public priceActionSetup: PriceActionSetup

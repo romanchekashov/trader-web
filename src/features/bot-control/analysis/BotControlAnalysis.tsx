@@ -20,15 +20,16 @@ import {Trade} from "../../../common/data/Trade";
 import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
 import {BrokerId} from "../../../common/data/BrokerId";
 import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
-import moment = require("moment");
 import {getTimeFrameHigh, getTimeFrameLow} from "../../../common/utils/TimeFrameChooser";
+import moment = require("moment");
+import {TradePremise} from "../../../common/data/strategy/TradePremise";
 
 export interface AnalysisState {
     realDepo: boolean
 }
 
 type Props = {
-    security: any
+    security: SecurityLastInfo
     tradingStrategyResult: TradingStrategyResult
 }
 
@@ -51,14 +52,14 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
     const [tfHigh, setTFHigh] = useState<Interval>(null)
     const [timeFrameTrading, setTimeFrameTrading] = useState<Interval>(null)
     const [timeFrameMin, setTimeFrameMin] = useState<Interval>(null)
-    const [premise, setPremise] = useState(null)
+    const [premise, setPremise] = useState<TradePremise>(null)
     const [orders, setOrders] = useState(null)
     const [activeTrade, setActiveTrade] = useState(null)
 
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}))
     const [chartNumber, setChartNumber] = useState<number>(2)
 
-    const [securityLastInfo, setSecurityLastInfo] = useState(null)
+    const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null)
     const [chart1Width, setChart1Width] = useState(CHART_MIN_WIDTH)
     const [chart2Width, setChart2Width] = useState(CHART_MIN_WIDTH)
     const [chartAlertsWidth, setChartAlertsWidth] = useState(CHART_MIN_WIDTH)
@@ -98,6 +99,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             setHasData(true)
             const trades = tradingStrategyResult.tradingStrategyData.trades
             setTsTrade(trades.length > 0 ? trades[0] : null)
+            setSecurityLastInfo(security)
         } else {
             setHasData(false)
         }

@@ -28,6 +28,7 @@ import {EconomicCalendar} from "../../common/components/economic-calendar/Econom
 import {WebsocketService, WSEvent} from "../../common/api/WebsocketService";
 import {adjustTradingStrategyResultArray} from "../../common/utils/DataUtils";
 import {TradingStrategyStatus} from "../../common/data/trading/TradingStrategyStatus";
+import {SecurityLastInfo} from "../../common/data/security/SecurityLastInfo";
 
 type Props = {}
 
@@ -42,8 +43,8 @@ export const BotControlPage: React.FC<Props> = ({}) => {
 
     const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null)
     const [activeItem, setActiveItem] = useState<any>(items[0])
-    const [selectedSecurity, setSelectedSecurity] = useState<any>(null)
-    const [selectedTSResult, setSelectedTSResult] = useState<any>(null)
+    const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
+    const [selectedTSResult, setSelectedTSResult] = useState<TradingStrategyResult>(null)
     const [nonRunning, setNonRunning] = useState<TradingStrategyResult[]>([])
     const [running, setRunning] = useState<TradingStrategyResult[]>([])
     const [selectedTsId, setSelectedTsId] = useState<number>(null)
@@ -117,12 +118,14 @@ export const BotControlPage: React.FC<Props> = ({}) => {
 
     const onStrategyResultSelected = (result: TradingStrategyResult): void => {
         setSelectedTSResult(result)
-        setSelectedSecurity(getSecurity(result.tradingStrategyData.security.classCode,
-            result.tradingStrategyData.security.secCode))
+        setSelectedSecurity(result.tradePremise?.security)
 
         if (result.tradingStrategyData.id) {
             searchByTradingStrategyId(result.tradingStrategyData.id)
-                .then(setSelectedTSResult)
+                .then(tsResult => {
+                    setSelectedTSResult(tsResult)
+                    setSelectedSecurity(tsResult.tradePremise?.security)
+                })
                 .catch(console.error)
         }
     }
