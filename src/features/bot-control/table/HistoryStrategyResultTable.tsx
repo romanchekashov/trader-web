@@ -203,17 +203,17 @@ export const HistoryStrategyResultTable: React.FC<Props> = ({stat}) => {
             <Column field="state" style={{overflow: 'auto'}}/>
 
             <Column field="stopPrice"/>
-            <Column field="targetPrice1"/>
-            <Column field="targetPrice2"/>
-            <Column field="lastWholesalePrice"/>
+            <Column field="firstTargetPrice"/>
+            <Column field="secondTargetPrice"/>
+            <Column field="entryPrice"/>
             <Column field="lastRewardRiskRatioPrice"/>
             <Column field="quantity" style={{width: '50px'}}/>
 
-            <Column field="realEntryQuantity" style={{width: '50px'}}/>
-            <Column field="realEntryPrice"/>
-            <Column field="realStoppedPrice"/>
-            <Column field="realTargetPrice1"/>
-            <Column field="realTargetPrice2"/>
+            <Column field="entryRealQuantity" style={{width: '50px'}}/>
+            <Column field="entryRealPrice"/>
+            <Column field="stopRealPrice"/>
+            <Column field="firstTargetRealPrice"/>
+            <Column field="secondTargetRealPrice"/>
             <Column field="realKillPrice"/>
             <Column field="realKillExceptionPrice"/>
             <Column field="leftQuantity" style={{width: '50px'}}/>

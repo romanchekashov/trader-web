@@ -64,7 +64,7 @@ const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHis
         end: null,
         debug: false,
         systemType: TradeSystemType.HISTORY,
-        strategy: TradingStrategyName.SWING
+        strategy: TradingStrategyName.SR_LEVEL
     }
 
     const brokers = filter ? filter.brokers : []
@@ -114,8 +114,9 @@ const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHis
     const [canTrade, setCanTrade] = useState<boolean>(false)
 
     const strategies: PrimeDropdownItem<TradingStrategyName>[] = [
-        TradingStrategyName.SWING,
+        TradingStrategyName.SR_LEVEL,
         TradingStrategyName.GERCHIK,
+        TradingStrategyName.SWING,
         TradingStrategyName.UNIVERSAL_2EMA_KEL,
         TradingStrategyName.TWO_EMA_CROSS,
         TradingStrategyName.KELTNER_CHANNEL].map(val => ({label: val, value: val}))

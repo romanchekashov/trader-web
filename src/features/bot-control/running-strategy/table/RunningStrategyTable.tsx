@@ -9,18 +9,14 @@ import TreeNode from "primereact/components/treenode/TreeNode";
 import {TradingStrategyResult} from "../../../../common/data/history/TradingStrategyResult";
 import {ClassCode} from "../../../../common/data/ClassCode";
 import {JournalTradeDto} from "../../../../common/data/journal/JournalTradeDto";
-import {OperationType} from "../../../../common/data/OperationType";
 import {TradingStrategyTrade} from "../../../../common/data/history/TradingStrategyTrade";
 import {TradingStrategyTradeState} from "../../../../common/data/history/TradingStrategyTradeState";
 import {TradeSystemType} from "../../../../common/data/trading/TradeSystemType";
 import moment = require("moment");
 
-export interface RunningStrategyTableState {
-    expandedRows: TradingStrategyResult[]
-}
-
 interface TableElementData {
     id: number
+    start: string
     name: string
     type: TradeSystemType
     secName: string
@@ -35,13 +31,9 @@ type Props = {
 }
 
 export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId}) => {
-    let initState: RunningStrategyTableState = {
-        expandedRows: []
-    }
-
     const [selectedTsId, setSelectedTsId] = useState<number>(null)
     const classCodes = [ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
-    const [expandedRows, setExpandedRows] = useState(initState.expandedRows)
+    const [selectedRows, setSelectedRows] = useState<TableElementData[]>([])
 
     const mapToData = (results: TradingStrategyResult[]): TableElementData[] => (results
         .map(result => {
@@ -50,6 +42,7 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
 
             return {
                 id: result.tradingStrategyData.id,
+                start: moment(result.tradingStrategyData.start).format("DD-MM-YY HH:mm"),
                 name: result.tradingStrategyData.name,
                 type: result.tradingStrategyData.systemType,
                 secName: result.tradingStrategyData.security.shortName,
@@ -75,26 +68,7 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
             })
         });
         return nodes;
-    };
-
-    const onRowToggle = (e) => {
-        setExpandedRows(e.data);
-    };
-
-    const rowExpansionTemplate = (data: any) => {
-        return data.trades.map(trade => {
-            return (
-                <div className="p-grid" key={trade.id}>
-                    <div className="p-col-1">{trade.id}</div>
-                    <div className="p-col-1">{trade.operation === OperationType.SELL ? 'SELL' : 'BUY'}</div>
-                    <div className="p-col-1">{trade.price}</div>
-                    <div className="p-col-1">{trade.quantity}</div>
-                    <div className="p-col-1">{trade.value}</div>
-                    <div className="p-col-1">{moment(trade.dateTime).format("DD-MM-YYYY HH:mm:ss")}</div>
-                </div>
-            );
-        });
-    };
+    }
 
     const isShortTemplate = (rowData: any, {field}) => {
         return rowData[field] ? <span className="fin-short">S</span> : <span className="fin-long">L</span>;
@@ -162,49 +136,9 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
         return className
     }
 
-    const headerGroup = (
-        <ColumnGroup>
-            <Row>
-                <Column header="" style={{width: '10px'}}/>
-                <Column header="№" style={{width: '10px'}}/>
-                <Column header="Strategy" style={{width: '30px'}}/>
-                <Column header="Type" style={{width: '20px'}}/>
-                <Column header="Sec. Name" style={{width: '30px'}}/>
-                <Column header="Deposit" style={{width: '30px'}}/>
-                <Column header="Result" style={{width: '30px'}}/>
-                <Column header="Last Trade" style={{width: '30px'}}/>
-
-                {/*<Column header="Op." style={{width: '30px'}}/>*/}
-                {/*<Column header="In Order N."/>*/}
-                {/*<Column header="Stop Order TransId"/>*/}
-                {/*<Column header="T1 Order N."/>*/}
-                {/*<Column header="T2 Order N."/>*/}
-                {/*<Column header="Kill Order N."/>*/}
-                {/*<Column header="Kill Exc. Order N."/>*/}
-                {/*<Column header="State"/>*/}
-
-                {/*<Column header="Stop"/>*/}
-                {/*<Column header="T1"/>*/}
-                {/*<Column header="T2"/>*/}
-                {/*<Column header="Last Wholesale Price"/>*/}
-                {/*<Column header="Last Reward Risk Ratio Price"/>*/}
-                {/*<Column header="Qty" style={{width: '50px'}}/>*/}
-
-                {/*<Column header="Real In Qty" style={{width: '50px'}}/>*/}
-                {/*<Column header="Real In"/>*/}
-                {/*<Column header="Real Stop"/>*/}
-                {/*<Column header="Real T1"/>*/}
-                {/*<Column header="Real T2"/>*/}
-                {/*<Column header="Real Kill"/>*/}
-                {/*<Column header="Real Kill Exc."/>*/}
-                {/*<Column header="Left Qty" style={{width: '50px'}}/>*/}
-            </Row>
-        </ColumnGroup>
-    )
-
     const sum = () => {
-        const sum = results
-            .map(value => value.stat?.totalGainAndLoss || 0)
+        const sum = selectedRows
+            .map(value => value.total || 0)
             .reduce((a, b) => a + b, 0)
         return Math.floor(sum)
     }
@@ -222,28 +156,32 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
     return (
         <DataTable value={mapToData(results)}
                    className="history-strategy-result-table"
-                   headerColumnGroup={headerGroup}
                    footerColumnGroup={footerGroup}
-                   expandedRows={expandedRows}
-                   onRowClick={e => onSelectedTsId(e.data.id)}
-            // onRowToggle={onRowToggle}
-            rowClassName={rowBgColor}
-            // rowExpansionTemplate={rowExpansionTemplate}
+                   onRowClick={e => {
+                       if (e.originalEvent.target["innerHTML"].indexOf('checkbox') === -1) {
+                           onSelectedTsId(e.data.id)
+                       }
+                   }}
+                   rowClassName={rowBgColor}
                    dataKey="id"
+                   selection={selectedRows}
+                   onSelectionChange={e => {
+                       setSelectedRows(e.value)
+                   }}
                    paginator
                    paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
                    rows={15}
-                   rowsPerPageOptions={[15,20,50]}>
-
-            <Column expander={true}/>
-            <Column field="id" style={{width: '10px'}}/>
-            <Column field="name" style={{width: '30px'}}/>
-            <Column field="type" style={{width: '20px'}}/>
-            <Column field="secName" style={{width: '30px'}}/>
-            <Column field="deposit" style={{width: '30px'}}/>
-            <Column field="total" style={{width: '30px'}}/>
-            <Column field="lastTradeState" style={{width: '30px'}}/>
+                   rowsPerPageOptions={[15, 20, 50]}>
+            <Column selectionMode="multiple" headerStyle={{width: '10px'}}/>
+            <Column field="id" style={{width: '10px'}} header="№" headerStyle={{width: '10px'}}/>
+            <Column field="name" style={{width: '30px'}} header="Strategy" headerStyle={{width: '30px'}}/>
+            <Column field="type" style={{width: '20px'}} header="Type" headerStyle={{width: '20px'}}/>
+            <Column field="start" style={{width: '30px'}} header="Start" headerStyle={{width: '30px'}}/>
+            <Column field="secName" style={{width: '30px'}} header="Sec. Name" headerStyle={{width: '30px'}}/>
+            <Column field="deposit" style={{width: '30px'}} header="Deposit" headerStyle={{width: '30px'}}/>
+            <Column field="total" style={{width: '30px'}} header="Result" headerStyle={{width: '30px'}}/>
+            <Column field="lastTradeState" style={{width: '30px'}} header="Last Trade" headerStyle={{width: '30px'}}/>
 
             {/*<Column field="operation" style={{width: '30px'}}/>*/}
             {/*<Column field="enterOrderNumber" style={{overflow: 'auto'}}/>*/}
@@ -271,4 +209,4 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
             {/*<Column field="leftQuantity" style={{width: '50px'}}/>*/}
         </DataTable>
     )
-};
+}

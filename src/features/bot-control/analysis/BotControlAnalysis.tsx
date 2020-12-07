@@ -48,7 +48,8 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
         "MONTH": [Interval.MONTH, Interval.WEEK]
     }
 
-    const [start, setStart] = useState(moment().subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate())
+    const [start, setStart] = useState<Date>(null)
+    const [startHigh, setStartHigh] = useState<Date>(null)
     const [tfHigh, setTFHigh] = useState<Interval>(null)
     const [timeFrameTrading, setTimeFrameTrading] = useState<Interval>(null)
     const [timeFrameMin, setTimeFrameMin] = useState<Interval>(null)
@@ -100,6 +101,9 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             const trades = tradingStrategyResult.tradingStrategyData.trades
             setTsTrade(trades.length > 0 ? trades[0] : null)
             setSecurityLastInfo(security)
+            const startDate = getAdjustedStart(tradingStrategyResult?.tradingStrategyData?.start)
+            setStart(moment(startDate).subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate())
+            setStartHigh(moment(startDate).subtract(15, 'days').hours(9).minutes(0).seconds(0).toDate())
         } else {
             setHasData(false)
         }
@@ -141,9 +145,9 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
         setTimeout(updateSize, 1000)
     }
 
-    const getAdjustedStart = (): Date => {
-        if (tradingStrategyResult?.tradingStrategyData) {
-            let mDate = moment(tradingStrategyResult.tradingStrategyData.start).subtract(1, 'days')
+    const getAdjustedStart = (start: Date): Date => {
+        if (start) {
+            let mDate = moment(start).subtract(1, 'days')
             while (mDate.day() === 0 || mDate.day() === 6) mDate.subtract(1, 'days')
             return mDate.toDate()
         }
@@ -194,7 +198,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                 <div className="p-col-12" ref={chart1Ref} style={{padding: '0'}}>
                     <ChartWrapper interval={timeFrameTrading}
                                   initialNumberOfCandles={1000}
-                                  start={getAdjustedStart()}
+                                  start={start}
                                   onPremiseBeforeChanged={onPremiseBeforeChanged}
                                   onIntervalChanged={interval => {
                                   }}
@@ -212,7 +216,8 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                     chartNumber === 2 ? (
                         <div className="p-col-12" ref={chart2Ref} style={{padding: '0'}}>
                             <ChartWrapper interval={tfHigh}
-                                          initialNumberOfCandles={200}
+                                          initialNumberOfCandles={500}
+                                          start={startHigh}
                                           onIntervalChanged={interval => {
                                           }}
                                           onStartChanged={start => {

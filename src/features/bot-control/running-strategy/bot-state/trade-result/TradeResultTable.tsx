@@ -6,13 +6,13 @@ import {DataTable} from "primereact/datatable";
 import {ColumnGroup} from "primereact/columngroup";
 import {Row} from "primereact/row";
 import TreeNode from "primereact/components/treenode/TreeNode";
-import moment = require("moment");
 import {TradingStrategyTrade} from "../../../../../common/data/history/TradingStrategyTrade";
 import {TradingStrategyTradeState} from "../../../../../common/data/history/TradingStrategyTradeState";
 import {TradeSystemType} from "../../../../../common/data/trading/TradeSystemType";
 import {ClassCode} from "../../../../../common/data/ClassCode";
 import {JournalTradeDto} from "../../../../../common/data/journal/JournalTradeDto";
 import {OperationType} from "../../../../../common/data/OperationType";
+import moment = require("moment");
 
 export interface RunningStrategyTableState {
     expandedRows: TradingStrategyTrade[]
@@ -114,15 +114,15 @@ export const TradeResultTable: React.FC<Props> = ({tsTrades}) => {
     };
 
     const getTotalGainAndLoss = (tsTrade: TradingStrategyTrade): number => {
-        let totalGainAndLoss = 0;
+        let totalGainAndLoss = 0
         tsTrade.trades.forEach(trade => {
-            if (trade.operation === tsTrade.operation) {
-                totalGainAndLoss += trade.value;
+            if (trade.operation !== tsTrade.operation) {
+                totalGainAndLoss += trade.value
             } else {
-                totalGainAndLoss -= trade.value;
+                totalGainAndLoss -= trade.value
             }
-        });
-        return totalGainAndLoss;
+        })
+        return tsTrade.operation === OperationType.BUY ? totalGainAndLoss : -totalGainAndLoss
     }
 
     const rowBgColor = (tsTrade: TradingStrategyTrade): any => {

@@ -43,6 +43,7 @@ export const BotControlPage: React.FC<Props> = ({}) => {
 
     const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null)
     const [activeItem, setActiveItem] = useState<any>(items[0])
+    const [activeIndex, setActiveIndex] = useState<number>(0)
     const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
     const [selectedTSResult, setSelectedTSResult] = useState<TradingStrategyResult>(null)
     const [nonRunning, setNonRunning] = useState<TradingStrategyResult[]>([])
@@ -53,13 +54,7 @@ export const BotControlPage: React.FC<Props> = ({}) => {
         getFilterData(false)
             .then(setFilterData)
 
-        getAllStrategies()
-            .then(results => {
-                setNonRunning(results
-                    .filter(value => value.tradingStrategyData.status !== TradingStrategyStatus.RUNNING)
-                    .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id))
-            })
-            .catch(console.error)
+        reloadHistory()
     }, [])
 
     useEffect(() => {
@@ -87,6 +82,21 @@ export const BotControlPage: React.FC<Props> = ({}) => {
             if (tradingStrategiesStatesSubscription) tradingStrategiesStatesSubscription.unsubscribe()
         }
     }, [selectedTsId])
+
+    const tabSelected = (index: number): void => {
+        setActiveIndex(index)
+        if (index === 1) reloadHistory()
+    }
+
+    const reloadHistory = () => {
+        getAllStrategies()
+            .then(results => {
+                setNonRunning(results
+                    .filter(value => value.tradingStrategyData.status !== TradingStrategyStatus.RUNNING)
+                    .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id))
+            })
+            .catch(console.error)
+    }
 
     const onStart = (data: MarketBotStartDto): void => {
         if (data.systemType === TradeSystemType.HISTORY) {
@@ -142,7 +152,7 @@ export const BotControlPage: React.FC<Props> = ({}) => {
             <div className="p-col-12">
                 <div className="p-grid">
                     <div className="p-col-6">
-                        <TabView>
+                        <TabView onTabChange={e => tabSelected(e.index)} activeIndex={activeIndex}>
                             <TabPanel header={"Running: " + running.length}>
                                 <RunningStrategy
                                     results={running}

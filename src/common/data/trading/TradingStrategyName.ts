@@ -1,6 +1,7 @@
 export enum TradingStrategyName {
-    SWING = 'SWING',
     GERCHIK = 'GERCHIK',
+    SR_LEVEL = 'SR_LEVEL',
+    SWING = 'SWING',
     TWO_EMA_CROSS = 'TWO_EMA_CROSS',
     KELTNER_CHANNEL = 'KELTNER_CHANNEL',
     UNIVERSAL_2EMA_KEL = 'UNIVERSAL_2EMA_KEL'
