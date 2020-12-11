@@ -13,13 +13,17 @@ import {BrokerId} from "../../common/data/BrokerId";
 import {RouteComponentProps} from "react-router-dom";
 import {getLastSecurities, getTradePremise} from "../../common/api/rest/analysisRestApi";
 import {ClassCode} from "../../common/data/ClassCode";
+import {Trend} from "../../common/data/strategy/Trend";
+import moment = require("moment");
 
 type RouteParams = {
     secId: string
+    premiseStart: string
 }
 
 export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> = ({match}) => {
     const secId: number = parseInt(match.params.secId)
+    const premiseStart = match.params.premiseStart ? moment(match.params.premiseStart, "DD-MM-YYYY_HH-mm").toDate() : null
     const CHART_HEIGHT = 600
     const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null);
     const [filter, setFilter] = useState<MarketBotStartDto>(null);
@@ -93,9 +97,9 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
         setSecurityLastInfo(secLastInfo)
         setTimeframe(secLastInfo.classCode)
         if (ClassCode.SPBFUT === secLastInfo.classCode) {
-            fetchPremise(secLastInfo, Interval.M3, Interval.M1)
+            fetchPremise(secLastInfo, Interval.M3, Interval.M1, premiseStart)
         } else {
-            fetchPremise(secLastInfo, Interval.H4, Interval.M60)
+            fetchPremise(secLastInfo, Interval.H4, Interval.M60, premiseStart)
         }
     }
 
@@ -113,79 +117,85 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
         }
     }
 
-    if (securityLastInfo) {
-        return (
-            <div className="p-grid sample-layout analysis">
-                <div className="p-col-12">
-                    <TrendsView trends={premise ? premise.analysis.trends : []}/>
-                </div>
-                <div className="p-col-12">
-                    <div className="p-grid">
-                        <div className="p-col-6" ref={chart1Ref} style={{padding: '0'}}>
-                            <ChartWrapper interval={timeFrame1}
-                                          initialNumberOfCandles={500}
-                                          onIntervalChanged={() => {
-                                          }}
-                                          onStartChanged={() => {
-                                          }}
-                                          width={chart1Width}
-                                          chartHeight={CHART_HEIGHT}
-                                          security={securityLastInfo}
-                                          premise={premise}
-                                          orders={orders}
-                                          activeTrade={activeTrade}
-                                          showGrid={true}/>
-                        </div>
-                        <div className="p-col-6" ref={chart2Ref} style={{padding: '0'}}>
-                            <ChartWrapper interval={timeFrame2}
-                                          initialNumberOfCandles={120}
-                                          onIntervalChanged={() => {
-                                          }}
-                                          onStartChanged={() => {
-                                          }}
-                                          width={chart2Width}
-                                          chartHeight={CHART_HEIGHT}
-                                          security={securityLastInfo}
-                                          premise={premise}
-                                          orders={orders}
-                                          activeTrade={activeTrade}
-                                          showGrid={true}/>
-                        </div>
-                        <div className="p-col-6" ref={chart3Ref} style={{padding: '0'}}>
-                            <ChartWrapper interval={timeFrame3}
-                                          initialNumberOfCandles={500}
-                                          onIntervalChanged={() => {
-                                          }}
-                                          onStartChanged={() => {
-                                          }}
-                                          width={chart3Width}
-                                          chartHeight={CHART_HEIGHT}
-                                          security={securityLastInfo}
-                                          premise={premise}
-                                          orders={orders}
-                                          activeTrade={activeTrade}
-                                          showGrid={true}/>
-                        </div>
-                        <div className="p-col-6" ref={chart4Ref} style={{padding: '0'}}>
-                            <ChartWrapper interval={timeFrame4}
-                                          initialNumberOfCandles={500}
-                                          onIntervalChanged={() => {
-                                          }}
-                                          onStartChanged={() => {
-                                          }}
-                                          width={chart4Width}
-                                          chartHeight={CHART_HEIGHT}
-                                          security={securityLastInfo}
-                                          premise={premise}
-                                          orders={orders}
-                                          activeTrade={activeTrade}
-                                          showGrid={true}/>
-                        </div>
+    const getTrend = (interval: Interval): Trend => {
+        return premise?.analysis?.trends.find(value => value.interval === interval)
+    }
+
+    if (!securityLastInfo) return (<div>No Data</div>)
+
+    return (
+        <div className="p-grid sample-layout analysis">
+            <div className="p-col-12">
+                <TrendsView trends={premise ? premise.analysis.trends : []}/>
+            </div>
+            <div className="p-col-12">
+                <div className="p-grid">
+                    <div className="p-col-6" ref={chart1Ref} style={{padding: '0'}}>
+                        <ChartWrapper interval={timeFrame1}
+                                      initialNumberOfCandles={500}
+                                      onIntervalChanged={() => {
+                                      }}
+                                      onStartChanged={() => {
+                                      }}
+                                      width={chart1Width}
+                                      chartHeight={CHART_HEIGHT}
+                                      security={securityLastInfo}
+                                      premise={premise}
+                                      trend={getTrend(timeFrame1)}
+                                      orders={orders}
+                                      activeTrade={activeTrade}
+                                      showGrid={true}/>
+                    </div>
+                    <div className="p-col-6" ref={chart2Ref} style={{padding: '0'}}>
+                        <ChartWrapper interval={timeFrame2}
+                                      initialNumberOfCandles={120}
+                                      onIntervalChanged={() => {
+                                      }}
+                                      onStartChanged={() => {
+                                      }}
+                                      width={chart2Width}
+                                      chartHeight={CHART_HEIGHT}
+                                      security={securityLastInfo}
+                                      premise={premise}
+                                      trend={getTrend(timeFrame2)}
+                                      orders={orders}
+                                      activeTrade={activeTrade}
+                                      showGrid={true}/>
+                    </div>
+                    <div className="p-col-6" ref={chart3Ref} style={{padding: '0'}}>
+                        <ChartWrapper interval={timeFrame3}
+                                      initialNumberOfCandles={500}
+                                      onIntervalChanged={() => {
+                                      }}
+                                      onStartChanged={() => {
+                                      }}
+                                      width={chart3Width}
+                                      chartHeight={CHART_HEIGHT}
+                                      security={securityLastInfo}
+                                      premise={premise}
+                                      trend={getTrend(timeFrame3)}
+                                      orders={orders}
+                                      activeTrade={activeTrade}
+                                      showGrid={true}/>
+                    </div>
+                    <div className="p-col-6" ref={chart4Ref} style={{padding: '0'}}>
+                        <ChartWrapper interval={timeFrame4}
+                                      initialNumberOfCandles={500}
+                                      onIntervalChanged={() => {
+                                      }}
+                                      onStartChanged={() => {
+                                      }}
+                                      width={chart4Width}
+                                      chartHeight={CHART_HEIGHT}
+                                      security={securityLastInfo}
+                                      premise={premise}
+                                      trend={getTrend(timeFrame4)}
+                                      orders={orders}
+                                      activeTrade={activeTrade}
+                                      showGrid={true}/>
                     </div>
                 </div>
             </div>
-        )
-    } else {
-        return (<div>No Data</div>)
-    }
+        </div>
+    )
 }

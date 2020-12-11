@@ -6,6 +6,7 @@ import {TradingChartsSecurity} from "./TradingChartsSecurity";
 export const TradingCharts = () => (
     <Switch>
         <Route exact path='/trading-charts' component={TradingChartsPage}/>
+        <Route path='/trading-charts/:secId/premise-start/:premiseStart' component={TradingChartsSecurity}/>
         <Route path='/trading-charts/:secId' component={TradingChartsSecurity}/>
     </Switch>
 )

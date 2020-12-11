@@ -13,6 +13,8 @@ import {TradingStrategyTrade} from "../../../../common/data/history/TradingStrat
 import {TradingStrategyTradeState} from "../../../../common/data/history/TradingStrategyTradeState";
 import {TradeSystemType} from "../../../../common/data/trading/TradeSystemType";
 import moment = require("moment");
+import {OperationType} from "../../../../common/data/OperationType";
+import {TradingStrategyStatus} from "../../../../common/data/trading/TradingStrategyStatus";
 
 interface TableElementData {
     id: number
@@ -21,6 +23,8 @@ interface TableElementData {
     type: TradeSystemType
     secName: string
     deposit: number
+    lastTradeOperation: OperationType
+    lastTradeEntryRealPrice: number
     lastTradeState: TradingStrategyTradeState
     total: number
 }
@@ -47,6 +51,8 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
                 type: result.tradingStrategyData.systemType,
                 secName: result.tradingStrategyData.security.shortName,
                 deposit: result.tradingStrategyData.deposit,
+                lastTradeOperation: lastTrade?.operation,
+                lastTradeEntryRealPrice: lastTrade?.entryRealPrice,
                 lastTradeState: lastTrade?.state,
                 total: result.stat?.totalGainAndLoss
             }
@@ -136,7 +142,19 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
         return className
     }
 
+    const isAllRunning = (): boolean => {
+        return results.length > 0 && results.length === results
+            .filter(value => value.tradingStrategyData.status === TradingStrategyStatus.RUNNING).length
+    }
+
     const sum = () => {
+        if (isAllRunning()) {
+            const sum = results
+                .map(value => value.stat?.totalGainAndLoss || 0)
+                .reduce((a, b) => a + b, 0)
+            return Math.floor(sum)
+        }
+
         const sum = selectedRows
             .map(value => value.total || 0)
             .reduce((a, b) => a + b, 0)
@@ -146,9 +164,8 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
     const footerGroup = (
         <ColumnGroup>
             <Row>
-                <Column footer="Totals:" colSpan={6} footerStyle={{textAlign: 'right'}}/>
+                <Column footer="Totals:" colSpan={10} footerStyle={{textAlign: 'right'}}/>
                 <Column footer={sum()}/>
-                <Column/>
             </Row>
         </ColumnGroup>
     )
@@ -180,8 +197,10 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
             <Column field="start" style={{width: '30px'}} header="Start" headerStyle={{width: '30px'}}/>
             <Column field="secName" style={{width: '30px'}} header="Sec. Name" headerStyle={{width: '30px'}}/>
             <Column field="deposit" style={{width: '30px'}} header="Deposit" headerStyle={{width: '30px'}}/>
+            <Column field="lastTradeOperation" style={{width: '30px'}} header="LT Op" headerStyle={{width: '30px'}}/>
+            <Column field="lastTradeEntryRealPrice" style={{width: '30px'}} header="LT Entry R" headerStyle={{width: '30px'}}/>
+            <Column field="lastTradeState" style={{width: '30px', overflow: 'hidden'}} header="LT State" headerStyle={{width: '30px'}}/>
             <Column field="total" style={{width: '30px'}} header="Result" headerStyle={{width: '30px'}}/>
-            <Column field="lastTradeState" style={{width: '30px'}} header="Last Trade" headerStyle={{width: '30px'}}/>
 
             {/*<Column field="operation" style={{width: '30px'}}/>*/}
             {/*<Column field="enterOrderNumber" style={{overflow: 'auto'}}/>*/}

@@ -63,7 +63,7 @@ const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHis
         start: null,
         end: null,
         debug: false,
-        systemType: TradeSystemType.HISTORY,
+        systemType: TradeSystemType.DEMO,
         strategy: TradingStrategyName.SR_LEVEL
     }
 
