@@ -11,7 +11,7 @@ import {WebsocketService, WSEvent} from "../../common/api/WebsocketService";
 import {adjustTradePremise} from "../../common/utils/DataUtils";
 import {Order} from "../../common/data/Order";
 import {ActiveTrade} from "../../common/data/ActiveTrade";
-import {TradingChartsSecurities} from "./TradingChartsSecurities";
+import {TradingChartsSecurities} from "./security/TradingChartsSecurities";
 import {TradingPlatform} from "../../common/data/trading/TradingPlatform";
 import {TrendsView} from "../../common/components/trend/TrendsView";
 import {TradeStrategyAnalysisFilterDto} from "../../common/data/TradeStrategyAnalysisFilterDto";

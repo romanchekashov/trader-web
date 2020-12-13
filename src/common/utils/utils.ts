@@ -85,7 +85,7 @@ export const OperationTypeColor = {
 export const getRecentBusinessDate = (date: Date): Date => {
     if (!date) return date
 
-    let mDate = moment(date).subtract(1, 'days')
+    let mDate = moment(date)
     while (mDate.day() === 0 || mDate.day() === 6) mDate.subtract(1, 'days')
     return mDate.toDate()
 }

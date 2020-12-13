@@ -1,23 +1,22 @@
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
-import {getFilterData} from "../../common/api/rest/botControlRestApi";
-import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
-import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
-import {CHART_MIN_WIDTH, ChartWrapper} from "../../common/components/chart/ChartWrapper";
-import {TradePremise} from "../../common/data/strategy/TradePremise";
-import {SecurityLastInfo} from "../../common/data/security/SecurityLastInfo";
-import {Interval} from "../../common/data/Interval";
-import {TradingPlatform} from "../../common/data/trading/TradingPlatform";
-import {TrendsView} from "../../common/components/trend/TrendsView";
-import {BrokerId} from "../../common/data/BrokerId";
+import {getFilterData} from "../../../common/api/rest/botControlRestApi";
+import {MarketBotFilterDataDto} from "../../../common/data/bot/MarketBotFilterDataDto";
+import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
+import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/ChartWrapper";
+import {TradePremise} from "../../../common/data/strategy/TradePremise";
+import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
+import {Interval} from "../../../common/data/Interval";
+import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
+import {TrendsView} from "../../../common/components/trend/TrendsView";
+import {BrokerId} from "../../../common/data/BrokerId";
 import {RouteComponentProps} from "react-router-dom";
-import {getLastSecurities, getTradePremise} from "../../common/api/rest/analysisRestApi";
-import {ClassCode} from "../../common/data/ClassCode";
-import {Trend} from "../../common/data/strategy/Trend";
+import {getLastSecurities, getTradePremise} from "../../../common/api/rest/analysisRestApi";
+import {ClassCode} from "../../../common/data/ClassCode";
+import {Trend} from "../../../common/data/strategy/Trend";
+import Notifications from "../../../common/components/notifications/Notifications";
+import {FilterDto} from "../../../common/data/FilterDto";
 import moment = require("moment");
-import Notifications from "../../common/components/notifications/Notifications";
-import {FilterDto} from "../../common/data/FilterDto";
-import {Market} from "../../common/data/Market";
 
 type RouteParams = {
     secId: string
@@ -26,7 +25,7 @@ type RouteParams = {
 
 export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> = ({match}) => {
     const secId: number = parseInt(match.params.secId)
-    const premiseStart = match.params.premiseStart ? moment(match.params.premiseStart, "DD-MM-YYYY_HH-mm").toDate() : null
+    const start = match.params.premiseStart ? moment(match.params.premiseStart, "DD-MM-YYYY_HH-mm").toDate() : null
     const CHART_HEIGHT = 600
     const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null);
     const [filter, setFilter] = useState<MarketBotStartDto>(null);
@@ -45,10 +44,14 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
     const [chart2Width, setChart2Width] = useState(CHART_MIN_WIDTH)
     const [chart3Width, setChart3Width] = useState(CHART_MIN_WIDTH)
     const [chart4Width, setChart4Width] = useState(CHART_MIN_WIDTH)
-    const [timeFrame1, setTimeFrame1] = useState<Interval>(Interval.WEEK)
-    const [timeFrame2, setTimeFrame2] = useState<Interval>(Interval.DAY)
-    const [timeFrame3, setTimeFrame3] = useState<Interval>(Interval.H4)
-    const [timeFrame4, setTimeFrame4] = useState<Interval>(Interval.M60)
+    const [timeFrame1, setTimeFrame1] = useState<Interval>(Interval.H2)
+    const [timeFrame2, setTimeFrame2] = useState<Interval>(Interval.M30)
+    const [timeFrame3, setTimeFrame3] = useState<Interval>(Interval.M3)
+    const [timeFrame4, setTimeFrame4] = useState<Interval>(Interval.M1)
+    const [start1, setStart1] = useState<Date>(start ? moment(start).subtract(30, 'days').hours(9).minutes(0).seconds(0).toDate() : null)
+    const [start2, setStart2] = useState<Date>(start ? moment(start).subtract(15, 'days').hours(9).minutes(0).seconds(0).toDate() : null)
+    const [start3, setStart3] = useState<Date>(start ? moment(start).subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate() : null)
+    const [start4, setStart4] = useState<Date>(start ? moment(start).subtract(1, 'hours').toDate() : null)
 
     useEffect(() => {
         document.getElementById("main-nav").style.display = "none";
@@ -101,9 +104,9 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
         setSecurityLastInfo(secLastInfo)
         setTimeframe(secLastInfo.classCode)
         if (ClassCode.SPBFUT === secLastInfo.classCode) {
-            fetchPremise(secLastInfo, Interval.M3, Interval.M1, premiseStart)
+            fetchPremise(secLastInfo, Interval.M3, Interval.M1, start)
         } else {
-            fetchPremise(secLastInfo, Interval.H4, Interval.M60, premiseStart)
+            fetchPremise(secLastInfo, Interval.H4, Interval.M60, start)
         }
 
         setFilterDto({
@@ -122,6 +125,11 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
             setTimeFrame2(Interval.M30)
             setTimeFrame3(Interval.M3)
             setTimeFrame4(Interval.M1)
+
+            setStart1(moment(start).subtract(60, 'days').hours(9).minutes(0).seconds(0).toDate())
+            setStart2(moment(start).subtract(15, 'days').hours(9).minutes(0).seconds(0).toDate())
+            setStart3(moment(start).subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate())
+            setStart4(moment(start).subtract(1, 'hours').toDate())
         } else {
             setTimeFrame1(Interval.WEEK)
             setTimeFrame2(Interval.DAY)
@@ -156,6 +164,7 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
                             <div className="p-col-6" ref={chart1Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame1}
                                               initialNumberOfCandles={500}
+                                              start={start1}
                                               onIntervalChanged={() => {
                                               }}
                                               onStartChanged={() => {
@@ -171,7 +180,8 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
                             </div>
                             <div className="p-col-6" ref={chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame2}
-                                              initialNumberOfCandles={120}
+                                              initialNumberOfCandles={500}
+                                              start={start2}
                                               onIntervalChanged={() => {
                                               }}
                                               onStartChanged={() => {
@@ -188,6 +198,7 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
                             <div className="p-col-6" ref={chart3Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame3}
                                               initialNumberOfCandles={500}
+                                              start={start3}
                                               onIntervalChanged={() => {
                                               }}
                                               onStartChanged={() => {
@@ -204,6 +215,7 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
                             <div className="p-col-6" ref={chart4Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame4}
                                               initialNumberOfCandles={500}
+                                              start={start4}
                                               onIntervalChanged={() => {
                                               }}
                                               onStartChanged={() => {

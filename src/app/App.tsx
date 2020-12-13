@@ -13,7 +13,7 @@ import {ControlPanel} from "../common/components/control-panel/ControlPanel";
 import {Stack} from "../common/components/stack/Stack";
 import {EconomicCalendarPage} from "../features/economic-calendar/EconomicCalendarPage";
 import {NewsPage} from "../features/news/NewsPage";
-import {TradingCharts} from "../features/trading-charts/TradingCharts";
+import {TradingChartsRouter} from "../features/trading-charts/TradingChartsRouter";
 import {BotControlPage} from "../features/bot-control/BotControlPage";
 
 export const App = () => {
@@ -27,7 +27,7 @@ export const App = () => {
                 <Route exact path="/" component={HomePage}/>
                 <Route path="/news" component={NewsPage}/>
                 <Route path="/analysis" component={TradeStrategyAnalysisPage}/>
-                <Route path="/trading-charts" component={TradingCharts}/>
+                <Route path="/trading-charts" component={TradingChartsRouter}/>
                 <Route path="/bot-control" component={BotControlPage}/>
                 <Route path="/trade-journal" component={TradeJournalPage}/>
                 <Route path="/economic-calendar" component={EconomicCalendarPage}/>
