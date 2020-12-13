@@ -367,6 +367,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                             <div className="p-grid">
                                 <div className="p-col-4">
                                     <Notifications filter={filterDto}
+                                                   security={securityLastInfo}
                                                    onNotificationSelected={(n) => {
                                                        console.log(n)
                                                    }}

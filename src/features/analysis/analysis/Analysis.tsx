@@ -62,6 +62,7 @@ const Analysis: React.FC<Props> = ({security}) => {
     const [premise, setPremise] = useState(null);
     const [orders, setOrders] = useState(null);
     const [activeTrade, setActiveTrade] = useState(null);
+    const [premiseBefore, setPremiseBefore] = useState<Date>(null)
 
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
     const [chartNumber, setChartNumber] = useState<number>(2);
@@ -209,22 +210,23 @@ const Analysis: React.FC<Props> = ({security}) => {
         }
     }
 
-    const fetchPremise = (timeFrameTrading: Interval) => {
+    const fetchPremise = (timeFrameTrading: Interval, before?: Date) => {
         getTradePremise({
             brokerId: security.market === Market.SPB ? BrokerId.TINKOFF_INVEST : BrokerId.ALFA_DIRECT,
             tradingPlatform: security.market === Market.SPB ? TradingPlatform.API : TradingPlatform.QUIK,
             secId: security.id,
             timeFrameTrading,
-            timeFrameMin
+            timeFrameMin,
+            timestamp: before
         }).then(setPremise).catch(reason => {
-            fetchPremise(timeFrameTrading);
+            fetchPremise(timeFrameTrading)
         })
-    };
+    }
 
     const onChartNumberChanged = (num: number) => {
-        setChartNumber(num);
-        setTimeout(updateSize, 1000);
-    };
+        setChartNumber(num)
+        setTimeout(updateSize, 1000)
+    }
 
     const onTradingIntervalChanged = (interval: Interval) => {
         setTimeFrameTrading(interval)
@@ -232,12 +234,16 @@ const Analysis: React.FC<Props> = ({security}) => {
         setTimeFrameMin(getTimeFrameLow(interval))
         fetchPremise(interval)
         updateMarketStateFilterDto(interval)
-    };
+    }
 
     const onStartChanged = (start: Date) => {
-        console.log(start);
-        setStart(start);
-    };
+        setStart(start)
+    }
+
+    const onPremiseBeforeChanged = (before: Date) => {
+        setPremiseBefore(before)
+        fetchPremise(timeFrameTrading, before)
+    }
 
     if (security) {
         return (
@@ -271,6 +277,7 @@ const Analysis: React.FC<Props> = ({security}) => {
                                           initialNumberOfCandles={500}
                                           onIntervalChanged={onTradingIntervalChanged}
                                           onStartChanged={onStartChanged}
+                                          onPremiseBeforeChanged={onPremiseBeforeChanged}
                                           width={chart1Width}
                                           security={securityLastInfo}
                                           premise={premise}
@@ -306,6 +313,7 @@ const Analysis: React.FC<Props> = ({security}) => {
                             <div className="p-grid">
                                 <div className="p-col-4">
                                     <Notifications filter={filterDto}
+                                                   security={securityLastInfo}
                                                    onNotificationSelected={(n) => {
                                                        console.log(n)
                                                    }}

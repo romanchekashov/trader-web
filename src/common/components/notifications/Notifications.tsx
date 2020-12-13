@@ -22,13 +22,14 @@ import moment = require("moment");
 
 type Props = {
     filter: FilterDto
+    security: Security
     onNotificationSelected: (notification: NotificationDto) => void
     viewHeight?: number
 };
 let fetchAlertsAttempt = 0;
 let previousAlertsCount = 0;
 
-const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHeight}) => {
+const Notifications: React.FC<Props> = ({filter, security, onNotificationSelected, viewHeight}) => {
 
     const [interval, setInterval] = useState(null);
     const [classCode, setClassCode] = useState(null);
@@ -47,10 +48,10 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
     const classCodes: PrimeDropdownItem<ClassCode>[] = [null, ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
         .map(val => ({label: val || "ALL", value: val}));
 
-    const fetchAlerts = (newClassCode: ClassCode, newSecCode: string, newInterval: Interval, newStart: Date, newTextPattern: string) => {
+    const fetchAlerts = (secId: number, newInterval: Interval, newStart: Date, newTextPattern: string) => {
         getNotifications(filter)
             .then(newAlerts => {
-                setAlertsReceivedFromServer(newAlerts, newClassCode, newSecCode, newInterval, newStart, newTextPattern);
+                setAlertsReceivedFromServer(newAlerts, security.classCode, security.secCode, newInterval, newStart, newTextPattern);
                 setFetchAlertsError(null);
             })
             .catch(reason => {
@@ -59,7 +60,7 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
                 setFetchAlertsError("Cannot get alerts for " + filter.secId);
                 if (fetchAlertsAttempt < 3) {
                     fetchAlertsAttempt++;
-                    fetchAlerts(newClassCode, newSecCode, newInterval, newStart, newTextPattern);
+                    fetchAlerts(secId, newInterval, newStart, newTextPattern);
                 }
             });
     };
@@ -87,8 +88,6 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
             onIntervalChanged(null);
             onTextPatternChanged("");
 
-            // fetchAlerts(filter.classCode, filter.secCode, null, start, "");
-
             if (filter.fetchByWS) {
                 setTimeout(() => getWSNotifications(filter), 500);
 
@@ -108,6 +107,8 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
                             getWSNotifications(filter);
                         }
                     });
+            } else {
+                fetchAlerts(filter.secId, null, start, "");
             }
         }
 
@@ -221,40 +222,40 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
     };
 
     const onIntervalChanged = (newInterval: Interval) => {
-        setInterval(newInterval);
-        setFilteredAlerts(alerts, classCode, secCode, newInterval, start, textPattern);
-    };
+        setInterval(newInterval)
+        setFilteredAlerts(alerts, classCode, secCode, newInterval, start, textPattern)
+    }
 
     const onClassCodeChanged = (newClassCode: ClassCode) => {
-        const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}];
+        const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}]
         if (newClassCode) {
-            const securities: Security[] = getSecuritiesByClassCode(newClassCode);
+            const securities: Security[] = getSecuritiesByClassCode(newClassCode)
             for (const sec of securities) {
-                newSecCodes.push({label: sec.secCode, value: sec.secCode});
+                newSecCodes.push({label: sec.secCode, value: sec.secCode})
             }
         } else {
-            setSecCode(null);
+            setSecCode(null)
         }
-        setClassCode(newClassCode);
-        setSecCodes(newSecCodes);
-        setSecCode(null);
-        setFilteredAlerts(alerts, newClassCode, null, interval, start, textPattern);
-    };
+        setClassCode(newClassCode)
+        setSecCodes(newSecCodes)
+        setSecCode(null)
+        setFilteredAlerts(alerts, newClassCode, null, interval, start, textPattern)
+    }
 
     const onSecCodeChanged = (newSecCode: string) => {
-        setSecCode(newSecCode);
-        setFilteredAlerts(alerts, classCode, newSecCode, interval, start, textPattern);
-    };
+        setSecCode(newSecCode)
+        setFilteredAlerts(alerts, classCode, newSecCode, interval, start, textPattern)
+    }
 
     const onStartDateChanged = (newStart: Date) => {
-        setStart(newStart);
-        setFilteredAlerts(alerts, classCode, secCode, interval, newStart, textPattern);
-    };
+        setStart(newStart)
+        setFilteredAlerts(alerts, classCode, secCode, interval, newStart, textPattern)
+    }
 
     const onTextPatternChanged = (newTextPattern: string) => {
-        setTextPattern(newTextPattern);
-        setFilteredAlerts(alerts, classCode, secCode, interval, start, newTextPattern);
-    };
+        setTextPattern(newTextPattern)
+        setFilteredAlerts(alerts, classCode, secCode, interval, start, newTextPattern)
+    }
 
     const setFilteredAlerts = (alerts: NotificationDto[], newClassCode: ClassCode, newSecCode: string,
                                newInterval: Interval, newStart: Date, newTextPattern: string) => {
@@ -275,12 +276,12 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
             filtered = filtered.filter(value => value.text.indexOf(newTextPattern) !== -1);
         }
 
-        setVisibleAlerts(filtered);
-    };
+        setVisibleAlerts(filtered)
+    }
 
     const Row = ({index, style}) => {
-        const alert = visibleAlerts[index];
-        const className = "alerts-row " + (selectedAlert === alert ? "alerts-row-selected" : "");
+        const alert = visibleAlerts[index]
+        const className = "alerts-row " + (selectedAlert === alert ? "alerts-row-selected" : "")
 
         return (
             <div className={index % 2 ? "ListItemOdd" : "ListItemEven"} style={style}>
@@ -290,31 +291,35 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
                          setSelectedAlert(alert);
                          onNotificationSelected(alert);
                      }}>
-                    <div className="alerts-cell alerts-time">
-                        {timeTemplate(alert)}
-                    </div>
-                    <div className="alerts-cell alerts-name">
-                        {nameTemplate(alert)}
-                    </div>
-                    <div className="alerts-cell alerts-symbol" title={alert.securityCode}>
-                        {alert.securityCode?.substr(0, 8)}
-                    </div>
-                    {/*<div className="alerts-cell alerts-strength">
+                    <div className="p-col-12">
+                        <div className="alerts-cell alerts-time">
+                            {timeTemplate(alert)}
+                        </div>
+                        <div className="alerts-cell alerts-name">
+                            {nameTemplate(alert)}
+                        </div>
+                        <div className="alerts-cell alerts-symbol" title={alert.securityCode}>
+                            {alert.securityCode?.substr(0, 8)}
+                        </div>
+                        {/*<div className="alerts-cell alerts-strength">
                         {strengthTemplate(alert)}
-                    </div>
-                    <div className="alerts-cell alerts-confirm">
-                        {confirmTemplate(alert)}
-                    </div>
-                    <div className="alerts-cell alerts-direction">
-                        {possibleFutureDirectionUpTemplate(alert)}
-                    </div>*/}
-                    <div className="alerts-cell alerts-description">
-                        {descriptionTemplate(alert)}
+                        </div>
+                        <div className="alerts-cell alerts-confirm">
+                            {confirmTemplate(alert)}
+                        </div>
+                        <div className="alerts-cell alerts-direction">
+                            {possibleFutureDirectionUpTemplate(alert)}
+                        </div>*/}
+                        </div>
+                    <div className="p-col-12">
+                        <div className="alerts-cell alerts-description">
+                            {descriptionTemplate(alert)}
+                        </div>
                     </div>
                 </div>
             </div>
-        );
-    };
+        )
+    }
 
     return (
         <div className="p-grid alerts" style={{height: viewHeight || 200}}>
@@ -363,7 +368,7 @@ const Notifications: React.FC<Props> = ({filter, onNotificationSelected, viewHei
                             className="List"
                             height={height}
                             itemCount={visibleAlerts.length}
-                            itemSize={50}
+                            itemSize={150}
                             width={width}
                         >
                             {Row}

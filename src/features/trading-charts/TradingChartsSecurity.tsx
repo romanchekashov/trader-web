@@ -15,6 +15,9 @@ import {getLastSecurities, getTradePremise} from "../../common/api/rest/analysis
 import {ClassCode} from "../../common/data/ClassCode";
 import {Trend} from "../../common/data/strategy/Trend";
 import moment = require("moment");
+import Notifications from "../../common/components/notifications/Notifications";
+import {FilterDto} from "../../common/data/FilterDto";
+import {Market} from "../../common/data/Market";
 
 type RouteParams = {
     secId: string
@@ -32,6 +35,7 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
     const [premise, setPremise] = useState<TradePremise>(null);
     const [orders, setOrders] = useState(null);
     const [activeTrade, setActiveTrade] = useState(null);
+    const [filterDto, setFilterDto] = useState<FilterDto>(null);
 
     const chart1Ref = useRef(null)
     const chart2Ref = useRef(null)
@@ -101,6 +105,15 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
         } else {
             fetchPremise(secLastInfo, Interval.H4, Interval.M60, premiseStart)
         }
+
+        setFilterDto({
+            brokerId: BrokerId.ALFA_DIRECT,
+            tradingPlatform: TradingPlatform.QUIK,
+            secId: secLastInfo.id,
+            fetchByWS: false,
+            history: true,
+            all: false
+        })
     }
 
     const setTimeframe = (classCode: ClassCode): void => {
@@ -125,74 +138,86 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
 
     return (
         <div className="p-grid sample-layout analysis">
-            <div className="p-col-12">
-                <TrendsView trends={premise ? premise.analysis.trends : []}/>
+            <div className="p-col-2">
+                <Notifications filter={filterDto}
+                               security={securityLastInfo}
+                               onNotificationSelected={(n) => {
+                                   console.log(n)
+                               }}
+                               viewHeight={800}/>
             </div>
-            <div className="p-col-12">
+            <div className="p-col-10">
                 <div className="p-grid">
-                    <div className="p-col-6" ref={chart1Ref} style={{padding: '0'}}>
-                        <ChartWrapper interval={timeFrame1}
-                                      initialNumberOfCandles={500}
-                                      onIntervalChanged={() => {
-                                      }}
-                                      onStartChanged={() => {
-                                      }}
-                                      width={chart1Width}
-                                      chartHeight={CHART_HEIGHT}
-                                      security={securityLastInfo}
-                                      premise={premise}
-                                      trend={getTrend(timeFrame1)}
-                                      orders={orders}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
+                    <div className="p-col-12">
+                        <TrendsView trends={premise ? premise.analysis.trends : []}/>
                     </div>
-                    <div className="p-col-6" ref={chart2Ref} style={{padding: '0'}}>
-                        <ChartWrapper interval={timeFrame2}
-                                      initialNumberOfCandles={120}
-                                      onIntervalChanged={() => {
-                                      }}
-                                      onStartChanged={() => {
-                                      }}
-                                      width={chart2Width}
-                                      chartHeight={CHART_HEIGHT}
-                                      security={securityLastInfo}
-                                      premise={premise}
-                                      trend={getTrend(timeFrame2)}
-                                      orders={orders}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
-                    </div>
-                    <div className="p-col-6" ref={chart3Ref} style={{padding: '0'}}>
-                        <ChartWrapper interval={timeFrame3}
-                                      initialNumberOfCandles={500}
-                                      onIntervalChanged={() => {
-                                      }}
-                                      onStartChanged={() => {
-                                      }}
-                                      width={chart3Width}
-                                      chartHeight={CHART_HEIGHT}
-                                      security={securityLastInfo}
-                                      premise={premise}
-                                      trend={getTrend(timeFrame3)}
-                                      orders={orders}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
-                    </div>
-                    <div className="p-col-6" ref={chart4Ref} style={{padding: '0'}}>
-                        <ChartWrapper interval={timeFrame4}
-                                      initialNumberOfCandles={500}
-                                      onIntervalChanged={() => {
-                                      }}
-                                      onStartChanged={() => {
-                                      }}
-                                      width={chart4Width}
-                                      chartHeight={CHART_HEIGHT}
-                                      security={securityLastInfo}
-                                      premise={premise}
-                                      trend={getTrend(timeFrame4)}
-                                      orders={orders}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
+                    <div className="p-col-12">
+                        <div className="p-grid">
+                            <div className="p-col-6" ref={chart1Ref} style={{padding: '0'}}>
+                                <ChartWrapper interval={timeFrame1}
+                                              initialNumberOfCandles={500}
+                                              onIntervalChanged={() => {
+                                              }}
+                                              onStartChanged={() => {
+                                              }}
+                                              width={chart1Width}
+                                              chartHeight={CHART_HEIGHT}
+                                              security={securityLastInfo}
+                                              premise={premise}
+                                              trend={getTrend(timeFrame1)}
+                                              orders={orders}
+                                              activeTrade={activeTrade}
+                                              showGrid={true}/>
+                            </div>
+                            <div className="p-col-6" ref={chart2Ref} style={{padding: '0'}}>
+                                <ChartWrapper interval={timeFrame2}
+                                              initialNumberOfCandles={120}
+                                              onIntervalChanged={() => {
+                                              }}
+                                              onStartChanged={() => {
+                                              }}
+                                              width={chart2Width}
+                                              chartHeight={CHART_HEIGHT}
+                                              security={securityLastInfo}
+                                              premise={premise}
+                                              trend={getTrend(timeFrame2)}
+                                              orders={orders}
+                                              activeTrade={activeTrade}
+                                              showGrid={true}/>
+                            </div>
+                            <div className="p-col-6" ref={chart3Ref} style={{padding: '0'}}>
+                                <ChartWrapper interval={timeFrame3}
+                                              initialNumberOfCandles={500}
+                                              onIntervalChanged={() => {
+                                              }}
+                                              onStartChanged={() => {
+                                              }}
+                                              width={chart3Width}
+                                              chartHeight={CHART_HEIGHT}
+                                              security={securityLastInfo}
+                                              premise={premise}
+                                              trend={getTrend(timeFrame3)}
+                                              orders={orders}
+                                              activeTrade={activeTrade}
+                                              showGrid={true}/>
+                            </div>
+                            <div className="p-col-6" ref={chart4Ref} style={{padding: '0'}}>
+                                <ChartWrapper interval={timeFrame4}
+                                              initialNumberOfCandles={500}
+                                              onIntervalChanged={() => {
+                                              }}
+                                              onStartChanged={() => {
+                                              }}
+                                              width={chart4Width}
+                                              chartHeight={CHART_HEIGHT}
+                                              security={securityLastInfo}
+                                              premise={premise}
+                                              trend={getTrend(timeFrame4)}
+                                              orders={orders}
+                                              activeTrade={activeTrade}
+                                              showGrid={true}/>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
