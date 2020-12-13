@@ -1,4 +1,5 @@
 import {Interval} from "../data/Interval";
+import moment = require("moment");
 
 export function round(number, precision = 0): number {
     const d = Math.pow(10, precision);
@@ -79,4 +80,12 @@ export const TrendDirectionColor = {
 export const OperationTypeColor = {
     BUY: "#4caf50",
     SELL: "#f44336"
+}
+
+export const getRecentBusinessDate = (date: Date): Date => {
+    if (!date) return date
+
+    let mDate = moment(date).subtract(1, 'days')
+    while (mDate.day() === 0 || mDate.day() === 6) mDate.subtract(1, 'days')
+    return mDate.toDate()
 }

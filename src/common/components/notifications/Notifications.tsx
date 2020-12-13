@@ -7,7 +7,7 @@ import {getNotifications} from "../../api/rest/analysisRestApi";
 import {FixedSizeList as List} from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import {Dropdown} from "primereact/components/dropdown/Dropdown";
-import {Intervals, PrimeDropdownItem} from "../../utils/utils";
+import {getRecentBusinessDate, Intervals, PrimeDropdownItem} from "../../utils/utils";
 import {Interval} from "../../data/Interval";
 import {ClassCode} from "../../data/ClassCode";
 import {getSecuritiesByClassCode} from "../../utils/Cache";
@@ -31,17 +31,17 @@ let previousAlertsCount = 0;
 
 const Notifications: React.FC<Props> = ({filter, security, onNotificationSelected, viewHeight}) => {
 
-    const [interval, setInterval] = useState(null);
-    const [classCode, setClassCode] = useState(null);
-    const [secCode, setSecCode] = useState(null);
-    const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}]);
-    const [start, setStart] = useState(moment().hours(0).minutes(0).seconds(0).toDate());
-    const [textPattern, setTextPattern] = useState("");
+    const [interval, setInterval] = useState(null)
+    const [classCode, setClassCode] = useState(null)
+    const [secCode, setSecCode] = useState(null)
+    const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}])
+    const [start, setStart] = useState<Date>(getRecentBusinessDate(moment().hours(0).minutes(0).seconds(0).toDate()))
+    const [textPattern, setTextPattern] = useState("")
 
-    const [visibleAlerts, setVisibleAlerts] = useState([]);
-    const [alerts, setAlerts] = useState([]);
-    const [fetchAlertsError, setFetchAlertsError] = useState(null);
-    const [selectedAlert, setSelectedAlert] = useState(null);
+    const [visibleAlerts, setVisibleAlerts] = useState([])
+    const [alerts, setAlerts] = useState([])
+    const [fetchAlertsError, setFetchAlertsError] = useState(null)
+    const [selectedAlert, setSelectedAlert] = useState(null)
 
     const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals]
         .map(val => ({label: val || "ALL", value: val}));
@@ -51,7 +51,7 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
     const fetchAlerts = (secId: number, newInterval: Interval, newStart: Date, newTextPattern: string) => {
         getNotifications(filter)
             .then(newAlerts => {
-                setAlertsReceivedFromServer(newAlerts, security.classCode, security.secCode, newInterval, newStart, newTextPattern);
+                setAlertsReceivedFromServer(newAlerts, security.classCode, security.code, newInterval, newStart, newTextPattern);
                 setFetchAlertsError(null);
             })
             .catch(reason => {
@@ -80,7 +80,7 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
         let alertsSubscription;
         let wsStatusSub;
 
-        if (filter) {
+        if (filter && security) {
             fetchAlertsAttempt = 0;
 
             // onClassCodeChanged(filter.classCode);
@@ -117,7 +117,7 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
             if (alertsSubscription) alertsSubscription.unsubscribe();
             if (wsStatusSub) wsStatusSub.unsubscribe();
         };
-    }, [filter]);
+    }, [filter, security]);
 
     const setAlertsReceivedFromServer = (newAlerts: NotificationDto[], newClassCode: ClassCode, newSecCode: string,
                                          newInterval: Interval, newStart: Date, newTextPattern: string): void => {
@@ -214,12 +214,15 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
         return <div className={className} title={alert.title}></div>;
     };
 
-    const descriptionTemplate = (dto: NotificationDto) => {
-        let index = dto.text.indexOf("[");
-        const description = (index !== -1) ? dto.text.substr(index) : dto.text;
+    const descriptionTemplate = (dto: NotificationDto): any => {
+        let index = dto.text.indexOf("[")
+        let description = (index !== -1) ? dto.text.substr(index) : dto.text
+        description = description.replace("CANDLE_PATTERN - ", "")
+        description = description.split("Interval")[0]
 
-        return <div title={dto.text}>{description.replace("CANDLE_PATTERN - ", "")}</div>;
-    };
+        // return <div title={dto.text}>{description}</div>
+        return '<div title="' + dto.text + '">' + description + '</div>'
+    }
 
     const onIntervalChanged = (newInterval: Interval) => {
         setInterval(newInterval)
@@ -264,7 +267,7 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
             filtered = filtered.filter(value => value.classCode === newClassCode);
         }
         if (newSecCode) {
-            filtered = filtered.filter(value => value.securityCode === newSecCode);
+            filtered = filtered.filter(value => value.code === newSecCode);
         }
         if (newInterval) {
             filtered = filtered.filter(value => value.timeInterval === newInterval);
@@ -276,6 +279,7 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
             filtered = filtered.filter(value => value.text.indexOf(newTextPattern) !== -1);
         }
 
+        // console.log(alerts, filtered)
         setVisibleAlerts(filtered)
     }
 
@@ -310,10 +314,10 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
                         <div className="alerts-cell alerts-direction">
                             {possibleFutureDirectionUpTemplate(alert)}
                         </div>*/}
-                        </div>
+                    </div>
                     <div className="p-col-12">
-                        <div className="alerts-cell alerts-description">
-                            {descriptionTemplate(alert)}
+                        <div className="alerts-cell alerts-description"
+                             dangerouslySetInnerHTML={{__html: descriptionTemplate(alert)}}>
                         </div>
                     </div>
                 </div>
@@ -378,6 +382,6 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
             </div>
         </div>
     )
-};
+}
 
-export default memo(Notifications);
+export default memo(Notifications)

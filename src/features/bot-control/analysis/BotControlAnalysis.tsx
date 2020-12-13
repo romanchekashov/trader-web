@@ -6,7 +6,7 @@ import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/Ch
 import {Dropdown} from "primereact/dropdown";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
-import {PrimeDropdownItem} from "../../../common/utils/utils";
+import {getRecentBusinessDate, PrimeDropdownItem} from "../../../common/utils/utils";
 import MarketState from "../../../common/components/market-state/MarketState";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
 import {TradingStrategyResult} from "../../../common/data/history/TradingStrategyResult";
@@ -101,7 +101,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             const trades = tradingStrategyResult.tradingStrategyData.trades
             setTsTrade(trades.length > 0 ? trades[0] : null)
             setSecurityLastInfo(security)
-            const startDate = getAdjustedStart(tradingStrategyResult?.tradingStrategyData?.start)
+            const startDate = getRecentBusinessDate(tradingStrategyResult?.tradingStrategyData?.start)
             setStart(moment(startDate).subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate())
             setStartHigh(moment(startDate).subtract(15, 'days').hours(9).minutes(0).seconds(0).toDate())
         } else {
@@ -143,14 +143,6 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
     const onChartNumberChanged = (num: number) => {
         setChartNumber(num)
         setTimeout(updateSize, 1000)
-    }
-
-    const getAdjustedStart = (start: Date): Date => {
-        if (start) {
-            let mDate = moment(start).subtract(1, 'days')
-            while (mDate.day() === 0 || mDate.day() === 6) mDate.subtract(1, 'days')
-            return mDate.toDate()
-        }
     }
 
     const fetchPremise = (timeFrameTrading: Interval, before?: Date) => {
