@@ -7,11 +7,11 @@ import {IntervalColor} from "../../../utils/utils";
 type Props = {
     srLevels: SRLevel[]
     scale: number
-};
+}
 
 export const ChartLevels: React.FC<Props> = ({srLevels, scale}) => {
 
-    if (!srLevels || srLevels.length === 0) return null;
+    if (!srLevels || srLevels.length === 0) return null
 
     const lineTypeMap = {
         MONTH: "LongDashDotDot",
@@ -20,14 +20,16 @@ export const ChartLevels: React.FC<Props> = ({srLevels, scale}) => {
         H4: "LongDash",
         H2: "DashDot",
         M60: "Dash"
-    };
+    }
 
     const scaleFormat = `.${scale}f`
 
     return (
         <>
             {
-                srLevels.map(level => {
+                srLevels
+                    .filter(level => level.type)
+                    .map(level => {
                     const color = IntervalColor[level.interval];
                     return (
                         <PriceCoordinate
@@ -45,9 +47,9 @@ export const ChartLevels: React.FC<Props> = ({srLevels, scale}) => {
                             arrowWidth={7}
                             displayFormat={format(scaleFormat)}
                         />
-                    );
+                    )
                 })
             }
         </>
     )
-};
+}

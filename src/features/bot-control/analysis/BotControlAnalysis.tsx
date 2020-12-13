@@ -210,8 +210,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
                             <ChartWrapper interval={tfHigh}
                                           initialNumberOfCandles={500}
                                           start={startHigh}
-                                          onIntervalChanged={interval => {
-                                          }}
+                                          onIntervalChanged={setTFHigh}
                                           onStartChanged={start => {
                                           }}
                                           width={chart2Width}
