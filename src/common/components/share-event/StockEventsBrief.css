@@ -1,0 +1,23 @@
+.menu-item-brief {
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    padding: 5px;
+    font-size: 10px;
+}
+
+.menu-item-brief-selected {
+    background-color: #0277bd;
+    color: #fff;
+}
+
+.menu-item-brief-even {
+    background-color: #f8f8f0;
+}
+
+.menu-item-brief-title {
+    font-weight: bold;
+}
+
+.menu-item-brief-pub {
+    /*font-size: 12px;*/
+}

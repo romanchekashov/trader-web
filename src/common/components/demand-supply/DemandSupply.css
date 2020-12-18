@@ -1,0 +1,18 @@
+.demand-supply {
+    height: 20px;
+    display: flex;
+}
+
+.demand {
+    background-color: #16a085;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+}
+
+.supply {
+    background-color: #e74c3c;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+}

@@ -7,10 +7,10 @@ import {SecurityLastInfo} from "../../../../common/data/security/SecurityLastInf
 import {Signal} from "../../../../common/data/Signal";
 import {PatternName} from "../../../../common/components/alerts/data/PatternName";
 import {getLastSecurities} from "../../../../common/api/rest/analysisRestApi";
-import moment = require("moment");
 import "./SecuritiesQuik.css"
-import {round100} from "../../../../common/utils/utils";
 import {SecurityType} from "../../../../common/data/security/SecurityType";
+import {DemandSupply} from "../../../../common/components/demand-supply/DemandSupply";
+import moment = require("moment");
 
 type Props = {
     selectedSecurity: SecurityLastInfo
@@ -147,18 +147,8 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
     }
 
     const demandSupplyTemplate = (rowData, column) => {
-        const totalDemand: number = rowData.totalDemand
-        const totalSupply: number = rowData.totalSupply
-        const sum = totalDemand + totalSupply
-        const demandWidth = totalDemand * 100 / sum
-        const supplyWidth = 100 - demandWidth
-        const ratio = round100(totalDemand / totalSupply)
-
         return (
-            <div className="demand-supply" title={`Общ спрос: ${totalDemand} / Общ предл: ${totalSupply} = ${ratio}`}>
-                <div className="demand" style={{width: demandWidth + '%'}}></div>
-                <div className="supply" style={{width: supplyWidth + '%'}}></div>
-            </div>
+            <DemandSupply totalDemand={rowData.totalDemand} totalSupply={rowData.totalSupply}/>
         )
     }
 
@@ -186,15 +176,24 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
                            style={{width: '105px'}}/>
         } else if ("secCode" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
-                           body={(rowData, column) => <div style={{overflowX: "hidden", fontWeight: SecurityType.STOCK !== rowData.type ? 'bold' : 'normal'}}>{rowData.secCode}</div>}/>
+                           body={(rowData, column) => <div style={{
+                               overflowX: "hidden",
+                               fontWeight: SecurityType.STOCK !== rowData.type ? 'bold' : 'normal'
+                           }}>{rowData.secCode}</div>}/>
         } else if ("shortName" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
                            style={{overflowX: "hidden"}}
-                           body={(rowData, column) => <div style={{width: '105px', fontWeight: SecurityType.FUTURE === rowData.type ? 'bold' : 'normal'}}>{rowData.shortName}</div>}/>
+                           body={(rowData, column) => <div style={{
+                               width: '105px',
+                               fontWeight: SecurityType.FUTURE === rowData.type ? 'bold' : 'normal'
+                           }}>{rowData.shortName}</div>}/>
         } else if ("type" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
                            style={{width: '30px'}}
-                           body={(rowData, column) => <div style={{overflowX: "hidden", fontWeight: SecurityType.CURRENCY === rowData.type ? 'bold' : 'normal'}}>{rowData.type}</div>}/>
+                           body={(rowData, column) => <div style={{
+                               overflowX: "hidden",
+                               fontWeight: SecurityType.CURRENCY === rowData.type ? 'bold' : 'normal'
+                           }}>{rowData.type}</div>}/>
         } else {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}/>
         }

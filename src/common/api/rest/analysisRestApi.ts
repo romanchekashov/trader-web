@@ -141,8 +141,8 @@ export function getSecurities(): Promise<SecurityAnalysis[]> {
         .catch(handleError);
 }
 
-export function getLastSecurities(): Promise<SecurityLastInfo[]> {
-    return fetch(`${baseUrl}last-securities`)
+export function getLastSecurities(secId?: number): Promise<SecurityLastInfo[]> {
+    return fetch(`${baseUrl}last-securities` + (secId ? `?secId=${secId}` : ''))
         .then(response => handleResponse(response)
             .then(adjustSecurities))
         .catch(handleError);

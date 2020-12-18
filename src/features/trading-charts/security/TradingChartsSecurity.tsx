@@ -1,7 +1,5 @@
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
-import {getFilterData} from "../../../common/api/rest/botControlRestApi";
-import {MarketBotFilterDataDto} from "../../../common/data/bot/MarketBotFilterDataDto";
 import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
 import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/ChartWrapper";
 import {TradePremise} from "../../../common/data/strategy/TradePremise";
@@ -16,7 +14,9 @@ import {ClassCode} from "../../../common/data/ClassCode";
 import {Trend} from "../../../common/data/strategy/Trend";
 import Notifications from "../../../common/components/notifications/Notifications";
 import {FilterDto} from "../../../common/data/FilterDto";
+import {StockEventsBrief} from "../../../common/components/share-event/StockEventsBrief";
 import moment = require("moment");
+import {SecurityLastInfoView} from "./info/SecurityLastInfoView";
 
 type RouteParams = {
     secId: string
@@ -27,7 +27,6 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
     const secId: number = parseInt(match.params.secId)
     const start = match.params.premiseStart ? moment(match.params.premiseStart, "DD-MM-YYYY_HH-mm").toDate() : null
     const CHART_HEIGHT = 600
-    const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null);
     const [filter, setFilter] = useState<MarketBotStartDto>(null);
     const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
     const [securities, setSecurities] = useState<SecurityLastInfo[]>([]);
@@ -58,9 +57,7 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
         document.getElementById("control-panel").style.display = "none";
         document.getElementById("stack").style.display = "none";
 
-        getFilterData(false).then(setFilterData)
-
-        getLastSecurities().then(securities => {
+        getLastSecurities(secId).then(securities => {
             const security = securities.find(value => value.id === secId)
             if (security) {
                 onSecuritySelected(security)
@@ -147,12 +144,14 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
     return (
         <div className="p-grid sample-layout analysis">
             <div className="p-col-2">
+                <SecurityLastInfoView security={securityLastInfo}/>
                 <Notifications filter={filterDto}
                                security={securityLastInfo}
                                onNotificationSelected={(n) => {
                                    console.log(n)
                                }}
                                viewHeight={800}/>
+                <StockEventsBrief secCode={securityLastInfo.secCode}/>
             </div>
             <div className="p-col-10">
                 <div className="p-grid">
