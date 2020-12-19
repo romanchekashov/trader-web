@@ -18,6 +18,12 @@ import {playSound} from "../../assets/assets";
 import {StopOrder} from "../../data/StopOrder";
 import {getSelectedSecurity} from "../../utils/Cache";
 import {ToggleButton} from "primereact/togglebutton";
+import SessionTradeResultView from "../control-panel/components/SessionTradeResultView";
+import ActiveTradeView from "../control-panel/components/ActiveTradeView";
+import {SessionTradeResult} from "../../data/SessionTradeResult";
+import {Growl} from "primereact/components/growl/Growl";
+import {ControlPanelGeneralBtn} from "./control-panel/ControlPanelGeneralBtn";
+import {ControlPanelFastBtn} from "./control-panel/ControlPanelFastBtn";
 
 type Props = {};
 
@@ -30,6 +36,7 @@ type States = {
     orders: Order[]
     volumes: SecurityVolume[]
     activeTrade: ActiveTrade
+    sessionResult: SessionTradeResult
     history?: boolean
     securityLastInfo: SecurityLastInfo
     visible: string
@@ -45,6 +52,7 @@ export class Stack extends React.Component<Props, States> {
 
     private previousOrdersNumber: number = 0;
     private previousStopOrder: StopOrder;
+    private growl: any
 
     MOUSE_BTN_LEFT = 0;
     MOUSE_BTN_WHEEL = 1;
@@ -56,38 +64,42 @@ export class Stack extends React.Component<Props, States> {
         HIDE: 'HIDE',
         VISIBLE: 'VISIBLE',
         VISIBLE_PART: 'VISIBLE_PART'
-    };
+    }
 
     private ToggleVisibleType = {
         HIDE: -46,
         VISIBLE: -45,
         VISIBLE_PART: -47
-    };
+    }
 
     private VisibleTypeViewTop = {
-        HIDE: -260,
+        HIDE: -460,
         VISIBLE: 0,
         VISIBLE_PART: -100
-    };
+    }
 
     constructor(props) {
-        super(props);
+        super(props)
         this.state = {
-            stackItemsHeight: 400, items: [], stackItems: [], ordersMap: {}, position: 1, orders: [],
+            stackItemsHeight: 400,
+            items: [],
+            stackItems: [],
+            ordersMap: {}, position: 1, orders: [],
             volumes: [], activeTrade: null, history: false, securityLastInfo: null,
-            visible: this.VisibleType.HIDE
-        };
+            visible: this.VisibleType.HIDE,
+            sessionResult: null
+        }
     }
 
     updateSize = () => {
         this.setState({
             stackItemsHeight: window.innerHeight
-        });
-    };
+        })
+    }
 
     blockContextMenu = (evt) => {
-        evt.preventDefault();
-    };
+        evt.preventDefault()
+    }
 
     componentDidMount = (): void => {
         this.updateSize();
@@ -344,9 +356,21 @@ export class Stack extends React.Component<Props, States> {
 
     toggleView = (toggle: boolean) => {
         this.setState({
-            visible: !toggle ? this.VisibleType.VISIBLE : this.VisibleType.HIDE
-        });
-    };
+            visible: !toggle ? this.VisibleType.VISIBLE : this.VisibleType.HIDE,
+            // securityLastInfo: getSelectedSecurity(),
+            // stackItems: [
+            //     {
+            //         price: 52.20,
+            //         quantity: 1,
+            //         sell: true
+            //     }, {
+            //         price: 52.10,
+            //         quantity: 1,
+            //         sell: false
+            //     }
+            // ]
+        })
+    }
 
     toggleViewPart = (toggle: boolean) => {
         this.setState({
@@ -355,7 +379,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     render() {
-        const {volumes, stackItemsHeight, visible} = this.state;
+        const {volumes, stackItemsHeight, visible, sessionResult, activeTrade, securityLastInfo} = this.state;
         const stackItemWrappers = this.createStackViewNew();
 
         return (
@@ -365,7 +389,24 @@ export class Stack extends React.Component<Props, States> {
                 }}/>
                 <div className="td__stack-main">
                     {
-                        visible !== this.VisibleType.VISIBLE_PART ? <StackVolumes volumes={volumes}/> : null
+                        visible !== this.VisibleType.VISIBLE_PART ?
+                            <div className="p-grid control-panel">
+                                <Growl ref={(el) => this.growl = el}/>
+                                <div className="p-col-12" style={{padding: 0, fontSize: '12px'}}>
+                                    <SessionTradeResultView result={sessionResult}/>
+                                    <ActiveTradeView trade={activeTrade}/>
+                                </div>
+                                <div className="p-col-12">
+                                    <ControlPanelGeneralBtn growl={this.growl} history={false} security={securityLastInfo}/>
+                                </div>
+                                <div className="p-col-12">
+                                    <ControlPanelFastBtn growl={this.growl} history={false} activeTrade={activeTrade}/>
+                                </div>
+                                <div className="p-col-12">
+                                    <StackVolumes volumes={volumes}/>
+                                </div>
+                            </div>
+                            : null
                     }
                     <div id="stack-items-wrap-id" className="p-grid stack-items-wrap">
                         <div className="p-col-12 stack-items" style={{height: stackItemsHeight}}>

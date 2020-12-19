@@ -22,6 +22,7 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
     const [securities, setSecurities] = useState<SecurityLastInfo[]>([])
 
     const columns = [
+        {field: 'id', header: 'Id'},
         {field: 'type', header: 'Type'},
         {field: 'shortName', header: 'Наз'},
         {field: 'secCode', header: 'Тикер'},
@@ -46,6 +47,7 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
     ]
 
     const lessColumns = [
+        {field: 'id', header: 'Id'},
         {field: 'type', header: 'Type'},
         {field: 'shortName', header: 'Наз'},
         {field: 'lastChange', header: '% изм'},
@@ -194,6 +196,9 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
                                overflowX: "hidden",
                                fontWeight: SecurityType.CURRENCY === rowData.type ? 'bold' : 'normal'
                            }}>{rowData.type}</div>}/>
+        } else if ("id" === col.field) {
+            return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
+                           style={{width: '40px', textAlign: "center"}}/>
         } else {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}/>
         }

@@ -11,10 +11,10 @@ import {SecurityLastInfo} from "../data/security/SecurityLastInfo";
 import {SecurityType} from "../data/security/SecurityType";
 import {Market} from "../data/Market";
 
-const securityMap = {};
-let futures = [];
-let shares = [];
-let currencies = [];
+const securityMap = {}
+let futures = []
+let shares = []
+let currencies = []
 let lastSecurities: SecurityLastInfo[] = []
 
 const fetchSecurityFutures = () => {
@@ -45,8 +45,8 @@ const fetchSecurityCurrencies = () => {
                 securityMap[security.classCode + security.secCode] = security;
             }
         })
-        .catch(fetchSecurityCurrencies);
-};
+        .catch(fetchSecurityCurrencies)
+}
 // fetchSecurityFutures();
 // fetchSecurityShares();
 // fetchSecurityCurrencies();
@@ -60,7 +60,7 @@ const fetchLastSecurities = () => {
                 securityMap[security.classCode + security.secCode] = security;
             }
         })
-        .catch(fetchSecurityCurrencies);
+        .catch(fetchSecurityCurrencies)
 }
 fetchLastSecurities()
 
@@ -83,7 +83,7 @@ export const getSecuritiesByClassCode = (classCode: ClassCode): Security[] => {
     }
 }
 
-let SELECTED_SECURITY: SecurityLastInfo = null;
+let SELECTED_SECURITY: SecurityLastInfo = null
 
-export const getSelectedSecurity = () => SELECTED_SECURITY;
-export const setSelectedSecurity = (security: SecurityLastInfo) => SELECTED_SECURITY = security;
+export const getSelectedSecurity = () => SELECTED_SECURITY
+export const setSelectedSecurity = (security: SecurityLastInfo) => SELECTED_SECURITY = security

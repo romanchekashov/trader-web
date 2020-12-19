@@ -1,7 +1,7 @@
 #stack {
     top: 0;
     bottom: 0;
-    width: 260px;
+    width: 460px;
     position: fixed;
     right: 8px;
     background-color: #dadada;
@@ -173,4 +173,15 @@
 .stack-item-order.active-order {
     border: 1px solid;
     background-color: #2980b988;
+}
+
+.control-panel {
+    margin: 0;
+    /* z-index: -3; */
+    /* position: absolute; */
+    /* top: 20px; */
+    /* bottom: 0px; */
+    width: 300px;
+    height: 100%;
+    overflow: hidden;
 }
