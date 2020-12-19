@@ -453,7 +453,8 @@ export class ChartWrapper extends React.Component<Props, States> {
         return map;
     };
 
-    onIntervalUpdated = (innerInterval: Interval) => {
+    onIntervalUpdated = (e: any) => {
+        const innerInterval: Interval = e.value
         this.fetchTrendLines(innerInterval);
         this.setState({innerInterval});
 
@@ -462,7 +463,7 @@ export class ChartWrapper extends React.Component<Props, States> {
 
         onIntervalChanged(innerInterval);
         this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
-    };
+    }
 
     onStartUpdated = (innerStart: Date) => {
         this.setState({innerStart});
@@ -472,7 +473,7 @@ export class ChartWrapper extends React.Component<Props, States> {
 
         onStartChanged(innerStart);
         this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
-    };
+    }
 
     onNumberOfCandlesUpdated = (numberOfCandles: number) => {
         const {security} = this.props;
@@ -483,12 +484,24 @@ export class ChartWrapper extends React.Component<Props, States> {
         this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
     }
 
+    onNumberOfCandlesUpdatedWrapper = (e: any) => {
+        this.onNumberOfCandlesUpdated(e.target['value'])
+    }
+
     onEnableTrendLine = (enableTrendLine: boolean) => {
         this.setState({enableTrendLine});
     }
 
+    onEnableTrendLineWrapper = (e: any) => {
+        this.onEnableTrendLine(e.value)
+    }
+
     onEnableNewOrder = (enableNewOrder: boolean) => {
         this.setState({enableNewOrder});
+    }
+
+    onEnableNewOrderWrapper = (e: any) => {
+        this.onEnableNewOrder(e.value)
     }
 
     onSave = () => {
@@ -629,6 +642,9 @@ export class ChartWrapper extends React.Component<Props, States> {
         }
     }
 
+    updateShowSRZones = (e: any) => this.setState({showSRZones: e.value})
+    updateShowSRLevels = (e: any) => this.setState({showSRLevels: e.value})
+
     render() {
         const {
             candles, nodata, innerInterval, innerStart, enableTrendLine, enableNewOrder, needSave, trends_1, showSRLevels,
@@ -649,16 +665,15 @@ export class ChartWrapper extends React.Component<Props, States> {
                 <div className="chart-wrapper-head">
                     <div className="chart-wrapper-head-security">{security.secCode}</div>
                     <div className="chart-wrapper-head-interval">
-                        <Dropdown value={innerInterval} options={this.intervals}
-                                  onChange={(e) => {
-                                      this.onIntervalUpdated(e.value);
-                                  }}/>
+                        <Dropdown value={innerInterval} 
+                                  options={this.intervals}
+                                  onChange={this.onIntervalUpdated}/>
                     </div>
                     <div className="chart-wrapper-head-start-date">
                         <InputText type="number"
                                    min={100}
                                    value={numberOfCandles}
-                                   onChange={(e) => this.onNumberOfCandlesUpdated(e.target['value'])}/>
+                                   onChange={this.onNumberOfCandlesUpdatedWrapper}/>
                     </div>
                     <div className="chart-wrapper-head-start-date">
                         <Button icon="pi pi-calendar"
@@ -676,13 +691,13 @@ export class ChartWrapper extends React.Component<Props, States> {
                         <ToggleButton onLabel="New Order"
                                       offLabel="New Order"
                                       checked={enableNewOrder}
-                                      onChange={(e) => this.onEnableNewOrder(e.value)}/>
+                                      onChange={this.onEnableNewOrderWrapper}/>
                     </div>
                     <div className="chart-wrapper-head-trendline">
                         <ToggleButton onLabel="Drawing"
                                       offLabel="Draw Line"
                                       checked={enableTrendLine}
-                                      onChange={(e) => this.onEnableTrendLine(e.value)}/>
+                                      onChange={this.onEnableTrendLineWrapper}/>
                     </div>
 
                     {
@@ -705,7 +720,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                         <ToggleButton onLabel="SRLevels"
                                       offLabel="SRLevels"
                                       checked={showSRLevels}
-                                      onChange={(e) => this.setState({showSRLevels: e.value})}/>
+                                      onChange={this.updateShowSRLevels}/>
                     </div>
                     <div className="chart-wrapper-head-legends">
                         <div className="chart-wrapper-head-legend" style={{backgroundColor: IntervalColor.MONTH}}>MN
@@ -724,7 +739,7 @@ export class ChartWrapper extends React.Component<Props, States> {
                         <ToggleButton onLabel="SRZones"
                                       offLabel="SRZones"
                                       checked={showSRZones}
-                                      onChange={(e) => this.setState({showSRZones: e.value})}/>
+                                      onChange={this.updateShowSRZones}/>
                     </div>
 
                 </div>
