@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --config webpack.config.dev.js --port 3000 --host 192.168.10.128",
+    "start": "webpack-dev-server --config webpack.config.dev.js --port 3000",
     "devbuild": "webpack --mode development",
     "build": "webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
