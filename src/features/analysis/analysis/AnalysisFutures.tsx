@@ -31,9 +31,9 @@ import {MarketStateFilterDto} from "../../../common/components/market-state/data
 import {Market} from "../../../common/data/Market";
 import {TradeStrategyAnalysisFilterDto} from "../../../common/data/TradeStrategyAnalysisFilterDto";
 import {FilterDto} from "../../../common/data/FilterDto";
-import moment = require("moment");
 import {SupplyAndDemand} from "./supply-and-demand/SupplyAndDemand";
 import {getTimeFrameHigh, getTimeFrameLow} from "../../../common/utils/TimeFrameChooser";
+import moment = require("moment");
 
 type Props = {
     security: SecurityLastInfo
@@ -62,7 +62,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
     const [timeFrameTrading, setTimeFrameTrading] = useState<Interval>(Interval.M3);
     const [timeFrameMin, setTimeFrameMin] = useState<Interval>(Interval.M1);
     const [timeFrameHigh, setTimeFrameHigh] = useState<Interval>(Interval.M30);
-    const [premise, setPremise] = useState(null);
+    const [premise, setPremise] = useState<TradePremise>(null);
     const [orders, setOrders] = useState<Order[]>([]);
     const [stopOrders, setStopOrders] = useState<StopOrder[]>([]);
     const [activeTrade, setActiveTrade] = useState(null);
@@ -293,129 +293,128 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
         setActiveTabIndex(tabIndex)
     }
 
-    if (security) {
+    if (!security) return (<div>Select security for analysis</div>)
 
-        return (
-            <TabView activeIndex={activeTabIndex} onTabChange={(e) => onTabChanged(e.index)}>
-                <TabPanel header="Chart">
-                    <div className="p-grid analysis-head">
-                        <div className="p-col-12">
-                            <div className="analysis-head-chart-number">
-                                <Dropdown value={chartNumber} options={chartNumbers}
-                                          onChange={(e) => onChartNumberChanged(e.value)}/>
-                            </div>
-                        </div>
-                        <div className="p-col-12">
-                            <DataTable value={[securityLastInfo]}>
-                                <Column field="totalDemand" header="Общ спрос"/>
-                                <Column field="totalSupply" header="Общ предл"/>
-                                <Column field="futureSellDepoPerContract" header="ГО прод"/>
-                                <Column field="futureBuyDepoPerContract" header="ГО покуп"/>
-                                <Column field="lastTradePrice" header="Цена"/>
-                                <Column field="numTradesToday" header="Кол-во сделок"/>
-                            </DataTable>
+    return (
+        <div className="p-grid">
+            <div className="p-col-12">
+                <div className="p-grid analysis-head">
+                    <div className="p-col-12">
+                        <div className="analysis-head-chart-number">
+                            <Dropdown value={chartNumber} options={chartNumbers}
+                                      onChange={(e) => onChartNumberChanged(e.value)}/>
                         </div>
                     </div>
-                    <TrendsView trends={premise ? premise.analysis.trends : []}/>
-                    <div className="p-grid" style={{margin: '0'}}>
-                        <div className="p-col-12" ref={chart1Ref}
-                             style={{padding: '0'}}>
-                            <ChartWrapper interval={timeFrameTrading}
-                                          initialNumberOfCandles={500}
-                                          onIntervalChanged={onTradingIntervalChanged}
-                                          onStartChanged={onStartChanged}
-                                          onPremiseBeforeChanged={onPremiseBeforeChanged}
-                                          width={chart1Width}
-                                          security={securityLastInfo}
-                                          premise={premise}
-                                          stops={stopOrders}
-                                          orders={orders}
-                                          trades={trades}
-                                          activeTrade={activeTrade}
-                                          showGrid={true}/>
+                    <div className="p-col-12">
+                        <DataTable value={[securityLastInfo]}>
+                            <Column field="totalDemand" header="Общ спрос"/>
+                            <Column field="totalSupply" header="Общ предл"/>
+                            <Column field="futureSellDepoPerContract" header="ГО прод"/>
+                            <Column field="futureBuyDepoPerContract" header="ГО покуп"/>
+                            <Column field="lastTradePrice" header="Цена"/>
+                            <Column field="numTradesToday" header="Кол-во сделок"/>
+                        </DataTable>
+                    </div>
+                </div>
+                <TrendsView trends={premise ? premise.analysis.trends : []}/>
+                <div className="p-grid" style={{margin: '0'}}>
+                    <div className="p-col-12" ref={chart1Ref}
+                         style={{padding: '0'}}>
+                        <ChartWrapper interval={timeFrameTrading}
+                                      initialNumberOfCandles={500}
+                                      onIntervalChanged={onTradingIntervalChanged}
+                                      onStartChanged={onStartChanged}
+                                      onPremiseBeforeChanged={onPremiseBeforeChanged}
+                                      width={chart1Width}
+                                      security={securityLastInfo}
+                                      premise={premise}
+                                      stops={stopOrders}
+                                      orders={orders}
+                                      trades={trades}
+                                      activeTrade={activeTrade}
+                                      showGrid={true}/>
+                    </div>
+                    {
+                        chartNumber === 2 ? (
+                            <div className="p-col-12" ref={chart2Ref} style={{padding: '0'}}>
+                                <ChartWrapper interval={timeFrameHigh}
+                                    // start={start}
+                                              initialNumberOfCandles={500}
+                                              onIntervalChanged={interval => {
+                                              }}
+                                              onStartChanged={start => {
+                                              }}
+                                              width={chart2Width}
+                                              security={securityLastInfo}
+                                              premise={premise}
+                                              trades={trades}
+                                              showGrid={true}/>
+                            </div>
+                        ) : null
+                    }
+                </div>
+                <div className="p-grid">
+                    <div className="p-col-12">
+                        <MarketState filter={marketStateFilterDto}/>
+                    </div>
+                    <div className="p-col-12">
+                        <SwingStateList filter={marketStateFilterDto}/>
+                    </div>
+                    <div className="p-col-12">
+                        <SupplyAndDemand security={securityLastInfo}/>
+                    </div>
+                    <div className="p-col-12">
+                        <div className="p-grid">
+                            <div className="p-col-4">
+                                <Notifications filter={filterDto}
+                                               security={securityLastInfo}
+                                               onNotificationSelected={(n) => {
+                                                   console.log(n)
+                                               }}
+                                               viewHeight={400}/>
+                            </div>
+                            <div className="p-col-4">
+                                <Alerts filter={filterDto}
+                                        onAlertSelected={(n) => {
+                                            console.log(n)
+                                        }}
+                                        alertsHeight={400}/>
+                            </div>
                         </div>
+                    </div>
+                    <div className="p-col-12" ref={chartAlertsRef} style={{padding: '0'}}>
                         {
-                            chartNumber === 2 ? (
-                                <div className="p-col-12" ref={chart2Ref} style={{padding: '0'}}>
-                                    <ChartWrapper interval={timeFrameHigh}
-                                                  // start={start}
-                                                  initialNumberOfCandles={500}
-                                                  onIntervalChanged={interval => {
-                                                  }}
-                                                  onStartChanged={start => {
-                                                  }}
-                                                  width={chart2Width}
-                                                  security={securityLastInfo}
-                                                  premise={premise}
-                                                  trades={trades}
-                                                  showGrid={true}/>
-                                </div>
-                            ) : null
+                            alert ?
+                                <ChartWrapper interval={alert.interval}
+                                              start={start}
+                                              onIntervalChanged={interval => {
+                                              }}
+                                              onStartChanged={start => {
+                                              }}
+                                              alert={alert}
+                                              width={chartAlertsWidth}
+                                              security={securityLastInfo}
+                                              premise={premise}
+                                              showGrid={true}/> : null
                         }
                     </div>
-                    <div className="p-grid">
-                        <div className="p-col-12">
-                            <MarketState filter={marketStateFilterDto}/>
-                        </div>
-                        <div className="p-col-12">
-                            <SwingStateList filter={marketStateFilterDto}/>
-                        </div>
-                        <div className="p-col-12">
-                            <SupplyAndDemand security={securityLastInfo}/>
-                        </div>
-                        <div className="p-col-12">
-                            <div className="p-grid">
-                                <div className="p-col-4">
-                                    <Notifications filter={filterDto}
-                                                   security={securityLastInfo}
-                                                   onNotificationSelected={(n) => {
-                                                       console.log(n)
-                                                   }}
-                                                   viewHeight={400}/>
-                                </div>
-                                <div className="p-col-4">
-                                    <Alerts filter={filterDto}
-                                            onAlertSelected={(n) => {
-                                                console.log(n)
-                                            }}
-                                            alertsHeight={400}/>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="p-col-12" ref={chartAlertsRef} style={{padding: '0'}}>
-                            {
-                                alert ?
-                                    <ChartWrapper interval={alert.interval}
-                                                  start={start}
-                                                  onIntervalChanged={interval => {
-                                                  }}
-                                                  onStartChanged={start => {
-                                                  }}
-                                                  alert={alert}
-                                                  width={chartAlertsWidth}
-                                                  security={securityLastInfo}
-                                                  premise={premise}
-                                                  showGrid={true}/> : null
-                            }
-                        </div>
-                    </div>
-                </TabPanel>
-                <TabPanel header="Open Interest">
-                    <MoexOpenInterestView security={security}/>
-                </TabPanel>
-                <TabPanel header="News">
-                    <News secId={security.id}/>
-                </TabPanel>
-                <TabPanel header="Calendar">
-                    <EconomicCalendar secId={security.id}/>
-                </TabPanel>
-            </TabView>
-        )
-    } else {
-        return (
-            <div>Select security for analysis</div>
-        )
-    }
-};
+                </div>
+            </div>
+            <div className="p-col-12">
+                <TabView activeIndex={activeTabIndex} onTabChange={(e) => onTabChanged(e.index)}>
+                    <TabPanel header="Open Interest">
+                        <MoexOpenInterestView security={security}/>
+                    </TabPanel>
+                    <TabPanel header="News">
+                        <News secId={security.id}/>
+                    </TabPanel>
+                    <TabPanel header="Calendar">
+                        <EconomicCalendar secId={security.id}/>
+                    </TabPanel>
+                </TabView>
+            </div>
+        </div>
+    )
+}
 
-export default AnalysisFutures;
+export default AnalysisFutures

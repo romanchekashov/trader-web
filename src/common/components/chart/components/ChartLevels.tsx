@@ -30,7 +30,7 @@ export const ChartLevels: React.FC<Props> = ({srLevels, scale}) => {
                 srLevels
                     .filter(level => level.type)
                     .map(level => {
-                    const color = IntervalColor[level.interval];
+                    const color = IntervalColor[level.interval]
                     return (
                         <PriceCoordinate
                             key={"start-" + level.interval + level.swingHL + level.dateTime}

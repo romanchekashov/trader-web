@@ -86,8 +86,8 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
 
     render() {
         const {selectedSecurity, isDetailsShown} = this.state
-        const classDataTable = isDetailsShown ? 'p-col-3' : 'p-col-12'
-        const classDetails = isDetailsShown ? 'p-col-9' : 'hidden'
+        const classDataTable = isDetailsShown ? 'p-col-12' : 'p-col-12'
+        const classDetails = isDetailsShown ? 'p-col-8' : 'hidden'
 
         return (
             <div className="p-grid sample-layout analysis">

@@ -24,6 +24,9 @@ import {SessionTradeResult} from "../../data/SessionTradeResult";
 import {Growl} from "primereact/components/growl/Growl";
 import {ControlPanelGeneralBtn} from "./control-panel/ControlPanelGeneralBtn";
 import {ControlPanelFastBtn} from "./control-panel/ControlPanelFastBtn";
+import {TradePremise} from "../../data/strategy/TradePremise";
+import {adjustTradePremise} from "../../utils/DataUtils";
+import intervalCompare from "../../utils/IntervalComporator";
 
 type Props = {};
 
@@ -40,25 +43,27 @@ type States = {
     history?: boolean
     securityLastInfo: SecurityLastInfo
     visible: string
-};
+    premise: TradePremise
+}
 
 export class Stack extends React.Component<Props, States> {
 
-    private lastSecuritiesSubscription: SubscriptionLike = null;
-    private stackItemsSubscription: SubscriptionLike = null;
-    private ordersSetupSubscription: SubscriptionLike = null;
-    private volumesSubscription: SubscriptionLike = null;
-    private activeTradeSubscription: SubscriptionLike = null;
+    private lastSecuritiesSubscription: SubscriptionLike = null
+    private stackItemsSubscription: SubscriptionLike = null
+    private ordersSetupSubscription: SubscriptionLike = null
+    private volumesSubscription: SubscriptionLike = null
+    private activeTradeSubscription: SubscriptionLike = null
+    private tradePremiseSubscription: SubscriptionLike = null
 
-    private previousOrdersNumber: number = 0;
-    private previousStopOrder: StopOrder;
+    private previousOrdersNumber: number = 0
+    private previousStopOrder: StopOrder
     private growl: any
 
-    MOUSE_BTN_LEFT = 0;
-    MOUSE_BTN_WHEEL = 1;
-    MOUSE_BTN_RIGHT = 2;
-    MOUSE_BTN_BACKWARD = 3;
-    MOUSE_BTN_FORWARD = 4;
+    MOUSE_BTN_LEFT = 0
+    MOUSE_BTN_WHEEL = 1
+    MOUSE_BTN_RIGHT = 2
+    MOUSE_BTN_BACKWARD = 3
+    MOUSE_BTN_FORWARD = 4
 
     private VisibleType = {
         HIDE: 'HIDE',
@@ -87,7 +92,8 @@ export class Stack extends React.Component<Props, States> {
             ordersMap: {}, position: 1, orders: [],
             volumes: [], activeTrade: null, history: false, securityLastInfo: null,
             visible: this.VisibleType.HIDE,
-            sessionResult: null
+            sessionResult: null,
+            premise: null
         }
     }
 
@@ -102,53 +108,60 @@ export class Stack extends React.Component<Props, States> {
     }
 
     componentDidMount = (): void => {
-        this.updateSize();
-        window.addEventListener('resize', this.updateSize);
+        this.updateSize()
+        window.addEventListener('resize', this.updateSize)
 
-        document.getElementById("stack-items-wrap-id").addEventListener('contextmenu', this.blockContextMenu);
+        document.getElementById("stack-items-wrap-id").addEventListener('contextmenu', this.blockContextMenu)
 
         this.lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
-                const {activeTrade} = this.state;
-                const selectedSecurity = getSelectedSecurity();
-                let secCode = activeTrade ? activeTrade.secCode : selectedSecurity ? selectedSecurity.secCode : null;
+                const {activeTrade} = this.state
+                const selectedSecurity = getSelectedSecurity()
+                let secCode = activeTrade ? activeTrade.secCode : selectedSecurity ? selectedSecurity.secCode : null
                 if (secCode) {
-                    const securityLastInfo = securities.find(o => o.secCode === secCode);
+                    const securityLastInfo = securities.find(o => o.secCode === secCode)
                     if (securityLastInfo) {
-                        securityLastInfo.lastTradeTime = new Date(securityLastInfo.lastTradeTime);
+                        securityLastInfo.lastTradeTime = new Date(securityLastInfo.lastTradeTime)
                     }
-                    this.setState({securityLastInfo});
+                    this.setState({securityLastInfo})
                 }
-            });
+            })
 
         this.stackItemsSubscription = WebsocketService.getInstance()
             .on<StackItem[]>(WSEvent.STACK).subscribe(stackItems => {
-                this.setState({stackItems});
-            });
+                this.setState({stackItems})
+            })
 
         this.ordersSetupSubscription = WebsocketService.getInstance()
             .on<Order[]>(WSEvent.ORDERS).subscribe(orders => {
-                this.notifyIfOrderHit(orders);
-                this.setState({orders, ordersMap: this.ordersMap(orders)});
-            });
+                this.notifyIfOrderHit(orders)
+                this.setState({orders, ordersMap: this.ordersMap(orders)})
+            })
 
         this.volumesSubscription = WebsocketService.getInstance()
             .on<SecurityVolume[]>(WSEvent.VOLUMES).subscribe(volumes => {
-                this.setState({volumes});
-            });
+                this.setState({volumes})
+            })
 
         this.activeTradeSubscription = WebsocketService.getInstance()
             .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES).subscribe(activeTrades => {
-                const {securityLastInfo} = this.state;
+                const {securityLastInfo} = this.state
                 if (securityLastInfo) {
                     const activeTrade = activeTrades
-                        .find(at => at && at.classCode === securityLastInfo.classCode && at.secCode === securityLastInfo.secCode);
-                    this.notifyIfStopHit(activeTrade);
-                    this.setState({activeTrade});
+                        .find(at => at && at.classCode === securityLastInfo.classCode && at.secCode === securityLastInfo.secCode)
+                    this.notifyIfStopHit(activeTrade)
+                    this.setState({activeTrade})
                 }
-            });
-    };
+            })
+
+        this.tradePremiseSubscription = WebsocketService.getInstance()
+            .on<TradePremise>(WSEvent.TRADE_PREMISE)
+            .subscribe(premise => {
+                if (!premise) adjustTradePremise(premise)
+                this.setState({premise})
+            })
+    }
 
     componentWillUnmount = (): void => {
         this.lastSecuritiesSubscription.unsubscribe();
@@ -351,8 +364,23 @@ export class Stack extends React.Component<Props, States> {
             price -= step;
         }
 
-        return stackItemWrappers;
-    };
+        return this.fillWithPremise(stackItemWrappers)
+    }
+
+    fillWithPremise = (items: StackItemWrapper[]): StackItemWrapper[] => {
+        const {premise} = this.state
+
+        if (premise) {
+            const srMap = {}
+            premise.analysis.srLevels.forEach(value => {
+                if (!srMap[value.swingHL] || intervalCompare(value.interval, srMap[value.swingHL]) > 0) {
+                    srMap[value.swingHL] = value.interval
+                }
+            })
+            items.forEach(value => value.srInterval = srMap[value.price])
+        }
+        return items
+    }
 
     toggleView = (toggle: boolean) => {
         this.setState({
@@ -360,11 +388,11 @@ export class Stack extends React.Component<Props, States> {
             // securityLastInfo: getSelectedSecurity(),
             // stackItems: [
             //     {
-            //         price: 52.20,
+            //         price: getSelectedSecurity().lastTradePrice,
             //         quantity: 1,
             //         sell: true
             //     }, {
-            //         price: 52.10,
+            //         price: getSelectedSecurity().lastTradePrice - getSelectedSecurity().secPriceStep,
             //         quantity: 1,
             //         sell: false
             //     }
@@ -375,8 +403,8 @@ export class Stack extends React.Component<Props, States> {
     toggleViewPart = (toggle: boolean) => {
         this.setState({
             visible: !toggle ? this.VisibleType.VISIBLE_PART : this.VisibleType.HIDE
-        });
-    };
+        })
+    }
 
     render() {
         const {volumes, stackItemsHeight, visible, sessionResult, activeTrade, securityLastInfo} = this.state;

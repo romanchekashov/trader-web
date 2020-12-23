@@ -161,7 +161,8 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
         return securities.sort((a, b) => b.totalDemand / b.totalSupply - a.totalDemand / a.totalSupply)
     }
 
-    const selectedColumns = selectedSecurity ? lessColumns : columns
+    // const selectedColumns = selectedSecurity ? lessColumns : columns
+    const selectedColumns = columns
     const columnComponents = selectedColumns.map(col => {
         if ("totalDemand" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true}
@@ -221,7 +222,7 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
                        selection={selectedSecurity}
                        onSelectionChange={onSelect}
                        scrollable={!!selectedSecurity}
-                       scrollHeight="400px">
+                       scrollHeight="200px">
                 {columnComponents}
             </DataTable>
         </>
