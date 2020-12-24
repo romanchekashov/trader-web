@@ -8,52 +8,53 @@ import {ActiveTrade} from "../../../data/ActiveTrade";
 import {OperationType} from "../../../data/OperationType";
 
 type Props = {
-    trade: ActiveTrade
-};
+    trades: ActiveTrade[]
+}
 
-const ActiveTradeView: React.FC<Props> = ({trade}) => {
+const ActiveTradeView: React.FC<Props> = ({trades}) => {
 
     const quantityTemplate = (rowData, column) => {
-        return OperationType.SELL === rowData.operation ? "-" + rowData.quantity : rowData.quantity;
-    };
+        return OperationType.SELL === rowData.operation ? "-" + rowData.quantity : rowData.quantity
+    }
 
     const rowClassName = (rowData) => {
         if (rowData.plPrice > 0) {
-            return {'win': true};
+            return {'win': true}
         } else if (rowData.plPrice < 0) {
-            return {'loss': true};
+            return {'loss': true}
         }
-        return {};
-    };
-
-    if (trade) {
-        const headerGroup = (
-            <ColumnGroup>
-                <Row style={{height: '10px'}}>
-                    <Column header="Pos"/>
-                    <Column header="Avg Price"/>
-                    <Column header="P&L"/>
-                    <Column header="Stop P&L"/>
-                    <Column header="Target P&L"/>
-                </Row>
-            </ColumnGroup>
-        );
-
-        return (
-            <DataTable value={[trade]} responsive
-                       headerColumnGroup={headerGroup}
-                       rowClassName={rowClassName}
-                       virtualRowHeight={24}>
-                <Column field="quantity" body={quantityTemplate}/>
-                <Column field="avgPrice"/>
-                <Column field="plPrice"/>
-                <Column field="plStop"/>
-                <Column field="plTarget"/>
-            </DataTable>
-        )
-    } else {
-        return (<></>)
+        return {}
     }
-};
 
-export default ActiveTradeView;
+    const headerGroup = (
+        <ColumnGroup>
+            <Row style={{height: '10px'}}>
+                <Column header="Pos"/>
+                <Column header="Avg Price"/>
+                <Column header="P&L"/>
+                <Column header="Stop P&L"/>
+                <Column header="Target P&L"/>
+            </Row>
+        </ColumnGroup>
+    )
+
+    if (!trades || trades.length === 0) {
+        return (<>No Active Trades</>)
+    }
+
+    return (
+        <DataTable value={trades} responsive
+                   className="active-trade-view"
+                   headerColumnGroup={headerGroup}
+                   rowClassName={rowClassName}
+                   virtualRowHeight={24}>
+            <Column field="quantity" body={quantityTemplate}/>
+            <Column field="avgPrice"/>
+            <Column field="plPrice"/>
+            <Column field="plStop"/>
+            <Column field="plTarget"/>
+        </DataTable>
+    )
+}
+
+export default ActiveTradeView

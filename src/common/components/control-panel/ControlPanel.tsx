@@ -162,7 +162,7 @@ export class ControlPanel extends React.Component<Props, States> {
                         </div>
                         <div className="p-col-12" style={{paddingBottom: 0}}>
                             <SessionTradeResultView result={sessionResult}/>
-                            <ActiveTradeView trade={activeTrade}/>
+                            <ActiveTradeView trades={activeTrade ? [activeTrade] : []}/>
                         </div>
                     </div>
                 </div>

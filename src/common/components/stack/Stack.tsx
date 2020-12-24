@@ -27,6 +27,7 @@ import {ControlPanelFastBtn} from "./control-panel/ControlPanelFastBtn";
 import {TradePremise} from "../../data/strategy/TradePremise";
 import {adjustTradePremise} from "../../utils/DataUtils";
 import intervalCompare from "../../utils/IntervalComporator";
+import {TEST_ACTIVE_TRADES} from "../../utils/TestData";
 
 type Props = {};
 
@@ -38,7 +39,8 @@ type States = {
     position: number
     orders: Order[]
     volumes: SecurityVolume[]
-    activeTrade: ActiveTrade
+    activeTrades: ActiveTrade[]
+    selectedActiveTrade: ActiveTrade
     sessionResult: SessionTradeResult
     history?: boolean
     securityLastInfo: SecurityLastInfo
@@ -89,10 +91,16 @@ export class Stack extends React.Component<Props, States> {
             stackItemsHeight: 400,
             items: [],
             stackItems: [],
-            ordersMap: {}, position: 1, orders: [],
-            volumes: [], activeTrade: null, history: false, securityLastInfo: null,
-            visible: this.VisibleType.HIDE,
+            ordersMap: {},
+            position: 1,
+            orders: [],
+            volumes: [],
+            activeTrades: [],
+            selectedActiveTrade: null,
             sessionResult: null,
+            history: false,
+            securityLastInfo: null,
+            visible: this.VisibleType.HIDE,
             premise: null
         }
     }
@@ -116,9 +124,8 @@ export class Stack extends React.Component<Props, States> {
         this.lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
-                const {activeTrade} = this.state
                 const selectedSecurity = getSelectedSecurity()
-                let secCode = activeTrade ? activeTrade.secCode : selectedSecurity ? selectedSecurity.secCode : null
+                let secCode = selectedSecurity ? selectedSecurity.secCode : null
                 if (secCode) {
                     const securityLastInfo = securities.find(o => o.secCode === secCode)
                     if (securityLastInfo) {
@@ -147,11 +154,16 @@ export class Stack extends React.Component<Props, States> {
         this.activeTradeSubscription = WebsocketService.getInstance()
             .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES).subscribe(activeTrades => {
                 const {securityLastInfo} = this.state
-                if (securityLastInfo) {
-                    const activeTrade = activeTrades
-                        .find(at => at && at.classCode === securityLastInfo.classCode && at.secCode === securityLastInfo.secCode)
-                    this.notifyIfStopHit(activeTrade)
-                    this.setState({activeTrade})
+                if (activeTrades && activeTrades.length > 0) {
+                    this.notifyIfStopHit(activeTrades)
+                    this.setState({
+                        activeTrades,
+                        selectedActiveTrade: securityLastInfo ? activeTrades
+                            .find(value => value.secCode === securityLastInfo.secCode) : null
+                    })
+                } else {
+                    this.setState({activeTrades: [], selectedActiveTrade: null})
+                    // this.setState({activeTrades: TEST_ACTIVE_TRADES, selectedActiveTrade: TEST_ACTIVE_TRADES[0]})
                 }
             })
 
@@ -180,21 +192,22 @@ export class Stack extends React.Component<Props, States> {
         }
     };
 
-    notifyIfStopHit = (newActiveTrade: ActiveTrade): void => {
-        const {activeTrade} = this.state;
+    notifyIfStopHit = (newActiveTrades: ActiveTrade[]): void => {
+        const {activeTrades} = this.state;
 
-        if ((!activeTrade && newActiveTrade) || (activeTrade && !newActiveTrade)) {
-            playSound(2);
-            if (newActiveTrade) {
-                this.previousStopOrder = newActiveTrade.stopOrder;
-            }
-        } else if (newActiveTrade && ((newActiveTrade.stopOrder && !this.previousStopOrder)
-            || (!newActiveTrade.stopOrder && this.previousStopOrder)
-            || (this.previousStopOrder && newActiveTrade.stopOrder.price !== this.previousStopOrder.price))) {
-            playSound(2);
-            this.previousStopOrder = newActiveTrade.stopOrder;
-        }
-    };
+        // todo
+        // if ((!activeTrades && newActiveTrade) || (activeTrades && !newActiveTrade)) {
+        //     playSound(2);
+        //     if (newActiveTrade) {
+        //         this.previousStopOrder = newActiveTrade.stopOrder;
+        //     }
+        // } else if (newActiveTrade && ((newActiveTrade.stopOrder && !this.previousStopOrder)
+        //     || (!newActiveTrade.stopOrder && this.previousStopOrder)
+        //     || (this.previousStopOrder && newActiveTrade.stopOrder.price !== this.previousStopOrder.price))) {
+        //     playSound(2);
+        //     this.previousStopOrder = newActiveTrade.stopOrder;
+        // }
+    }
 
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<States>, nextContext: any): boolean {
         const {stackItems} = this.state;
@@ -283,12 +296,12 @@ export class Stack extends React.Component<Props, States> {
     };
 
     createStackViewNew = (): StackItemWrapper[] => {
-        const {ordersMap, stackItems, activeTrade, securityLastInfo} = this.state;
+        const {ordersMap, stackItems, activeTrades, selectedActiveTrade, securityLastInfo} = this.state
 
-        if (stackItems.length === 0 || !securityLastInfo) return [];
-        const stackItemMap = {};
+        if (stackItems.length === 0 || !securityLastInfo) return []
+        const stackItemMap = {}
         for (const stackItem of stackItems) {
-            stackItemMap[stackItem.price] = stackItem;
+            stackItemMap[stackItem.price] = stackItem
         }
 
         const multiplier = Math.pow(10, securityLastInfo.scale);
@@ -337,14 +350,14 @@ export class Stack extends React.Component<Props, States> {
                 }
             }
 
-            if (activeTrade) {
-                if (value.price === activeTrade.avgPrice) {
+            if (selectedActiveTrade) {
+                if (value.price === selectedActiveTrade.avgPrice) {
                     stackItemOrderClassName += " active-order";
-                    quantity = activeTrade.quantity;
+                    quantity = selectedActiveTrade.quantity;
                 }
-                if (activeTrade.stopOrder && value.price === activeTrade.stopOrder.price) {
+                if (selectedActiveTrade.stopOrder && value.price === selectedActiveTrade.stopOrder.price) {
                     stackItemOrderClassName += " stop-order";
-                    quantity = activeTrade.stopOrder.quantity;
+                    quantity = selectedActiveTrade.stopOrder.quantity;
                 }
             }
 
@@ -407,8 +420,11 @@ export class Stack extends React.Component<Props, States> {
     }
 
     render() {
-        const {volumes, stackItemsHeight, visible, sessionResult, activeTrade, securityLastInfo} = this.state;
-        const stackItemWrappers = this.createStackViewNew();
+        const {
+            volumes, stackItemsHeight, visible, sessionResult, activeTrades,
+            selectedActiveTrade, securityLastInfo
+        } = this.state
+        const stackItemWrappers = this.createStackViewNew()
 
         return (
             <div id="stack" className="td__stack" style={{right: this.VisibleTypeViewTop[visible]}}>
@@ -422,13 +438,17 @@ export class Stack extends React.Component<Props, States> {
                                 <Growl ref={(el) => this.growl = el}/>
                                 <div className="p-col-12" style={{padding: 0, fontSize: '12px'}}>
                                     <SessionTradeResultView result={sessionResult}/>
-                                    <ActiveTradeView trade={activeTrade}/>
+                                    <ActiveTradeView trades={activeTrades}/>
                                 </div>
                                 <div className="p-col-12">
-                                    <ControlPanelGeneralBtn growl={this.growl} history={false} security={securityLastInfo}/>
+                                    <ControlPanelGeneralBtn growl={this.growl}
+                                                            history={false}
+                                                            security={securityLastInfo}/>
                                 </div>
                                 <div className="p-col-12">
-                                    <ControlPanelFastBtn growl={this.growl} history={false} activeTrade={activeTrade}/>
+                                    <ControlPanelFastBtn growl={this.growl}
+                                                         history={false}
+                                                         activeTrade={selectedActiveTrade}/>
                                 </div>
                                 <div className="p-col-12">
                                     <StackVolumes volumes={volumes}/>
