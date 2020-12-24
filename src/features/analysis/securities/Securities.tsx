@@ -8,6 +8,7 @@ import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
 import {SecuritiesQuik} from "./quik/SecuritiesQuik";
 import {SecuritiesTinkoffApi} from "./tinkoff/SecuritiesTinkoffApi";
 import {BrokerId} from "../../../common/data/BrokerId";
+import {SecurityType} from "../../../common/data/security/SecurityType";
 import moment = require("moment");
 
 type Props = {
@@ -19,6 +20,7 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
     const [platform, setPlatform] = useState<TradingPlatform>(TradingPlatform.QUIK);
     const [brokerId, setBrokerId] = useState<BrokerId>(BrokerId.ALFA_DIRECT);
     const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
+    const [secType, setSecType] = useState<SecurityType>(null)
 
     useEffect(() => {
         // Specify how to clean up after this effect:
@@ -46,10 +48,13 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
                               onShowAll={() => selectSecurity(null)}
                               brokerId={brokerId}
                               onBrokerId={selectBrokerId}
-                              platform={platform}/>
+                              platform={platform}
+                              secType={secType}
+                              changeSecType={setSecType}/>
             {
                 brokerId === BrokerId.ALFA_DIRECT ?
-                    <SecuritiesQuik selectedSecurity={selectedSecurity}
+                    <SecuritiesQuik secType={secType}
+                                    selectedSecurity={selectedSecurity}
                                     onSelectRow={selectSecurity}
                                     onLastTimeUpdate={onLastTimeUpdate}/>
                     :

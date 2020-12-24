@@ -13,12 +13,13 @@ import {DemandSupply} from "../../../../common/components/demand-supply/DemandSu
 import moment = require("moment");
 
 type Props = {
+    secType: SecurityType
     selectedSecurity: SecurityLastInfo
     onSelectRow: (e: SecurityLastInfo) => void
     onLastTimeUpdate: (lastTimeUpdate: Date) => void
 }
 
-export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, onLastTimeUpdate}) => {
+export const SecuritiesQuik: React.FC<Props> = ({secType, selectedSecurity, onSelectRow, onLastTimeUpdate}) => {
     const [securities, setSecurities] = useState<SecurityLastInfo[]>([])
 
     const columns = [
@@ -67,7 +68,7 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
         const lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
-                setSecurities(securities)
+                setSecurities(secType ? securities.filter(value => value.type === secType) : securities)
                 onLastTimeUpdate(new Date())
             })
 
@@ -75,7 +76,7 @@ export const SecuritiesQuik: React.FC<Props> = ({selectedSecurity, onSelectRow, 
         return function cleanup() {
             lastSecuritiesSubscription.unsubscribe()
         }
-    }, [])
+    }, [secType])
 
     const getCandlePatternClassName = (alert: Signal) => {
         let className = "";
