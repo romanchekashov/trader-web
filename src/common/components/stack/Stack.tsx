@@ -27,6 +27,7 @@ import {ControlPanelFastBtn} from "./control-panel/ControlPanelFastBtn";
 import {TradePremise} from "../../data/strategy/TradePremise";
 import {adjustTradePremise} from "../../utils/DataUtils";
 import intervalCompare from "../../utils/IntervalComporator";
+import DepositView from "./deposit/DepositView";
 import {TEST_ACTIVE_TRADES} from "../../utils/TestData";
 
 type Props = {};
@@ -176,14 +177,14 @@ export class Stack extends React.Component<Props, States> {
     }
 
     componentWillUnmount = (): void => {
-        this.lastSecuritiesSubscription.unsubscribe();
-        this.stackItemsSubscription.unsubscribe();
-        this.ordersSetupSubscription.unsubscribe();
-        this.volumesSubscription.unsubscribe();
-        this.activeTradeSubscription.unsubscribe();
-        window.removeEventListener('resize', this.updateSize);
-        document.getElementById("stack-items-wrap-id").removeEventListener('contextmenu', this.blockContextMenu);
-    };
+        this.lastSecuritiesSubscription.unsubscribe()
+        this.stackItemsSubscription.unsubscribe()
+        this.ordersSetupSubscription.unsubscribe()
+        this.volumesSubscription.unsubscribe()
+        this.activeTradeSubscription.unsubscribe()
+        window.removeEventListener('resize', this.updateSize)
+        document.getElementById("stack-items-wrap-id").removeEventListener('contextmenu', this.blockContextMenu)
+    }
 
     notifyIfOrderHit = (orders: Order[]): void => {
         if (orders && orders.length !== this.previousOrdersNumber) {
@@ -439,6 +440,7 @@ export class Stack extends React.Component<Props, States> {
                                 <div className="p-col-12" style={{padding: 0, fontSize: '12px'}}>
                                     <SessionTradeResultView result={sessionResult}/>
                                     <ActiveTradeView trades={activeTrades}/>
+                                    <DepositView/>
                                 </div>
                                 <div className="p-col-12">
                                     <ControlPanelGeneralBtn growl={this.growl}

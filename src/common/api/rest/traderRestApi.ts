@@ -5,8 +5,9 @@ import {SecurityFuture} from "../../data/security/SecurityFuture";
 import {SecurityShare} from "../../data/security/SecurityShare";
 import {SecurityCurrency} from "../../data/security/SecurityCurrency";
 import {TradingPlatformDataFilter} from "../../data/TradingPlatformDataFilter";
-import {adjustOrders, adjustShares} from "../../utils/DataUtils";
+import {adjustShares} from "../../utils/DataUtils";
 import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
+import {FuturesClientLimit} from "../../data/FuturesClientLimit";
 
 const baseUrl = process.env.API_URL + "/api/v1/";
 
@@ -57,6 +58,12 @@ export function createStop(dto: CreateStopDto): Promise<void> {
         headers: {"content-type": "application/json"},
         body: JSON.stringify(dto)
     })
+        .then(handleResponse)
+        .catch(handleError);
+}
+
+export function getFuturesLimits(): Promise<FuturesClientLimit[]> {
+    return fetch(`${baseUrl}futures-limits`)
         .then(handleResponse)
         .catch(handleError);
 }
