@@ -28,14 +28,17 @@ export const SecuritiesTinkoffApi: React.FC<Props> = ({selectedSecurity, onSelec
         {field: 'valueToday', header: 'Оборот'},
         {field: 'numTradesToday', header: 'Кол-во сделок'},
         {field: 'percentOfFloatTradedToday', header: '% Flt Traded'},
-        {field: 'atrDayPercent', header: 'ATR(D)%'},
-        {field: 'atrM60Percent', header: 'ATR(M60)%'},
-        {field: 'atrM5Percent', header: 'ATR(M5)%'},
+        {field: 'atrDay', header: 'ATR(D)'},
+        {field: 'atrM60', header: 'ATR(M60)'},
+        {field: 'atrM30', header: 'ATR(M30)'},
+        {field: 'atrM3', header: 'ATR(M3)'},
         {field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GerATRDis(D)%'},
         {field: 'gapDay', header: 'Gap(D)'},
         {field: 'gapDayPercent', header: 'Gap(D)%'},
-        {field: 'volumeM60Percent', header: 'Vol(M60)%'},
-        {field: 'volumeM5Percent', header: 'Vol(M5)%'},
+        {field: 'volumeInPercentDay', header: 'Vol(D)%'},
+        {field: 'volumeInPercentM60', header: 'Vol(M60)%'},
+        {field: 'volumeInPercentM30', header: 'Vol(M30)%'},
+        {field: 'volumeInPercentM3', header: 'Vol(M3)%'},
         {field: 'volumeToday', header: 'Vol Today'},
         {field: 'relativeVolumeDay', header: 'Rel Vol(D)'},
         {field: 'signals', header: 'Signals'}
@@ -44,8 +47,8 @@ export const SecuritiesTinkoffApi: React.FC<Props> = ({selectedSecurity, onSelec
     const lessColumns = [
         {field: 'name', header: 'Наз'},
         {field: 'lastChange', header: '% изм'},
-        {field: 'atrM5Percent', header: 'ATR(M5)%'},
-        {field: 'volumeM5Percent', header: 'Vol(M5)%'},
+        {field: 'atrM3', header: 'ATR(M3)'},
+        {field: 'volumeInPercentM3', header: 'Vol(M3)%'},
         {field: 'relativeVolumeDay', header: 'Rel Vol(D)'}
     ]
 
