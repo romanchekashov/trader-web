@@ -19,7 +19,7 @@ import {BotControlPage} from "../features/bot-control/BotControlPage";
 export const App = () => {
     return (
         <div className="container-fluid">
-            <ControlPanel/>
+            {/*<ControlPanel/>*/}
             <Stack/>
             {/*<BotControl/>*/}
             <Header/>

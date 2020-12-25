@@ -1,0 +1,19 @@
+.market-work-time {
+    height: 20px;
+    margin-left: 5px;
+    display: flex;
+    justify-content: flex-start;
+    line-height: 19px;
+}
+
+.market-work-time-flag {
+    margin-top: 2px;
+}
+
+.market-work-time-open {
+    color: green;
+}
+
+.market-work-time-closed {
+    color: red;
+}
