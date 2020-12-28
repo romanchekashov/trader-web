@@ -54,7 +54,7 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
 
     useEffect(() => {
         document.getElementById("main-nav").style.display = "none";
-        document.getElementById("control-panel").style.display = "none";
+        // document.getElementById("control-panel").style.display = "none";
         document.getElementById("stack").style.display = "none";
 
         getLastSecurities(secId).then(securities => {
