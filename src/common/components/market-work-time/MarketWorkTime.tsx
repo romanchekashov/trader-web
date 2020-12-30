@@ -3,6 +3,10 @@ import {useEffect, useState} from "react";
 import "./MarketWorkTime.css"
 import moment = require("moment");
 
+/**
+ * https://stock-list.ru/vremya-raboty-birzh.html
+ * @constructor
+ */
 const MarketWorkTime: React.FC<{}> = ({}) => {
     const CLOSED = 'closed'
     const OPEN = 'open'
