@@ -89,3 +89,14 @@ export const getRecentBusinessDate = (date: Date): Date => {
     while (mDate.day() === 0 || mDate.day() === 6) mDate.subtract(1, 'days')
     return mDate.toDate()
 }
+
+export const formatNumber = (val: number): string => {
+    const absVal = Math.abs(val)
+    // Nine Zeroes for Billions
+    return absVal >= 1.0e+9 ? round100(absVal / 1.0e+9) + " B"
+        // Six Zeroes for Millions
+        : absVal >= 1.0e+6 ? round100(absVal / 1.0e+6) + " M"
+            // Three Zeroes for Thousands
+            : absVal >= 1.0e+3 ? round100(absVal / 1.0e+3) + " K"
+                : absVal + ""
+}
