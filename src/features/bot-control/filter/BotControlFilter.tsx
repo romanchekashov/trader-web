@@ -64,7 +64,7 @@ const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHis
         end: null,
         debug: false,
         systemType: TradeSystemType.DEMO,
-        strategy: TradingStrategyName.SR_LEVEL
+        strategy: TradingStrategyName.STRATEGY_1
     }
 
     const brokers = filter ? filter.brokers : []
@@ -114,6 +114,7 @@ const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHis
     const [canTrade, setCanTrade] = useState<boolean>(false)
 
     const strategies: PrimeDropdownItem<TradingStrategyName>[] = [
+        TradingStrategyName.STRATEGY_1,
         TradingStrategyName.SR_LEVEL,
         TradingStrategyName.GERCHIK,
         TradingStrategyName.SWING,

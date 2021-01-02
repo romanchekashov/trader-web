@@ -189,7 +189,7 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
                    paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
                    rows={15}
-                   rowsPerPageOptions={[15, 20, 50]}>
+                   rowsPerPageOptions={[15, 30, 50]}>
             <Column selectionMode="multiple" headerStyle={{width: '10px'}}/>
             <Column field="id" style={{width: '10px'}} header="№" headerStyle={{width: '10px'}}/>
             <Column field="name" style={{width: '30px'}} header="Strategy" headerStyle={{width: '30px'}}/>

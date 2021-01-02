@@ -1,4 +1,5 @@
 export enum TradingStrategyName {
+    STRATEGY_1 = 'STRATEGY_1',
     GERCHIK = 'GERCHIK',
     SR_LEVEL = 'SR_LEVEL',
     SWING = 'SWING',

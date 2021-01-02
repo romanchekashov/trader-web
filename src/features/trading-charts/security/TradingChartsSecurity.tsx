@@ -156,7 +156,8 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
             <div className="p-col-10">
                 <div className="p-grid">
                     <div className="p-col-12">
-                        <TrendsView trends={premise ? premise.analysis.trends : []}/>
+                        <TrendsView trends={premise?.analysis?.trends || []}
+                                    srLevels={premise?.analysis?.srLevels || []}/>
                     </div>
                     <div className="p-col-12">
                         <div className="p-grid">
