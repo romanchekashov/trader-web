@@ -4,7 +4,6 @@ import {Trend} from "../../data/strategy/Trend";
 import TrendView from "./TrendView";
 import "./TrendView.css";
 import {SRLevel} from "../../data/strategy/SRLevel";
-import {Interval} from "../../data/Interval";
 
 type Props = {
     trends: Trend[]
@@ -13,15 +12,9 @@ type Props = {
 
 export const TrendsView: React.FC<Props> = ({trends, srLevels}) => {
     const [position, setPosition] = useState<number>(2)
-    const [levels, setLevels] = useState<number[]>([])
 
     useEffect(() => {
-        if (srLevels) {
-            setLevels(srLevels
-                .filter(value => value.interval === Interval.DAY)
-                .map(value => value.swingHL))
-        }
-    }, [srLevels])
+    }, [])
 
     if (trends.length > 0) {
         const className = "p-grid" + (position === 3 ? " trends-position-3" : "");
@@ -46,8 +39,10 @@ export const TrendsView: React.FC<Props> = ({trends, srLevels}) => {
                     trends.map(trend => {
                         return (<TrendView key={trend.interval}
                                            trend={trend}
-                                           levels={levels}
-                                           position={position}/>)
+                                           srLevels={srLevels}
+                                           position={position}
+                                           width={400}
+                                           height={400}/>)
                     })
                 }
             </div>
@@ -57,4 +52,4 @@ export const TrendsView: React.FC<Props> = ({trends, srLevels}) => {
             <div>Select security for trends</div>
         )
     }
-};
+}

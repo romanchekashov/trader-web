@@ -15,8 +15,9 @@ import {Trend} from "../../../common/data/strategy/Trend";
 import Notifications from "../../../common/components/notifications/Notifications";
 import {FilterDto} from "../../../common/data/FilterDto";
 import {StockEventsBrief} from "../../../common/components/share-event/StockEventsBrief";
-import moment = require("moment");
 import {SecurityLastInfoView} from "./info/SecurityLastInfoView";
+import TrendView from "../../../common/components/trend/TrendView";
+import moment = require("moment");
 
 type RouteParams = {
     secId: string
@@ -161,6 +162,14 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
                     </div>
                     <div className="p-col-12">
                         <div className="p-grid">
+                            <div className="p-col-6" style={{padding: '0'}}>
+                                <TrendView key={timeFrame1}
+                                           trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame1)}
+                                           srLevels={premise?.analysis?.srLevels}
+                                           position={1}
+                                           width={600}
+                                           height={600}/>
+                            </div>
                             <div className="p-col-6" ref={chart1Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame1}
                                               initialNumberOfCandles={500}
@@ -177,6 +186,14 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
                                               orders={orders}
                                               activeTrade={activeTrade}
                                               showGrid={true}/>
+                            </div>
+                            <div className="p-col-6" style={{padding: '0'}}>
+                                <TrendView key={timeFrame2}
+                                           trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
+                                           srLevels={premise?.analysis?.srLevels}
+                                           position={1}
+                                           width={600}
+                                           height={600}/>
                             </div>
                             <div className="p-col-6" ref={chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame2}
@@ -195,6 +212,14 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
                                               activeTrade={activeTrade}
                                               showGrid={true}/>
                             </div>
+                            <div className="p-col-6" style={{padding: '0'}}>
+                                <TrendView key={timeFrame3}
+                                           trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
+                                           srLevels={premise?.analysis?.srLevels}
+                                           position={1}
+                                           width={600}
+                                           height={600}/>
+                            </div>
                             <div className="p-col-6" ref={chart3Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame3}
                                               initialNumberOfCandles={500}
@@ -211,6 +236,14 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
                                               orders={orders}
                                               activeTrade={activeTrade}
                                               showGrid={true}/>
+                            </div>
+                            <div className="p-col-6" style={{padding: '0'}}>
+                                <TrendView key={timeFrame4}
+                                           trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame4)}
+                                           srLevels={premise?.analysis?.srLevels}
+                                           position={1}
+                                           width={600}
+                                           height={600}/>
                             </div>
                             <div className="p-col-6" ref={chart4Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame4}

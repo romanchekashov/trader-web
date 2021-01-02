@@ -5,15 +5,21 @@ import {Trend} from "../../data/strategy/Trend";
 import {TrendDirection} from "../../data/strategy/TrendDirection";
 import "./TrendView.css";
 import {TrendDirectionColor} from "../../utils/utils";
+import {SRLevel} from "../../data/strategy/SRLevel";
+import {Interval} from "../../data/Interval";
+import {SrLevelType} from "../../data/strategy/SrLevelType";
+import intervalCompare from "../../utils/IntervalComporator";
 import moment = require("moment");
 
 type Props = {
     trend: Trend
-    levels: number[]
-    position?: number
+    srLevels?: SRLevel[]
+    position?: number,
+    width: number,
+    height: number
 }
 
-const TrendView: React.FC<Props> = ({trend, levels, position}) => {
+const TrendView: React.FC<Props> = ({trend, srLevels, position, width, height}) => {
     const [innerTrend, setInnerTrend] = useState(null)
     const [data, setData] = useState(null)
     const intervalShortName = {
@@ -26,29 +32,36 @@ const TrendView: React.FC<Props> = ({trend, levels, position}) => {
         WEEK: "DD-MM-YYYY",
         DAY: "DD-MM-YYYY"
     }
+    const TODAY_COLOR = '#f44336'
 
     useEffect(() => {
         if (trend) {
             if (innerTrend && trend.swingHighsLows.length === innerTrend.swingHighsLows.length) {
                 for (let i = 0; i < trend.swingHighsLows.length; i++) {
                     if (trend.swingHighsLows[i].swingHL !== innerTrend.swingHighsLows[i].swingHL) {
-                        updateData(trend, levels)
+                        updateData(trend, [])
                         break
                     }
                 }
             } else {
-                updateData(trend, levels)
+                updateData(trend, [])
             }
 
-            if (levels && levels.length > 0) updateData(trend, levels)
+            if (srLevels && srLevels.length > 0) {
+                const INTERVAL = intervalCompare(trend.interval, Interval.M60) < 0 ? Interval.DAY
+                    : intervalCompare(trend.interval, Interval.H4) < 0 ? Interval.WEEK
+                        : Interval.MONTH
+                updateData(trend, srLevels
+                    .filter(value => value.interval === INTERVAL))
+            }
         }
-    }, [trend, levels])
+    }, [trend, srLevels])
 
     const getColor = (direction: TrendDirection) => {
         return TrendDirectionColor[direction] || '#3f51b5'
     }
 
-    const updateData = (trend: Trend, levels: number[]) => {
+    const updateData = (trend: Trend, levels: SRLevel[]) => {
         setInnerTrend(trend)
         const color = getColor(trend.direction)
         const dateTimeFormat = intervalDateTimeFormat[trend.interval] || "HH:mm DD-MM"
@@ -62,10 +75,10 @@ const TrendView: React.FC<Props> = ({trend, levels, position}) => {
         })
         for (let lvl of levels) {
             datasets.push({
-                label: lvl,
-                data: Array(trend.swingHighsLows.length).fill(lvl, 0, trend.swingHighsLows.length),
+                label: `${lvl.type}(${lvl.interval}): ${lvl.swingHL}`,
+                data: Array(trend.swingHighsLows.length).fill(lvl.swingHL, 0, trend.swingHighsLows.length),
                 fill: false,
-                borderColor: '#FFA726'
+                borderColor: lvl.type === SrLevelType.TODAY_HIGH || lvl.type === SrLevelType.TODAY_LOW ? TODAY_COLOR : '#FFA726'
             })
         }
 
@@ -93,7 +106,10 @@ const TrendView: React.FC<Props> = ({trend, levels, position}) => {
         } else {
             return (
                 <div className="p-col-4">
-                    <Chart type="line" data={data} width={'400px'} height={'300px'}/>
+                    <Chart type="line"
+                           data={data}
+                           width={width + 'px'}
+                           height={height + 'px'}/>
                 </div>
             )
         }
