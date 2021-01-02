@@ -64,7 +64,11 @@ export const SecuritiesQuik: React.FC<Props> = ({secType, selectedSecurity, onSe
     useEffect(() => {
 
         getLastSecurities().then(securities => {
-            setSecurities(securities)
+            if (secType && securities?.length > 0) {
+                setSecurities(securities.filter(value => value.type === secType))
+            } else {
+                setSecurities(securities)
+            }
             onLastTimeUpdate(new Date())
         })
 
