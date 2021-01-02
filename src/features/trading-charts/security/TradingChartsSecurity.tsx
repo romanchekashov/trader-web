@@ -16,7 +16,7 @@ import Notifications from "../../../common/components/notifications/Notification
 import {FilterDto} from "../../../common/data/FilterDto";
 import {StockEventsBrief} from "../../../common/components/share-event/StockEventsBrief";
 import {SecurityLastInfoView} from "./info/SecurityLastInfoView";
-import TrendView from "../../../common/components/trend/TrendView";
+import TrendViewChart from "../../../common/components/trend/TrendViewChart";
 import moment = require("moment");
 
 type RouteParams = {
@@ -36,12 +36,14 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
     const [activeTrade, setActiveTrade] = useState(null);
     const [filterDto, setFilterDto] = useState<FilterDto>(null);
 
-    const chart1Ref = useRef(null)
+    const chart2Ref1 = useRef(null)
     const chart2Ref = useRef(null)
+    const chart3Ref1 = useRef(null)
     const chart3Ref = useRef(null)
-    const chart4Ref = useRef(null)
-    const [chart2Width, setChart2Width] = useState(CHART_MIN_WIDTH)
-    const [chart3Width, setChart3Width] = useState(CHART_MIN_WIDTH)
+    const [chart2Width1, setChart2Width1] = useState<number>(CHART_MIN_WIDTH)
+    const [chart2Width, setChart2Width] = useState<number>(CHART_MIN_WIDTH)
+    const [chart3Width1, setChart3Width1] = useState<number>(CHART_MIN_WIDTH)
+    const [chart3Width, setChart3Width] = useState<number>(CHART_MIN_WIDTH)
     const [timeFrame2, setTimeFrame2] = useState<Interval>(Interval.M30)
     const [timeFrame3, setTimeFrame3] = useState<Interval>(Interval.M3)
     const [start1, setStart1] = useState<Date>(start ? moment(start).subtract(30, 'days').hours(9).minutes(0).seconds(0).toDate() : null)
@@ -88,7 +90,9 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
 
     const updateSize = () => {
         const offset = 10
+        setChart2Width1(chart2Ref1.current ? chart2Ref1.current.clientWidth - offset : CHART_MIN_WIDTH)
         setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth - offset : CHART_MIN_WIDTH)
+        setChart3Width1(chart3Ref1.current ? chart3Ref1.current.clientWidth - offset : CHART_MIN_WIDTH)
         setChart3Width(chart3Ref.current ? chart3Ref.current.clientWidth - offset : CHART_MIN_WIDTH)
     }
 
@@ -109,6 +113,8 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
             history: true,
             all: false
         })
+
+        updateSize()
     }
 
     const setTimeframe = (classCode: ClassCode): void => {
@@ -132,6 +138,8 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
 
     if (!securityLastInfo) return (<div>No Data</div>)
 
+    // console.log(chart2Width1, chart2Width, chart3Width1, chart3Width)
+
     return (
         <div className="p-grid sample-layout analysis">
             <div className="p-col-2">
@@ -152,15 +160,14 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
                     </div>
                     <div className="p-col-12">
                         <div className="p-grid">
-                            <div className="p-col-6" style={{padding: '0'}}>
-                                <TrendView key={timeFrame2}
-                                           trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
-                                           srLevels={premise?.analysis?.srLevels}
-                                           position={1}
-                                           width={600}
-                                           height={600}/>
+                            <div className="p-col-5" ref={chart2Ref1} style={{padding: '0'}}>
+                                <TrendViewChart key={timeFrame2}
+                                                trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
+                                                srLevels={premise?.analysis?.srLevels}
+                                                width={chart2Width1}
+                                                height={600}/>
                             </div>
-                            <div className="p-col-6" ref={chart2Ref} style={{padding: '0'}}>
+                            <div className="p-col-7" ref={chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame2}
                                               initialNumberOfCandles={500}
                                               start={start2}
@@ -177,15 +184,14 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
                                               activeTrade={activeTrade}
                                               showGrid={true}/>
                             </div>
-                            <div className="p-col-6" style={{padding: '0'}}>
-                                <TrendView key={timeFrame3}
-                                           trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
-                                           srLevels={premise?.analysis?.srLevels}
-                                           position={1}
-                                           width={600}
-                                           height={600}/>
+                            <div className="p-col-5" ref={chart3Ref1} style={{padding: '0'}}>
+                                <TrendViewChart key={timeFrame3}
+                                                trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
+                                                srLevels={premise?.analysis?.srLevels}
+                                                width={chart3Width1}
+                                                height={600}/>
                             </div>
-                            <div className="p-col-6" ref={chart3Ref} style={{padding: '0'}}>
+                            <div className="p-col-7" ref={chart3Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame3}
                                               initialNumberOfCandles={500}
                                               start={start3}

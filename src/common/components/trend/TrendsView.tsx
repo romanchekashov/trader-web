@@ -37,12 +37,14 @@ export const TrendsView: React.FC<Props> = ({trends, srLevels}) => {
                 </div>
                 {
                     trends.map(trend => {
-                        return (<TrendView key={trend.interval}
-                                           trend={trend}
-                                           srLevels={srLevels}
-                                           position={position}
-                                           width={400}
-                                           height={400}/>)
+                        return (
+                            <TrendView key={trend.interval}
+                                       trend={trend}
+                                       srLevels={srLevels}
+                                       position={position}
+                                       width={400}
+                                       height={400}/>
+                        )
                     })
                 }
             </div>
