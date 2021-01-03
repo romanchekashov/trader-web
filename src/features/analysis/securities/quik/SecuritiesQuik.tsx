@@ -164,9 +164,23 @@ export const SecuritiesQuik: React.FC<Props> = ({secType, selectedSecurity, onSe
 
     const demandSupplySort = (e: any) => {
         if (e.order > 0) {
-            return securities.sort((a, b) => a.totalDemand / a.totalSupply - b.totalDemand / b.totalSupply)
+            return securities.sort((a, b) => {
+                if (!a.totalSupply) return -1
+                if (!b.totalSupply) return 1
+                if (a.totalSupply && b.totalSupply) {
+                    return a.totalDemand / a.totalSupply - b.totalDemand / b.totalSupply
+                }
+                return 0
+            })
         }
-        return securities.sort((a, b) => b.totalDemand / b.totalSupply - a.totalDemand / a.totalSupply)
+        return securities.sort((a, b) => {
+            if (!a.totalSupply) return 1
+            if (!b.totalSupply) return -1
+            if (a.totalSupply && b.totalSupply) {
+                return b.totalDemand / b.totalSupply - a.totalDemand / a.totalSupply
+            }
+            return 0
+        })
     }
 
     // const selectedColumns = selectedSecurity ? lessColumns : columns
