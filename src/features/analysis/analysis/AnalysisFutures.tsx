@@ -1,45 +1,45 @@
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
-import {ChartWrapper} from "../../../common/components/chart/ChartWrapper";
-import {Interval} from "../../../common/data/Interval";
-import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
-import {TrendsView} from "../../../common/components/trend/TrendsView";
-import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
-import {Dropdown} from "primereact/dropdown";
-import {PrimeDropdownItem} from "../../../common/utils/utils";
-import {Column} from "primereact/column";
-import {DataTable} from "primereact/datatable";
+import { useEffect, useRef, useState } from "react";
+import { ChartWrapper } from "../../../common/components/chart/ChartWrapper";
+import { Interval } from "../../../common/data/Interval";
+import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
+import { TrendsView } from "../../../common/components/trend/TrendsView";
+import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
+import { Dropdown } from "primereact/dropdown";
+import { PrimeDropdownItem } from "../../../common/utils/utils";
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
 import Notifications from "../../../common/components/notifications/Notifications";
-import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
-import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
-import {TradePremise} from "../../../common/data/strategy/TradePremise";
-import {Order} from "../../../common/data/Order";
-import {ActiveTrade} from "../../../common/data/ActiveTrade";
+import { WebsocketService, WSEvent } from "../../../common/api/WebsocketService";
+import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
+import { TradePremise } from "../../../common/data/strategy/TradePremise";
+import { Order } from "../../../common/data/Order";
+import { ActiveTrade } from "../../../common/data/ActiveTrade";
 import Alerts from "../../../common/components/alerts/Alerts";
 import MarketState from "../../../common/components/market-state/MarketState";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
-import {adjustTradePremise} from "../../../common/utils/DataUtils";
-import {MoexOpenInterestView} from "./moex-open-interest/MoexOpenInterestView";
-import {Trade} from "../../../common/data/Trade";
-import {TabPanel, TabView} from "primereact/tabview";
-import {EconomicCalendar} from "../../../common/components/economic-calendar/EconomicCalendar";
-import {News} from "../../../common/components/news/News";
-import {StopOrder} from "../../../common/data/StopOrder";
-import {getTrades} from "../../../common/api/rest/quikRestApi";
-import {BrokerId} from "../../../common/data/BrokerId";
-import {MarketStateFilterDto} from "../../../common/components/market-state/data/MarketStateFilterDto";
-import {Market} from "../../../common/data/Market";
-import {TradeStrategyAnalysisFilterDto} from "../../../common/data/TradeStrategyAnalysisFilterDto";
-import {FilterDto} from "../../../common/data/FilterDto";
-import {SupplyAndDemand} from "./supply-and-demand/SupplyAndDemand";
-import {getTimeFrameHigh, getTimeFrameLow} from "../../../common/utils/TimeFrameChooser";
+import { adjustTradePremise } from "../../../common/utils/DataUtils";
+import { MoexOpenInterestView } from "./moex-open-interest/MoexOpenInterestView";
+import { Trade } from "../../../common/data/Trade";
+import { TabPanel, TabView } from "primereact/tabview";
+import { EconomicCalendar } from "../../../common/components/economic-calendar/EconomicCalendar";
+import { News } from "../../../common/components/news/News";
+import { StopOrder } from "../../../common/data/StopOrder";
+import { getTrades } from "../../../common/api/rest/quikRestApi";
+import { BrokerId } from "../../../common/data/BrokerId";
+import { MarketStateFilterDto } from "../../../common/components/market-state/data/MarketStateFilterDto";
+import { Market } from "../../../common/data/Market";
+import { TradeStrategyAnalysisFilterDto } from "../../../common/data/TradeStrategyAnalysisFilterDto";
+import { FilterDto } from "../../../common/data/FilterDto";
+import { SupplyAndDemand } from "./supply-and-demand/SupplyAndDemand";
+import { getTimeFrameHigh, getTimeFrameLow } from "../../../common/utils/TimeFrameChooser";
 import moment = require("moment");
 
 type Props = {
     security: SecurityLastInfo
 }
 
-const AnalysisFutures: React.FC<Props> = ({security}) => {
+const AnalysisFutures: React.FC<Props> = ({ security }) => {
     const timeFrameTradingIntervals = {
         "M1": [Interval.M1],
         "M3": [Interval.M3, Interval.M1],
@@ -67,7 +67,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
     const [stopOrders, setStopOrders] = useState<StopOrder[]>([]);
     const [activeTrade, setActiveTrade] = useState(null);
 
-    const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}));
+    const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({ label: "" + val, value: val }));
     const [chartNumber, setChartNumber] = useState<number>(2);
 
     const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
@@ -137,7 +137,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                 all: false
             })
 
-            updateMarketStateFilterDto(timeFrameTrading)
+            // updateMarketStateFilterDto(timeFrameTrading)
 
             fetchPremise(timeFrameTrading)
 
@@ -266,7 +266,7 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
         setTimeFrameHigh(getTimeFrameHigh(interval))
         setTimeFrameMin(getTimeFrameLow(interval))
         fetchPremise(interval)
-        updateMarketStateFilterDto(interval)
+        // updateMarketStateFilterDto(interval)
     }
 
     const onStartChanged = (start: Date) => {
@@ -302,100 +302,100 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
                     <div className="p-col-12">
                         <div className="analysis-head-chart-number">
                             <Dropdown value={chartNumber} options={chartNumbers}
-                                      onChange={(e) => onChartNumberChanged(e.value)}/>
+                                onChange={(e) => onChartNumberChanged(e.value)} />
                         </div>
                     </div>
                     <div className="p-col-12">
                         <DataTable value={[securityLastInfo]}>
-                            <Column field="totalDemand" header="Общ спрос"/>
-                            <Column field="totalSupply" header="Общ предл"/>
-                            <Column field="futureSellDepoPerContract" header="ГО прод"/>
-                            <Column field="futureBuyDepoPerContract" header="ГО покуп"/>
-                            <Column field="lastTradePrice" header="Цена"/>
-                            <Column field="numTradesToday" header="Кол-во сделок"/>
+                            <Column field="totalDemand" header="Общ спрос" />
+                            <Column field="totalSupply" header="Общ предл" />
+                            <Column field="futureSellDepoPerContract" header="ГО прод" />
+                            <Column field="futureBuyDepoPerContract" header="ГО покуп" />
+                            <Column field="lastTradePrice" header="Цена" />
+                            <Column field="numTradesToday" header="Кол-во сделок" />
                         </DataTable>
                     </div>
                 </div>
-                <TrendsView trends={premise ? premise.analysis.trends : []}/>
-                <div className="p-grid" style={{margin: '0'}}>
+                <TrendsView trends={premise ? premise.analysis.trends : []} />
+                <div className="p-grid" style={{ margin: '0' }}>
                     <div className="p-col-12" ref={chart1Ref}
-                         style={{padding: '0'}}>
+                        style={{ padding: '0' }}>
                         <ChartWrapper interval={timeFrameTrading}
-                                      initialNumberOfCandles={500}
-                                      onIntervalChanged={onTradingIntervalChanged}
-                                      onStartChanged={onStartChanged}
-                                      onPremiseBeforeChanged={onPremiseBeforeChanged}
-                                      width={chart1Width}
-                                      security={securityLastInfo}
-                                      premise={premise}
-                                      stops={stopOrders}
-                                      orders={orders}
-                                      trades={trades}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
+                            initialNumberOfCandles={500}
+                            onIntervalChanged={onTradingIntervalChanged}
+                            onStartChanged={onStartChanged}
+                            onPremiseBeforeChanged={onPremiseBeforeChanged}
+                            width={chart1Width}
+                            security={securityLastInfo}
+                            premise={premise}
+                            stops={stopOrders}
+                            orders={orders}
+                            trades={trades}
+                            activeTrade={activeTrade}
+                            showGrid={true} />
                     </div>
                     {
                         chartNumber === 2 ? (
-                            <div className="p-col-12" ref={chart2Ref} style={{padding: '0'}}>
+                            <div className="p-col-12" ref={chart2Ref} style={{ padding: '0' }}>
                                 <ChartWrapper interval={timeFrameHigh}
                                     // start={start}
-                                              initialNumberOfCandles={500}
-                                              onIntervalChanged={interval => {
-                                              }}
-                                              onStartChanged={start => {
-                                              }}
-                                              width={chart2Width}
-                                              security={securityLastInfo}
-                                              premise={premise}
-                                              trades={trades}
-                                              showGrid={true}/>
+                                    initialNumberOfCandles={500}
+                                    onIntervalChanged={interval => {
+                                    }}
+                                    onStartChanged={start => {
+                                    }}
+                                    width={chart2Width}
+                                    security={securityLastInfo}
+                                    premise={premise}
+                                    trades={trades}
+                                    showGrid={true} />
                             </div>
                         ) : null
                     }
                 </div>
                 <div className="p-grid">
-                    <div className="p-col-12">
+                    {/* <div className="p-col-12">
                         <MarketState filter={marketStateFilterDto}/>
                     </div>
                     <div className="p-col-12">
                         <SwingStateList filter={marketStateFilterDto}/>
-                    </div>
+                    </div> */}
                     <div className="p-col-12">
-                        <SupplyAndDemand security={securityLastInfo}/>
+                        <SupplyAndDemand security={securityLastInfo} />
                     </div>
                     <div className="p-col-12">
                         <div className="p-grid">
                             <div className="p-col-4">
                                 <Notifications filter={filterDto}
-                                               security={securityLastInfo}
-                                               onNotificationSelected={(n) => {
-                                                   console.log(n)
-                                               }}
-                                               viewHeight={400}/>
+                                    security={securityLastInfo}
+                                    onNotificationSelected={(n) => {
+                                        console.log(n)
+                                    }}
+                                    viewHeight={400} />
                             </div>
                             <div className="p-col-4">
                                 <Alerts filter={filterDto}
-                                        onAlertSelected={(n) => {
-                                            console.log(n)
-                                        }}
-                                        alertsHeight={400}/>
+                                    onAlertSelected={(n) => {
+                                        console.log(n)
+                                    }}
+                                    alertsHeight={400} />
                             </div>
                         </div>
                     </div>
-                    <div className="p-col-12" ref={chartAlertsRef} style={{padding: '0'}}>
+                    <div className="p-col-12" ref={chartAlertsRef} style={{ padding: '0' }}>
                         {
                             alert ?
                                 <ChartWrapper interval={alert.interval}
-                                              start={start}
-                                              onIntervalChanged={interval => {
-                                              }}
-                                              onStartChanged={start => {
-                                              }}
-                                              alert={alert}
-                                              width={chartAlertsWidth}
-                                              security={securityLastInfo}
-                                              premise={premise}
-                                              showGrid={true}/> : null
+                                    start={start}
+                                    onIntervalChanged={interval => {
+                                    }}
+                                    onStartChanged={start => {
+                                    }}
+                                    alert={alert}
+                                    width={chartAlertsWidth}
+                                    security={securityLastInfo}
+                                    premise={premise}
+                                    showGrid={true} /> : null
                         }
                     </div>
                 </div>
@@ -403,13 +403,13 @@ const AnalysisFutures: React.FC<Props> = ({security}) => {
             <div className="p-col-12">
                 <TabView activeIndex={activeTabIndex} onTabChange={(e) => onTabChanged(e.index)}>
                     <TabPanel header="Open Interest">
-                        <MoexOpenInterestView security={security}/>
+                        <MoexOpenInterestView security={security} />
                     </TabPanel>
                     <TabPanel header="News">
-                        <News secId={security.id}/>
+                        <News secId={security.id} />
                     </TabPanel>
                     <TabPanel header="Calendar">
-                        <EconomicCalendar secId={security.id}/>
+                        <EconomicCalendar secId={security.id} />
                     </TabPanel>
                 </TabView>
             </div>
