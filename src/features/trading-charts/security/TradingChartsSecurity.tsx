@@ -1,34 +1,36 @@
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
-import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
-import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/ChartWrapper";
-import {TradePremise} from "../../../common/data/strategy/TradePremise";
-import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
-import {Interval} from "../../../common/data/Interval";
-import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
-import {TrendsView} from "../../../common/components/trend/TrendsView";
-import {BrokerId} from "../../../common/data/BrokerId";
-import {RouteComponentProps} from "react-router-dom";
-import {getLastSecurities, getTradePremise} from "../../../common/api/rest/analysisRestApi";
-import {ClassCode} from "../../../common/data/ClassCode";
-import {Trend} from "../../../common/data/strategy/Trend";
+import { useEffect, useRef, useState } from "react";
+import { MarketBotStartDto } from "../../../common/data/bot/MarketBotStartDto";
+import { CHART_MIN_WIDTH, ChartWrapper } from "../../../common/components/chart/ChartWrapper";
+import { TradePremise } from "../../../common/data/strategy/TradePremise";
+import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
+import { Interval } from "../../../common/data/Interval";
+import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
+import { TrendsView } from "../../../common/components/trend/TrendsView";
+import { BrokerId } from "../../../common/data/BrokerId";
+import { RouteComponentProps } from "react-router-dom";
+import { getLastSecurities, getTradePremise } from "../../../common/api/rest/analysisRestApi";
+import { ClassCode } from "../../../common/data/ClassCode";
+import { Trend } from "../../../common/data/strategy/Trend";
 import Notifications from "../../../common/components/notifications/Notifications";
-import {FilterDto} from "../../../common/data/FilterDto";
-import {StockEventsBrief} from "../../../common/components/share-event/StockEventsBrief";
-import {SecurityLastInfoView} from "./info/SecurityLastInfoView";
+import { FilterDto } from "../../../common/data/FilterDto";
+import { StockEventsBrief } from "../../../common/components/share-event/StockEventsBrief";
+import { SecurityLastInfoView } from "./info/SecurityLastInfoView";
 import TrendViewChart from "../../../common/components/trend/TrendViewChart";
 import moment = require("moment");
+import { WebsocketService, WSEvent } from "../../../common/api/WebsocketService";
+import { filter } from "rxjs/internal/operators/filter";
+import { map } from "rxjs/internal/operators/map";
 
 type RouteParams = {
     secId: string
     premiseStart: string
 }
 
-export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> = ({match}) => {
+export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> = ({ match }) => {
     const secId: number = parseInt(match.params.secId)
     const start = match.params.premiseStart ? moment(match.params.premiseStart, "DD-MM-YYYY_HH-mm").toDate() : null
     const CHART_HEIGHT = 600
-    const [filter, setFilter] = useState<MarketBotStartDto>(null);
     const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
     const [securities, setSecurities] = useState<SecurityLastInfo[]>([]);
     const [premise, setPremise] = useState<TradePremise>(null);
@@ -63,11 +65,19 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
             }
         })
 
+        const lastSecuritiesSubscription = WebsocketService.getInstance()
+            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+            .pipe(map(securities => securities.find(security => security.id === secId)))
+            .subscribe(security => {
+                document.title = `${security.secCode} - ${security.lastChange}% - ${security.lastTradePrice}`
+            })
+
         setTimeout(updateSize, 1000)
         window.addEventListener('resize', updateSize)
 
         // Specify how to clean up after this effect:
         return function cleanup() {
+            lastSecuritiesSubscription.unsubscribe()
             window.removeEventListener('resize', updateSize)
         }
     }, [])
@@ -143,70 +153,70 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
     return (
         <div className="p-grid sample-layout analysis">
             <div className="p-col-2">
-                <SecurityLastInfoView security={securityLastInfo}/>
+                <SecurityLastInfoView security={securityLastInfo} />
                 <Notifications filter={filterDto}
-                               security={securityLastInfo}
-                               onNotificationSelected={(n) => {
-                                   console.log(n)
-                               }}
-                               viewHeight={800}/>
-                <StockEventsBrief secCode={securityLastInfo.secCode}/>
+                    security={securityLastInfo}
+                    onNotificationSelected={(n) => {
+                        console.log(n)
+                    }}
+                    viewHeight={800} />
+                <StockEventsBrief secCode={securityLastInfo.secCode} />
             </div>
             <div className="p-col-10">
                 <div className="p-grid">
                     <div className="p-col-12">
                         <TrendsView trends={premise?.analysis?.trends || []}
-                                    srLevels={premise?.analysis?.srLevels || []}/>
+                            srLevels={premise?.analysis?.srLevels || []} />
                     </div>
                     <div className="p-col-12">
                         <div className="p-grid">
-                            <div className="p-col-5" ref={chart2Ref1} style={{padding: '0'}}>
+                            <div className="p-col-5" ref={chart2Ref1} style={{ padding: '0' }}>
                                 <TrendViewChart key={timeFrame2}
-                                                trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
-                                                srLevels={premise?.analysis?.srLevels}
-                                                width={chart2Width1}
-                                                height={600}/>
+                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
+                                    srLevels={premise?.analysis?.srLevels}
+                                    width={chart2Width1}
+                                    height={600} />
                             </div>
-                            <div className="p-col-7" ref={chart2Ref} style={{padding: '0'}}>
+                            <div className="p-col-7" ref={chart2Ref} style={{ padding: '0' }}>
                                 <ChartWrapper interval={timeFrame2}
-                                              initialNumberOfCandles={500}
-                                              start={start2}
-                                              onIntervalChanged={() => {
-                                              }}
-                                              onStartChanged={() => {
-                                              }}
-                                              width={chart2Width}
-                                              chartHeight={CHART_HEIGHT}
-                                              security={securityLastInfo}
-                                              premise={premise}
-                                              trend={getTrend(timeFrame2)}
-                                              orders={orders}
-                                              activeTrade={activeTrade}
-                                              showGrid={true}/>
+                                    initialNumberOfCandles={500}
+                                    start={start2}
+                                    onIntervalChanged={() => {
+                                    }}
+                                    onStartChanged={() => {
+                                    }}
+                                    width={chart2Width}
+                                    chartHeight={CHART_HEIGHT}
+                                    security={securityLastInfo}
+                                    premise={premise}
+                                    trend={getTrend(timeFrame2)}
+                                    orders={orders}
+                                    activeTrade={activeTrade}
+                                    showGrid={true} />
                             </div>
-                            <div className="p-col-5" ref={chart3Ref1} style={{padding: '0'}}>
+                            <div className="p-col-5" ref={chart3Ref1} style={{ padding: '0' }}>
                                 <TrendViewChart key={timeFrame3}
-                                                trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
-                                                srLevels={premise?.analysis?.srLevels}
-                                                width={chart3Width1}
-                                                height={600}/>
+                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
+                                    srLevels={premise?.analysis?.srLevels}
+                                    width={chart3Width1}
+                                    height={600} />
                             </div>
-                            <div className="p-col-7" ref={chart3Ref} style={{padding: '0'}}>
+                            <div className="p-col-7" ref={chart3Ref} style={{ padding: '0' }}>
                                 <ChartWrapper interval={timeFrame3}
-                                              initialNumberOfCandles={500}
-                                              start={start3}
-                                              onIntervalChanged={() => {
-                                              }}
-                                              onStartChanged={() => {
-                                              }}
-                                              width={chart3Width}
-                                              chartHeight={CHART_HEIGHT}
-                                              security={securityLastInfo}
-                                              premise={premise}
-                                              trend={getTrend(timeFrame3)}
-                                              orders={orders}
-                                              activeTrade={activeTrade}
-                                              showGrid={true}/>
+                                    initialNumberOfCandles={500}
+                                    start={start3}
+                                    onIntervalChanged={() => {
+                                    }}
+                                    onStartChanged={() => {
+                                    }}
+                                    width={chart3Width}
+                                    chartHeight={CHART_HEIGHT}
+                                    security={securityLastInfo}
+                                    premise={premise}
+                                    trend={getTrend(timeFrame3)}
+                                    orders={orders}
+                                    activeTrade={activeTrade}
+                                    showGrid={true} />
                             </div>
                         </div>
                     </div>

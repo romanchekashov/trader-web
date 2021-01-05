@@ -1,26 +1,26 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
-import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
+import { useEffect, useState } from "react";
+import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
 import "../../../common/components/notifications/Signals.css";
 import "./Securities.css"
-import {SecuritiesFilter} from "./filter/SecuritiesFilter";
-import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
-import {SecuritiesQuik} from "./quik/SecuritiesQuik";
-import {SecuritiesTinkoffApi} from "./tinkoff/SecuritiesTinkoffApi";
-import {BrokerId} from "../../../common/data/BrokerId";
-import {SecurityType} from "../../../common/data/security/SecurityType";
+import { SecuritiesFilter } from "./filter/SecuritiesFilter";
+import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
+import { SecuritiesQuik } from "./quik/SecuritiesQuik";
+import { SecuritiesTinkoffApi } from "./tinkoff/SecuritiesTinkoffApi";
+import { BrokerId } from "../../../common/data/BrokerId";
+import { SecurityType } from "../../../common/data/security/SecurityType";
 import moment = require("moment");
 
 type Props = {
     onSelectRow: (e: SecurityLastInfo) => void
 }
 
-export const Securities: React.FC<Props> = ({onSelectRow}) => {
+export const Securities: React.FC<Props> = ({ onSelectRow }) => {
     const [lastTimeUpdate, setLastTimeUpdate] = useState<string>(null)
-    const [platform, setPlatform] = useState<TradingPlatform>(TradingPlatform.QUIK);
-    const [brokerId, setBrokerId] = useState<BrokerId>(BrokerId.ALFA_DIRECT);
+    const [platform, setPlatform] = useState<TradingPlatform>(TradingPlatform.QUIK)
+    const [brokerId, setBrokerId] = useState<BrokerId>(BrokerId.ALFA_DIRECT)
     const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
-    const [secType, setSecType] = useState<SecurityType>(null)
+    const [secType, setSecType] = useState<SecurityType>(SecurityType.FUTURE)
 
     useEffect(() => {
         // Specify how to clean up after this effect:
@@ -45,22 +45,22 @@ export const Securities: React.FC<Props> = ({onSelectRow}) => {
     return (
         <>
             <SecuritiesFilter lastTimeUpdate={lastTimeUpdate}
-                              onShowAll={() => selectSecurity(null)}
-                              brokerId={brokerId}
-                              onBrokerId={selectBrokerId}
-                              platform={platform}
-                              secType={secType}
-                              changeSecType={setSecType}/>
+                onShowAll={() => selectSecurity(null)}
+                brokerId={brokerId}
+                onBrokerId={selectBrokerId}
+                platform={platform}
+                secType={secType}
+                changeSecType={setSecType} />
             {
                 brokerId === BrokerId.ALFA_DIRECT ?
                     <SecuritiesQuik secType={secType}
-                                    selectedSecurity={selectedSecurity}
-                                    onSelectRow={selectSecurity}
-                                    onLastTimeUpdate={onLastTimeUpdate}/>
+                        selectedSecurity={selectedSecurity}
+                        onSelectRow={selectSecurity}
+                        onLastTimeUpdate={onLastTimeUpdate} />
                     :
                     <SecuritiesTinkoffApi selectedSecurity={selectedSecurity}
-                                          onSelectRow={selectSecurity}
-                                          onLastTimeUpdate={onLastTimeUpdate}/>
+                        onSelectRow={selectSecurity}
+                        onLastTimeUpdate={onLastTimeUpdate} />
             }
         </>
     )
