@@ -13,7 +13,7 @@ export class SecurityAnalysis extends Security {
     public atrM5Percent: number
     public distancePassedSinceLastDayCloseRelativeToAtr: number
     public distancePassedSinceLastDayCloseRelativeToAtrAvg: number
-    public percentOfFloatTradedToday: number
+    public percentOfFreeFloatTradedToday: number
     public gapDay: number
     public gapDayPercent: number
     public relativeVolumeDay: number

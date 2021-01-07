@@ -33,7 +33,8 @@ export const SecuritiesQuik: React.FC<Props> = ({ secType, selectedSecurity, onS
         { field: 'totalDemand', header: 'Об спр/пред' },
         { field: 'valueToday', header: 'Оборот' },
         { field: 'numTradesToday', header: 'Кол сд' },
-        { field: 'percentOfFloatTradedToday', header: '% Flt Tr' },
+        { field: 'percentOfFreeFloatTradedToday', header: '% FreeFlt Tr' },
+        { field: 'freeFloatInPercent', header: 'FreeFlt(%)' },
         { field: 'atrDay', header: 'ATR(D)' },
         { field: 'atrM60', header: 'ATR(M60)' },
         { field: 'atrM30', header: 'ATR(M30)' },
@@ -221,6 +222,7 @@ export const SecuritiesQuik: React.FC<Props> = ({ secType, selectedSecurity, onS
                 style={{ width: '105px' }} />
         } else if ("secCode" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
+                style={{ width: '60px' }}
                 body={(rowData, column) => <div style={{
                     overflowX: "hidden",
                     fontWeight: SecurityType.STOCK !== rowData.type ? 'bold' : 'normal'

@@ -1,15 +1,15 @@
 import * as React from "react";
-import {useEffect} from "react";
+import { useEffect } from "react";
 import "./SecurityLastInfoView.css"
-import {SecurityLastInfo} from "../../../../common/data/security/SecurityLastInfo";
-import {DemandSupply} from "../../../../common/components/demand-supply/DemandSupply";
-import {formatNumber} from "../../../../common/utils/utils";
+import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
+import { DemandSupply } from "../../../../common/components/demand-supply/DemandSupply";
+import { formatNumber } from "../../../../common/utils/utils";
 
 type Props = {
     security: SecurityLastInfo
 }
 
-export const SecurityLastInfoView: React.FC<Props> = ({security}) => {
+export const SecurityLastInfoView: React.FC<Props> = ({ security }) => {
 
     useEffect(() => {
 
@@ -55,9 +55,9 @@ export const SecurityLastInfoView: React.FC<Props> = ({security}) => {
                     Vol Today: <strong>{security.volumeToday} </strong>
                     Rel Vol(D): <strong>{security.relativeVolumeDay}</strong>
                 </div>
-                {security.percentOfFloatTradedToday ?
-                    <div>Float Traded(%): <strong>{security.percentOfFloatTradedToday}</strong></div> : null}
-                <DemandSupply totalDemand={security.totalDemand} totalSupply={security.totalSupply}/>
+                {security.percentOfFreeFloatTradedToday ?
+                    <div>Float Traded(%): <strong>{security.percentOfFreeFloatTradedToday}</strong></div> : null}
+                <DemandSupply totalDemand={security.totalDemand} totalSupply={security.totalSupply} />
             </div>
         </div>
     )

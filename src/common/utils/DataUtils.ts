@@ -108,7 +108,7 @@ export const adjustOrders = (orders: Order[]): any => {
 export const adjustShares = (shares: SecurityShare[]): any => {
     if (shares && shares.length > 0) {
         for (const share of shares) {
-            share.percentOfFloatTradedToday = share.issueSize > 0
+            share.percentOfFreeFloatTradedToday = share.issueSize > 0
                 ? round100((share.volumeToday / share.issueSize) * 100) : 0;
         }
     }
