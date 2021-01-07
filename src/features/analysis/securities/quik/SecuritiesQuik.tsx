@@ -39,9 +39,9 @@ export const SecuritiesQuik: React.FC<Props> = ({ secType, selectedSecurity, onS
         { field: 'distancePassedSinceLastDayCloseRelativeToAtrAvg', header: 'GAtrDis AVG(D)%' },
         { field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GAtrDis (D)%' },
         { field: 'atrDay', header: 'ATR(D)' },
-        { field: 'atrM60', header: 'ATR(M60)' },
+        // { field: 'atrM60', header: 'ATR(M60)' },
         { field: 'atrM30', header: 'ATR(M30)' },
-        { field: 'atrM3', header: 'ATR(M3)' },
+        // { field: 'atrM3', header: 'ATR(M3)' },
         { field: 'gapDay', header: 'Gap(D)' },
         { field: 'gapDayPercent', header: 'Gap(D)%' },
         { field: 'volumeInPercentDay', header: 'Vol(D)%' },
@@ -227,6 +227,28 @@ export const SecuritiesQuik: React.FC<Props> = ({ secType, selectedSecurity, onS
         return securities.sort((a, b) => b.volumeToday - a.volumeToday)
     }
 
+    const shortNameTemplate = (rowData, column) => {
+        return <div title={rowData.name}
+            style={{
+                width: '105px',
+                fontWeight: SecurityType.FUTURE === rowData.type ? 'bold' : 'normal'
+            }}>{rowData.shortName}</div>
+    }
+
+    const secCodeTemplate = (rowData, column) => {
+        return <div style={{
+            overflowX: "hidden",
+            fontWeight: SecurityType.STOCK !== rowData.type ? 'bold' : 'normal'
+        }}>{rowData.secCode}</div>
+    }
+
+    const typeTemplate = (rowData, column) => {
+        return <div style={{
+            overflowX: "hidden",
+            fontWeight: SecurityType.CURRENCY === rowData.type ? 'bold' : 'normal'
+        }}>{rowData.type}</div>
+    }
+
     // const selectedColumns = selectedSecurity ? lessColumns : columns
     const selectedColumns = columns
     const columnComponents = selectedColumns.map(col => {
@@ -248,27 +270,21 @@ export const SecuritiesQuik: React.FC<Props> = ({ secType, selectedSecurity, onS
         } else if ("secCode" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
                 style={{ width: '60px' }}
-                body={(rowData, column) => <div style={{
-                    overflowX: "hidden",
-                    fontWeight: SecurityType.STOCK !== rowData.type ? 'bold' : 'normal'
-                }}>{rowData.secCode}</div>} />
+                body={secCodeTemplate} />
         } else if ("shortName" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
-                style={{ overflowX: "hidden" }}
-                body={(rowData, column) => <div style={{
-                    width: '105px',
-                    fontWeight: SecurityType.FUTURE === rowData.type ? 'bold' : 'normal'
-                }}>{rowData.shortName}</div>} />
+                style={{ overflowX: "hidden", width: '90px' }}
+                body={shortNameTemplate} />
         } else if ("type" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
                 style={{ width: '30px' }}
-                body={(rowData, column) => <div style={{
-                    overflowX: "hidden",
-                    fontWeight: SecurityType.CURRENCY === rowData.type ? 'bold' : 'normal'
-                }}>{rowData.type}</div>} />
+                body={typeTemplate} />
         } else if ("id" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
                 style={{ width: '40px', textAlign: "center" }} />
+        } else if ("lastTradePrice" === col.field) {
+            return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
+                style={{ width: '60px', textAlign: "center" }} />
         } else {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true} />
         }
