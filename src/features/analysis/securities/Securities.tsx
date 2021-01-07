@@ -10,6 +10,7 @@ import { SecuritiesTinkoffApi } from "./tinkoff/SecuritiesTinkoffApi";
 import { BrokerId } from "../../../common/data/BrokerId";
 import { SecurityType } from "../../../common/data/security/SecurityType";
 import moment = require("moment");
+import { SecurityTypeWrapper } from "../../../common/data/security/SecurityTypeWrapper";
 
 type Props = {
     onSelectRow: (e: SecurityLastInfo) => void
@@ -20,7 +21,7 @@ export const Securities: React.FC<Props> = ({ onSelectRow }) => {
     const [platform, setPlatform] = useState<TradingPlatform>(TradingPlatform.QUIK)
     const [brokerId, setBrokerId] = useState<BrokerId>(BrokerId.ALFA_DIRECT)
     const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
-    const [secType, setSecType] = useState<SecurityType>(SecurityType.FUTURE)
+    const [secType, setSecType] = useState<SecurityTypeWrapper>(SecurityTypeWrapper.FUTURE)
 
     useEffect(() => {
         // Specify how to clean up after this effect:

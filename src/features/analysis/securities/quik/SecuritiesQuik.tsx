@@ -1,71 +1,72 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
-import {Column} from "primereact/column";
-import {DataTable} from "primereact/datatable";
-import {WebsocketService, WSEvent} from "../../../../common/api/WebsocketService";
-import {SecurityLastInfo} from "../../../../common/data/security/SecurityLastInfo";
-import {Signal} from "../../../../common/data/Signal";
-import {PatternName} from "../../../../common/components/alerts/data/PatternName";
-import {getLastSecurities} from "../../../../common/api/rest/analysisRestApi";
+import { useEffect, useState } from "react";
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
+import { WebsocketService, WSEvent } from "../../../../common/api/WebsocketService";
+import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
+import { Signal } from "../../../../common/data/Signal";
+import { PatternName } from "../../../../common/components/alerts/data/PatternName";
+import { getLastSecurities } from "../../../../common/api/rest/analysisRestApi";
 import "./SecuritiesQuik.css"
-import {SecurityType} from "../../../../common/data/security/SecurityType";
-import {DemandSupply} from "../../../../common/components/demand-supply/DemandSupply";
+import { SecurityType } from "../../../../common/data/security/SecurityType";
+import { DemandSupply } from "../../../../common/components/demand-supply/DemandSupply";
 import moment = require("moment");
+import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
 
 type Props = {
-    secType: SecurityType
+    secType: SecurityTypeWrapper
     selectedSecurity: SecurityLastInfo
     onSelectRow: (e: SecurityLastInfo) => void
     onLastTimeUpdate: (lastTimeUpdate: Date) => void
 }
 
-export const SecuritiesQuik: React.FC<Props> = ({secType, selectedSecurity, onSelectRow, onLastTimeUpdate}) => {
+export const SecuritiesQuik: React.FC<Props> = ({ secType, selectedSecurity, onSelectRow, onLastTimeUpdate }) => {
     const [securities, setSecurities] = useState<SecurityLastInfo[]>([])
 
     const columns = [
-        {field: 'id', header: 'Id'},
-        {field: 'type', header: 'Type'},
-        {field: 'shortName', header: 'Наз'},
-        {field: 'secCode', header: 'Тикер'},
-        {field: 'lastChange', header: '% изм'},
-        {field: 'lastTradePrice', header: 'Цен посл'},
-        {field: 'totalDemand', header: 'Об спр/пред'},
-        {field: 'valueToday', header: 'Оборот'},
-        {field: 'numTradesToday', header: 'Кол сд'},
-        {field: 'percentOfFloatTradedToday', header: '% Flt Tr'},
-        {field: 'atrDay', header: 'ATR(D)'},
-        {field: 'atrM60', header: 'ATR(M60)'},
-        {field: 'atrM30', header: 'ATR(M30)'},
-        {field: 'atrM3', header: 'ATR(M3)'},
-        {field: 'distancePassedSinceLastDayCloseRelativeToAtrAvg', header: 'GAtrDis AVG(D)%'},
-        {field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GAtrDis (D)%'},
-        {field: 'gapDay', header: 'Gap(D)'},
-        {field: 'gapDayPercent', header: 'Gap(D)%'},
-        {field: 'volumeInPercentDay', header: 'Vol(D)%'},
-        {field: 'volumeInPercentM60', header: 'Vol(M60)%'},
-        {field: 'volumeInPercentM30', header: 'Vol(M30)%'},
-        {field: 'volumeInPercentM3', header: 'Vol(M3)%'},
-        {field: 'volumeToday', header: 'Vol Today'},
-        {field: 'relativeVolumeDay', header: 'Rel Vol(D)'},
-        {field: 'signals', header: 'Signals'}
+        { field: 'id', header: 'Id' },
+        { field: 'type', header: 'Type' },
+        { field: 'shortName', header: 'Наз' },
+        { field: 'secCode', header: 'Тикер' },
+        { field: 'lastChange', header: '% изм' },
+        { field: 'lastTradePrice', header: 'Цен посл' },
+        { field: 'totalDemand', header: 'Об спр/пред' },
+        { field: 'valueToday', header: 'Оборот' },
+        { field: 'numTradesToday', header: 'Кол сд' },
+        { field: 'percentOfFloatTradedToday', header: '% Flt Tr' },
+        { field: 'atrDay', header: 'ATR(D)' },
+        { field: 'atrM60', header: 'ATR(M60)' },
+        { field: 'atrM30', header: 'ATR(M30)' },
+        { field: 'atrM3', header: 'ATR(M3)' },
+        { field: 'distancePassedSinceLastDayCloseRelativeToAtrAvg', header: 'GAtrDis AVG(D)%' },
+        { field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GAtrDis (D)%' },
+        { field: 'gapDay', header: 'Gap(D)' },
+        { field: 'gapDayPercent', header: 'Gap(D)%' },
+        { field: 'volumeInPercentDay', header: 'Vol(D)%' },
+        { field: 'volumeInPercentM60', header: 'Vol(M60)%' },
+        { field: 'volumeInPercentM30', header: 'Vol(M30)%' },
+        { field: 'volumeInPercentM3', header: 'Vol(M3)%' },
+        { field: 'volumeToday', header: 'Vol Today' },
+        { field: 'relativeVolumeDay', header: 'Rel Vol(D)' },
+        { field: 'signals', header: 'Signals' }
     ]
 
     const lessColumns = [
-        {field: 'id', header: 'Id'},
-        {field: 'type', header: 'Type'},
-        {field: 'shortName', header: 'Наз'},
-        {field: 'lastChange', header: '% изм'},
-        {field: 'lastTradePrice', header: 'Цен посл'},
-        {field: 'totalDemand', header: 'Об спр/пред'},
-        {field: 'distancePassedSinceLastDayCloseRelativeToAtrAvg', header: 'GAtrDis AVG(D)%'},
-        {field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GAtrDis (D)%'}
+        { field: 'id', header: 'Id' },
+        { field: 'type', header: 'Type' },
+        { field: 'shortName', header: 'Наз' },
+        { field: 'lastChange', header: '% изм' },
+        { field: 'lastTradePrice', header: 'Цен посл' },
+        { field: 'totalDemand', header: 'Об спр/пред' },
+        { field: 'distancePassedSinceLastDayCloseRelativeToAtrAvg', header: 'GAtrDis AVG(D)%' },
+        { field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GAtrDis (D)%' }
     ]
 
     useEffect(() => {
 
         getLastSecurities().then(securities => {
             if (secType && securities?.length > 0) {
-                setSecurities(securities.filter(value => value.type === secType))
+                setSecurities(filterSecurities(securities, secType))
             } else {
                 setSecurities(securities)
             }
@@ -75,7 +76,7 @@ export const SecuritiesQuik: React.FC<Props> = ({secType, selectedSecurity, onSe
         const lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
-                setSecurities(secType ? securities.filter(value => value.type === secType) : securities)
+                setSecurities(secType ? filterSecurities(securities, secType) : securities)
                 onLastTimeUpdate(new Date())
             })
 
@@ -84,6 +85,25 @@ export const SecuritiesQuik: React.FC<Props> = ({secType, selectedSecurity, onSe
             lastSecuritiesSubscription.unsubscribe()
         }
     }, [secType])
+
+    const filterSecurities = (securities: SecurityLastInfo[], secType: SecurityTypeWrapper): SecurityLastInfo[] => {
+        return securities.filter(value => {
+            switch (secType) {
+                case SecurityTypeWrapper.FUTURE:
+                    return value.type === SecurityType.FUTURE
+                case SecurityTypeWrapper.STOCK:
+                    return value.type === SecurityType.STOCK
+                case SecurityTypeWrapper.STOCK_1:
+                    return value.type === SecurityType.STOCK && value.shareSection === 1
+                case SecurityTypeWrapper.STOCK_2:
+                    return value.type === SecurityType.STOCK && value.shareSection === 2
+                case SecurityTypeWrapper.STOCK_3:
+                    return value.type === SecurityType.STOCK && value.shareSection === 3
+                case SecurityTypeWrapper.CURRENCY:
+                    return value.type === SecurityType.CURRENCY
+            }
+        })
+    }
 
     const getCandlePatternClassName = (alert: Signal) => {
         let className = "";
@@ -143,8 +163,8 @@ export const SecuritiesQuik: React.FC<Props> = ({secType, selectedSecurity, onSe
         }
 
         return <div key={signal.securityType + signal.ticker + signal.price + title}
-                    className={className}
-                    title={signal.description}></div>
+            className={className}
+            title={signal.description}></div>
     }
 
     const signalsTemplate = (rowData, column) => {
@@ -158,7 +178,7 @@ export const SecuritiesQuik: React.FC<Props> = ({secType, selectedSecurity, onSe
 
     const demandSupplyTemplate = (rowData, column) => {
         return (
-            <DemandSupply totalDemand={rowData.totalDemand} totalSupply={rowData.totalSupply}/>
+            <DemandSupply totalDemand={rowData.totalDemand} totalSupply={rowData.totalSupply} />
         )
     }
 
@@ -188,42 +208,42 @@ export const SecuritiesQuik: React.FC<Props> = ({secType, selectedSecurity, onSe
     const columnComponents = selectedColumns.map(col => {
         if ("totalDemand" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true}
-                           body={demandSupplyTemplate} sortFunction={demandSupplySort}
-                           style={{width: '100px'}}/>
+                body={demandSupplyTemplate} sortFunction={demandSupplySort}
+                style={{ width: '100px' }} />
         } else if ("signals" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} body={signalsTemplate}
-                           style={{width: '300px'}}/>
+                style={{ width: '300px' }} />
         } else if ("valueToday" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
-                           style={{width: '105px'}}/>
+                style={{ width: '105px' }} />
         } else if ("volumeToday" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
-                           style={{width: '105px'}}/>
+                style={{ width: '105px' }} />
         } else if ("secCode" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
-                           body={(rowData, column) => <div style={{
-                               overflowX: "hidden",
-                               fontWeight: SecurityType.STOCK !== rowData.type ? 'bold' : 'normal'
-                           }}>{rowData.secCode}</div>}/>
+                body={(rowData, column) => <div style={{
+                    overflowX: "hidden",
+                    fontWeight: SecurityType.STOCK !== rowData.type ? 'bold' : 'normal'
+                }}>{rowData.secCode}</div>} />
         } else if ("shortName" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
-                           style={{overflowX: "hidden"}}
-                           body={(rowData, column) => <div style={{
-                               width: '105px',
-                               fontWeight: SecurityType.FUTURE === rowData.type ? 'bold' : 'normal'
-                           }}>{rowData.shortName}</div>}/>
+                style={{ overflowX: "hidden" }}
+                body={(rowData, column) => <div style={{
+                    width: '105px',
+                    fontWeight: SecurityType.FUTURE === rowData.type ? 'bold' : 'normal'
+                }}>{rowData.shortName}</div>} />
         } else if ("type" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
-                           style={{width: '30px'}}
-                           body={(rowData, column) => <div style={{
-                               overflowX: "hidden",
-                               fontWeight: SecurityType.CURRENCY === rowData.type ? 'bold' : 'normal'
-                           }}>{rowData.type}</div>}/>
+                style={{ width: '30px' }}
+                body={(rowData, column) => <div style={{
+                    overflowX: "hidden",
+                    fontWeight: SecurityType.CURRENCY === rowData.type ? 'bold' : 'normal'
+                }}>{rowData.type}</div>} />
         } else if ("id" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
-                           style={{width: '40px', textAlign: "center"}}/>
+                style={{ width: '40px', textAlign: "center" }} />
         } else {
-            return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}/>
+            return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true} />
         }
     })
 
@@ -240,11 +260,11 @@ export const SecuritiesQuik: React.FC<Props> = ({secType, selectedSecurity, onSe
     return (
         <>
             <DataTable value={securities} responsive
-                       selectionMode="single"
-                       selection={selectedSecurity}
-                       onSelectionChange={onSelect}
-                       scrollable={!!selectedSecurity}
-                       scrollHeight="200px">
+                selectionMode="single"
+                selection={selectedSecurity}
+                onSelectionChange={onSelect}
+                scrollable={!!selectedSecurity}
+                scrollHeight="200px">
                 {columnComponents}
             </DataTable>
         </>

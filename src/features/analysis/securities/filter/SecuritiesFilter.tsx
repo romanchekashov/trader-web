@@ -1,11 +1,14 @@
 import * as React from "react";
-import {useEffect} from "react";
-import {Toolbar} from 'primereact/toolbar';
-import {Button} from "primereact/button";
-import {Dropdown} from "primereact/dropdown";
-import {TradingPlatform} from "../../../../common/data/trading/TradingPlatform";
-import {BrokerId} from "../../../../common/data/BrokerId";
-import {SecurityType} from "../../../../common/data/security/SecurityType";
+import { useEffect } from "react";
+import { Toolbar } from 'primereact/toolbar';
+import { Button } from "primereact/button";
+import { Dropdown } from "primereact/dropdown";
+import { TradingPlatform } from "../../../../common/data/trading/TradingPlatform";
+import { BrokerId } from "../../../../common/data/BrokerId";
+import { SecurityType } from "../../../../common/data/security/SecurityType";
+import { SelectButton } from "primereact/selectbutton";
+import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
+import "./SecuritiesFilter.css"
 
 type Props = {
     lastTimeUpdate: string
@@ -14,18 +17,25 @@ type Props = {
     platform: TradingPlatform
     // onPlatformChange: (platform: TradingPlatform) => void
     onShowAll: () => void
-    secType: SecurityType
-    changeSecType: (secType: SecurityType) => void
+    secType: SecurityTypeWrapper
+    changeSecType: (secType: SecurityTypeWrapper) => void
 }
 
-export const SecuritiesFilter: React.FC<Props> = ({lastTimeUpdate, onShowAll, brokerId, onBrokerId, platform, secType, changeSecType}) => {
+export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate, onShowAll, brokerId, onBrokerId, platform, secType, changeSecType }) => {
 
+    const types = [
+        { label: 'ALL', value: null },
+        { label: 'FUTURE', value: SecurityTypeWrapper.FUTURE },
+        { label: 'STOCK', value: SecurityTypeWrapper.STOCK },
+        { label: 'STOCK_1', value: SecurityTypeWrapper.STOCK_1 },
+        { label: 'STOCK_2', value: SecurityTypeWrapper.STOCK_2 },
+        { label: 'STOCK_3', value: SecurityTypeWrapper.STOCK_3 },
+        { label: 'CURRENCY', value: SecurityTypeWrapper.CURRENCY }
+    ]
     const ALL = "ALL"
-    const brokerIds = [BrokerId.ALFA_DIRECT, BrokerId.TINKOFF_INVEST].map(val => ({label: val, value: val}))
-    const secTypes = [ALL, SecurityType.FUTURE, SecurityType.STOCK, SecurityType.CURRENCY]
-        .map(val => ({label: val, value: val === ALL ? null : val}))
+    const brokerIds = [BrokerId.ALFA_DIRECT, BrokerId.TINKOFF_INVEST].map(val => ({ label: val, value: val }))
     const platforms = (brokerId === BrokerId.ALFA_DIRECT ? [TradingPlatform.QUIK] : [TradingPlatform.API])
-        .map(val => ({label: val, value: val}))
+        .map(val => ({ label: val, value: val }))
 
     const updateSecType = (e: any): void => changeSecType(e.value)
 
@@ -33,24 +43,36 @@ export const SecuritiesFilter: React.FC<Props> = ({lastTimeUpdate, onShowAll, br
     }, [])
 
     return (
-        <Toolbar className="filter" style={{padding: 0}}>
-            <div className="p-toolbar-group-left">
-                <Dropdown value={brokerId} options={brokerIds} onChange={(e) => {
+        <div className="securities-filter">
+            <Dropdown value={brokerId}
+                options={brokerIds}
+                onChange={(e) => {
                     onShowAll()
                     onBrokerId(e.value)
-                }} placeholder="Select a broker" style={{width: '120px'}}/>
-                <Dropdown value={platform} options={platforms} onChange={(e) => {
+                }}
+                placeholder="Select a broker"
+                style={{ width: '120px', marginRight: '5px' }} />
+
+            <Dropdown value={platform}
+                options={platforms}
+                onChange={(e) => {
                     // onPlatformChange(e.value)
-                }} placeholder="Select a platform" style={{width: '120px'}}/>
-                <Dropdown value={secType}
-                          options={secTypes}
-                          onChange={updateSecType}
-                          style={{width: '120px'}}/>
-                <Button label="Show All" icon="pi pi-caret-right" onClick={(e) => onShowAll()}/>
-            </div>
+                }}
+                placeholder="Select a platform"
+                style={{ width: '120px', marginRight: '5px' }} />
+
+            <SelectButton value={secType}
+                options={types}
+                onChange={updateSecType}
+                style={{ display: 'inline-block', marginRight: '5px' }} />
+
+            <Button label="Show All" icon="pi pi-caret-right"
+                onClick={(e) => onShowAll()}
+                style={{ marginRight: '5px' }} />
+
             <div className="p-toolbar-group-right">
                 {lastTimeUpdate}
             </div>
-        </Toolbar>
+        </div>
     )
 }
