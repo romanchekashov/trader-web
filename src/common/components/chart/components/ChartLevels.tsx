@@ -30,7 +30,7 @@ export const ChartLevels: React.FC<Props> = ({ srLevels, scale }) => {
         <>
             {
                 srLevels
-                    .filter(level => level.type)
+                    // .filter(level => level.type)
                     .map(level => {
 
                         const color = IntervalColor[level.interval]
