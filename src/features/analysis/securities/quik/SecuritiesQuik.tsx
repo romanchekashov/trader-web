@@ -12,6 +12,7 @@ import { SecurityType } from "../../../../common/data/security/SecurityType";
 import { DemandSupply } from "../../../../common/components/demand-supply/DemandSupply";
 import moment = require("moment");
 import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
+import { formatNumber } from "../../../../common/utils/utils";
 
 type Props = {
     secType: SecurityTypeWrapper
@@ -32,23 +33,23 @@ export const SecuritiesQuik: React.FC<Props> = ({ secType, selectedSecurity, onS
         { field: 'lastTradePrice', header: 'Цен посл' },
         { field: 'totalDemand', header: 'Об спр/пред' },
         { field: 'valueToday', header: 'Оборот' },
-        { field: 'numTradesToday', header: 'Кол сд' },
+        { field: 'volumeToday', header: 'Vol Today' },
         { field: 'percentOfFreeFloatTradedToday', header: '% FreeFlt Tr' },
         { field: 'freeFloatInPercent', header: 'FreeFlt(%)' },
+        { field: 'distancePassedSinceLastDayCloseRelativeToAtrAvg', header: 'GAtrDis AVG(D)%' },
+        { field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GAtrDis (D)%' },
         { field: 'atrDay', header: 'ATR(D)' },
         { field: 'atrM60', header: 'ATR(M60)' },
         { field: 'atrM30', header: 'ATR(M30)' },
         { field: 'atrM3', header: 'ATR(M3)' },
-        { field: 'distancePassedSinceLastDayCloseRelativeToAtrAvg', header: 'GAtrDis AVG(D)%' },
-        { field: 'distancePassedSinceLastDayCloseRelativeToAtr', header: 'GAtrDis (D)%' },
         { field: 'gapDay', header: 'Gap(D)' },
         { field: 'gapDayPercent', header: 'Gap(D)%' },
         { field: 'volumeInPercentDay', header: 'Vol(D)%' },
         { field: 'volumeInPercentM60', header: 'Vol(M60)%' },
         { field: 'volumeInPercentM30', header: 'Vol(M30)%' },
         { field: 'volumeInPercentM3', header: 'Vol(M3)%' },
-        { field: 'volumeToday', header: 'Vol Today' },
         { field: 'relativeVolumeDay', header: 'Rel Vol(D)' },
+        { field: 'numTradesToday', header: 'Кол сд' },
         { field: 'signals', header: 'Signals' }
     ]
 
@@ -204,6 +205,28 @@ export const SecuritiesQuik: React.FC<Props> = ({ secType, selectedSecurity, onS
         })
     }
 
+    const valueTodayTemplate = (rowData, column) => {
+        return formatNumber(rowData.valueToday)
+    }
+
+    const valueTodaySort = (e: any) => {
+        if (e.order > 0) {
+            return securities.sort((a, b) => a.valueToday - b.valueToday)
+        }
+        return securities.sort((a, b) => b.valueToday - a.valueToday)
+    }
+
+    const volumeTodayTemplate = (rowData, column) => {
+        return formatNumber(rowData.volumeToday)
+    }
+
+    const volumeTodaySort = (e: any) => {
+        if (e.order > 0) {
+            return securities.sort((a, b) => a.volumeToday - b.volumeToday)
+        }
+        return securities.sort((a, b) => b.volumeToday - a.volumeToday)
+    }
+
     // const selectedColumns = selectedSecurity ? lessColumns : columns
     const selectedColumns = columns
     const columnComponents = selectedColumns.map(col => {
@@ -216,10 +239,12 @@ export const SecuritiesQuik: React.FC<Props> = ({ secType, selectedSecurity, onS
                 style={{ width: '300px' }} />
         } else if ("valueToday" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
-                style={{ width: '105px' }} />
+                body={valueTodayTemplate} sortFunction={valueTodaySort}
+                style={{ width: '70px' }} />
         } else if ("volumeToday" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
-                style={{ width: '105px' }} />
+                body={volumeTodayTemplate} sortFunction={volumeTodaySort}
+                style={{ width: '70px' }} />
         } else if ("secCode" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}
                 style={{ width: '60px' }}
