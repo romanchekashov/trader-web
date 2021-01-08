@@ -1,7 +1,7 @@
 import * as React from "react"
-import {useEffect, useState} from "react"
-import {SecurityShareEvent} from "../../data/news/SecurityShareEvent"
-import {getSecurityShareEvents} from "../../api/rest/analysisRestApi"
+import { useEffect, useState } from "react"
+import { SecurityShareEvent } from "../../data/news/SecurityShareEvent"
+import { getSecurityShareEvents } from "../../api/rest/analysisRestApi"
 import "./StockEventsBrief.css"
 import moment = require("moment");
 
@@ -9,7 +9,7 @@ type Props = {
     secCode: string
 }
 
-export const StockEventsBrief: React.FC<Props> = ({secCode}) => {
+export const StockEventsBrief: React.FC<Props> = ({ secCode }) => {
     const [events, setEvents] = useState<SecurityShareEvent[]>([])
     const [selectedEvent, setSelectedEvent] = useState<SecurityShareEvent>(null)
 
@@ -18,7 +18,7 @@ export const StockEventsBrief: React.FC<Props> = ({secCode}) => {
             getSecurityShareEvents(secCode)
                 .then(events => {
                     setEvents(events)
-                    if (events.length > 0) setSelectedEvent(events[0])
+                    // if (events.length > 0) setSelectedEvent(events[0])
                 })
         }
     }, [secCode])
@@ -31,14 +31,14 @@ export const StockEventsBrief: React.FC<Props> = ({secCode}) => {
             <>
                 <h3>{event.title} ({date})</h3>
                 <p>Pub: {published} by {event.newsProvider} <a href={event.href} target="_blank">{event.href}</a></p>
-                <div dangerouslySetInnerHTML={{__html: selectedEvent.htmlText}}></div>
+                <div dangerouslySetInnerHTML={{ __html: selectedEvent.htmlText }}></div>
             </>
         )
     }
 
     return (
         <div className="p-grid">
-            <div className="p-col-12" style={{padding: 0, height: 800, overflowY: "scroll"}}>
+            <div className="p-col-12" style={{ padding: 0, height: 800, overflowY: "scroll" }}>
                 {
                     events.map((shareEvent, index) => {
                         const date = moment(shareEvent.date).format("DD-MM-YYYY");
@@ -55,9 +55,12 @@ export const StockEventsBrief: React.FC<Props> = ({secCode}) => {
 
                         return (
                             <div className={className}
-                                 onClick={(e) => setSelectedEvent(shareEvent)}>
-                                <div className="menu-item-brief-pub">Pub: {published} by {shareEvent.newsProvider}</div>
+                                onClick={(e) => setSelectedEvent(shareEvent)}>
+                                <div className="menu-item-brief-pub">
+                                    Pub: <strong>{published}</strong> by {shareEvent.newsProvider}
+                                </div>
                                 <div className="menu-item-brief-title">{shareEvent.title} ({date})</div>
+                                <div dangerouslySetInnerHTML={{ __html: shareEvent.htmlText }}></div>
                             </div>
                         )
                     })
