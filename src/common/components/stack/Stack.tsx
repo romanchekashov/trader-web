@@ -29,6 +29,7 @@ import { adjustTradePremise } from "../../utils/DataUtils";
 import intervalCompare from "../../utils/IntervalComporator";
 import DepositView from "./deposit/DepositView";
 import { TEST_ACTIVE_TRADES } from "../../utils/TestData";
+import { StackEvent, StackService } from "./StackService";
 
 type Props = {};
 
@@ -164,9 +165,11 @@ export class Stack extends React.Component<Props, States> {
                     })
                 } else {
                     this.setState({ activeTrades: [], selectedActiveTrade: null })
-                    // this.setState({activeTrades: TEST_ACTIVE_TRADES, selectedActiveTrade: TEST_ACTIVE_TRADES[0]})
                 }
             })
+
+        // TestData
+        // this.setState({ activeTrades: TEST_ACTIVE_TRADES, selectedActiveTrade: TEST_ACTIVE_TRADES[0] })
 
         this.tradePremiseSubscription = WebsocketService.getInstance()
             .on<TradePremise>(WSEvent.TRADE_PREMISE)
@@ -420,6 +423,11 @@ export class Stack extends React.Component<Props, States> {
         })
     }
 
+    onSelectActiveTrade = (selectedActiveTrade: ActiveTrade): void => {
+        this.setState({ selectedActiveTrade })
+        StackService.getInstance().send(StackEvent.ACTIVE_TRADE_SELECTED, selectedActiveTrade)
+    }
+
     render() {
         const {
             volumes, stackItemsHeight, visible, sessionResult, activeTrades,
@@ -439,7 +447,9 @@ export class Stack extends React.Component<Props, States> {
                                 <Growl ref={(el) => this.growl = el} />
                                 <div className="p-col-12" style={{ padding: 0, fontSize: '12px' }}>
                                     <SessionTradeResultView result={sessionResult} />
-                                    <ActiveTradeView trades={activeTrades} />
+                                    <ActiveTradeView trades={activeTrades}
+                                        selected={selectedActiveTrade}
+                                        onSelectRow={this.onSelectActiveTrade} />
                                     <DepositView />
                                 </div>
                                 <div className="p-col-12">

@@ -124,7 +124,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
     // console.log(chart2Width1, chart2Width, chart3Width1, chart3Width)
 
     return (
-        <div className="p-grid sample-layout analysis">
+        <div id={"trading-chart-security-" + securityLastInfo.id} className="p-grid sample-layout analysis">
             <div className="p-col-2">
                 <SecurityLastInfoView security={securityLastInfo} />
                 <Notifications filter={filterDto}

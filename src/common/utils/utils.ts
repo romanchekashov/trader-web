@@ -100,3 +100,8 @@ export const formatNumber = (val: number): string => {
             : absVal >= 1.0e+3 ? round100(absVal / 1.0e+3) + " K"
                 : absVal + ""
 }
+
+export const pageJumpById = (elId: string): void => {
+    var top = document.getElementById(elId).offsetTop //Getting Y of target element
+    window.scrollTo(0, top)                        //Go there directly or some transition
+}​
