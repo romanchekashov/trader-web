@@ -1,10 +1,10 @@
 import * as React from "react";
-import {format} from "d3-format";
-import {timeFormat} from "d3-time-format";
+import { format } from "d3-format";
+import { timeFormat } from "d3-time-format";
 
-import {Chart, ChartCanvas} from "react-financial-charts";
-import {BarSeries, CandlestickSeries, LineSeries, ScatterSeries, Square,} from "react-financial-charts/lib/series";
-import {XAxis, YAxis} from "react-financial-charts/lib/axes";
+import { Chart, ChartCanvas } from "react-financial-charts";
+import { BarSeries, CandlestickSeries, LineSeries, ScatterSeries, Square, } from "react-financial-charts/lib/series";
+import { XAxis, YAxis } from "react-financial-charts/lib/axes";
 import {
     CrossHairCursor,
     CurrentCoordinate,
@@ -14,42 +14,42 @@ import {
     PriceCoordinate,
 } from "react-financial-charts/lib/coordinates";
 
-import {discontinuousTimeScaleProvider} from "react-financial-charts/lib/scale";
-import {OHLCTooltip} from "react-financial-charts/lib/tooltip";
+import { discontinuousTimeScaleProvider } from "react-financial-charts/lib/scale";
+import { OHLCTooltip } from "react-financial-charts/lib/tooltip";
 // import { fitWidth } from "react-financial-charts/lib/helper";
-import {head, last, toObject} from "react-financial-charts/lib/utils";
-import {ChartDrawType} from "./data/ChartDrawType";
-import {Candle} from "../../data/Candle";
-import {ChartLevel} from "./data/ChartLevel";
-import {SRZone} from "../../data/strategy/SRZone";
+import { head, last, toObject } from "react-financial-charts/lib/utils";
+import { ChartDrawType } from "./data/ChartDrawType";
+import { Candle } from "../../data/Candle";
+import { ChartLevel } from "./data/ChartLevel";
+import { SRZone } from "../../data/strategy/SRZone";
 import ChartZones from "./components/ChartZones";
-import {Interval} from "../../data/Interval";
-import {SRLevel} from "../../data/strategy/SRLevel";
-import {ChartLevels} from "./components/ChartLevels";
-import {DrawingObjectSelector, InteractiveYCoordinate, TrendLine} from "react-financial-charts/lib/interactive";
-import {atr, ema} from "react-financial-charts/lib/indicator";
+import { Interval } from "../../data/Interval";
+import { SRLevel } from "../../data/strategy/SRLevel";
+import { ChartLevels } from "./components/ChartLevels";
+import { DrawingObjectSelector, InteractiveYCoordinate, TrendLine } from "react-financial-charts/lib/interactive";
+import { atr, ema } from "react-financial-charts/lib/indicator";
 import {
     getInteractiveNodes,
     isCurrentChartInteractingId,
     saveInteractiveNodes,
     setCurrentChartInteractingId,
 } from "./utils/interactiveutils";
-import {TrendLineDto} from "../../data/TrendLineDto";
-import {round, StoreData} from "../../utils/utils";
-import {ChartTrendLine} from "./data/ChartTrendLine";
-import {TrendWrapper} from "../../data/TrendWrapper";
-import {ChartTrades} from "./components/ChartTrades";
-import {Trade} from "../../data/Trade";
-import {ChartDialog} from "./components/ChartDialog";
-import {getMorePropsForChart} from "react-financial-charts/lib/interactive/utils";
-import {Security} from "../../data/security/Security";
-import {Order} from "../../data/Order";
-import {StopOrder} from "../../data/StopOrder";
-import {OperationType} from "../../data/OperationType";
-import {ChartManageOrder} from "./data/ChartManageOrder";
-import {ActiveTrade} from "../../data/ActiveTrade";
-import {KeltnerChannelSeries} from "./components/keltner-channel/KeltnerChannelSeries";
-import {ChartSwingHighsLows} from "./components/ChartSwingHighsLows";
+import { TrendLineDto } from "../../data/TrendLineDto";
+import { round, StoreData } from "../../utils/utils";
+import { ChartTrendLine } from "./data/ChartTrendLine";
+import { TrendWrapper } from "../../data/TrendWrapper";
+import { ChartTrades } from "./components/ChartTrades";
+import { Trade } from "../../data/Trade";
+import { ChartDialog } from "./components/ChartDialog";
+import { getMorePropsForChart } from "react-financial-charts/lib/interactive/utils";
+import { Security } from "../../data/security/Security";
+import { Order } from "../../data/Order";
+import { StopOrder } from "../../data/StopOrder";
+import { OperationType } from "../../data/OperationType";
+import { ChartManageOrder } from "./data/ChartManageOrder";
+import { ActiveTrade } from "../../data/ActiveTrade";
+import { KeltnerChannelSeries } from "./components/keltner-channel/KeltnerChannelSeries";
+import { ChartSwingHighsLows } from "./components/ChartSwingHighsLows";
 
 const _ = require("lodash");
 
@@ -267,13 +267,13 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     onKeyPress = (e) => {
         if (!isCurrentChartInteractingId(this.id)) return;
 
-        const {onEnableTrendLine, needSave, onEnableNewOrder} = this.props;
+        const { onEnableTrendLine, needSave, onEnableNewOrder } = this.props;
         const keyCode = e.which;
         // console.log(keyCode);
 
         switch (keyCode) {
             case 46: { // DEL
-                const {trends_1, yCoordinateList_1} = this.state;
+                const { trends_1, yCoordinateList_1 } = this.state;
 
                 if (trends_1.some(each => each.selected)) {
                     needSave({
@@ -310,7 +310,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     };
 
     mapChartTrendToTrendLine = (trend: ChartTrendLine): TrendLineDto => {
-        const {data} = this.props;
+        const { data } = this.props;
         const startCandle = data[trend.start[0]];
         const endCandle = data[trend.end[0]];
 
@@ -336,7 +336,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     };
 
     onTrendLineComplete = (trends_1: ChartTrendLine[]) => {
-        const {onEnableTrendLine, data, needSave} = this.props;
+        const { onEnableTrendLine, data, needSave } = this.props;
 
         // this gets called on
         // 1. draw complete of trendline
@@ -382,7 +382,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                     const morePropsForChart = getMorePropsForChart(moreProps, first);
                     const {
                         mouseXY: [, mouseY],
-                        chartConfig: {yScale},
+                        chartConfig: { yScale },
                     } = morePropsForChart;
 
                     const yValue = round(yScale.invert(mouseY), 2);
@@ -423,8 +423,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     };
 
     handleChoosePosition = (alert, moreProps, e) => {
-        const {onEnableNewOrder} = this.props
-        const {id: chartId} = moreProps.chartConfig;
+        const { onEnableNewOrder } = this.props
+        const { id: chartId } = moreProps.chartConfig;
         this.setState({
             yCoordinateList_1: [
                 ...this.state.yCoordinateList_1,
@@ -449,8 +449,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     }
 
     handleChangeAlert = (alert, chartId, manageOrder: ChartManageOrder) => {
-        const {onEnableNewOrder, onManageOrder} = this.props
-        const {yCoordinateList_1} = this.state;
+        const { onEnableNewOrder, onManageOrder } = this.props
+        const { yCoordinateList_1 } = this.state;
         const newAlertList = yCoordinateList_1.map(d => {
             return d.id === alert.id ? alert : d;
         });
@@ -464,7 +464,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     }
 
     handleDeleteAlert = () => {
-        const {alertToEdit, yCoordinateList_1} = this.state
+        const { alertToEdit, yCoordinateList_1 } = this.state
 
         if (alertToEdit.alert.id.startsWith("alert_")) {
             this.setState({
@@ -496,7 +496,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
     handleDialogClose = () => {
         // cancel alert edit
-        const {originalAlertList, alertToEdit} = this.state;
+        const { originalAlertList, alertToEdit } = this.state;
 
         const key = `yCoordinateList_${alertToEdit.chartId}`;
         const list = originalAlertList || this.state[key];
@@ -513,8 +513,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
 
     onDragComplete = (yCoordinateList, moreProps, draggedAlert) => {
         // this gets called on drag complete of drawing object
-        const {onEnableNewOrder} = this.props
-        const {id: chartId} = moreProps.chartConfig
+        const { onEnableNewOrder } = this.props
+        const { id: chartId } = moreProps.chartConfig
 
         const key = `yCoordinateList_${chartId}`
         const alertDragged = draggedAlert != null
@@ -532,7 +532,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     }
 
     deleteOrderView = (interactiveOrderId: string) => {
-        const {yCoordinateList_1} = this.state
+        const { yCoordinateList_1 } = this.state
 
         if (interactiveOrderId.startsWith("alert_")) {
             this.setState({
@@ -559,7 +559,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
     }
 
     deleteOrder = (interactiveOrderId: string) => {
-        const {orders, stops} = this.props
+        const { orders, stops } = this.props
         const orderAndStopMap = this.getOrderAndStopMap(orders, stops)
 
         const cancelOrder = interactiveOrderId.startsWith("order_") ? orderAndStopMap[interactiveOrderId] : null
@@ -586,13 +586,13 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
             swingHighsLows, showGrid, zones, candlePatternsUp, candlePatternsDown, securityInfo, srLevels,
             enableNewOrder, activeTrade
         } = this.props;
-        const {trends_1, showModal, alertToEdit} = this.state;
+        const { trends_1, showModal, alertToEdit } = this.state;
         const scale = securityInfo ? securityInfo.scale : 4
         const scaleFormat = `.${scale}s`
 
         const volumeHeight = 100;
         const height = chartHeight || 500;
-        const margin = {left: 50, right: 50, top: 10, bottom: 30};
+        const margin = { left: 50, right: 50, top: 10, bottom: 30 };
         const gridHeight = height - margin.top - margin.bottom;
         const xGrid = showGrid ? {
             innerTickSize: -1 * gridHeight,
@@ -604,7 +604,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         const ema7 = ema()
             .id(0)
             .stroke("#f44336")
-            .options({windowSize: 7})
+            .options({ windowSize: 7 })
             .merge((d, c) => {
                 d.ema7 = c;
             })
@@ -613,14 +613,14 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         const ema20 = ema()
             .id(1)
             .stroke("#3f51b5")
-            .options({windowSize: 20})
+            .options({ windowSize: 20 })
             .merge((d, c) => {
                 d.ema20 = c;
             })
             .accessor(d => d.ema20);
 
         const atr7 = atr()
-            .options({windowSize: 7})
+            .options({ windowSize: 7 })
             .merge((d, c) => {
                 d.atr7 = c;
             })
@@ -669,68 +669,69 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
         return (
             <div id={this.id} onClick={(e) => setCurrentChartInteractingId(this.id)}>
                 <ChartCanvas ref={this.canvasNode}
-                             height={height}
-                             ratio={ratio}
-                             width={width}
-                             margin={{left: 50, right: 50, top: 10, bottom: 30}}
-                             type={type}
-                             seriesName="MSFT"
-                             data={data}
-                             xScale={xScale}
-                             xAccessor={xAccessor}
-                             displayXAccessor={displayXAccessor}
-                             xExtents={xExtents}>
+                    height={height}
+                    ratio={ratio}
+                    width={width}
+                    margin={{ left: 50, right: 50, top: 10, bottom: 30 }}
+                    padding={{ top: 0, right: 5, bottom: 0, left: 0 }}
+                    type={type}
+                    seriesName="MSFT"
+                    data={data}
+                    xScale={xScale}
+                    xAccessor={xAccessor}
+                    displayXAccessor={displayXAccessor}
+                    xExtents={xExtents}>
 
                     <Chart id={2}
-                           yExtents={d => [d.volume]}
-                           height={volumeHeight}
-                           origin={(w, h) => [0, h - volumeHeight]}>
-                        <YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")}/>
+                        yExtents={d => [d.volume]}
+                        height={volumeHeight}
+                        origin={(w, h) => [0, h - volumeHeight]}>
+                        <YAxis axisAt="left" orient="left" ticks={5} tickFormat={format(".2s")} />
 
                         <MouseCoordinateY
                             at="left"
                             orient="left"
-                            displayFormat={format(scaleFormat)}/>
+                            displayFormat={format(scaleFormat)} />
 
-                        <BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
+                        <BarSeries yAccessor={d => d.volume} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
 
-                        <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47"/>
+                        <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
 
                         <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-                                       yAccessor={d => d.volume}
-                                       displayFormat={format(scaleFormat)}
-                                       fill="#0F0F0F"/>
+                            yAccessor={d => d.volume}
+                            displayFormat={format(scaleFormat)}
+                            fill="#0F0F0F" />
                     </Chart>
 
                     <Chart id={1}
-                           yExtents={[d => [d.high, d.low], ema20.accessor(), ema7.accessor()]}
-                           padding={{top: 40, bottom: 20}}>
-                        <XAxis axisAt="bottom" orient="bottom" {...xGrid}/>
-                        <YAxis axisAt="right" orient="right" ticks={5}/>
+                        yExtents={[d => [d.high, d.low], ema20.accessor(), ema7.accessor()]}
+                        padding={{ top: 40, bottom: 20 }}>
+                        <XAxis axisAt="bottom" orient="bottom" {...xGrid} />
+                        <YAxis axisAt="right" orient="right" ticks={5} />
 
                         <MouseCoordinateX
                             rectWidth={60}
                             at="bottom"
                             orient="bottom"
-                            displayFormat={timeFormat(timeFormatInput)}/>
+                            displayFormat={timeFormat(timeFormatInput)} />
                         <MouseCoordinateY
                             at="right"
                             orient="right"
-                            displayFormat={format(formatInput)}/>
+                            displayFormat={format(formatInput)} />
 
-                        <ChartZones zones={zones} scale={scale}/>
-                        <ChartLevels srLevels={srLevels} scale={scale}/>
-                        <ChartSwingHighsLows swingHighsLows={swingHighsLows}/>
+                        <ChartZones zones={zones} scale={scale} />
+                        <ChartLevels srLevels={srLevels} scale={scale} />
+                        <ChartSwingHighsLows swingHighsLows={swingHighsLows} />
 
                         <CandlestickSeries fill={(d) => d.close > d.open ? "#ecf0f1" : "#000"}
-                                           stroke="#000"
-                                           wickStroke="#000"/>
+                            stroke="#000"
+                            wickStroke="#000" />
                         <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-                                       yAccessor={d => d.close}
-                                       displayFormat={format(`.${scale}f`)}
-                                       fill={d => d.close > d.open ? "#6BA583" : "#FF0000"}/>
+                            yAccessor={d => d.close}
+                            displayFormat={format(`.${scale}f`)}
+                            fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} />
 
-                        <OHLCTooltip origin={[-40, 0]} xDisplayFormat={timeFormat("%Y-%m-%d %H:%M:%S")}/>
+                        <OHLCTooltip origin={[-40, 0]} xDisplayFormat={timeFormat("%Y-%m-%d %H:%M:%S")} />
 
                         {htSRLevelsView}
                         {
@@ -758,7 +759,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                                         return candlePatternsUp[d.timestamp.getTime()];
                                     }}
                                     marker={Square}
-                                    markerProps={{width: 16, stroke: "#43a047", fill: "#43a047"}}/> : null
+                                    markerProps={{ width: 16, stroke: "#43a047", fill: "#43a047" }} /> : null
                         }
 
                         {
@@ -768,23 +769,23 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                                         return candlePatternsDown[d.timestamp.getTime()];
                                     }}
                                     marker={Square}
-                                    markerProps={{width: 16, stroke: "#e53935", fill: "#e53935"}}/> : null
+                                    markerProps={{ width: 16, stroke: "#e53935", fill: "#e53935" }} /> : null
                         }
 
-                        <KeltnerChannelSeries yAccessor={d => ({ema: ema20.accessor(), atr: atr7.accessor()})}/>
+                        <KeltnerChannelSeries yAccessor={d => ({ ema: ema20.accessor(), atr: atr7.accessor() })} />
                         {/*<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>*/}
-                        <LineSeries yAccessor={ema7.accessor()} stroke={ema7.stroke()}/>
+                        <LineSeries yAccessor={ema7.accessor()} stroke={ema7.stroke()} />
 
-                        <ChartTrades candles={data} trades={trades}/>
+                        <ChartTrades candles={data} trades={trades} />
 
                         <TrendLine ref={this.saveInteractiveNodes("Trendline", 1)}
-                                   enabled={this.props.enableTrendLine}
-                                   type="RAY"
-                                   snap={true}
-                                   snapTo={d => [d.high, d.low]}
-                                   onStart={this.onTrendLineStart}
-                                   onComplete={this.onTrendLineComplete}
-                                   trends={trends_1}
+                            enabled={this.props.enableTrendLine}
+                            type="RAY"
+                            snap={true}
+                            snapTo={d => [d.high, d.low]}
+                            onStart={this.onTrendLineStart}
+                            onComplete={this.onTrendLineComplete}
+                            trends={trends_1}
                         />
 
                         <InteractiveYCoordinate
@@ -796,7 +797,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                         />
 
                     </Chart>
-                    <CrossHairCursor/>
+                    <CrossHairCursor />
                     <DrawingObjectSelector
                         enabled={!(this.props.enableTrendLine && this.props.enableNewOrder)}
                         getInteractiveNodes={this.getInteractiveNodes}

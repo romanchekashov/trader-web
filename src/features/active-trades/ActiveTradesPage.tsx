@@ -39,15 +39,15 @@ export const ActiveTradesPage = () => {
             })
 
         // TestData
-        // const activeTrades = TEST_ACTIVE_TRADES
-        // if (activeTrades.some(at => activeTradesSecIds.indexOf(at.secId) === -1)) {
-        //     const activeTradesSecIds = activeTrades.map(at => at.secId)
+        const activeTrades = TEST_ACTIVE_TRADES
+        if (activeTrades.some(at => activeTradesSecIds.indexOf(at.secId) === -1)) {
+            const activeTradesSecIds = activeTrades.map(at => at.secId)
 
-        //     getLastSecurities().then(securities => {
-        //         securities = securities.filter(sec => activeTradesSecIds.indexOf(sec.id) > -1)
-        //         setSecurities(activeTradesSecIds.map(id => securities.find(sec => sec.id === id)))
-        //     })
-        // }
+            getLastSecurities().then(securities => {
+                securities = securities.filter(sec => activeTradesSecIds.indexOf(sec.id) > -1)
+                setSecurities(activeTradesSecIds.map(id => securities.find(sec => sec.id === id)))
+            })
+        }
 
         updateSize()
         window.addEventListener('resize', updateSize)
@@ -71,7 +71,8 @@ export const ActiveTradesPage = () => {
                 securities?.map(securityLastInfo => (
                     <TradingChartsSecurity
                         securityLastInfo={securityLastInfo}
-                        start={null} />
+                        start={null}
+                        layout={2} />
                 ))
             }
         </div>

@@ -25,11 +25,12 @@ type Props = {
     security: Security
     onNotificationSelected: (notification: NotificationDto) => void
     viewHeight?: number
+    itemSize?: number
 };
 let fetchAlertsAttempt = 0;
 let previousAlertsCount = 0;
 
-const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelected, viewHeight }) => {
+const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelected, viewHeight, itemSize }) => {
 
     const [interval, setInterval] = useState(null)
     const [classCode, setClassCode] = useState(null)
@@ -376,7 +377,7 @@ const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelect
                             className="notifications-list"
                             height={height}
                             itemCount={visibleAlerts.length}
-                            itemSize={100}
+                            itemSize={itemSize || 100}
                             width={width}
                         >
                             {Row}

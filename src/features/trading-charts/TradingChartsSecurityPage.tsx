@@ -49,6 +49,7 @@ export const TradingChartsSecurityPage: React.FC<RouteComponentProps<RouteParams
     return (
         <TradingChartsSecurity
             securityLastInfo={securityLastInfo}
-            start={start} />
+            start={start}
+            layout={1} />
     )
 }

@@ -19,10 +19,11 @@ import moment = require("moment");
 
 type Props = {
     securityLastInfo: SecurityLastInfo
-    start: Date
+    start: Date,
+    layout: number
 }
 
-export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start }) => {
+export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start, layout }) => {
     const CHART_HEIGHT = 600
     const [premise, setPremise] = useState<TradePremise>(null);
     const [orders, setOrders] = useState(null);
@@ -122,20 +123,15 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
     if (!securityLastInfo) return (<div>No Data</div>)
 
     // console.log(chart2Width1, chart2Width, chart3Width1, chart3Width)
+    let chartsClassName = 'p-col-10'
+    if (layout === 2) {
+        chartsClassName = 'p-col-8'
+    }
 
     return (
         <div id={"trading-chart-security-" + securityLastInfo.id} className="p-grid sample-layout analysis">
-            <div className="p-col-2">
-                <SecurityLastInfoView security={securityLastInfo} />
-                <Notifications filter={filterDto}
-                    security={securityLastInfo}
-                    onNotificationSelected={(n) => {
-                        console.log(n)
-                    }}
-                    viewHeight={400} />
-                <StockEventsBrief secCode={securityLastInfo.secCode} height={400} />
-            </div>
-            <div className="p-col-10">
+
+            <div className={chartsClassName}>
                 <div className="p-grid">
                     <div className="p-col-12">
                         <TrendsView trends={premise?.analysis?.trends || []}
@@ -143,20 +139,6 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
                     </div>
                     <div className="p-col-12">
                         <div className="p-grid">
-                            <div className="p-col-6" ref={chart2Ref1} style={{ padding: '0' }}>
-                                <TrendViewChart key={timeFrame2}
-                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
-                                    srLevels={premise?.analysis?.srLevels}
-                                    width={chart2Width1}
-                                    height={600} />
-                            </div>
-                            <div className="p-col-6" ref={chart3Ref1} style={{ padding: '0' }}>
-                                <TrendViewChart key={timeFrame3}
-                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
-                                    srLevels={premise?.analysis?.srLevels}
-                                    width={chart3Width1}
-                                    height={600} />
-                            </div>
                             <div className="p-col-6" ref={chart2Ref} style={{ padding: '0' }}>
                                 <ChartWrapper interval={timeFrame2}
                                     initialNumberOfCandles={500}
@@ -191,10 +173,58 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
                                     activeTrade={activeTrade}
                                     showGrid={true} />
                             </div>
+                            <div className="p-col-6" ref={chart2Ref1} style={{ padding: '0' }}>
+                                <TrendViewChart key={timeFrame2}
+                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
+                                    srLevels={premise?.analysis?.srLevels}
+                                    width={chart2Width1}
+                                    height={600} />
+                            </div>
+                            <div className="p-col-6" ref={chart3Ref1} style={{ padding: '0' }}>
+                                <TrendViewChart key={timeFrame3}
+                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
+                                    srLevels={premise?.analysis?.srLevels}
+                                    width={chart3Width1}
+                                    height={600} />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {
+                layout === 2 ?
+                    <div className="p-col-12">
+                        <div className="p-grid">
+                            <div className="p-col-3">
+                                <SecurityLastInfoView security={securityLastInfo} />
+                            </div>
+                            <div className="p-col-3">
+                                <Notifications filter={filterDto}
+                                    security={securityLastInfo}
+                                    onNotificationSelected={(n) => {
+                                        console.log(n)
+                                    }}
+                                    viewHeight={400}
+                                    itemSize={70} />
+                            </div>
+                            <div className="p-col-3">
+                                <StockEventsBrief secCode={securityLastInfo.secCode} height={400} />
+                            </div>
+                        </div>
+                    </div>
+                    :
+                    <div className="p-col-2">
+                        <SecurityLastInfoView security={securityLastInfo} />
+                        <Notifications filter={filterDto}
+                            security={securityLastInfo}
+                            onNotificationSelected={(n) => {
+                                console.log(n)
+                            }}
+                            viewHeight={400} />
+                        <StockEventsBrief secCode={securityLastInfo.secCode} height={400} />
+                    </div>
+            }
         </div>
     )
 }
