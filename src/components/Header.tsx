@@ -1,10 +1,10 @@
 import * as React from "react";
-import {NavLink} from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import MarketWorkTime from "../common/components/market-work-time/MarketWorkTime";
 import "./Header.css"
 
 export const Header = () => {
-    const activeStyle = {color: "#f15b2a"};
+    const activeStyle = { color: "#f15b2a" };
 
     return (
         <div className="header">
@@ -33,6 +33,10 @@ export const Header = () => {
                     Bot Control
                 </NavLink>
                 {" / "}
+                <NavLink to="/active-trades" activeStyle={activeStyle}>
+                    ActiveTrades
+                </NavLink>
+                {" / "}
                 <NavLink to="/trade-journal" activeStyle={activeStyle}>
                     Journal
                 </NavLink>
@@ -41,7 +45,7 @@ export const Header = () => {
                     About
                 </NavLink>
             </nav>
-            <MarketWorkTime/>
+            <MarketWorkTime />
         </div>
     )
 }
