@@ -132,8 +132,8 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
                     onNotificationSelected={(n) => {
                         console.log(n)
                     }}
-                    viewHeight={800} />
-                <StockEventsBrief secCode={securityLastInfo.secCode} />
+                    viewHeight={400} />
+                <StockEventsBrief secCode={securityLastInfo.secCode} height={400} />
             </div>
             <div className="p-col-10">
                 <div className="p-grid">
@@ -143,14 +143,21 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
                     </div>
                     <div className="p-col-12">
                         <div className="p-grid">
-                            <div className="p-col-5" ref={chart2Ref1} style={{ padding: '0' }}>
+                            <div className="p-col-6" ref={chart2Ref1} style={{ padding: '0' }}>
                                 <TrendViewChart key={timeFrame2}
                                     trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
                                     srLevels={premise?.analysis?.srLevels}
                                     width={chart2Width1}
                                     height={600} />
                             </div>
-                            <div className="p-col-7" ref={chart2Ref} style={{ padding: '0' }}>
+                            <div className="p-col-6" ref={chart3Ref1} style={{ padding: '0' }}>
+                                <TrendViewChart key={timeFrame3}
+                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
+                                    srLevels={premise?.analysis?.srLevels}
+                                    width={chart3Width1}
+                                    height={600} />
+                            </div>
+                            <div className="p-col-6" ref={chart2Ref} style={{ padding: '0' }}>
                                 <ChartWrapper interval={timeFrame2}
                                     initialNumberOfCandles={500}
                                     start={start2}
@@ -167,14 +174,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
                                     activeTrade={activeTrade}
                                     showGrid={true} />
                             </div>
-                            <div className="p-col-5" ref={chart3Ref1} style={{ padding: '0' }}>
-                                <TrendViewChart key={timeFrame3}
-                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
-                                    srLevels={premise?.analysis?.srLevels}
-                                    width={chart3Width1}
-                                    height={600} />
-                            </div>
-                            <div className="p-col-7" ref={chart3Ref} style={{ padding: '0' }}>
+                            <div className="p-col-6" ref={chart3Ref} style={{ padding: '0' }}>
                                 <ChartWrapper interval={timeFrame3}
                                     initialNumberOfCandles={500}
                                     start={start3}

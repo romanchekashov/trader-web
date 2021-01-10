@@ -2,6 +2,7 @@
     overflow-x: hidden;
     font-size: 0.8em;
     padding: 0;
+    margin-bottom: 5px;
 }
 
 .alerts-body::-webkit-scrollbar {
@@ -98,7 +99,8 @@
     padding: 0;
 }
 
-.alerts-head-security, .alerts-head-interval {
+.alerts-head-security,
+.alerts-head-interval {
     margin-left: 5px;
 }
 

@@ -7,9 +7,10 @@ import moment = require("moment");
 
 type Props = {
     secCode: string
+    height: number
 }
 
-export const StockEventsBrief: React.FC<Props> = ({ secCode }) => {
+export const StockEventsBrief: React.FC<Props> = ({ secCode, height }) => {
     const [events, setEvents] = useState<SecurityShareEvent[]>([])
     const [selectedEvent, setSelectedEvent] = useState<SecurityShareEvent>(null)
 
@@ -37,8 +38,8 @@ export const StockEventsBrief: React.FC<Props> = ({ secCode }) => {
     }
 
     return (
-        <div className="p-grid">
-            <div className="p-col-12" style={{ padding: 0, height: 800, overflowY: "scroll" }}>
+        <div className="p-grid" style={{ padding: 0 }}>
+            <div className="p-col-12" style={{ padding: 0, height: height || 400, overflowY: "scroll" }}>
                 {
                     events.map((shareEvent, index) => {
                         const date = moment(shareEvent.date).format("DD-MM-YYYY");

@@ -1,23 +1,23 @@
 import * as React from "react";
-import {memo, useEffect, useState} from "react";
+import { memo, useEffect, useState } from "react";
 import "./Notifications.css";
 import "./Signals.css";
-import {playSound} from "../../assets/assets";
-import {getNotifications} from "../../api/rest/analysisRestApi";
-import {FixedSizeList as List} from "react-window";
+import { playSound } from "../../assets/assets";
+import { getNotifications } from "../../api/rest/analysisRestApi";
+import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
-import {Dropdown} from "primereact/components/dropdown/Dropdown";
-import {getRecentBusinessDate, Intervals, PrimeDropdownItem} from "../../utils/utils";
-import {Interval} from "../../data/Interval";
-import {ClassCode} from "../../data/ClassCode";
-import {getSecuritiesByClassCode} from "../../utils/Cache";
-import {Security} from "../../data/security/Security";
-import {Calendar} from "primereact/calendar";
-import {FilterDto} from "../../data/FilterDto";
-import {NotificationDto} from "./data/NotificationDto";
-import {InputText} from "primereact/inputtext";
-import {PatternName} from "../alerts/data/PatternName";
-import {WebsocketService, WSEvent} from "../../api/WebsocketService";
+import { Dropdown } from "primereact/components/dropdown/Dropdown";
+import { getRecentBusinessDate, Intervals, PrimeDropdownItem } from "../../utils/utils";
+import { Interval } from "../../data/Interval";
+import { ClassCode } from "../../data/ClassCode";
+import { getSecuritiesByClassCode } from "../../utils/Cache";
+import { Security } from "../../data/security/Security";
+import { Calendar } from "primereact/calendar";
+import { FilterDto } from "../../data/FilterDto";
+import { NotificationDto } from "./data/NotificationDto";
+import { InputText } from "primereact/inputtext";
+import { PatternName } from "../alerts/data/PatternName";
+import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import moment = require("moment");
 
 type Props = {
@@ -29,12 +29,12 @@ type Props = {
 let fetchAlertsAttempt = 0;
 let previousAlertsCount = 0;
 
-const Notifications: React.FC<Props> = ({filter, security, onNotificationSelected, viewHeight}) => {
+const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelected, viewHeight }) => {
 
     const [interval, setInterval] = useState(null)
     const [classCode, setClassCode] = useState(null)
     const [secCode, setSecCode] = useState(null)
-    const [secCodes, setSecCodes] = useState([{label: "ALL", value: null}])
+    const [secCodes, setSecCodes] = useState([{ label: "ALL", value: null }])
     const [start, setStart] = useState<Date>(getRecentBusinessDate(moment().hours(0).minutes(0).seconds(0).toDate()))
     const [textPattern, setTextPattern] = useState("")
 
@@ -44,9 +44,9 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
     const [selectedAlert, setSelectedAlert] = useState(null)
 
     const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals]
-        .map(val => ({label: val || "ALL", value: val}));
+        .map(val => ({ label: val || "ALL", value: val }));
     const classCodes: PrimeDropdownItem<ClassCode>[] = [null, ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
-        .map(val => ({label: val || "ALL", value: val}));
+        .map(val => ({ label: val || "ALL", value: val }));
 
     const fetchAlerts = (secId: number, newInterval: Interval, newStart: Date, newTextPattern: string) => {
         getNotifications(filter)
@@ -120,7 +120,7 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
     }, [filter, security]);
 
     const setAlertsReceivedFromServer = (newAlerts: NotificationDto[], newClassCode: ClassCode, newSecCode: string,
-                                         newInterval: Interval, newStart: Date, newTextPattern: string): void => {
+        newInterval: Interval, newStart: Date, newTextPattern: string): void => {
         setAlerts(newAlerts);
         setFilteredAlerts(newAlerts, newClassCode, newSecCode, newInterval, newStart, newTextPattern);
         notifyOnNewAlert(newAlerts);
@@ -131,7 +131,7 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
     }
 
     if (filter && fetchAlertsError) {
-        return (<div style={{color: "red"}}>{fetchAlertsError}</div>);
+        return (<div style={{ color: "red" }}>{fetchAlertsError}</div>);
     }
 
     const timeTemplate = (alert: NotificationDto) => {
@@ -230,11 +230,11 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
     }
 
     const onClassCodeChanged = (newClassCode: ClassCode) => {
-        const newSecCodes: PrimeDropdownItem<string>[] = [{label: "ALL", value: null}]
+        const newSecCodes: PrimeDropdownItem<string>[] = [{ label: "ALL", value: null }]
         if (newClassCode) {
             const securities: Security[] = getSecuritiesByClassCode(newClassCode)
             for (const sec of securities) {
-                newSecCodes.push({label: sec.secCode, value: sec.secCode})
+                newSecCodes.push({ label: sec.secCode, value: sec.secCode })
             }
         } else {
             setSecCode(null)
@@ -261,7 +261,7 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
     }
 
     const setFilteredAlerts = (alerts: NotificationDto[], newClassCode: ClassCode, newSecCode: string,
-                               newInterval: Interval, newStart: Date, newTextPattern: string) => {
+        newInterval: Interval, newStart: Date, newTextPattern: string) => {
         let filtered = alerts;
         if (newClassCode) {
             filtered = filtered.filter(value => value.classCode === newClassCode);
@@ -283,18 +283,18 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
         setVisibleAlerts(filtered)
     }
 
-    const Row = ({index, style}) => {
+    const Row = ({ index, style }) => {
         const alert = visibleAlerts[index]
         const className = "alerts-row " + (selectedAlert === alert ? "alerts-row-selected" : "")
 
         return (
             <div className={index % 2 ? "ListItemOdd" : "ListItemEven"} style={style}>
                 <div key={alert.title + alert.timeInterval + alert.created}
-                     className={className}
-                     onClick={() => {
-                         setSelectedAlert(alert);
-                         onNotificationSelected(alert);
-                     }}>
+                    className={className}
+                    onClick={() => {
+                        setSelectedAlert(alert);
+                        onNotificationSelected(alert);
+                    }}>
                     <div className="p-col-12">
                         <div className="alerts-cell alerts-time">
                             {timeTemplate(alert)}
@@ -317,7 +317,7 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
                     </div>
                     <div className="p-col-12">
                         <div className="alerts-cell alerts-description"
-                             dangerouslySetInnerHTML={{__html: descriptionTemplate(alert)}}>
+                            dangerouslySetInnerHTML={{ __html: descriptionTemplate(alert) }}>
                         </div>
                     </div>
                 </div>
@@ -326,7 +326,7 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
     }
 
     return (
-        <div className="p-grid alerts" style={{height: viewHeight || 200}}>
+        <div className="p-grid alerts" style={{ height: viewHeight || 200 }}>
             <div className="p-col-12 alerts-head">
                 <div className="alerts-head-dropdown alerts-head-class-code">
                     {
@@ -334,9 +334,9 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
                             classCode
                             :
                             <Dropdown value={classCode} options={classCodes}
-                                      onChange={(e) => {
-                                          onClassCodeChanged(e.value);
-                                      }}/>
+                                onChange={(e) => {
+                                    onClassCodeChanged(e.value);
+                                }} />
                     }
                 </div>
                 <div className="alerts-head-dropdown alerts-head-security">
@@ -345,29 +345,29 @@ const Notifications: React.FC<Props> = ({filter, security, onNotificationSelecte
                             secCode
                             :
                             <Dropdown value={secCode} options={secCodes}
-                                      onChange={(e) => {
-                                          onSecCodeChanged(e.value);
-                                      }}/>
+                                onChange={(e) => {
+                                    onSecCodeChanged(e.value);
+                                }} />
                     }
                 </div>
                 <div className="alerts-head-dropdown alerts-head-interval">
                     <Dropdown value={interval} options={intervals}
-                              onChange={(e) => {
-                                  onIntervalChanged(e.value);
-                              }}/>
+                        onChange={(e) => {
+                            onIntervalChanged(e.value);
+                        }} />
                 </div>
                 <div className="alerts-head-start-date">
                     <Calendar value={start}
-                              onChange={(e) => onStartDateChanged(e.value as Date)}/>
+                        onChange={(e) => onStartDateChanged(e.value as Date)} />
                 </div>
                 <div className="alerts-head-start-date">
                     <InputText value={textPattern}
-                               onChange={(e) => onTextPatternChanged(e.target['value'])}/>
+                        onChange={(e) => onTextPatternChanged(e.target['value'])} />
                 </div>
             </div>
-            <div className="p-col-12 alerts-body" style={{height: (viewHeight || 200) - 20}}>
+            <div className="p-col-12 alerts-body" style={{ height: (viewHeight || 200) - 30 }}>
                 <AutoSizer>
-                    {({height, width}) => (
+                    {({ height, width }) => (
                         <List
                             className="List"
                             height={height}
