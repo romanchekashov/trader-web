@@ -1,0 +1,78 @@
+.active-trades-securities {
+}
+
+.active-trades-securities .p-datatable .p-datatable-thead > tr > th {
+    padding: 2px;
+    font-size: 10px;
+}
+.active-trades-securities
+    .p-datatable
+    .p-datatable-thead
+    > tr
+    > th:first-child {
+    width: 100px;
+}
+
+.active-trades-securities .p-datatable .p-datatable-thead .p-inputtext {
+    padding: 2px;
+    font-size: 12px;
+}
+
+.active-trades-securities .p-datatable .p-datatable-tbody td {
+    padding: 2px 5px;
+    font-size: 13px;
+}
+.active-trades-securities .p-datatable .p-datatable-tbody td:first-child {
+    width: 100px;
+}
+
+.active-trades-securities-head {
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+.active-trades-securities-head
+    .p-datatable-wrapper
+    .p-datatable-thead
+    > tr
+    > th {
+    font-size: 12px;
+    padding: 0;
+}
+.active-trades-securities-head .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0 2px;
+    text-align: center;
+}
+
+.active-trades-securities-head .p-dropdown {
+    font-size: 12px;
+}
+.active-trades-securities-head .p-dropdown-label {
+    font-size: 12px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.active-trades-securities-head .p-col-1,
+.active-trades-securities-head .p-col-11,
+.active-trades-securities-head .p-col-12 {
+    padding: 0;
+}
+
+.contract-open-positions {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+.contract-open-positions th {
+    vertical-align: middle;
+    font-weight: normal;
+    color: white;
+    background-color: #888888;
+    border: 1px #c6c6c6 solid;
+}
+.contract-open-positions td {
+    border: 1px #999999 dotted;
+}
+.contract-open-positions td.text_right {
+    text-align: right;
+}

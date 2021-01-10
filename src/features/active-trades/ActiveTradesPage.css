@@ -1,5 +1,5 @@
 #active-trades-page {
-    padding-top: 10px;
+    width: 100%;
 }
 
 #news-page {
@@ -30,4 +30,10 @@
 
 .news-item-pub {
     font-size: 12px;
+}
+
+.fixed {
+    position: fixed;
+    z-index: 9;
+    top: 20px;
 }

@@ -101,7 +101,7 @@ export const formatNumber = (val: number): string => {
                 : absVal + ""
 }
 
-export const pageJumpById = (elId: string): void => {
+export const pageJumpById = (elId: string, offset?: number): void => {
     var top = document.getElementById(elId).offsetTop //Getting Y of target element
-    window.scrollTo(0, top)                        //Go there directly or some transition
+    window.scrollTo(0, top - (offset || 0))                        //Go there directly or some transition
 }​

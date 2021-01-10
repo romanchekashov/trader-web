@@ -3,3 +3,11 @@
     display: flex;
     justify-content: space-between;
 }
+
+.header-sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #fff;
+    z-index: 9;
+}

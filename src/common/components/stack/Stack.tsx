@@ -169,7 +169,7 @@ export class Stack extends React.Component<Props, States> {
             })
 
         // TestData
-        this.setState({ activeTrades: TEST_ACTIVE_TRADES, selectedActiveTrade: TEST_ACTIVE_TRADES[0] })
+        // this.setState({ activeTrades: TEST_ACTIVE_TRADES, selectedActiveTrade: TEST_ACTIVE_TRADES[0] })
 
         this.tradePremiseSubscription = WebsocketService.getInstance()
             .on<TradePremise>(WSEvent.TRADE_PREMISE)
