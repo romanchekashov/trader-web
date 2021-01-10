@@ -16,9 +16,16 @@ export const TEST_SESSION_RESULT: SessionTradeResult = {
 
 export const TEST_ACTIVE_TRADES: ActiveTrade[] = [
     {
-        classCode: ClassCode.SPBFUT,
-        secCode: "BRM0",
+        secId: 372,
         avgPrice: 34,
+        quantity: 5,
+        operation: OperationType.SELL,
+        plPrice: 123,
+        plStop: 23,
+        plTarget: 200,
+        start: new Date(),
+        trades: [],
+        targets: [],
         stopOrder: {
             transId: 1,
             number: 2,
@@ -31,18 +38,18 @@ export const TEST_ACTIVE_TRADES: ActiveTrade[] = [
             quantity: 5,
             status: StopOrderStatus.ACTIVE,
             dateTime: new Date()
-        },
+        }
+    }, {
+        secId: 370,
+        avgPrice: 136900,
         quantity: 5,
         operation: OperationType.SELL,
         plPrice: 123,
         plStop: 23,
         plTarget: 200,
         start: new Date(),
-        trades: []
-    }, {
-        classCode: ClassCode.SPBFUT,
-        secCode: "RIH1",
-        avgPrice: 136900,
+        trades: [],
+        targets: [],
         stopOrder: {
             transId: 1,
             number: 2,
@@ -55,13 +62,6 @@ export const TEST_ACTIVE_TRADES: ActiveTrade[] = [
             quantity: 5,
             status: StopOrderStatus.ACTIVE,
             dateTime: new Date()
-        },
-        quantity: 5,
-        operation: OperationType.SELL,
-        plPrice: 123,
-        plStop: 23,
-        plTarget: 200,
-        start: new Date(),
-        trades: []
+        }
     }
 ]

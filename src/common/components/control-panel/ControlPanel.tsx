@@ -1,21 +1,21 @@
 import * as React from "react";
 import ActiveTradeView from "./components/ActiveTradeView";
-import {Growl} from "primereact/components/growl/Growl";
-import {SelectButton} from "primereact/components/selectbutton/SelectButton";
-import {ToggleButton} from "primereact/components/togglebutton/ToggleButton";
-import {FastBtn} from "./btn/FastBtn";
-import {GeneralBtn} from "./btn/GeneralBtn";
-import {CatchBtn} from "./btn/CatchBtn";
+import { Growl } from "primereact/components/growl/Growl";
+import { SelectButton } from "primereact/components/selectbutton/SelectButton";
+import { ToggleButton } from "primereact/components/togglebutton/ToggleButton";
+import { FastBtn } from "./btn/FastBtn";
+import { GeneralBtn } from "./btn/GeneralBtn";
+import { CatchBtn } from "./btn/CatchBtn";
 import StrategyBtn from "./btn/StrategyBtn";
-import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
-import {ActiveTrade} from "../../data/ActiveTrade";
-import {WebsocketService, WSEvent} from "../../api/WebsocketService";
-import {SubscriptionLike} from "rxjs";
+import { SecurityLastInfo } from "../../data/security/SecurityLastInfo";
+import { ActiveTrade } from "../../data/ActiveTrade";
+import { WebsocketService, WSEvent } from "../../api/WebsocketService";
+import { SubscriptionLike } from "rxjs";
 import "./ControlPanel.css";
-import {StopCalc} from "../stack/stop-calc/StopCalc";
-import {SessionTradeResult} from "../../data/SessionTradeResult";
+import { StopCalc } from "../stack/stop-calc/StopCalc";
+import { SessionTradeResult } from "../../data/SessionTradeResult";
 import SessionTradeResultView from "./components/SessionTradeResultView";
-import {getSelectedSecurity} from "../../utils/Cache";
+import { getSelectedSecurity } from "../../utils/Cache";
 
 type Props = {};
 
@@ -58,10 +58,10 @@ export class ControlPanel extends React.Component<Props, States> {
 
     growl: any;
     btnSets = [
-        {label: 'General', value: 'general'},
-        {label: 'Catch', value: 'catch'},
-        {label: 'Fast', value: 'fast'},
-        {label: 'Strategy', value: 'strategy'}
+        { label: 'General', value: 'general' },
+        { label: 'Catch', value: 'catch' },
+        { label: 'Fast', value: 'fast' },
+        { label: 'Strategy', value: 'strategy' }
     ];
 
     constructor(props) {
@@ -79,25 +79,25 @@ export class ControlPanel extends React.Component<Props, States> {
         this.lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
-                const {activeTrade} = this.state;
+                const { activeTrade } = this.state;
                 const selectedSecurity = getSelectedSecurity();
-                let secCode = activeTrade ? activeTrade.secCode : selectedSecurity ? selectedSecurity.secCode : null;
-                if (secCode) {
-                    const security = securities.find(o => o.secCode === secCode);
+                let secId = activeTrade?.secId || selectedSecurity?.id;
+                if (secId) {
+                    const security = securities.find(o => o.id === secId);
                     if (security) {
                         security.lastTradeTime = new Date(security.lastTradeTime);
                     }
-                    this.setState({security});
+                    this.setState({ security });
                 }
             });
 
         this.activeTradeSubscription = WebsocketService.getInstance()
             .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES).subscribe(activeTrades => {
-                const {security} = this.state;
+                const { security } = this.state;
                 if (security) {
                     const activeTrade = activeTrades
-                        .find(at => at && at.classCode === security.classCode && at.secCode === security.secCode);
-                    this.setState({activeTrade});
+                        .find(at => at && at.secId === security.id);
+                    this.setState({ activeTrade });
                 }
             });
     };
@@ -120,64 +120,64 @@ export class ControlPanel extends React.Component<Props, States> {
     };
 
     render() {
-        const {stop, btnSet, isMarket, hasStop, security, activeTrade, visible, sessionResult} = this.state;
+        const { stop, btnSet, isMarket, hasStop, security, activeTrade, visible, sessionResult } = this.state;
 
         return (
-            <div id="control-panel" className="p-grid" style={{top: this.VisibleTypeViewTop[visible]}}>
-                <Growl ref={(el) => this.growl = el}/>
+            <div id="control-panel" className="p-grid" style={{ top: this.VisibleTypeViewTop[visible] }}>
+                <Growl ref={(el) => this.growl = el} />
                 <div className="p-col-fixed"
-                     style={{
-                         width: '100px',
-                         padding: 0,
-                         paddingTop: visible === this.VisibleType.VISIBLE_PART ? 73 : 0
-                     }}>
+                    style={{
+                        width: '100px',
+                        padding: 0,
+                        paddingTop: visible === this.VisibleType.VISIBLE_PART ? 73 : 0
+                    }}>
                     <StopCalc securityLastInfo={security}
-                              showSmall={visible === this.VisibleType.VISIBLE_PART}/>
+                        showSmall={visible === this.VisibleType.VISIBLE_PART} />
                 </div>
-                <div className="p-col" style={{padding: 0}}>
-                    <div className="p-grid" style={{marginTop: 0, marginRight: 0}}>
-                        <div className="p-col-12" style={{paddingBottom: 0, paddingTop: 0, height: 90}}>
+                <div className="p-col" style={{ padding: 0 }}>
+                    <div className="p-grid" style={{ marginTop: 0, marginRight: 0 }}>
+                        <div className="p-col-12" style={{ paddingBottom: 0, paddingTop: 0, height: 90 }}>
                             <div className="p-grid">
                                 <div className="p-col-5">
                                     <SelectButton value={btnSet}
-                                                  options={this.btnSets}
-                                                  onChange={(e) => this.setState({btnSet: e.value})}/>
+                                        options={this.btnSets}
+                                        onChange={(e) => this.setState({ btnSet: e.value })} />
                                 </div>
                                 <div className="p-col-2">
-                                    <ToggleButton style={{width: '100%'}} checked={isMarket}
-                                                  className={isMarket ? "p-button-danger" : ""}
-                                                  onLabel="Market" offLabel="Limit"
-                                                  onChange={(e) => this.setState({isMarket: e.value})}/>
+                                    <ToggleButton style={{ width: '100%' }} checked={isMarket}
+                                        className={isMarket ? "p-button-danger" : ""}
+                                        onLabel="Market" offLabel="Limit"
+                                        onChange={(e) => this.setState({ isMarket: e.value })} />
                                 </div>
                             </div>
                             {btnSet === 'general' ?
-                                <GeneralBtn growl={this.growl} history={false} security={security}/> : null}
+                                <GeneralBtn growl={this.growl} history={false} security={security} /> : null}
                             {btnSet === 'catch' ?
                                 <CatchBtn growl={this.growl} history={false}
-                                          security={security} isMarket={isMarket}/> : null}
+                                    security={security} isMarket={isMarket} /> : null}
                             {btnSet === 'fast' ?
-                                <FastBtn growl={this.growl} history={false} activeTrade={activeTrade}/> : null}
+                                <FastBtn growl={this.growl} history={false} activeTrade={activeTrade} /> : null}
                             {btnSet === 'strategy' ?
-                                <StrategyBtn onSelectStrategy={console.log}/> : null}
+                                <StrategyBtn onSelectStrategy={console.log} /> : null}
                         </div>
-                        <div className="p-col-12" style={{paddingBottom: 0}}>
-                            <SessionTradeResultView result={sessionResult}/>
-                            <ActiveTradeView trades={activeTrade ? [activeTrade] : []}/>
+                        <div className="p-col-12" style={{ paddingBottom: 0 }}>
+                            <SessionTradeResultView result={sessionResult} />
+                            <ActiveTradeView trades={activeTrade ? [activeTrade] : []} />
                         </div>
                     </div>
                 </div>
                 <ToggleButton id="control-panel-toggle-btn"
-                              checked={visible !== this.VisibleType.VISIBLE}
-                              onChange={(e) => this.toggleView(e.value)}
-                              style={{bottom: this.ToggleVisibleType[visible]}}
-                              onLabel="Show controls"
-                              offLabel="Hide controls"/>
+                    checked={visible !== this.VisibleType.VISIBLE}
+                    onChange={(e) => this.toggleView(e.value)}
+                    style={{ bottom: this.ToggleVisibleType[visible] }}
+                    onLabel="Show controls"
+                    offLabel="Hide controls" />
                 <ToggleButton id="control-panel-toggle-btn-2"
-                              checked={visible !== this.VisibleType.VISIBLE_PART}
-                              onChange={(e) => this.toggleViewPart(e.value)}
-                              style={{bottom: this.ToggleVisibleType[visible]}}
-                              onLabel="Show part"
-                              offLabel="Hide part"/>
+                    checked={visible !== this.VisibleType.VISIBLE_PART}
+                    onChange={(e) => this.toggleViewPart(e.value)}
+                    style={{ bottom: this.ToggleVisibleType[visible] }}
+                    onLabel="Show part"
+                    offLabel="Hide part" />
             </div>
         )
     }

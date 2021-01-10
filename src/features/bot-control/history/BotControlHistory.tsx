@@ -1,15 +1,15 @@
 import * as React from "react";
-import {SubscriptionLike} from "rxjs";
-import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
-import {Interval} from "../../../common/data/Interval";
-import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/ChartWrapper";
-import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
-import {TradingStrategyState} from "../../../common/data/strategy/TradingStrategyState";
-import {TradeSetup} from "../../../common/data/strategy/TradeSetup";
-import {Order} from "../../../common/data/Order";
-import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
-import {ActiveTrade} from "../../../common/data/ActiveTrade";
-import {SessionTradeResult} from "../../../common/data/SessionTradeResult";
+import { SubscriptionLike } from "rxjs";
+import { WebsocketService, WSEvent } from "../../../common/api/WebsocketService";
+import { Interval } from "../../../common/data/Interval";
+import { CHART_MIN_WIDTH, ChartWrapper } from "../../../common/components/chart/ChartWrapper";
+import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
+import { TradingStrategyState } from "../../../common/data/strategy/TradingStrategyState";
+import { TradeSetup } from "../../../common/data/strategy/TradeSetup";
+import { Order } from "../../../common/data/Order";
+import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
+import { ActiveTrade } from "../../../common/data/ActiveTrade";
+import { SessionTradeResult } from "../../../common/data/SessionTradeResult";
 import moment = require("moment");
 
 type Props = {};
@@ -72,36 +72,36 @@ export class BotControlHistory extends React.Component<Props, States> {
                         security = securities.find(o => o.secCode === security.secCode);
                     }
                     // console.log(securities[0]);
-                    this.setState({securities, security, timeInHistory: security?.lastTradeTime});
+                    this.setState({ securities, security, timeInHistory: security?.lastTradeTime });
                 } else {
-                    this.setState({securities: [], security: null, timeInHistory: null});
+                    this.setState({ securities: [], security: null, timeInHistory: null });
                 }
             });
 
         this.tradeSetupSubscription = WebsocketService.getInstance()
             .on<TradeSetup>(WSEvent.HISTORY_TRADE_SETUP).subscribe(setup => {
                 console.log(setup);
-                this.setState({setup});
+                this.setState({ setup });
             });
 
         this.ordersSetupSubscription = WebsocketService.getInstance()
             .on<Order[]>(WSEvent.HISTORY_ORDERS).subscribe(orders => {
-                this.setState({orders});
+                this.setState({ orders });
             });
 
         this.activeTradeSubscription = WebsocketService.getInstance()
             .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES).subscribe(activeTrades => {
-                const {security} = this.state;
+                const { security } = this.state;
                 if (security) {
                     const activeTrade = activeTrades
-                        .find(at => at && at.classCode === security.classCode && at.secCode === security.secCode);
-                    this.setState({activeTrade});
+                        .find(at => at && at.secId === security.id);
+                    this.setState({ activeTrade });
                 }
             });
 
         this.tradingStrategyStateSubscription = WebsocketService.getInstance()
             .on<TradingStrategyState>(WSEvent.HISTORY_TRADING_STRATEGY_STATE).subscribe(tradingStrategyState => {
-                this.setState({tradingStrategyState});
+                this.setState({ tradingStrategyState });
             });
 
         // this.setIntervalIdForFetchTradePremise = setInterval(() => {this.fetchTradePremise()}, 5000);
@@ -118,7 +118,7 @@ export class BotControlHistory extends React.Component<Props, States> {
     };
 
     updateSize = () => {
-        const {chart1Width, chart2Width} = this.state;
+        const { chart1Width, chart2Width } = this.state;
         const chart1RefWidth = this.chart1Ref.current.clientWidth;
         const chart2RefWidth = this.chart2Ref.current.clientWidth;
 
@@ -131,7 +131,7 @@ export class BotControlHistory extends React.Component<Props, States> {
     };
 
     onSecuritySelected = (security: SecurityLastInfo): void => {
-        this.setState({security});
+        this.setState({ security });
         if (security) {
             WebsocketService.getInstance().send(WSEvent.HISTORY_GET_TRADE_PREMISE_AND_SETUP, {
                 brokerId: 1, tradingPlatform: TradingPlatform.QUIK,
@@ -153,37 +153,37 @@ export class BotControlHistory extends React.Component<Props, States> {
             <>
                 <span>{timeInHistoryView}</span>
                 <div className="p-grid td__history_main">
-                    <div className="p-col-7" style={{padding: '0', minWidth: '600px'}}>
-                        <div className="p-grid" style={{margin: '0'}}>
-                            <div className="p-col-7" ref={this.chart1Ref} style={{padding: '0'}}>
+                    <div className="p-col-7" style={{ padding: '0', minWidth: '600px' }}>
+                        <div className="p-grid" style={{ margin: '0' }}>
+                            <div className="p-col-7" ref={this.chart1Ref} style={{ padding: '0' }}>
                                 <ChartWrapper interval={Interval.M3}
-                                              start={start}
-                                              onIntervalChanged={interval => {
-                                              }}
-                                              onStartChanged={start => {
-                                              }}
-                                              initialNumberOfCandles={168}
-                                              width={chart1Width}
-                                              security={security}
-                                              premise={tradingStrategyState ? tradingStrategyState.currentPremise : null}
-                                              orders={orders}
-                                              history={true}/>
+                                    start={start}
+                                    onIntervalChanged={interval => {
+                                    }}
+                                    onStartChanged={start => {
+                                    }}
+                                    initialNumberOfCandles={168}
+                                    width={chart1Width}
+                                    security={security}
+                                    premise={tradingStrategyState ? tradingStrategyState.currentPremise : null}
+                                    orders={orders}
+                                    history={true} />
                             </div>
-                            <div className="p-col-5" ref={this.chart2Ref} style={{padding: '0'}}>
+                            <div className="p-col-5" ref={this.chart2Ref} style={{ padding: '0' }}>
                                 <ChartWrapper interval={Interval.M1}
-                                              start={start}
-                                              onIntervalChanged={interval => {
-                                              }}
-                                              onStartChanged={start => {
-                                              }}
-                                              initialNumberOfCandles={50}
-                                              width={chart2Width}
-                                              security={security}
-                                              history={true}/>
+                                    start={start}
+                                    onIntervalChanged={interval => {
+                                    }}
+                                    onStartChanged={start => {
+                                    }}
+                                    initialNumberOfCandles={50}
+                                    width={chart2Width}
+                                    security={security}
+                                    history={true} />
                             </div>
                         </div>
                     </div>
-                    <div className="p-col-5" style={{width: '500px', padding: 0}}>
+                    <div className="p-col-5" style={{ width: '500px', padding: 0 }}>
                         {/*<BotControlAnalysis premise={tradingStrategyState ? tradingStrategyState.currentPremise : null}
                                             setup={setup}/>*/}
                     </div>

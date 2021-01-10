@@ -79,7 +79,7 @@ export const TradingChartsPage: React.FC = () => {
             .subscribe(activeTrades => {
                 if (securityLastInfo) {
                     const activeTrade = activeTrades
-                        .find(at => at && at.classCode === securityLastInfo.classCode && at.secCode === securityLastInfo.secCode);
+                        .find(at => at && at.secId === securityLastInfo.id);
                     setActiveTrade(activeTrade);
                 }
             });

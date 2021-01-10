@@ -171,7 +171,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
             .subscribe(activeTrades => {
                 if (security) {
                     const activeTrade = activeTrades
-                        .find(at => at && at.classCode === security.classCode && at.secCode === security.secCode)
+                        .find(at => at && at.secId === security.id)
                     setActiveTrade(activeTrade)
                 }
             })

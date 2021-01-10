@@ -1,34 +1,34 @@
 import * as React from "react";
 import "./Stack.css";
 import StackVolumes from "./volumes/StackVolumes";
-import {SubscriptionLike} from "rxjs";
-import {StackItemView} from "./StackItemView";
-import {StackItemWrapper} from "./data/StackItemWrapper";
-import {StackSwitcher} from "./StackSwitcher";
-import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
-import {Order} from "../../data/Order";
-import {SecurityVolume} from "./volumes/data/SecurityVolume";
-import {StackItem} from "./data/StackItem";
-import {WebsocketService, WSEvent} from "../../api/WebsocketService";
-import {OperationType} from "../../data/OperationType";
-import {createStop} from "../../api/rest/traderRestApi";
-import {OrderType} from "../../data/OrderType";
-import {ActiveTrade} from "../../data/ActiveTrade";
-import {playSound} from "../../assets/assets";
-import {StopOrder} from "../../data/StopOrder";
-import {getSelectedSecurity} from "../../utils/Cache";
-import {ToggleButton} from "primereact/togglebutton";
+import { SubscriptionLike } from "rxjs";
+import { StackItemView } from "./StackItemView";
+import { StackItemWrapper } from "./data/StackItemWrapper";
+import { StackSwitcher } from "./StackSwitcher";
+import { SecurityLastInfo } from "../../data/security/SecurityLastInfo";
+import { Order } from "../../data/Order";
+import { SecurityVolume } from "./volumes/data/SecurityVolume";
+import { StackItem } from "./data/StackItem";
+import { WebsocketService, WSEvent } from "../../api/WebsocketService";
+import { OperationType } from "../../data/OperationType";
+import { createStop } from "../../api/rest/traderRestApi";
+import { OrderType } from "../../data/OrderType";
+import { ActiveTrade } from "../../data/ActiveTrade";
+import { playSound } from "../../assets/assets";
+import { StopOrder } from "../../data/StopOrder";
+import { getSelectedSecurity } from "../../utils/Cache";
+import { ToggleButton } from "primereact/togglebutton";
 import SessionTradeResultView from "../control-panel/components/SessionTradeResultView";
 import ActiveTradeView from "../control-panel/components/ActiveTradeView";
-import {SessionTradeResult} from "../../data/SessionTradeResult";
-import {Growl} from "primereact/components/growl/Growl";
-import {ControlPanelGeneralBtn} from "./control-panel/ControlPanelGeneralBtn";
-import {ControlPanelFastBtn} from "./control-panel/ControlPanelFastBtn";
-import {TradePremise} from "../../data/strategy/TradePremise";
-import {adjustTradePremise} from "../../utils/DataUtils";
+import { SessionTradeResult } from "../../data/SessionTradeResult";
+import { Growl } from "primereact/components/growl/Growl";
+import { ControlPanelGeneralBtn } from "./control-panel/ControlPanelGeneralBtn";
+import { ControlPanelFastBtn } from "./control-panel/ControlPanelFastBtn";
+import { TradePremise } from "../../data/strategy/TradePremise";
+import { adjustTradePremise } from "../../utils/DataUtils";
 import intervalCompare from "../../utils/IntervalComporator";
 import DepositView from "./deposit/DepositView";
-import {TEST_ACTIVE_TRADES} from "../../utils/TestData";
+import { TEST_ACTIVE_TRADES } from "../../utils/TestData";
 
 type Props = {};
 
@@ -132,38 +132,38 @@ export class Stack extends React.Component<Props, States> {
                     if (securityLastInfo) {
                         securityLastInfo.lastTradeTime = new Date(securityLastInfo.lastTradeTime)
                     }
-                    this.setState({securityLastInfo})
+                    this.setState({ securityLastInfo })
                 }
             })
 
         this.stackItemsSubscription = WebsocketService.getInstance()
             .on<StackItem[]>(WSEvent.STACK).subscribe(stackItems => {
-                this.setState({stackItems})
+                this.setState({ stackItems })
             })
 
         this.ordersSetupSubscription = WebsocketService.getInstance()
             .on<Order[]>(WSEvent.ORDERS).subscribe(orders => {
                 this.notifyIfOrderHit(orders)
-                this.setState({orders, ordersMap: this.ordersMap(orders)})
+                this.setState({ orders, ordersMap: this.ordersMap(orders) })
             })
 
         this.volumesSubscription = WebsocketService.getInstance()
             .on<SecurityVolume[]>(WSEvent.VOLUMES).subscribe(volumes => {
-                this.setState({volumes})
+                this.setState({ volumes })
             })
 
         this.activeTradeSubscription = WebsocketService.getInstance()
             .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES).subscribe(activeTrades => {
-                const {securityLastInfo} = this.state
+                const { securityLastInfo } = this.state
                 if (activeTrades && activeTrades.length > 0) {
                     this.notifyIfStopHit(activeTrades)
                     this.setState({
                         activeTrades,
                         selectedActiveTrade: securityLastInfo ? activeTrades
-                            .find(value => value.secCode === securityLastInfo.secCode) : null
+                            .find(at => at.secId === securityLastInfo.id) : null
                     })
                 } else {
-                    this.setState({activeTrades: [], selectedActiveTrade: null})
+                    this.setState({ activeTrades: [], selectedActiveTrade: null })
                     // this.setState({activeTrades: TEST_ACTIVE_TRADES, selectedActiveTrade: TEST_ACTIVE_TRADES[0]})
                 }
             })
@@ -172,7 +172,7 @@ export class Stack extends React.Component<Props, States> {
             .on<TradePremise>(WSEvent.TRADE_PREMISE)
             .subscribe(premise => {
                 if (!premise) adjustTradePremise(premise)
-                this.setState({premise})
+                this.setState({ premise })
             })
     }
 
@@ -194,7 +194,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     notifyIfStopHit = (newActiveTrades: ActiveTrade[]): void => {
-        const {activeTrades} = this.state;
+        const { activeTrades } = this.state;
 
         // todo
         // if ((!activeTrades && newActiveTrade) || (activeTrades && !newActiveTrade)) {
@@ -211,7 +211,7 @@ export class Stack extends React.Component<Props, States> {
     }
 
     shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<States>, nextContext: any): boolean {
-        const {stackItems} = this.state;
+        const { stackItems } = this.state;
         if (stackItems && nextState.stackItems && stackItems.length > 0
             && stackItems.length === nextState.stackItems.length) {
             const index = stackItems.length / 2;
@@ -235,7 +235,7 @@ export class Stack extends React.Component<Props, States> {
                 if (e.ctrlKey) {
                     this.createStopOrder(val);
                 } else {
-                    const {ordersMap} = this.state;
+                    const { ordersMap } = this.state;
                     const order = ordersMap[val.price];
                     if (order) {
                         this.cancelOrder(order);
@@ -249,7 +249,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     createStopOrder = (val: any) => {
-        const {securityLastInfo} = this.state;
+        const { securityLastInfo } = this.state;
         createStop({
             classCode: securityLastInfo.classCode,
             secCode: securityLastInfo.secCode,
@@ -260,7 +260,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     createOrder = (val: any) => {
-        const {position, securityLastInfo, history} = this.state;
+        const { position, securityLastInfo, history } = this.state;
 
         const orders: Order[] = [
             {
@@ -279,7 +279,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     cancelOrder = (order: Order) => {
-        const {history} = this.state;
+        const { history } = this.state;
         WebsocketService.getInstance().send(history ? WSEvent.HISTORY_CANCEL_ORDERS : WSEvent.CANCEL_ORDERS, [order])
     };
 
@@ -297,7 +297,7 @@ export class Stack extends React.Component<Props, States> {
     };
 
     createStackViewNew = (): StackItemWrapper[] => {
-        const {ordersMap, stackItems, activeTrades, selectedActiveTrade, securityLastInfo} = this.state
+        const { ordersMap, stackItems, activeTrades, selectedActiveTrade, securityLastInfo } = this.state
 
         if (stackItems.length === 0 || !securityLastInfo) return []
         const stackItemMap = {}
@@ -327,7 +327,7 @@ export class Stack extends React.Component<Props, States> {
             if (stackItemMap[value.price]) {
                 value = stackItemMap[value.price];
                 if (value.sell !== undefined) {
-                    style = {backgroundColor: value.sell ? '#e74c3c44' : '#16a08544'};
+                    style = { backgroundColor: value.sell ? '#e74c3c44' : '#16a08544' };
                 }
             }
 
@@ -382,7 +382,7 @@ export class Stack extends React.Component<Props, States> {
     }
 
     fillWithPremise = (items: StackItemWrapper[]): StackItemWrapper[] => {
-        const {premise} = this.state
+        const { premise } = this.state
 
         if (premise) {
             const srMap = {}
@@ -428,60 +428,60 @@ export class Stack extends React.Component<Props, States> {
         const stackItemWrappers = this.createStackViewNew()
 
         return (
-            <div id="stack" className="td__stack" style={{right: this.VisibleTypeViewTop[visible]}}>
+            <div id="stack" className="td__stack" style={{ right: this.VisibleTypeViewTop[visible] }}>
                 <StackSwitcher onSelectedPosition={(pos) => {
-                    this.setState({position: pos})
-                }}/>
+                    this.setState({ position: pos })
+                }} />
                 <div className="td__stack-main">
                     {
                         visible !== this.VisibleType.VISIBLE_PART ?
                             <div className="p-grid control-panel">
-                                <Growl ref={(el) => this.growl = el}/>
-                                <div className="p-col-12" style={{padding: 0, fontSize: '12px'}}>
-                                    <SessionTradeResultView result={sessionResult}/>
-                                    <ActiveTradeView trades={activeTrades}/>
-                                    <DepositView/>
+                                <Growl ref={(el) => this.growl = el} />
+                                <div className="p-col-12" style={{ padding: 0, fontSize: '12px' }}>
+                                    <SessionTradeResultView result={sessionResult} />
+                                    <ActiveTradeView trades={activeTrades} />
+                                    <DepositView />
                                 </div>
                                 <div className="p-col-12">
                                     <ControlPanelGeneralBtn growl={this.growl}
-                                                            history={false}
-                                                            security={securityLastInfo}/>
+                                        history={false}
+                                        security={securityLastInfo} />
                                 </div>
                                 <div className="p-col-12">
                                     <ControlPanelFastBtn growl={this.growl}
-                                                         history={false}
-                                                         activeTrade={selectedActiveTrade}/>
+                                        history={false}
+                                        activeTrade={selectedActiveTrade} />
                                 </div>
                                 <div className="p-col-12">
-                                    <StackVolumes volumes={volumes}/>
+                                    <StackVolumes volumes={volumes} />
                                 </div>
                             </div>
                             : null
                     }
                     <div id="stack-items-wrap-id" className="p-grid stack-items-wrap">
-                        <div className="p-col-12 stack-items" style={{height: stackItemsHeight}}>
+                        <div className="p-col-12 stack-items" style={{ height: stackItemsHeight }}>
                             {
                                 stackItemWrappers.map(value =>
                                     <StackItemView key={value.price}
-                                                   stackItemWrapper={value}
-                                                   onItemClick={this.clickOnStackItem}/>
+                                        stackItemWrapper={value}
+                                        onItemClick={this.clickOnStackItem} />
                                 )
                             }
                         </div>
                     </div>
                 </div>
                 <ToggleButton id="stack-toggle-btn"
-                              checked={visible !== this.VisibleType.VISIBLE}
-                              onChange={(e) => this.toggleView(e.value)}
-                              style={{left: this.ToggleVisibleType[visible]}}
-                              onLabel="Show stack"
-                              offLabel="Hide stack"/>
+                    checked={visible !== this.VisibleType.VISIBLE}
+                    onChange={(e) => this.toggleView(e.value)}
+                    style={{ left: this.ToggleVisibleType[visible] }}
+                    onLabel="Show stack"
+                    offLabel="Hide stack" />
                 <ToggleButton id="stack-toggle-btn-2"
-                              checked={visible !== this.VisibleType.VISIBLE_PART}
-                              onChange={(e) => this.toggleViewPart(e.value)}
-                              style={{left: this.ToggleVisibleType[visible] + 4}}
-                              onLabel="Show part"
-                              offLabel="Hide part"/>
+                    checked={visible !== this.VisibleType.VISIBLE_PART}
+                    onChange={(e) => this.toggleViewPart(e.value)}
+                    style={{ left: this.ToggleVisibleType[visible] + 4 }}
+                    onLabel="Show part"
+                    offLabel="Hide part" />
             </div>
         )
     }
