@@ -1,0 +1,54 @@
+import * as React from "react";
+import { useEffect, useRef, useState } from "react";
+import { RouteComponentProps } from "react-router-dom";
+import moment = require("moment");
+import { map } from "rxjs/internal/operators/map";
+import { TradingChartsSecurity } from "./security/TradingChartsSecurity";
+import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
+import { getLastSecurities } from "../../common/api/rest/analysisRestApi";
+import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
+
+type RouteParams = {
+    secId: string
+    premiseStart: string
+}
+
+export const TradingChartsSecurityPage: React.FC<RouteComponentProps<RouteParams>> = ({ match }) => {
+    const secId: number = parseInt(match.params.secId)
+    const start = match.params.premiseStart ? moment(match.params.premiseStart, "DD-MM-YYYY_HH-mm").toDate() : null
+
+    const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
+
+    useEffect(() => {
+        document.getElementById("main-nav").style.display = "none";
+        // document.getElementById("control-panel").style.display = "none";
+        document.getElementById("stack").style.display = "none";
+
+        getLastSecurities(secId).then(securities => {
+            const security = securities.find(value => value.id === secId)
+            if (security) {
+                setSecurityLastInfo(security)
+            }
+        })
+
+        const lastSecuritiesSubscription = WebsocketService.getInstance()
+            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+            .pipe(map(securities => securities.find(security => security.id === secId)))
+            .subscribe(security => {
+                document.title = `${security.secCode} - ${security.lastChange}% - ${security.lastTradePrice}`
+            })
+
+        // Specify how to clean up after this effect:
+        return function cleanup() {
+            lastSecuritiesSubscription.unsubscribe()
+        }
+    }, [])
+
+    if (!securityLastInfo) return (<div>No Data</div>)
+
+    return (
+        <TradingChartsSecurity
+            securityLastInfo={securityLastInfo}
+            start={start} />
+    )
+}

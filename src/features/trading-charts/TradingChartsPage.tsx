@@ -1,22 +1,22 @@
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
-import {getFilterData} from "../../common/api/rest/botControlRestApi";
-import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
-import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
-import {CHART_MIN_WIDTH, ChartWrapper} from "../../common/components/chart/ChartWrapper";
-import {TradePremise} from "../../common/data/strategy/TradePremise";
-import {SecurityLastInfo} from "../../common/data/security/SecurityLastInfo";
-import {Interval} from "../../common/data/Interval";
-import {WebsocketService, WSEvent} from "../../common/api/WebsocketService";
-import {adjustTradePremise} from "../../common/utils/DataUtils";
-import {Order} from "../../common/data/Order";
-import {ActiveTrade} from "../../common/data/ActiveTrade";
-import {TradingChartsSecurities} from "./security/TradingChartsSecurities";
-import {TradingPlatform} from "../../common/data/trading/TradingPlatform";
-import {TrendsView} from "../../common/components/trend/TrendsView";
-import {TradeStrategyAnalysisFilterDto} from "../../common/data/TradeStrategyAnalysisFilterDto";
-import {Market} from "../../common/data/Market";
-import {BrokerId} from "../../common/data/BrokerId";
+import { useEffect, useRef, useState } from "react";
+import { getFilterData } from "../../common/api/rest/botControlRestApi";
+import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
+import { MarketBotStartDto } from "../../common/data/bot/MarketBotStartDto";
+import { CHART_MIN_WIDTH, ChartWrapper } from "../../common/components/chart/ChartWrapper";
+import { TradePremise } from "../../common/data/strategy/TradePremise";
+import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
+import { Interval } from "../../common/data/Interval";
+import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
+import { adjustTradePremise } from "../../common/utils/DataUtils";
+import { Order } from "../../common/data/Order";
+import { ActiveTrade } from "../../common/data/ActiveTrade";
+import { TradingChartsSecurities } from "./TradingChartsSecurities";
+import { TradingPlatform } from "../../common/data/trading/TradingPlatform";
+import { TrendsView } from "../../common/components/trend/TrendsView";
+import { TradeStrategyAnalysisFilterDto } from "../../common/data/TradeStrategyAnalysisFilterDto";
+import { Market } from "../../common/data/Market";
+import { BrokerId } from "../../common/data/BrokerId";
 
 export const TradingChartsPage: React.FC = () => {
     const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null);
@@ -135,88 +135,88 @@ export const TradingChartsPage: React.FC = () => {
                 <Filter filter={filterData} onStart={onStart}/>
             </div>*/}
             <div className="p-col-12">
-                <TrendsView trends={premise ? premise.analysis.trends : []}/>
+                <TrendsView trends={premise ? premise.analysis.trends : []} />
             </div>
             <div className="p-col-12">
                 <div className="p-grid">
                     <div className="p-col-4">
                         <TradingChartsSecurities securities={securities}
-                                                 onSelectRow={onSecuritySelected}/>
+                            onSelectRow={onSecuritySelected} />
                     </div>
-                    <div className="p-col-4" ref={chart1Ref} style={{padding: '0'}}>
+                    <div className="p-col-4" ref={chart1Ref} style={{ padding: '0' }}>
                         <ChartWrapper interval={timeFrame1}
-                                      initialNumberOfCandles={500}
-                                      onIntervalChanged={() => {
-                                      }}
-                                      onStartChanged={() => {
-                                      }}
-                                      width={chart1Width}
-                                      chartHeight={400}
-                                      security={securityLastInfo}
-                                      premise={premise}
-                                      orders={orders}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
+                            initialNumberOfCandles={500}
+                            onIntervalChanged={() => {
+                            }}
+                            onStartChanged={() => {
+                            }}
+                            width={chart1Width}
+                            chartHeight={400}
+                            security={securityLastInfo}
+                            premise={premise}
+                            orders={orders}
+                            activeTrade={activeTrade}
+                            showGrid={true} />
                     </div>
-                    <div className="p-col-4" ref={chart2Ref} style={{padding: '0'}}>
+                    <div className="p-col-4" ref={chart2Ref} style={{ padding: '0' }}>
                         <ChartWrapper interval={timeFrame2}
-                                      initialNumberOfCandles={120}
-                                      onIntervalChanged={() => {
-                                      }}
-                                      onStartChanged={() => {
-                                      }}
-                                      width={chart2Width}
-                                      chartHeight={400}
-                                      security={securityLastInfo}
-                                      premise={premise}
-                                      orders={orders}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
+                            initialNumberOfCandles={120}
+                            onIntervalChanged={() => {
+                            }}
+                            onStartChanged={() => {
+                            }}
+                            width={chart2Width}
+                            chartHeight={400}
+                            security={securityLastInfo}
+                            premise={premise}
+                            orders={orders}
+                            activeTrade={activeTrade}
+                            showGrid={true} />
                     </div>
-                    <div className="p-col-4" ref={chart3Ref} style={{padding: '0'}}>
+                    <div className="p-col-4" ref={chart3Ref} style={{ padding: '0' }}>
                         <ChartWrapper interval={timeFrame3}
-                                      initialNumberOfCandles={500}
-                                      onIntervalChanged={() => {
-                                      }}
-                                      onStartChanged={() => {
-                                      }}
-                                      width={chart3Width}
-                                      chartHeight={400}
-                                      security={securityLastInfo}
-                                      premise={premise}
-                                      orders={orders}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
+                            initialNumberOfCandles={500}
+                            onIntervalChanged={() => {
+                            }}
+                            onStartChanged={() => {
+                            }}
+                            width={chart3Width}
+                            chartHeight={400}
+                            security={securityLastInfo}
+                            premise={premise}
+                            orders={orders}
+                            activeTrade={activeTrade}
+                            showGrid={true} />
                     </div>
-                    <div className="p-col-4" ref={chart4Ref} style={{padding: '0'}}>
+                    <div className="p-col-4" ref={chart4Ref} style={{ padding: '0' }}>
                         <ChartWrapper interval={timeFrame4}
-                                      initialNumberOfCandles={500}
-                                      onIntervalChanged={() => {
-                                      }}
-                                      onStartChanged={() => {
-                                      }}
-                                      width={chart4Width}
-                                      chartHeight={400}
-                                      security={securityLastInfo}
-                                      premise={premise}
-                                      orders={orders}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
+                            initialNumberOfCandles={500}
+                            onIntervalChanged={() => {
+                            }}
+                            onStartChanged={() => {
+                            }}
+                            width={chart4Width}
+                            chartHeight={400}
+                            security={securityLastInfo}
+                            premise={premise}
+                            orders={orders}
+                            activeTrade={activeTrade}
+                            showGrid={true} />
                     </div>
-                    <div className="p-col-4" ref={chart5Ref} style={{padding: '0'}}>
+                    <div className="p-col-4" ref={chart5Ref} style={{ padding: '0' }}>
                         <ChartWrapper interval={timeFrame5}
-                                      initialNumberOfCandles={500}
-                                      onIntervalChanged={() => {
-                                      }}
-                                      onStartChanged={() => {
-                                      }}
-                                      width={chart5Width}
-                                      chartHeight={400}
-                                      security={securityLastInfo}
-                                      premise={premise}
-                                      orders={orders}
-                                      activeTrade={activeTrade}
-                                      showGrid={true}/>
+                            initialNumberOfCandles={500}
+                            onIntervalChanged={() => {
+                            }}
+                            onStartChanged={() => {
+                            }}
+                            width={chart5Width}
+                            chartHeight={400}
+                            security={securityLastInfo}
+                            premise={premise}
+                            orders={orders}
+                            activeTrade={activeTrade}
+                            showGrid={true} />
                     </div>
                 </div>
             </div>

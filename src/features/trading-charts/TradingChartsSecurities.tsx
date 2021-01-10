@@ -1,24 +1,24 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
-import {Column} from "primereact/column";
-import {DataTable} from "primereact/datatable";
-import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
-import {round100} from "../../../common/utils/utils";
+import { useEffect, useState } from "react";
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
+import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
+import { round100 } from "../../common/utils/utils";
 
 type Props = {
     securities: SecurityLastInfo[]
     onSelectRow: (e: any) => void
 };
 
-export const TradingChartsSecurities: React.FC<Props> = ({securities, onSelectRow}) => {
+export const TradingChartsSecurities: React.FC<Props> = ({ securities, onSelectRow }) => {
 
     const columns = [
-        {field: 'shortName', header: 'Наз'},
-        {field: 'lastChange', header: '% изм'},
-        {field: 'lastTradePrice', header: 'Цен посл'},
-        {field: 'totalDemand', header: 'Об спр/пред'},
-        {field: 'valueToday', header: 'Оборот'},
-        {field: 'numTradesToday', header: 'Кол сдел'}
+        { field: 'shortName', header: 'Наз' },
+        { field: 'lastChange', header: '% изм' },
+        { field: 'lastTradePrice', header: 'Цен посл' },
+        { field: 'totalDemand', header: 'Об спр/пред' },
+        { field: 'valueToday', header: 'Оборот' },
+        { field: 'numTradesToday', header: 'Кол сдел' }
     ];
 
     const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
@@ -36,8 +36,8 @@ export const TradingChartsSecurities: React.FC<Props> = ({securities, onSelectRo
 
         return (
             <div className="demand-supply" title={`Общ спрос: ${totalDemand} / Общ предл: ${totalSupply} = ${ratio}`}>
-                <div className="demand" style={{width: demandWidth + '%'}}></div>
-                <div className="supply" style={{width: supplyWidth + '%'}}></div>
+                <div className="demand" style={{ width: demandWidth + '%' }}></div>
+                <div className="supply" style={{ width: supplyWidth + '%' }}></div>
             </div>
         )
     }
@@ -52,10 +52,10 @@ export const TradingChartsSecurities: React.FC<Props> = ({securities, onSelectRo
     const columnComponents = columns.map(col => {
         if ("totalDemand" === col.field) {
             return <Column key={col.field} field={col.field} header={col.header} sortable={true}
-                           body={demandSupplyTemplate} sortFunction={demandSupplySort}
-                           style={{width: '100px'}}/>
+                body={demandSupplyTemplate} sortFunction={demandSupplySort}
+                style={{ width: '100px' }} />
         }
-        return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true}/>
+        return <Column key={col.field} field={col.field} header={col.header} sortable={true} filter={true} />
     })
 
     const onSelect = (e) => {
@@ -68,11 +68,11 @@ export const TradingChartsSecurities: React.FC<Props> = ({securities, onSelectRo
     return (
         <div className="p-grid analysis-securities">
             <DataTable value={securities} responsive
-                       selectionMode="single"
-                       selection={securityLastInfo}
-                       onSelectionChange={onSelect}
-                       scrollable={true}
-                       scrollHeight="350px">
+                selectionMode="single"
+                selection={securityLastInfo}
+                onSelectionChange={onSelect}
+                scrollable={true}
+                scrollHeight="350px">
                 {columnComponents}
             </DataTable>
         </div>

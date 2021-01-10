@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { MarketBotStartDto } from "../../../common/data/bot/MarketBotStartDto";
 import { CHART_MIN_WIDTH, ChartWrapper } from "../../../common/components/chart/ChartWrapper";
 import { TradePremise } from "../../../common/data/strategy/TradePremise";
 import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
@@ -8,8 +7,7 @@ import { Interval } from "../../../common/data/Interval";
 import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
 import { TrendsView } from "../../../common/components/trend/TrendsView";
 import { BrokerId } from "../../../common/data/BrokerId";
-import { RouteComponentProps } from "react-router-dom";
-import { getLastSecurities, getTradePremise } from "../../../common/api/rest/analysisRestApi";
+import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
 import { ClassCode } from "../../../common/data/ClassCode";
 import { Trend } from "../../../common/data/strategy/Trend";
 import Notifications from "../../../common/components/notifications/Notifications";
@@ -18,21 +16,14 @@ import { StockEventsBrief } from "../../../common/components/share-event/StockEv
 import { SecurityLastInfoView } from "./info/SecurityLastInfoView";
 import TrendViewChart from "../../../common/components/trend/TrendViewChart";
 import moment = require("moment");
-import { WebsocketService, WSEvent } from "../../../common/api/WebsocketService";
-import { filter } from "rxjs/internal/operators/filter";
-import { map } from "rxjs/internal/operators/map";
 
-type RouteParams = {
-    secId: string
-    premiseStart: string
+type Props = {
+    securityLastInfo: SecurityLastInfo
+    start: Date
 }
 
-export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> = ({ match }) => {
-    const secId: number = parseInt(match.params.secId)
-    const start = match.params.premiseStart ? moment(match.params.premiseStart, "DD-MM-YYYY_HH-mm").toDate() : null
+export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start }) => {
     const CHART_HEIGHT = 600
-    const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null);
-    const [securities, setSecurities] = useState<SecurityLastInfo[]>([]);
     const [premise, setPremise] = useState<TradePremise>(null);
     const [orders, setOrders] = useState(null);
     const [activeTrade, setActiveTrade] = useState(null);
@@ -54,33 +45,16 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
     const [start4, setStart4] = useState<Date>(start ? moment(start).subtract(1, 'hours').toDate() : null)
 
     useEffect(() => {
-        document.getElementById("main-nav").style.display = "none";
-        // document.getElementById("control-panel").style.display = "none";
-        document.getElementById("stack").style.display = "none";
-
-        getLastSecurities(secId).then(securities => {
-            const security = securities.find(value => value.id === secId)
-            if (security) {
-                onSecuritySelected(security)
-            }
-        })
-
-        const lastSecuritiesSubscription = WebsocketService.getInstance()
-            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-            .pipe(map(securities => securities.find(security => security.id === secId)))
-            .subscribe(security => {
-                document.title = `${security.secCode} - ${security.lastChange}% - ${security.lastTradePrice}`
-            })
+        if (securityLastInfo) onSecuritySelected(securityLastInfo)
 
         setTimeout(updateSize, 1000)
         window.addEventListener('resize', updateSize)
 
         // Specify how to clean up after this effect:
         return function cleanup() {
-            lastSecuritiesSubscription.unsubscribe()
             window.removeEventListener('resize', updateSize)
         }
-    }, [])
+    }, [securityLastInfo])
 
     const fetchPremise = (security: SecurityLastInfo, timeFrameTrading: Interval, timeFrameMin: Interval, before?: Date) => {
         getTradePremise({
@@ -107,7 +81,6 @@ export const TradingChartsSecurity: React.FC<RouteComponentProps<RouteParams>> =
     }
 
     const onSecuritySelected = (secLastInfo: SecurityLastInfo): void => {
-        setSecurityLastInfo(secLastInfo)
         setTimeframe(secLastInfo.classCode)
         if (ClassCode.SPBFUT === secLastInfo.classCode) {
             fetchPremise(secLastInfo, Interval.M3, Interval.M1, start)
