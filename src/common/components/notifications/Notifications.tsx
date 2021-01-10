@@ -1,7 +1,7 @@
 import * as React from "react";
 import { memo, useEffect, useState } from "react";
-import "./Notifications.css";
-import "./Signals.css";
+import "./styles/Notifications.css";
+import "./styles/Signals.css";
 import { playSound } from "../../assets/assets";
 import { getNotifications } from "../../api/rest/analysisRestApi";
 import { FixedSizeList as List } from "react-window";
@@ -35,7 +35,7 @@ const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelect
     const [classCode, setClassCode] = useState(null)
     const [secCode, setSecCode] = useState(null)
     const [secCodes, setSecCodes] = useState([{ label: "ALL", value: null }])
-    const [start, setStart] = useState<Date>(getRecentBusinessDate(moment().hours(0).minutes(0).seconds(0).toDate()))
+    const [start, setStart] = useState<Date>(getRecentBusinessDate(moment().subtract(60, 'days').hours(0).minutes(0).seconds(0).toDate()))
     const [textPattern, setTextPattern] = useState("")
 
     const [visibleAlerts, setVisibleAlerts] = useState([])
@@ -119,8 +119,8 @@ const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelect
         };
     }, [filter, security]);
 
-    const setAlertsReceivedFromServer = (newAlerts: NotificationDto[], newClassCode: ClassCode, newSecCode: string,
-        newInterval: Interval, newStart: Date, newTextPattern: string): void => {
+    const setAlertsReceivedFromServer = (newAlerts: NotificationDto[], newClassCode: ClassCode,
+        newSecCode: string, newInterval: Interval, newStart: Date, newTextPattern: string): void => {
         setAlerts(newAlerts);
         setFilteredAlerts(newAlerts, newClassCode, newSecCode, newInterval, newStart, newTextPattern);
         notifyOnNewAlert(newAlerts);
@@ -155,8 +155,10 @@ const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelect
                 className += cls.toLowerCase() + "-" + sInterval.toLowerCase();
             } else if ("SR_ZONE_CROSS" === sArr[0]) {
                 className += alert.title.toLowerCase();
-            } else {
-                className += alert.title.toLowerCase() + "-" + sInterval.toLowerCase();
+            } else if (alert.text.toLowerCase().indexOf("рост") >= 0) {
+                className += "direction-up";
+            } else if (alert.text.toLowerCase().indexOf("падение") >= 0) {
+                className += "direction-down";
             }
         }
 
@@ -234,7 +236,7 @@ const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelect
         if (newClassCode) {
             const securities: Security[] = getSecuritiesByClassCode(newClassCode)
             for (const sec of securities) {
-                newSecCodes.push({ label: sec.secCode, value: sec.secCode })
+                newSecCodes.push({ label: sec.code, value: sec.code })
             }
         } else {
             setSecCode(null)
@@ -279,31 +281,33 @@ const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelect
             filtered = filtered.filter(value => value.text.indexOf(newTextPattern) !== -1);
         }
 
-        // console.log(alerts, filtered)
+        // if (alerts.length > 0) debugger
+        // console.log(newClassCode, newSecCode, newInterval, newStart, newTextPattern, alerts, filtered)
         setVisibleAlerts(filtered)
     }
 
     const Row = ({ index, style }) => {
         const alert = visibleAlerts[index]
-        const className = "alerts-row " + (selectedAlert === alert ? "alerts-row-selected" : "")
+        const className = "notifications-row " + (selectedAlert === alert ? "notifications-row-selected" : "")
 
         return (
-            <div className={index % 2 ? "ListItemOdd" : "ListItemEven"} style={style}>
+            <div className={index % 2 ? "notifications-list-item-odd" : "notifications-list-item-even"} style={style}>
                 <div key={alert.title + alert.timeInterval + alert.created}
                     className={className}
                     onClick={() => {
                         setSelectedAlert(alert);
                         onNotificationSelected(alert);
                     }}>
-                    <div className="p-col-12">
-                        <div className="alerts-cell alerts-time">
+                    <div className="notifications-title">
+
+                        <div className="notifications-cell notifications-symbol" title={alert.code}>
+                            {alert.code?.substr(0, 8)}
+                        </div>
+                        <div className="notifications-cell notifications-time">
                             {timeTemplate(alert)}
                         </div>
-                        <div className="alerts-cell alerts-name">
+                        <div className="notifications-cell notifications-name">
                             {nameTemplate(alert)}
-                        </div>
-                        <div className="alerts-cell alerts-symbol" title={alert.securityCode}>
-                            {alert.securityCode?.substr(0, 8)}
                         </div>
                         {/*<div className="alerts-cell alerts-strength">
                         {strengthTemplate(alert)}
@@ -315,8 +319,8 @@ const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelect
                             {possibleFutureDirectionUpTemplate(alert)}
                         </div>*/}
                     </div>
-                    <div className="p-col-12">
-                        <div className="alerts-cell alerts-description"
+                    <div>
+                        <div className="notifications-cell notifications-description"
                             dangerouslySetInnerHTML={{ __html: descriptionTemplate(alert) }}>
                         </div>
                     </div>
@@ -326,9 +330,9 @@ const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelect
     }
 
     return (
-        <div className="p-grid alerts" style={{ height: viewHeight || 200 }}>
-            <div className="p-col-12 alerts-head">
-                <div className="alerts-head-dropdown alerts-head-class-code">
+        <div className="p-grid notifications" style={{ height: viewHeight || 200 }}>
+            <div className="p-col-12 notifications-head">
+                <div className="notifications-head-dropdown notifications-head-class-code">
                     {
                         filter ?
                             classCode
@@ -339,7 +343,7 @@ const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelect
                                 }} />
                     }
                 </div>
-                <div className="alerts-head-dropdown alerts-head-security">
+                <div className="notifications-head-dropdown notifications-head-security">
                     {
                         filter ?
                             secCode
@@ -350,29 +354,29 @@ const Notifications: React.FC<Props> = ({ filter, security, onNotificationSelect
                                 }} />
                     }
                 </div>
-                <div className="alerts-head-dropdown alerts-head-interval">
+                <div className="notifications-head-dropdown notifications-head-interval">
                     <Dropdown value={interval} options={intervals}
                         onChange={(e) => {
                             onIntervalChanged(e.value);
                         }} />
                 </div>
-                <div className="alerts-head-start-date">
+                <div className="notifications-head-start-date">
                     <Calendar value={start}
                         onChange={(e) => onStartDateChanged(e.value as Date)} />
                 </div>
-                <div className="alerts-head-start-date">
+                <div className="notifications-head-start-date">
                     <InputText value={textPattern}
                         onChange={(e) => onTextPatternChanged(e.target['value'])} />
                 </div>
             </div>
-            <div className="p-col-12 alerts-body" style={{ height: (viewHeight || 200) - 30 }}>
+            <div className="p-col-12 notifications-body" style={{ height: (viewHeight || 200) - 30 }}>
                 <AutoSizer>
                     {({ height, width }) => (
                         <List
-                            className="List"
+                            className="notifications-list"
                             height={height}
                             itemCount={visibleAlerts.length}
-                            itemSize={150}
+                            itemSize={100}
                             width={width}
                         >
                             {Row}
