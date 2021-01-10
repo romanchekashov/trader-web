@@ -24,15 +24,15 @@ export const ActiveTradesPage = () => {
         document.querySelector(".header").classList.add('header-sticky')
 
         const stackEventsListener = StackService.getInstance()
-            .on<ActiveTrade>(StackEvent.ACTIVE_TRADE_SELECTED).subscribe(at => {
-                pageJumpById("trading-chart-security-" + at.secId, offsetHeight)
-            })
+            .on<ActiveTrade>(StackEvent.ACTIVE_TRADE_SELECTED)
+            .subscribe(selectActiveTrade)
 
         // Specify how to clean up after this effect:
         return function cleanup() {
             stackEventsListener.unsubscribe()
+            document.querySelector(".header").classList.remove('header-sticky')
         }
-    }, [offsetHeight])
+    }, [offsetHeight, securities])
 
     useEffect(() => {
 
@@ -87,14 +87,25 @@ export const ActiveTradesPage = () => {
         setHeight(window.innerHeight - 27)
     }
 
+    const selectActiveTrade = (at: ActiveTrade): void => {
+        const sec = securities.find(s => s.id === at.secId)
+        onSecuritySelected(sec)
+    }
+
+    const onSecuritySelected = (sec: SecurityLastInfo): void => {
+        setSelectedSecurity(sec)
+        pageJumpById("trading-chart-security-" + sec.id, offsetHeight)
+        StackService.getInstance().send(StackEvent.SECURITY_SELECTED, sec)
+    }
+
     return (
-        <div id="active-trades-page" className="p-grid" style={{ paddingTop: offsetHeight }}>
+        <div id="active-trades-page" style={{ paddingTop: offsetHeight }}>
             <div id="active-trades-securities-wrapper" className="fixed">
 
                 <ActiveTradesSecurities
                     securities={securities}
                     selectedSecurity={selectedSecurity}
-                    onSelectRow={setSelectedSecurity} />
+                    onSelectRow={onSecuritySelected} />
 
             </div>
             {

@@ -47,7 +47,8 @@ type States = {
     history?: boolean
     securityLastInfo: SecurityLastInfo
     visible: string
-    premise: TradePremise
+    premise: TradePremise,
+    selectedSecId: number
 }
 
 export class Stack extends React.Component<Props, States> {
@@ -58,6 +59,7 @@ export class Stack extends React.Component<Props, States> {
     private volumesSubscription: SubscriptionLike = null
     private activeTradeSubscription: SubscriptionLike = null
     private tradePremiseSubscription: SubscriptionLike = null
+    private stackEventsListener: SubscriptionLike = null
 
     private previousOrdersNumber: number = 0
     private previousStopOrder: StopOrder
@@ -103,7 +105,8 @@ export class Stack extends React.Component<Props, States> {
             history: false,
             securityLastInfo: null,
             visible: this.VisibleType.HIDE,
-            premise: null
+            premise: null,
+            selectedSecId: null
         }
     }
 
@@ -123,13 +126,26 @@ export class Stack extends React.Component<Props, States> {
 
         document.getElementById("stack-items-wrap-id").addEventListener('contextmenu', this.blockContextMenu)
 
+        this.stackEventsListener = StackService.getInstance()
+            .on<SecurityLastInfo>(StackEvent.SECURITY_SELECTED)
+            .subscribe(sec => {
+                const { activeTrades } = this.state
+                if (activeTrades.length > 0) {
+                    this.setState({
+                        selectedSecId: sec.id,
+                        selectedActiveTrade: activeTrades.find(at => at.secId === sec.id)
+                    })
+                } else {
+                    this.setState({ selectedSecId: sec.id })
+                }
+            })
+
         this.lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
             .subscribe(securities => {
-                const selectedSecurity = getSelectedSecurity()
-                let secCode = selectedSecurity ? selectedSecurity.secCode : null
-                if (secCode) {
-                    const securityLastInfo = securities.find(o => o.secCode === secCode)
+                const { selectedSecId } = this.state
+                if (selectedSecId) {
+                    const securityLastInfo = securities.find(o => o.id === selectedSecId)
                     if (securityLastInfo) {
                         securityLastInfo.lastTradeTime = new Date(securityLastInfo.lastTradeTime)
                     }
@@ -185,6 +201,7 @@ export class Stack extends React.Component<Props, States> {
         this.ordersSetupSubscription.unsubscribe()
         this.volumesSubscription.unsubscribe()
         this.activeTradeSubscription.unsubscribe()
+        this.stackEventsListener.unsubscribe()
         window.removeEventListener('resize', this.updateSize)
         document.getElementById("stack-items-wrap-id").removeEventListener('contextmenu', this.blockContextMenu)
     }

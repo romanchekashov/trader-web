@@ -194,12 +194,12 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
 
             {
                 layout === 2 ?
-                    <div className="p-col-12">
+                    <div className="p-col-8">
                         <div className="p-grid">
-                            <div className="p-col-3">
+                            {/* <div className="p-col-3">
                                 <SecurityLastInfoView security={securityLastInfo} />
-                            </div>
-                            <div className="p-col-3">
+                            </div> */}
+                            <div className="p-col-4">
                                 <Notifications filter={filterDto}
                                     security={securityLastInfo}
                                     onNotificationSelected={(n) => {
@@ -208,7 +208,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
                                     viewHeight={400}
                                     itemSize={70} />
                             </div>
-                            <div className="p-col-3">
+                            <div className="p-col-4">
                                 <StockEventsBrief secCode={securityLastInfo.secCode} height={400} />
                             </div>
                         </div>

@@ -2,7 +2,8 @@ import {Observable, Subject} from 'rxjs';
 import {filter, map} from "rxjs/internal/operators";
 
 export enum StackEvent {
-    ACTIVE_TRADE_SELECTED = 'ACTIVE_TRADE_SELECTED'
+    ACTIVE_TRADE_SELECTED = 'ACTIVE_TRADE_SELECTED',
+    SECURITY_SELECTED = 'SECURITY_SELECTED'
 }
 
 export interface StackMessage<T> {
