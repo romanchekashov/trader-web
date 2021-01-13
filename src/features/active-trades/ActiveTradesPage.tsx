@@ -10,6 +10,7 @@ import { getLastSecurities } from "../../common/api/rest/analysisRestApi";
 import { StackEvent, StackService } from "../../common/components/stack/StackService";
 import { pageJumpById } from "../../common/utils/utils";
 import { ActiveTradesSecurities } from "./securities/ActiveTradesSecurities";
+import { getActiveTrades } from "../../common/api/rest/traderRestApi";
 
 export const ActiveTradesPage = () => {
     const DEFAULT_OFFSET_HEIGHT = 0
@@ -35,6 +36,7 @@ export const ActiveTradesPage = () => {
     }, [offsetHeight, securities])
 
     useEffect(() => {
+        getActiveTrades().then(updateActiveTrades)
 
         const lastSecuritiesSubscription = WebsocketService.getInstance()
             .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
@@ -46,12 +48,7 @@ export const ActiveTradesPage = () => {
             })
 
         const activeTradeSubscription = WebsocketService.getInstance()
-            .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES).subscribe(activeTrades => {
-                setActiveTrades(activeTrades)
-                if (activeTrades.some(at => activeTradesSecIds.indexOf(at.secId) === -1)) {
-                    setActiveTradesSecIds(activeTrades.map(at => at.secId))
-                }
-            })
+            .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES).subscribe(updateActiveTrades)
 
         // TestData
         // const activeTrades = TEST_ACTIVE_TRADES
@@ -76,6 +73,13 @@ export const ActiveTradesPage = () => {
             window.removeEventListener('resize', updateSize)
         }
     }, [activeTradesSecIds])
+
+    const updateActiveTrades = (activeTrades: ActiveTrade[]): void => {
+        setActiveTrades(activeTrades)
+        if (activeTrades.some(at => activeTradesSecIds.indexOf(at.secId) === -1)) {
+            setActiveTradesSecIds(activeTrades.map(at => at.secId))
+        }
+    }
 
     const updateOffsetHeight = (): void => {
         let h = document.querySelector(".active-trades-securities").clientHeight

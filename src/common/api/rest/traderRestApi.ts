@@ -8,6 +8,9 @@ import {TradingPlatformDataFilter} from "../../data/TradingPlatformDataFilter";
 import {adjustShares} from "../../utils/DataUtils";
 import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
 import {FuturesClientLimit} from "../../data/FuturesClientLimit";
+import { ActiveTrade } from "../../data/ActiveTrade";
+import { Order } from "../../data/Order";
+import { StopOrder } from "../../data/StopOrder";
 
 const baseUrl = process.env.API_URL + "/api/v1/";
 
@@ -46,12 +49,6 @@ export function getAllSecurityCurrencies(): Promise<SecurityCurrency[]> {
         .catch(handleError);
 }
 
-export function getLastSecurities(): Promise<SecurityLastInfo[]> {
-    return fetch(`${baseUrl}last-securities`)
-        .then(handleResponse)
-        .catch(handleError);
-}
-
 export function createStop(dto: CreateStopDto): Promise<void> {
     return fetch(`${baseUrl}create-stop`, {
         method: "POST", // POST for create, PUT to update when id already exists.
@@ -64,6 +61,24 @@ export function createStop(dto: CreateStopDto): Promise<void> {
 
 export function getFuturesLimits(): Promise<FuturesClientLimit[]> {
     return fetch(`${baseUrl}futures-limits`)
+        .then(handleResponse)
+        .catch(handleError);
+}
+
+export function getActiveTrades(): Promise<ActiveTrade[]> {
+    return fetch(`${baseUrl}active-trades`)
+        .then(handleResponse)
+        .catch(handleError);
+}
+
+export function getActiveOrders(): Promise<Order[]> {
+    return fetch(`${baseUrl}active-orders`)
+        .then(handleResponse)
+        .catch(handleError);
+}
+
+export function getActiveStopOrders(): Promise<StopOrder[]> {
+    return fetch(`${baseUrl}active-stop-orders`)
         .then(handleResponse)
         .catch(handleError);
 }

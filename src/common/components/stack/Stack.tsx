@@ -11,7 +11,7 @@ import { SecurityVolume } from "./volumes/data/SecurityVolume";
 import { StackItem } from "./data/StackItem";
 import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import { OperationType } from "../../data/OperationType";
-import { createStop } from "../../api/rest/traderRestApi";
+import { createStop, getActiveOrders, getActiveStopOrders, getActiveTrades } from "../../api/rest/traderRestApi";
 import { OrderType } from "../../data/OrderType";
 import { ActiveTrade } from "../../data/ActiveTrade";
 import { playSound } from "../../assets/assets";
@@ -40,6 +40,7 @@ type States = {
     ordersMap: any
     position: number
     orders: Order[]
+    stopOrders: StopOrder[]
     volumes: SecurityVolume[]
     activeTrades: ActiveTrade[]
     selectedActiveTrade: ActiveTrade
@@ -60,6 +61,7 @@ export class Stack extends React.Component<Props, States> {
     private activeTradeSubscription: SubscriptionLike = null
     private tradePremiseSubscription: SubscriptionLike = null
     private stackEventsListener: SubscriptionLike = null
+    private stopOrdersSubscription: SubscriptionLike = null
 
     private previousOrdersNumber: number = 0
     private previousStopOrder: StopOrder
@@ -98,6 +100,7 @@ export class Stack extends React.Component<Props, States> {
             ordersMap: {},
             position: 1,
             orders: [],
+            stopOrders: [],
             volumes: [],
             activeTrades: [],
             selectedActiveTrade: null,
@@ -158,31 +161,26 @@ export class Stack extends React.Component<Props, States> {
                 this.setState({ stackItems })
             })
 
+        getActiveOrders().then(this.updateActiveOrders)
         this.ordersSetupSubscription = WebsocketService.getInstance()
-            .on<Order[]>(WSEvent.ORDERS).subscribe(orders => {
-                this.notifyIfOrderHit(orders)
-                this.setState({ orders, ordersMap: this.ordersMap(orders) })
-            })
+            .on<Order[]>(WSEvent.ORDERS)
+            .subscribe(this.updateActiveOrders)
 
         this.volumesSubscription = WebsocketService.getInstance()
-            .on<SecurityVolume[]>(WSEvent.VOLUMES).subscribe(volumes => {
+            .on<SecurityVolume[]>(WSEvent.VOLUMES)
+            .subscribe(volumes => {
                 this.setState({ volumes })
             })
 
+        getActiveStopOrders().then(this.updateActiveStopOrders)
+        this.stopOrdersSubscription = WebsocketService.getInstance()
+            .on<StopOrder[]>(WSEvent.STOP_ORDERS)
+            .subscribe(this.updateActiveStopOrders)
+
+        getActiveTrades().then(this.updateActiveTrades)
         this.activeTradeSubscription = WebsocketService.getInstance()
-            .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES).subscribe(activeTrades => {
-                const { securityLastInfo } = this.state
-                if (activeTrades && activeTrades.length > 0) {
-                    this.notifyIfStopHit(activeTrades)
-                    this.setState({
-                        activeTrades,
-                        selectedActiveTrade: securityLastInfo ? activeTrades
-                            .find(at => at.secId === securityLastInfo.id) : null
-                    })
-                } else {
-                    this.setState({ activeTrades: [], selectedActiveTrade: null })
-                }
-            })
+            .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
+            .subscribe(this.updateActiveTrades)
 
         // TestData
         // this.setState({ activeTrades: TEST_ACTIVE_TRADES, selectedActiveTrade: TEST_ACTIVE_TRADES[0] })
@@ -202,8 +200,35 @@ export class Stack extends React.Component<Props, States> {
         this.volumesSubscription.unsubscribe()
         this.activeTradeSubscription.unsubscribe()
         this.stackEventsListener.unsubscribe()
+        this.stopOrdersSubscription.unsubscribe()
         window.removeEventListener('resize', this.updateSize)
         document.getElementById("stack-items-wrap-id").removeEventListener('contextmenu', this.blockContextMenu)
+    }
+
+    updateActiveOrders = (orders: Order[]): void => {
+        this.notifyIfOrderHit(orders)
+        this.setState({ orders, ordersMap: this.ordersMap(orders) })
+    }
+
+    updateActiveStopOrders = (newStopOrders: StopOrder[]): void => {
+        const { stopOrders } = this.state
+        if (stopOrders.length !== newStopOrders.length) {
+            this.setState({ stopOrders: newStopOrders })
+        }
+    }
+
+    updateActiveTrades = (activeTrades: ActiveTrade[]): void => {
+        const { securityLastInfo } = this.state
+        if (activeTrades && activeTrades.length > 0) {
+            this.notifyIfStopHit(activeTrades)
+            this.setState({
+                activeTrades,
+                selectedActiveTrade: securityLastInfo ? activeTrades
+                    .find(at => at.secId === securityLastInfo.id) : null
+            })
+        } else {
+            this.setState({ activeTrades: [], selectedActiveTrade: null })
+        }
     }
 
     notifyIfOrderHit = (orders: Order[]): void => {
