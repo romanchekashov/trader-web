@@ -40,7 +40,7 @@ export const ChartLevels: React.FC<Props> = ({ srLevels, scale }) => {
 
                         return (
                             <PriceCoordinate
-                                key={"start-" + level.interval + level.swingHL + level.dateTime}
+                                key={"start-" + level.interval + level.swingHL + level.dateTime + level.type}
                                 at="left"
                                 orient="left"
                                 price={level.swingHL}
