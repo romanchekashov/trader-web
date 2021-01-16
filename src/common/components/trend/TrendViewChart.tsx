@@ -60,6 +60,12 @@ const TrendViewChart: React.FC<Props> = ({trend, srLevels, width, height}) => {
         return TrendDirectionColor[direction] || '#3f51b5'
     }
 
+    const makeShort = (type: SrLevelType): string => {
+        if (!type) return ""
+        const arr = type.split('_')
+        return arr[0][0] + arr[1][0]
+    }
+
     const updateData = (trend: Trend, levels: SRLevel[]) => {
         setInnerTrend(trend)
         const color = getColor(trend.direction)
@@ -74,7 +80,7 @@ const TrendViewChart: React.FC<Props> = ({trend, srLevels, width, height}) => {
         })
         for (let lvl of levels) {
             datasets.push({
-                label: `${lvl.type}(${intervalShortName[lvl.interval]}): ${lvl.swingHL}`,
+                label: `${makeShort(lvl.type)}(${intervalShortName[lvl.interval]}): ${lvl.swingHL}`,
                 data: Array(trend.swingHighsLows.length).fill(lvl.swingHL, 0, trend.swingHighsLows.length),
                 fill: false,
                 borderColor: lvl.type === SrLevelType.TODAY_HIGH || lvl.type === SrLevelType.TODAY_LOW ? TODAY_COLOR : '#FFA726'

@@ -30,6 +30,10 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
     const [activeTrade, setActiveTrade] = useState(null);
     const [filterDto, setFilterDto] = useState<FilterDto>(null);
 
+    const chart1Ref1 = useRef(null)
+    const [chart1Width1, setChart1Width1] = useState<number>(CHART_MIN_WIDTH)
+    const [timeFrame1, setTimeFrame1] = useState<Interval>(Interval.DAY)
+
     const chart2Ref1 = useRef(null)
     const chart2Ref = useRef(null)
     const chart3Ref1 = useRef(null)
@@ -75,6 +79,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
 
     const updateSize = () => {
         const offset = 10
+        setChart1Width1(chart1Ref1.current ? chart1Ref1.current.clientWidth - offset : CHART_MIN_WIDTH)
         setChart2Width1(chart2Ref1.current ? chart2Ref1.current.clientWidth - offset : CHART_MIN_WIDTH)
         setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth - offset : CHART_MIN_WIDTH)
         setChart3Width1(chart3Ref1.current ? chart3Ref1.current.clientWidth - offset : CHART_MIN_WIDTH)
@@ -103,6 +108,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
 
     const setTimeframe = (classCode: ClassCode): void => {
         if (ClassCode.SPBFUT === classCode) {
+            setTimeFrame1(Interval.DAY)
             setTimeFrame2(Interval.M30)
             setTimeFrame3(Interval.M3)
 
@@ -111,6 +117,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
             setStart3(moment(start).subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate())
             setStart4(moment(start).subtract(1, 'hours').toDate())
         } else {
+            setTimeFrame1(Interval.MONTH)
             setTimeFrame2(Interval.DAY)
             setTimeFrame3(Interval.M60)
         }
@@ -173,14 +180,21 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
                                     activeTrade={activeTrade}
                                     showGrid={true} />
                             </div>
-                            <div className="p-col-6" ref={chart2Ref1} style={{ padding: '0' }}>
+                            <div className="p-col-4" ref={chart1Ref1} style={{ padding: '0' }}>
+                                <TrendViewChart key={timeFrame1}
+                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame1)}
+                                    srLevels={premise?.analysis?.srLevels}
+                                    width={chart1Width1}
+                                    height={600} />
+                            </div>
+                            <div className="p-col-4" ref={chart2Ref1} style={{ padding: '0' }}>
                                 <TrendViewChart key={timeFrame2}
                                     trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
                                     srLevels={premise?.analysis?.srLevels}
                                     width={chart2Width1}
                                     height={600} />
                             </div>
-                            <div className="p-col-6" ref={chart3Ref1} style={{ padding: '0' }}>
+                            <div className="p-col-4" ref={chart3Ref1} style={{ padding: '0' }}>
                                 <TrendViewChart key={timeFrame3}
                                     trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
                                     srLevels={premise?.analysis?.srLevels}
