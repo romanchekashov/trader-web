@@ -6,11 +6,10 @@ import {SecurityShare} from "../../data/security/SecurityShare";
 import {SecurityCurrency} from "../../data/security/SecurityCurrency";
 import {TradingPlatformDataFilter} from "../../data/TradingPlatformDataFilter";
 import {adjustShares} from "../../utils/DataUtils";
-import {SecurityLastInfo} from "../../data/security/SecurityLastInfo";
 import {FuturesClientLimit} from "../../data/FuturesClientLimit";
-import { ActiveTrade } from "../../data/ActiveTrade";
-import { Order } from "../../data/Order";
-import { StopOrder } from "../../data/StopOrder";
+import {ActiveTrade} from "../../data/ActiveTrade";
+import {Order} from "../../data/Order";
+import {StopOrder} from "../../data/StopOrder";
 
 const baseUrl = process.env.API_URL + "/api/v1/";
 
