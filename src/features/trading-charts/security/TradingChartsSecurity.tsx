@@ -226,9 +226,18 @@ export const TradingChartsSecurity: React.FC<Props> = ({securityLastInfo, start,
                 layout === 2 ?
                     <div className="p-col-8">
                         <div className="p-grid">
-                            {/* <div className="p-col-3">
-                                <SecurityLastInfoView security={securityLastInfo} />
-                            </div> */}
+                            <div className="p-col-4" ref={infoRef}>
+                                {/*<SecurityLastInfoView security={securityLastInfo} />*/}
+                                {
+                                    ClassCode.SPBFUT === securityLastInfo?.classCode ?
+                                        <MoexOpenInterestChart moexOpenInterests={moexOpenInterestsForDays}
+                                                               title={"Open Interest history"}
+                                                               dateTimeFormat={"DD MMM YY"}
+                                                               width={infoWidth}
+                                                               height={300}/>
+                                        : null
+                                }
+                            </div>
                             <div className="p-col-4">
                                 <Notifications filter={filterDto}
                                                security={securityLastInfo}
