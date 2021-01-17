@@ -41,28 +41,28 @@ export const MoexOpenInterestChart: React.FC<Props> = ({moexOpenInterests, dateT
                 .map(value => moment(value.dateTime).format(dateTimeFormat)),
             datasets: [
                 {
-                    label: ClientGroup.FIZ + " LONG",
+                    label: ClientGroup.FIZ + " LON",
                     data: moexOpenInterests.map(value => value.fizPosLong),
                     fill: false,
                     backgroundColor: fizLongColor,
                     borderColor: fizLongColor
                 },
                 {
-                    label: ClientGroup.FIZ + " SHORT",
+                    label: ClientGroup.FIZ + " SHO",
                     data: moexOpenInterests.map(value => value.fizPosShort),
                     fill: false,
                     backgroundColor: fizShortColor,
                     borderColor: fizShortColor
                 },
                 {
-                    label: ClientGroup.YUR + " LONG",
+                    label: ClientGroup.YUR + " LON",
                     data: moexOpenInterests.map(value => value.yurPosLong),
                     fill: false,
                     backgroundColor: yurLongColor,
                     borderColor: yurLongColor
                 },
                 {
-                    label: ClientGroup.YUR + " SHORT",
+                    label: ClientGroup.YUR + " SHO",
                     data: moexOpenInterests.map(value => value.yurPosShort),
                     fill: false,
                     backgroundColor: yurShortColor,

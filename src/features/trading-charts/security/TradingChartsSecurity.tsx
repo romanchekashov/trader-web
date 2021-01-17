@@ -1,20 +1,22 @@
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
-import { CHART_MIN_WIDTH, ChartWrapper } from "../../../common/components/chart/ChartWrapper";
-import { TradePremise } from "../../../common/data/strategy/TradePremise";
-import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
-import { Interval } from "../../../common/data/Interval";
-import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
-import { TrendsView } from "../../../common/components/trend/TrendsView";
-import { BrokerId } from "../../../common/data/BrokerId";
-import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
-import { ClassCode } from "../../../common/data/ClassCode";
-import { Trend } from "../../../common/data/strategy/Trend";
+import {useEffect, useRef, useState} from "react";
+import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/ChartWrapper";
+import {TradePremise} from "../../../common/data/strategy/TradePremise";
+import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
+import {Interval} from "../../../common/data/Interval";
+import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
+import {TrendsView} from "../../../common/components/trend/TrendsView";
+import {BrokerId} from "../../../common/data/BrokerId";
+import {getMoexOpenInterests, getTradePremise} from "../../../common/api/rest/analysisRestApi";
+import {ClassCode} from "../../../common/data/ClassCode";
+import {Trend} from "../../../common/data/strategy/Trend";
 import Notifications from "../../../common/components/notifications/Notifications";
-import { FilterDto } from "../../../common/data/FilterDto";
-import { StockEventsBrief } from "../../../common/components/share-event/StockEventsBrief";
-import { SecurityLastInfoView } from "./info/SecurityLastInfoView";
+import {FilterDto} from "../../../common/data/FilterDto";
+import {StockEventsBrief} from "../../../common/components/share-event/StockEventsBrief";
+import {SecurityLastInfoView} from "./info/SecurityLastInfoView";
 import TrendViewChart from "../../../common/components/trend/TrendViewChart";
+import {MoexOpenInterest} from "../../../common/data/open-interest/MoexOpenInterest";
+import {MoexOpenInterestChart} from "../../analysis/analysis/moex-open-interest/MoexOpenInterestChart";
 import moment = require("moment");
 
 type Props = {
@@ -23,7 +25,7 @@ type Props = {
     layout: number
 }
 
-export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start, layout }) => {
+export const TradingChartsSecurity: React.FC<Props> = ({securityLastInfo, start, layout}) => {
     const CHART_HEIGHT = 600
     const [premise, setPremise] = useState<TradePremise>(null);
     const [orders, setOrders] = useState(null);
@@ -33,6 +35,9 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
     const chart1Ref1 = useRef(null)
     const [chart1Width1, setChart1Width1] = useState<number>(CHART_MIN_WIDTH)
     const [timeFrame1, setTimeFrame1] = useState<Interval>(Interval.DAY)
+
+    const infoRef = useRef(null)
+    const [infoWidth, setInfoWidth] = useState<number>(200)
 
     const chart2Ref1 = useRef(null)
     const chart2Ref = useRef(null)
@@ -48,6 +53,8 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
     const [start2, setStart2] = useState<Date>(start ? moment(start).subtract(15, 'days').hours(9).minutes(0).seconds(0).toDate() : null)
     const [start3, setStart3] = useState<Date>(start ? moment(start).subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate() : null)
     const [start4, setStart4] = useState<Date>(start ? moment(start).subtract(1, 'hours').toDate() : null)
+
+    const [moexOpenInterestsForDays, setMoexOpenInterestsForDays] = useState<MoexOpenInterest[]>([])
 
     useEffect(() => {
         if (securityLastInfo) onSecuritySelected(securityLastInfo)
@@ -79,6 +86,8 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
 
     const updateSize = () => {
         const offset = 10
+        setInfoWidth(infoRef.current ? infoRef.current.clientWidth - offset : 200)
+
         setChart1Width1(chart1Ref1.current ? chart1Ref1.current.clientWidth - offset : CHART_MIN_WIDTH)
         setChart2Width1(chart2Ref1.current ? chart2Ref1.current.clientWidth - offset : CHART_MIN_WIDTH)
         setChart2Width(chart2Ref.current ? chart2Ref.current.clientWidth - offset : CHART_MIN_WIDTH)
@@ -104,6 +113,13 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
         })
 
         updateSize()
+
+        if (ClassCode.SPBFUT === secLastInfo.classCode) {
+            const from = moment().subtract(20, 'days').format("YYYY-MM-DD")
+
+            getMoexOpenInterests(secLastInfo.classCode, secLastInfo.secCode, from)
+                .then(setMoexOpenInterestsForDays)
+        }
     }
 
     const setTimeframe = (classCode: ClassCode): void => {
@@ -142,64 +158,64 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
                 <div className="p-grid">
                     <div className="p-col-12">
                         <TrendsView trends={premise?.analysis?.trends || []}
-                            srLevels={premise?.analysis?.srLevels || []} />
+                                    srLevels={premise?.analysis?.srLevels || []}/>
                     </div>
                     <div className="p-col-12">
                         <div className="p-grid">
-                            <div className="p-col-6" ref={chart2Ref} style={{ padding: '0' }}>
+                            <div className="p-col-6" ref={chart2Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame2}
-                                    initialNumberOfCandles={500}
-                                    start={start2}
-                                    onIntervalChanged={() => {
-                                    }}
-                                    onStartChanged={() => {
-                                    }}
-                                    width={chart2Width}
-                                    chartHeight={CHART_HEIGHT}
-                                    security={securityLastInfo}
-                                    premise={premise}
-                                    trend={getTrend(timeFrame2)}
-                                    orders={orders}
-                                    activeTrade={activeTrade}
-                                    showGrid={true} />
+                                              initialNumberOfCandles={500}
+                                              start={start2}
+                                              onIntervalChanged={() => {
+                                              }}
+                                              onStartChanged={() => {
+                                              }}
+                                              width={chart2Width}
+                                              chartHeight={CHART_HEIGHT}
+                                              security={securityLastInfo}
+                                              premise={premise}
+                                              trend={getTrend(timeFrame2)}
+                                              orders={orders}
+                                              activeTrade={activeTrade}
+                                              showGrid={true}/>
                             </div>
-                            <div className="p-col-6" ref={chart3Ref} style={{ padding: '0' }}>
+                            <div className="p-col-6" ref={chart3Ref} style={{padding: '0'}}>
                                 <ChartWrapper interval={timeFrame3}
-                                    initialNumberOfCandles={500}
-                                    start={start3}
-                                    onIntervalChanged={() => {
-                                    }}
-                                    onStartChanged={() => {
-                                    }}
-                                    width={chart3Width}
-                                    chartHeight={CHART_HEIGHT}
-                                    security={securityLastInfo}
-                                    premise={premise}
-                                    trend={getTrend(timeFrame3)}
-                                    orders={orders}
-                                    activeTrade={activeTrade}
-                                    showGrid={true} />
+                                              initialNumberOfCandles={500}
+                                              start={start3}
+                                              onIntervalChanged={() => {
+                                              }}
+                                              onStartChanged={() => {
+                                              }}
+                                              width={chart3Width}
+                                              chartHeight={CHART_HEIGHT}
+                                              security={securityLastInfo}
+                                              premise={premise}
+                                              trend={getTrend(timeFrame3)}
+                                              orders={orders}
+                                              activeTrade={activeTrade}
+                                              showGrid={true}/>
                             </div>
-                            <div className="p-col-4" ref={chart1Ref1} style={{ padding: '0' }}>
+                            <div className="p-col-4" ref={chart1Ref1} style={{padding: '0'}}>
                                 <TrendViewChart key={timeFrame1}
-                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame1)}
-                                    srLevels={premise?.analysis?.srLevels}
-                                    width={chart1Width1}
-                                    height={600} />
+                                                trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame1)}
+                                                srLevels={premise?.analysis?.srLevels}
+                                                width={chart1Width1}
+                                                height={600}/>
                             </div>
-                            <div className="p-col-4" ref={chart2Ref1} style={{ padding: '0' }}>
+                            <div className="p-col-4" ref={chart2Ref1} style={{padding: '0'}}>
                                 <TrendViewChart key={timeFrame2}
-                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
-                                    srLevels={premise?.analysis?.srLevels}
-                                    width={chart2Width1}
-                                    height={600} />
+                                                trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame2)}
+                                                srLevels={premise?.analysis?.srLevels}
+                                                width={chart2Width1}
+                                                height={600}/>
                             </div>
-                            <div className="p-col-4" ref={chart3Ref1} style={{ padding: '0' }}>
+                            <div className="p-col-4" ref={chart3Ref1} style={{padding: '0'}}>
                                 <TrendViewChart key={timeFrame3}
-                                    trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
-                                    srLevels={premise?.analysis?.srLevels}
-                                    width={chart3Width1}
-                                    height={600} />
+                                                trend={premise?.analysis?.trends?.find(value => value.interval === timeFrame3)}
+                                                srLevels={premise?.analysis?.srLevels}
+                                                width={chart3Width1}
+                                                height={600}/>
                             </div>
                         </div>
                     </div>
@@ -215,28 +231,38 @@ export const TradingChartsSecurity: React.FC<Props> = ({ securityLastInfo, start
                             </div> */}
                             <div className="p-col-4">
                                 <Notifications filter={filterDto}
-                                    security={securityLastInfo}
-                                    onNotificationSelected={(n) => {
-                                        console.log(n)
-                                    }}
-                                    viewHeight={400}
-                                    itemSize={70} />
+                                               security={securityLastInfo}
+                                               onNotificationSelected={(n) => {
+                                                   console.log(n)
+                                               }}
+                                               viewHeight={400}
+                                               itemSize={70}/>
                             </div>
                             <div className="p-col-4">
-                                <StockEventsBrief secCode={securityLastInfo.secCode} height={400} />
+                                <StockEventsBrief secCode={securityLastInfo.secCode} height={400}/>
                             </div>
                         </div>
                     </div>
                     :
-                    <div className="p-col-2">
-                        <SecurityLastInfoView security={securityLastInfo} />
+                    <div className="p-col-2" ref={infoRef}>
+                        <SecurityLastInfoView security={securityLastInfo}/>
+                        {
+                            ClassCode.SPBFUT === securityLastInfo?.classCode ?
+                                <MoexOpenInterestChart moexOpenInterests={moexOpenInterestsForDays}
+                                                       title={"Open Interest history"}
+                                                       dateTimeFormat={"DD MMM YY"}
+                                                       width={infoWidth}
+                                                       height={300}/>
+                                : null
+                        }
+                        <div style={{marginBottom: '5px'}}></div>
                         <Notifications filter={filterDto}
-                            security={securityLastInfo}
-                            onNotificationSelected={(n) => {
-                                console.log(n)
-                            }}
-                            viewHeight={400} />
-                        <StockEventsBrief secCode={securityLastInfo.secCode} height={400} />
+                                       security={securityLastInfo}
+                                       onNotificationSelected={(n) => {
+                                           console.log(n)
+                                       }}
+                                       viewHeight={400}/>
+                        <StockEventsBrief secCode={securityLastInfo.secCode} height={400}/>
                     </div>
             }
         </div>
