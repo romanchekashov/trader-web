@@ -25,8 +25,8 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            // "process.env.API_URL": JSON.stringify("http://localhost:3001")
-            "process.env.API_URL": JSON.stringify("http://192.168.10.102:3001"),
+            "process.env.API_URL": JSON.stringify("http://localhost:3001"),
+            // "process.env.API_URL": JSON.stringify("http://192.168.10.102:3001"),
             // "process.env.API_URL": JSON.stringify("http://79.134.222.60:3001") // prod
         }),
         new HtmlWebpackPlugin({
