@@ -5,12 +5,11 @@ import {InputText} from "primereact/inputtext";
 import {PrimeDropdownItem, round10} from "../../../common/utils/utils";
 import {Dropdown} from "primereact/dropdown";
 import {Deposit} from "../../../common/data/Deposit";
-import {Security} from "../../../common/data/security/Security";
 import {ClassCode} from "../../../common/data/ClassCode";
-import {SecurityFuture} from "../../../common/data/security/SecurityFuture";
+import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
 
 type Props = {
-    security: Security,
+    security: SecurityLastInfo,
     realDeposit: Deposit
     setup: DepositSetup
     onChange: (setup: DepositSetup) => void
@@ -51,8 +50,8 @@ export const DepositSetupView: React.FC<Props> = ({security, realDeposit, setup,
         case ClassCode.CETS:
             break
         case ClassCode.SPBFUT:
-            const future: SecurityFuture = security as SecurityFuture
-            minDepoPerContract = future.buyDepoPerContract > future.sellDepoPerContract ? future.buyDepoPerContract : future.sellDepoPerContract
+            minDepoPerContract = security.futureBuyDepoPerContract > security.futureSellDepoPerContract ?
+                security.futureBuyDepoPerContract : security.futureSellDepoPerContract
             break
         case ClassCode.TQBR:
             break

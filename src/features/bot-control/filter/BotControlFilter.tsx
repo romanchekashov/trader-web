@@ -11,7 +11,6 @@ import "./BotControlFilter.css";
 import {MarketBotStartDto} from "../../../common/data/bot/MarketBotStartDto";
 import {Intervals, PrimeDropdownItem} from "../../../common/utils/utils";
 import {Security} from "../../../common/data/security/Security";
-import {getSecuritiesByTypeAndMarket} from "../../../common/utils/Cache";
 import {MarketSecuritiesDto} from "../../../common/data/bot/MarketSecuritiesDto";
 import {HistoryDateDto} from "../../../common/data/bot/HistoryDateDto";
 import {TradingStrategyName} from "../../../common/data/trading/TradingStrategyName";
@@ -25,6 +24,8 @@ import {Panel} from "primereact/panel";
 import {BrokerId} from "../../../common/data/BrokerId";
 import {SecurityType} from "../../../common/data/security/SecurityType";
 import {Market} from "../../../common/data/Market";
+import {getLastSecurities} from "../../../common/api/rest/analysisRestApi";
+import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
 import moment = require("moment");
 
 export interface BotControlFilterState {
@@ -110,7 +111,7 @@ const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHis
         TradeSystemType.DEMO, TradeSystemType.REAL].map(val => ({label: val, value: val}))
     const [systemType, setSystemType] = useState(initState.systemType)
 
-    const [selectedSecurity, setSelectedSecurity] = useState<Security>(null)
+    const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
     const [canTrade, setCanTrade] = useState<boolean>(false)
 
     const strategies: PrimeDropdownItem<TradingStrategyName>[] = [
@@ -206,7 +207,7 @@ const BotControlFilter: React.FC<Props> = ({filter, onStart, onSearch, onStopHis
             .security
         setSecCode(newSecCode)
         setSecId(security?.id)
-        setSelectedSecurity(security)
+        getLastSecurities(security?.id).then(value => setSelectedSecurity(value[0]))
         updateHistoryDates(newSecCode, minInterval)
     }
 

@@ -1,19 +1,19 @@
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
-import { RouteComponentProps } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {RouteComponentProps} from "react-router-dom";
+import {map} from "rxjs/internal/operators/map";
+import {TradingChartsSecurity} from "./security/TradingChartsSecurity";
+import {SecurityLastInfo} from "../../common/data/security/SecurityLastInfo";
+import {getLastSecurities} from "../../common/api/rest/analysisRestApi";
+import {WebsocketService, WSEvent} from "../../common/api/WebsocketService";
 import moment = require("moment");
-import { map } from "rxjs/internal/operators/map";
-import { TradingChartsSecurity } from "./security/TradingChartsSecurity";
-import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
-import { getLastSecurities } from "../../common/api/rest/analysisRestApi";
-import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
 
 type RouteParams = {
     secId: string
     premiseStart: string
 }
 
-export const TradingChartsSecurityPage: React.FC<RouteComponentProps<RouteParams>> = ({ match }) => {
+export const TradingChartsSecurityPage: React.FC<RouteComponentProps<RouteParams>> = ({match}) => {
     const secId: number = parseInt(match.params.secId)
     const start = match.params.premiseStart ? moment(match.params.premiseStart, "DD-MM-YYYY_HH-mm").toDate() : null
 
@@ -36,6 +36,7 @@ export const TradingChartsSecurityPage: React.FC<RouteComponentProps<RouteParams
             .pipe(map(securities => securities.find(security => security.id === secId)))
             .subscribe(security => {
                 document.title = `${security.secCode} - ${security.lastChange}% - ${security.lastTradePrice}`
+                setSecurityLastInfo(security)
             })
 
         // Specify how to clean up after this effect:
@@ -50,6 +51,6 @@ export const TradingChartsSecurityPage: React.FC<RouteComponentProps<RouteParams
         <TradingChartsSecurity
             securityLastInfo={securityLastInfo}
             start={start}
-            layout={1} />
+            layout={1}/>
     )
 }

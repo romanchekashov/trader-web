@@ -114,7 +114,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({securityLastInfo, start,
 
         updateSize()
 
-        if (ClassCode.SPBFUT === secLastInfo.classCode) {
+        if (ClassCode.SPBFUT === secLastInfo.classCode && moexOpenInterestsForDays.length === 0) {
             const from = moment().subtract(20, 'days').format("YYYY-MM-DD")
 
             getMoexOpenInterests(secLastInfo.classCode, secLastInfo.secCode, from)
