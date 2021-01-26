@@ -32,6 +32,15 @@ const TrendViewChart: React.FC<Props> = ({trend, srLevels, width, height}) => {
         DAY: "DD-MM-YYYY"
     }
     const TODAY_COLOR = '#f44336'
+    const options = {
+        title: {
+            display: true,
+            fontSize: 12
+        },
+        animation: {
+            duration: 0
+        }
+    }
 
     useEffect(() => {
         if (trend) {
@@ -100,6 +109,7 @@ const TrendViewChart: React.FC<Props> = ({trend, srLevels, width, height}) => {
     return (
         <Chart type="line"
                data={data}
+               options={options}
                width={width + 'px'}
                height={height + 'px'}/>
     )
