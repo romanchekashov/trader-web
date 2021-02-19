@@ -4,6 +4,11 @@ import {BrowserRouter} from "react-router-dom";
 import { Provider as ReduxProvider } from "react-redux";
 import {App} from "./app/App";
 import store from "./app/store";
+
+import 'primereact/resources/primereact.css';
+import 'primereact/resources/themes/nova-light/theme.css';
+import 'primeicons/primeicons.css';
+import 'primeflex/primeflex.css';
 import "./index.css";
 import "./common/styles/common.css";
 

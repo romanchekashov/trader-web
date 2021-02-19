@@ -5,6 +5,7 @@
 ### react-financial-charts
 
 - Fix Trendline And InteractiveYCoordinate:
+
 ```bash
 node_modules/react-financial-charts/lib/interactive/TrendLine.js
 node_modules/react-financial-charts/lib/interactive/InteractiveYCoordinate.js
@@ -25,3 +26,13 @@ constructor(props) {
 }
 ```
 
+### CSS Modules usage with React example
+
+- create Component.module.css
+- add to Component.tsx:
+
+```tsx
+const styles = require("./Component.module.css");
+// and use like
+<div className={styles.cssClassName}></div>;
+```

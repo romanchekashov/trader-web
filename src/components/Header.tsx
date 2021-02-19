@@ -1,13 +1,13 @@
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 import MarketWorkTime from "../common/components/market-work-time/MarketWorkTime";
-import "./Header.css"
+const styles = require("./Header.module.css");
 
 export const Header = () => {
     const activeStyle = { color: "#f15b2a" };
 
     return (
-        <div className="header">
+        <div className={styles.header}>
             <nav id="main-nav">
                 <NavLink to="/" activeStyle={activeStyle} exact>
                     Home
