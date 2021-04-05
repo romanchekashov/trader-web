@@ -1,8 +1,7 @@
 import * as React from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {AppDispatch} from "../../app/store";
-import {RootState} from "../../app/rootReducer";
+import {AppDispatch, RootState} from "../../app/store";
 import {loadStat} from "./TradeJournalActions";
 import {ResultDto} from "../../common/data/journal/ResultDto";
 import {Trade} from "../../common/data/journal/Trade";

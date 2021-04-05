@@ -1,8 +1,7 @@
 import * as React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { AppDispatch } from "../../app/store";
-import { RootState } from "../../app/rootReducer";
+import { AppDispatch, RootState } from "../../app/store";
 import { loadFilterData, loadSecurityCurrency, loadSecurityFuture, loadSecurityShares } from "./AnalysisActions";
 import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
 import { MarketBotStartDto } from "../../common/data/bot/MarketBotStartDto";
@@ -22,10 +21,10 @@ import { StackEvent, StackService } from "../../common/components/stack/StackSer
 
 function mapStateToProps(state: RootState) {
     return {
-        filterData: state.tradeStrategyAnalysis.filter,
-        shares: state.tradeStrategyAnalysis.shares,
-        currencies: state.tradeStrategyAnalysis.currencies,
-        futures: state.tradeStrategyAnalysis.futures
+        filterData: state.analysis.filter,
+        shares: state.analysis.shares,
+        currencies: state.analysis.currencies,
+        futures: state.analysis.futures
     }
 }
 
