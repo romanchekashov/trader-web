@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { TradeStrategyBotControlState } from "./BotControlActions";
 
-const initialState: TradeStrategyBotControlState = {
+export const initialState: TradeStrategyBotControlState = {
     filter: null,
 };
 

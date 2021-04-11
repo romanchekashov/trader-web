@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { TradeJournalState } from "./TradeJournalActions";
 
-const initialState: TradeJournalState = {
+export const initialState: TradeJournalState = {
     stat: [],
 };
 

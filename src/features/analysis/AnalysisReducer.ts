@@ -6,9 +6,10 @@ import {
     LOAD_TRADE_PREMISE_SUCCESS,
     TradeStrategyAnalysisActionTypes
 } from "./AnalysisActions";
-import {initialState} from "../../app/rootReducer";
+import { initialState } from "./AnalysisSlice";
+// import {initialState} from "../../app/rootReducer";
 
-export default function AnalysisReducer(state = initialState.tradeStrategyAnalysis, action: TradeStrategyAnalysisActionTypes) {
+export default function AnalysisReducer(state = initialState, action: TradeStrategyAnalysisActionTypes) {
     switch (action.type) {
         case LOAD_FILTER_DATA_SUCCESS:
             return {...state, filter: action.filter};

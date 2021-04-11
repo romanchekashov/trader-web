@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { TradeStrategyAnalysisState } from "./AnalysisActions";
 
-const initialState: TradeStrategyAnalysisState = {
+export const initialState: TradeStrategyAnalysisState = {
     filter: null,
     shares: [],
     currencies: [],
