@@ -1,0 +1,29 @@
+.header {
+    height: 20px;
+    display: flex;
+    justify-content: space-between;
+    background-color: lightgrey;
+}
+
+.draggable {
+    -webkit-app-region: drag;
+    cursor: move;
+}
+
+.header-sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #fff;
+    z-index: 9;
+}
+
+.header nav {
+    height: 20px;
+    line-height: 19px;
+}
+
+.header .p-selectbutton .p-button.p-button-text-only .p-button-text {
+    padding: 2px 2px;
+    line-height: 12px;
+}

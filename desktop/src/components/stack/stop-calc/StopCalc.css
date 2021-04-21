@@ -1,0 +1,23 @@
+.td__stop-calc {
+    width: 100px;
+    position: absolute;
+    font-size: 12px;
+}
+
+.td__stop-calc input {
+    width: 60px;
+    font-size: 12px;
+    padding: 0 5px;
+    margin-left: 5px;
+}
+
+.td__stop-calc-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5px;
+    line-height: 12px;
+}
+
+.td__stop-calc-price {
+    text-align: center;
+}

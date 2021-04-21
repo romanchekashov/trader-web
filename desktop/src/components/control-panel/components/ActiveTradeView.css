@@ -1,0 +1,19 @@
+.win-lg {
+    background-color: #27ae60aa !important;
+}
+.win {
+    background-color: #27ae6055 !important;
+}
+.win-sm {
+    background-color: #27ae6022 !important;
+}
+
+.loss-lg {
+    background-color: #e74c3caa !important;
+}
+.loss {
+    background-color: #e74c3c55 !important;
+}
+.loss-sm {
+    background-color: #e74c3c22 !important;
+}

@@ -3,9 +3,11 @@
     "name": "trader-client",
     "workspaces": [
         "web",
-        "web-scraper"
+        "web-scraper",
+        "desktop"
     ],
     "scripts": {
-        "start-web-dev": "yarn workspace @trader-client/web run start"
+        "start-web-dev": "yarn workspace @trader-client/web run start",
+        "start-desktop-dev": "yarn workspace @trader-client/desktop run start"
     }
 }

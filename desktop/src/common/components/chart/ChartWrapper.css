@@ -1,0 +1,27 @@
+.chart-wrapper {
+
+}
+
+.chart-wrapper-head {
+    display: flex;
+    justify-content: flex-start;
+    font-size: 12px;
+}
+
+.chart-wrapper-head-security {
+    line-height: 18px;
+}
+
+.chart-wrapper-head-interval {
+    margin-left: 5px;
+}
+
+.chart-wrapper-head-interval .p-dropdown {
+    font-size: 12px;
+}
+
+.chart-wrapper-head-interval .p-dropdown-label {
+    font-size: 12px;
+    padding-top: 0;
+    padding-bottom: 0;
+}

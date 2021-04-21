@@ -1,0 +1,12 @@
+.td__analysis-line input {
+    width: 100%;
+}
+
+.tfh, .tft, .tfl {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.tfh div, .tft div, .tfl div {
+    margin-right: 5px;
+}
