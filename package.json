@@ -2,7 +2,8 @@
     "private": true,
     "name": "trader-client",
     "workspaces": [
-        "web"
+        "web",
+        "web-scraper"
     ],
     "scripts": {
         "start-web-dev": "yarn workspace @trader-client/web run start"
