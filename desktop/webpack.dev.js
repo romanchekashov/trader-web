@@ -71,10 +71,10 @@ module.exports = [
         },
         plugins: [
             new webpack.DefinePlugin({
-                // "process.env.API_URL": JSON.stringify("http://localhost:3001"),
-                "process.env.API_URL": JSON.stringify(
-                    "http://192.168.10.104:3001"
-                ),
+                "process.env.API_URL": JSON.stringify("http://localhost:3001"),
+                // "process.env.API_URL": JSON.stringify(
+                //     "http://192.168.10.104:3001"
+                // ),
             }),
             new HtmlWebpackPlugin({
                 template: "index.html",

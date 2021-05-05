@@ -788,13 +788,13 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<Pr
                             trends={trends_1}
                         />
 
-                        <InteractiveYCoordinate
+                        {/* <InteractiveYCoordinate
                             ref={this.saveInteractiveNodes("InteractiveYCoordinate", 1)}
                             enabled={enableNewOrder}
                             onDragComplete={this.onDragComplete}
                             onDelete={this.onDelete}
                             yCoordinateList={this.state.yCoordinateList_1}
-                        />
+                        /> */}
 
                     </Chart>
                     <CrossHairCursor />
