@@ -1,2 +1,4 @@
-.wrap {
+.Widgetbar {
+  border-left: 1px solid #eee;
+  display: flex;
 }

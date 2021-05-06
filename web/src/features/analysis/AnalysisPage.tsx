@@ -26,7 +26,6 @@ import {
   StackEvent,
   StackService,
 } from "../../common/components/stack/StackService";
-import Widgetbar from "../../common/components/widgetbar/Widgetbar";
 
 function mapStateToProps(state: RootState) {
   return {
@@ -105,25 +104,22 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
         {/*<div className="p-col-12" style={{padding: 0}}>
                     <Filter filter={filterData} onStart={this.onStart}/>
                 </div>*/}
-        <div className="p-col">
-          <div className={classDataTable}>
-            <div className="p-grid analysis-securities">
-              <Securities onSelectRow={this.onSelectRow} />
-            </div>
-          </div>
-          <div className={classDetails}>
-            {!selectedSecurity ? (
-              <div>Select security</div>
-            ) : Market.SPB === selectedSecurity.market ? (
-              <AnalysisTinkoff security={selectedSecurity} />
-            ) : ClassCode.SPBFUT === selectedSecurity.classCode ? (
-              <AnalysisFutures security={selectedSecurity} />
-            ) : (
-              <Analysis security={selectedSecurity} />
-            )}
+        <div className={classDataTable}>
+          <div className="p-grid analysis-securities">
+            <Securities onSelectRow={this.onSelectRow} />
           </div>
         </div>
-        <Widgetbar />
+        <div className={classDetails}>
+          {!selectedSecurity ? (
+            <div>Select security</div>
+          ) : Market.SPB === selectedSecurity.market ? (
+            <AnalysisTinkoff security={selectedSecurity} />
+          ) : ClassCode.SPBFUT === selectedSecurity.classCode ? (
+            <AnalysisFutures security={selectedSecurity} />
+          ) : (
+            <Analysis security={selectedSecurity} />
+          )}
+        </div>
       </div>
     );
   }
