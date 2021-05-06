@@ -5,16 +5,12 @@ import {
   BsNewspaper,
   BsCalendar,
   BsFileEarmarkSpreadsheet,
+  BsAlarm,
+  BsBell,
 } from "react-icons/bs";
 import "./WidgetbarTabs.css";
 import { Tooltip } from "primereact/tooltip";
 import { WidgetbarItem } from "../WidgetbarItem";
-
-enum VisibleType {
-  HIDE = "HIDE",
-  VISIBLE = "VISIBLE",
-  VISIBLE_PART = "VISIBLE_PART",
-}
 
 type Props = {
   item: WidgetbarItem | undefined;
@@ -22,29 +18,7 @@ type Props = {
 };
 
 const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
-  const ToggleVisibleType = {
-    HIDE: -58,
-    VISIBLE: -60,
-    VISIBLE_PART: -58,
-  };
-
-  const VisibleTypeViewTop = {
-    HIDE: -260,
-    VISIBLE: 0,
-    VISIBLE_PART: -100,
-  };
-
-  const [visible, setVisible] = useState(VisibleType.HIDE);
-
   useEffect(() => {});
-
-  const toggleView = (toggle: boolean) => {
-    setVisible(!toggle ? VisibleType.VISIBLE : VisibleType.HIDE);
-  };
-
-  const toggleViewPart = (toggle: boolean) => {
-    setVisible(!toggle ? VisibleType.VISIBLE_PART : VisibleType.HIDE);
-  };
 
   const select = (newItem: WidgetbarItem) => {
     if (item === newItem) {
@@ -55,7 +29,7 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
   };
 
   return (
-    <div className="WidgetbarTabs">
+    <div className={`WidgetbarTabs ${item ? "WidgetbarTabs_border" : ""}`}>
       <Tooltip target=".WidgetbarTab" />
       <div
         className={`WidgetbarTab ${
@@ -86,6 +60,26 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
         onClick={() => select(WidgetbarItem.SEC_DATA)}
       >
         <BsFileEarmarkSpreadsheet />
+      </div>
+      <div
+        className={`WidgetbarTab ${
+          item === WidgetbarItem.ALARMS ? "active" : ""
+        }`}
+        data-pr-tooltip="Alarms"
+        data-pr-position="left"
+        onClick={() => select(WidgetbarItem.ALARMS)}
+      >
+        <BsAlarm />
+      </div>
+      <div
+        className={`WidgetbarTab ${
+          item === WidgetbarItem.NOTIFICATIONS ? "active" : ""
+        }`}
+        data-pr-tooltip="Notifications"
+        data-pr-position="left"
+        onClick={() => select(WidgetbarItem.NOTIFICATIONS)}
+      >
+        <BsBell />
       </div>
     </div>
   );

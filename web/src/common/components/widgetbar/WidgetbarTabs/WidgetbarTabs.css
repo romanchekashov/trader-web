@@ -2,6 +2,10 @@
   width: 50px;
 }
 
+.WidgetbarTabs_border {
+  border-left: 1px solid #eee;
+}
+
 .WidgetbarTab {
   width: 40px;
   height: 40px;

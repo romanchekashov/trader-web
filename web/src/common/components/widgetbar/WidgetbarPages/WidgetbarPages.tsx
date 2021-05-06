@@ -8,6 +8,10 @@ import { WidgetbarItem } from "../WidgetbarItem";
 import { StockEventsBrief } from "../../share-event/StockEventsBrief";
 import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 import { SecurityLastInfoView } from "../../../../features/trading-charts/security/info/SecurityLastInfoView";
+import { FilterDto } from "../../../data/FilterDto";
+import { BrokerId } from "../../../data/BrokerId";
+import { TradingPlatform } from "../../../data/trading/TradingPlatform";
+import Notifications from "../../notifications/Notifications";
 
 enum VisibleType {
   HIDE = "HIDE",
@@ -21,38 +25,46 @@ type Props = {
 };
 
 const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
-  const ToggleVisibleType = {
-    HIDE: -58,
-    VISIBLE: -60,
-    VISIBLE_PART: -58,
-  };
+  const [filterDto, setFilterDto] = useState<FilterDto>(null);
 
-  const VisibleTypeViewTop = {
-    HIDE: -260,
-    VISIBLE: 0,
-    VISIBLE_PART: -100,
-  };
+  useEffect(() => {
+    if (security) {
+      setFilterDto({
+        brokerId: BrokerId.ALFA_DIRECT,
+        tradingPlatform: TradingPlatform.QUIK,
+        secId: security.id,
+        fetchByWS: false,
+        history: true,
+        all: false,
+      });
+    }
+  }, [security]);
 
-  const [visible, setVisible] = useState(VisibleType.HIDE);
-
-  useEffect(() => {});
-
-  const toggleView = (toggle: boolean) => {
-    setVisible(!toggle ? VisibleType.VISIBLE : VisibleType.HIDE);
-  };
-
-  const toggleViewPart = (toggle: boolean) => {
-    setVisible(!toggle ? VisibleType.VISIBLE_PART : VisibleType.HIDE);
-  };
+  if (!security)
+    return (
+      <div className="WidgetbarPages">
+        <div>{item}</div>
+      </div>
+    );
 
   return (
     <div className="WidgetbarPages">
       <div>{item}</div>
-      {security && item === WidgetbarItem.NEWS ? (
+      {item === WidgetbarItem.NEWS ? (
         <StockEventsBrief secCode={security.secCode} height={600} />
       ) : null}
-      {security && item === WidgetbarItem.SEC_DATA ? (
+      {item === WidgetbarItem.SEC_DATA ? (
         <SecurityLastInfoView security={security} />
+      ) : null}
+      {item === WidgetbarItem.NOTIFICATIONS ? (
+        <Notifications
+          filter={filterDto}
+          security={security}
+          onNotificationSelected={(n) => {
+            console.log(n);
+          }}
+          viewHeight={600}
+        />
       ) : null}
     </div>
   );

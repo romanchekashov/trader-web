@@ -9,29 +9,14 @@ import { SecurityLastInfo } from "../../data/security/SecurityLastInfo";
 import { SubscriptionLike } from "rxjs";
 import { StackEvent, StackService } from "../stack/StackService";
 
-enum VisibleType {
-  HIDE = "HIDE",
-  VISIBLE = "VISIBLE",
-  VISIBLE_PART = "VISIBLE_PART",
-}
+type Props = {
+  width: number;
+  onWidthChange: (width: number) => void;
+};
 
-const Widgetbar: React.FC = () => {
+const Widgetbar: React.FC<Props> = ({ width, onWidthChange }) => {
   const [item, setItem] = useState<WidgetbarItem>();
   const [security, setSecurity] = useState<SecurityLastInfo>();
-
-  const ToggleVisibleType = {
-    HIDE: -58,
-    VISIBLE: -60,
-    VISIBLE_PART: -58,
-  };
-
-  const VisibleTypeViewTop = {
-    HIDE: -260,
-    VISIBLE: 0,
-    VISIBLE_PART: -100,
-  };
-
-  const [visible, setVisible] = useState(VisibleType.HIDE);
 
   useEffect(() => {
     const stackEventsListener: SubscriptionLike = StackService.getInstance()
@@ -43,21 +28,17 @@ const Widgetbar: React.FC = () => {
     };
   }, []);
 
-  const toggleView = (toggle: boolean) => {
-    setVisible(!toggle ? VisibleType.VISIBLE : VisibleType.HIDE);
-  };
-
-  const toggleViewPart = (toggle: boolean) => {
-    setVisible(!toggle ? VisibleType.VISIBLE_PART : VisibleType.HIDE);
-  };
+  useEffect(() => {
+    onWidthChange(item ? 300 : 50);
+  }, [item]);
 
   const style = item
     ? {
-        width: "300px",
+        width,
         paddingRight: 0,
       }
     : {
-        width: "50px",
+        width,
         paddingLeft: 0,
       };
 
