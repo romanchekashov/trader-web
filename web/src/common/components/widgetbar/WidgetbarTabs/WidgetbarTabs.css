@@ -1,0 +1,12 @@
+.WidgetbarTab {
+  width: 40px;
+  height: 40px;
+  font-size: 1.4em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.WidgetbarTab:hover {
+  background-color: #eee;
+}

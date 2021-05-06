@@ -1,7 +1,8 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { ToggleButton } from "primereact/togglebutton";
-const styles = require("./Widgetbar.module.css");
+import { BsNewspaper, BsCalendar } from "react-icons/bs";
+import "./WidgetbarTabs.css";
 
 enum VisibleType {
   HIDE = "HIDE",
@@ -36,8 +37,11 @@ const WidgetbarTabs: React.FC = () => {
 
   return (
     <div>
-      <div>
-        <i className="pi pi-check" style={{ fontSize: "2em" }}></i>
+      <div className="WidgetbarTab">
+        <BsNewspaper />
+      </div>
+      <div className="WidgetbarTab">
+        <BsCalendar />
       </div>
     </div>
   );
