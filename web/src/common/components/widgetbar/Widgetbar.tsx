@@ -2,7 +2,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { ToggleButton } from "primereact/togglebutton";
 import WidgetbarTabs from "./WidgetbarTabs/WidgetbarTabs";
-import "./Widgetbar.module.css";
+import "./Widgetbar.css";
 
 enum VisibleType {
   HIDE = "HIDE",
