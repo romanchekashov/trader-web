@@ -78,8 +78,8 @@ const Notifications: React.FC<Props> = ({
       .then((newAlerts) => {
         setAlertsReceivedFromServer(
           newAlerts,
-          security.classCode,
-          security.code,
+          security?.classCode,
+          security?.code,
           newInterval,
           newStart,
           newTextPattern
@@ -115,7 +115,7 @@ const Notifications: React.FC<Props> = ({
     let alertsSubscription;
     let wsStatusSub;
 
-    if (filter && security) {
+    if (filter) {
       fetchAlertsAttempt = 0;
 
       // onClassCodeChanged(filter.classCode);
@@ -164,12 +164,12 @@ const Notifications: React.FC<Props> = ({
       if (alertsSubscription) alertsSubscription.unsubscribe();
       if (wsStatusSub) wsStatusSub.unsubscribe();
     };
-  }, [filter, security]);
+  }, [filter]);
 
   const setAlertsReceivedFromServer = (
     newAlerts: NotificationDto[],
-    newClassCode: ClassCode,
-    newSecCode: string,
+    newClassCode: ClassCode | undefined,
+    newSecCode: string | undefined,
     newInterval: Interval,
     newStart: Date,
     newTextPattern: string

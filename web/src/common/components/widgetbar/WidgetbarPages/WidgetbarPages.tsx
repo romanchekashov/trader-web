@@ -28,32 +28,23 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
   const [filterDto, setFilterDto] = useState<FilterDto>(null);
 
   useEffect(() => {
-    if (security) {
-      setFilterDto({
-        brokerId: BrokerId.ALFA_DIRECT,
-        tradingPlatform: TradingPlatform.QUIK,
-        secId: security.id,
-        fetchByWS: false,
-        history: true,
-        all: false,
-      });
-    }
+    setFilterDto({
+      brokerId: BrokerId.ALFA_DIRECT,
+      tradingPlatform: TradingPlatform.QUIK,
+      secId: security?.id,
+      fetchByWS: false,
+      history: false,
+      all: !security,
+    });
   }, [security]);
-
-  if (!security)
-    return (
-      <div className="WidgetbarPages">
-        <div>{item}</div>
-      </div>
-    );
 
   return (
     <div className="WidgetbarPages">
       <div>{item}</div>
-      {item === WidgetbarItem.NEWS ? (
+      {security && item === WidgetbarItem.NEWS ? (
         <StockEventsBrief secCode={security.secCode} height={600} />
       ) : null}
-      {item === WidgetbarItem.SEC_DATA ? (
+      {security && item === WidgetbarItem.SEC_DATA ? (
         <SecurityLastInfoView security={security} />
       ) : null}
       {item === WidgetbarItem.NOTIFICATIONS ? (
