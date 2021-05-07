@@ -5,6 +5,8 @@ import { NotificationDto } from "./data/NotificationDto";
 import "./styles/Notifications.css";
 import "./styles/Signals.css";
 import moment = require("moment");
+import { DataType } from "../../data/DataType";
+import NotificationPossibleTrade from "./NotificationPossibleTrade";
 
 type Props = {
   alert: NotificationDto;
@@ -144,10 +146,14 @@ const Notification: React.FC<Props> = ({ alert, className }) => {
                         </div>*/}
       </div>
       <div>
-        <div
-          className="notifications-cell notifications-description"
-          dangerouslySetInnerHTML={{ __html: descriptionTemplate(alert) }}
-        ></div>
+        {alert.dataType === DataType.POSSIBLE_TRADE && alert.data ? (
+          <NotificationPossibleTrade possibleTrade={alert.data} />
+        ) : (
+          <div
+            className="notifications-cell notifications-description"
+            dangerouslySetInnerHTML={{ __html: descriptionTemplate(alert) }}
+          ></div>
+        )}
       </div>
     </div>
   );
