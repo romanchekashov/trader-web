@@ -26,6 +26,7 @@ import {
   StackEvent,
   StackService,
 } from "../../common/components/stack/StackService";
+import { TabPanel, TabView } from "primereact/tabview";
 
 function mapStateToProps(state: RootState) {
   return {
@@ -51,6 +52,8 @@ interface TradeStrategyAnalysisState {
   selectedSecurity: SecurityLastInfo;
   isDetailsShown: boolean;
   filter: MarketBotStartDto;
+  activeTabIndex: number;
+  isTabShown: boolean;
 }
 
 type Props = {
@@ -68,6 +71,8 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
       selectedSecurity: null,
       isDetailsShown: false,
       filter: null,
+      activeTabIndex: 0,
+      isTabShown: false,
     };
   }
 
@@ -95,7 +100,12 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
   };
 
   render() {
-    const { selectedSecurity, isDetailsShown } = this.state;
+    const {
+      selectedSecurity,
+      isDetailsShown,
+      activeTabIndex,
+      isTabShown,
+    } = this.state;
     const classDataTable = isDetailsShown ? "p-col-12" : "p-col-12";
     const classDetails = isDetailsShown ? "p-col-12" : "hidden";
 
@@ -106,7 +116,22 @@ class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
                 </div>*/}
         <div className={classDataTable}>
           <div className="p-grid analysis-securities">
-            <Securities onSelectRow={this.onSelectRow} />
+            <TabView
+              activeIndex={activeTabIndex}
+              onTabChange={(e) =>
+                this.setState({
+                  activeTabIndex: e.index,
+                  isTabShown: !isTabShown,
+                })
+              }
+              className={isTabShown ? "" : "analysis_tab_toggle"}
+            >
+              <TabPanel header="Screener">
+                {isTabShown ? (
+                  <Securities onSelectRow={this.onSelectRow} />
+                ) : null}
+              </TabPanel>
+            </TabView>
           </div>
         </div>
         <div className={classDetails}>

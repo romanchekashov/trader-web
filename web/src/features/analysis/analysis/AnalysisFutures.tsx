@@ -46,6 +46,8 @@ type Props = {
   security: SecurityLastInfo;
 };
 
+let prevMainWidth;
+
 const AnalysisFutures: React.FC<Props> = ({ security }) => {
   const timeFrameTradingIntervals = {
     M1: [Interval.M1],
@@ -91,6 +93,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
   const [chart1Width, setChart1Width] = useState(MIN_CHART_WIDTH);
   const [chart2Width, setChart2Width] = useState(MIN_CHART_WIDTH);
   const [chartAlertsWidth, setChartAlertsWidth] = useState(MIN_CHART_WIDTH);
+  const mainRef = useRef(null);
   const chart1Ref = useRef(null);
   const chart2Ref = useRef(null);
   const chartAlertsRef = useRef(null);
@@ -99,6 +102,13 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
   const [marketStateFilterDto, setMarketStateFilterDto] = useState(null);
   const [alert, setAlert] = useState(null);
   const [trades, setTrades] = useState<Trade[]>([]);
+
+  useEffect(() => {
+    if (prevMainWidth && prevMainWidth !== mainRef?.current?.clientWidth) {
+      updateSize();
+    }
+    prevMainWidth = mainRef?.current?.clientWidth;
+  });
 
   const updateSize = () => {
     setChart1Width(
@@ -374,7 +384,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
   if (!security) return <div>Select security for analysis</div>;
 
   return (
-    <div className="p-grid">
+    <div className="p-grid" ref={mainRef}>
       <Toast ref={toast} />
       <div className="p-col-12">
         <div className="p-grid analysis-head">

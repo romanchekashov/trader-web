@@ -1,71 +1,86 @@
 .analysis {
-
 }
 
 .analysis-securities .p-datatable .p-datatable-thead > tr > th {
-    padding: 2px;
-    font-size: 10px;
+  padding: 2px;
+  font-size: 10px;
 }
 .analysis-securities .p-datatable .p-datatable-thead > tr > th:first-child {
-    width: 100px;
+  width: 100px;
 }
 
 .analysis-securities .p-datatable .p-datatable-thead .p-inputtext {
-    padding: 2px;
-    font-size: 12px;
+  padding: 2px;
+  font-size: 12px;
 }
 
 .analysis-securities .p-datatable .p-datatable-tbody td {
-    padding: 2px 5px;
-    font-size: 13px;
+  padding: 2px 5px;
+  font-size: 13px;
 }
 .analysis-securities .p-datatable .p-datatable-tbody td:first-child {
-    width: 100px;
+  width: 100px;
 }
 
 .analysis-head {
-    font-size: 12px;
-    margin-bottom: 10px;
+  font-size: 12px;
+  margin-bottom: 10px;
 }
 .analysis-head .p-datatable-wrapper .p-datatable-thead > tr > th {
-    font-size: 12px;
-    padding: 0;
+  font-size: 12px;
+  padding: 0;
 }
 .analysis-head .p-datatable .p-datatable-tbody > tr > td {
-    padding: 0 2px;
-    text-align: center;
+  padding: 0 2px;
+  text-align: center;
 }
 
 .analysis-head .p-dropdown {
-    font-size: 12px;
+  font-size: 12px;
 }
 .analysis-head .p-dropdown-label {
-    font-size: 12px;
-    padding-top: 0;
-    padding-bottom: 0;
+  font-size: 12px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 .analysis-head .p-col-1,
 .analysis-head .p-col-11,
 .analysis-head .p-col-12 {
-    padding: 0;
+  padding: 0;
 }
 
 .contract-open-positions {
-    width: 100%;
-    border: 1px solid #ccc;
-    border-spacing: 0;
-    border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-spacing: 0;
+  border-collapse: collapse;
 }
 .contract-open-positions th {
-    vertical-align: middle;
-    font-weight: normal;
-    color: white;
-    background-color: #888888;
-    border: 1px #C6C6C6 solid;
+  vertical-align: middle;
+  font-weight: normal;
+  color: white;
+  background-color: #888888;
+  border: 1px #c6c6c6 solid;
 }
 .contract-open-positions td {
-    border: 1px #999999 dotted;
+  border: 1px #999999 dotted;
 }
 .contract-open-positions td.text_right {
-     text-align: right;
- }
+  text-align: right;
+}
+
+.analysis .p-tabview .p-tabview-panels {
+  padding: 0;
+}
+
+.analysis .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  padding: 5px;
+}
+
+.analysis_tab_toggle .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  border-color: transparent transparent #dee2e6 transparent !important;
+  color: #6c757d !important;
+}
+.analysis_tab_toggle .p-tabview-nav li.p-highlight .p-tabview-nav-link:hover {
+  border-color: transparent transparent #6c757d transparent !important;
+}
