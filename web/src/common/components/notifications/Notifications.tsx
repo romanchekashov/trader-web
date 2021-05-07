@@ -1,28 +1,28 @@
+import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
+import { InputText } from "primereact/inputtext";
 import * as React from "react";
 import { memo, useEffect, useState } from "react";
-import "./styles/Notifications.css";
-import "./styles/Signals.css";
-import { playSound } from "../../assets/assets";
-import { getNotifications } from "../../api/rest/notificationsRestApi";
-import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
+import { FixedSizeList as List } from "react-window";
+import { getNotifications } from "../../api/rest/notificationsRestApi";
+import { WebsocketService, WSEvent } from "../../api/WebsocketService";
+import { playSound } from "../../assets/assets";
+import { ClassCode } from "../../data/ClassCode";
+import { FilterDto } from "../../data/FilterDto";
+import { Interval } from "../../data/Interval";
+import { Security } from "../../data/security/Security";
+import { getSecuritiesByClassCode } from "../../utils/Cache";
 import {
   getRecentBusinessDate,
   Intervals,
   PrimeDropdownItem,
 } from "../../utils/utils";
-import { Interval } from "../../data/Interval";
-import { ClassCode } from "../../data/ClassCode";
-import { getSecuritiesByClassCode } from "../../utils/Cache";
-import { Security } from "../../data/security/Security";
-import { Calendar } from "primereact/calendar";
-import { FilterDto } from "../../data/FilterDto";
 import { NotificationDto } from "./data/NotificationDto";
-import { InputText } from "primereact/inputtext";
-import { PatternName } from "../alerts/data/PatternName";
-import { WebsocketService, WSEvent } from "../../api/WebsocketService";
+import Notification from "./Notification";
+import "./styles/Notifications.css";
+import "./styles/Signals.css";
 import moment = require("moment");
-import { Dropdown } from "primereact/dropdown";
 
 type Props = {
   filter: FilterDto;
@@ -194,112 +194,6 @@ const Notifications: React.FC<Props> = ({
     return <div style={{ color: "red" }}>{fetchAlertsError}</div>;
   }
 
-  const timeTemplate = (alert: NotificationDto) => {
-    return <>{moment(alert.created).format("HH:mm/DD MMM YY")}</>;
-  };
-
-  const nameTemplate = (alert: NotificationDto) => {
-    let className = "alert-icon ";
-    const sInterval = alert.timeInterval.toString();
-    const title = `${alert.title} - Interval: ${sInterval}`;
-    const sArr = alert.title.split("-");
-
-    if (sArr.length > 1) {
-      if ("CANDLE_PATTERN" === sArr[0]) {
-        className += getCandlePatternClassName(alert);
-      } else if ("PRICE_CLOSE_TO_SR_LEVEL" === sArr[0]) {
-        const cls = alert.title.replace(
-          "PRICE_CLOSE_TO_SR_LEVEL",
-          "sr_level_cross"
-        );
-        className += cls.toLowerCase() + "-" + sInterval.toLowerCase();
-      } else if ("PRICE_CLOSE_TO_TREND_LINE" === sArr[0]) {
-        const cls = alert.title.replace(
-          "PRICE_CLOSE_TO_TREND_LINE",
-          "trend_line_cross"
-        );
-        className += cls.toLowerCase() + "-" + sInterval.toLowerCase();
-      } else if ("SR_ZONE_CROSS" === sArr[0]) {
-        className += alert.title.toLowerCase();
-      } else if (alert.text.toLowerCase().indexOf("рост") >= 0) {
-        className += "direction-up";
-      } else if (alert.text.toLowerCase().indexOf("падение") >= 0) {
-        className += "direction-down";
-      }
-    }
-
-    return <div className={className} title={title}></div>;
-  };
-
-  const getCandlePatternClassName = (alert: NotificationDto) => {
-    let className = "";
-    const name = alert.title.split("-")[1];
-    const sInterval = alert.timeInterval.toString();
-
-    if (PatternName.BEARISH_REVERSAL_PATTERN_DARK_CLOUD_COVER === name) {
-      className +=
-        "bearish-reversal-pattern-dark-cloud-cover-" + sInterval.toLowerCase();
-    } else if (PatternName.BEARISH_REVERSAL_PATTERN_ENGULFING === name) {
-      className +=
-        "bearish-reversal-pattern-engulfing-" + sInterval.toLowerCase();
-    } else if (PatternName.BEARISH_REVERSAL_PATTERN_EVENING_STAR === name) {
-      className +=
-        "bearish-reversal-pattern-evening-star-" + sInterval.toLowerCase();
-    } else if (PatternName.BEARISH_REVERSAL_PATTERN_HANGING_MAN === name) {
-      className +=
-        "bearish-reversal-pattern-hanging-man-" + sInterval.toLowerCase();
-    } else if (PatternName.BEARISH_REVERSAL_PATTERN_HARAMI === name) {
-      className += "bearish-reversal-pattern-harami-" + sInterval.toLowerCase();
-    } else if (PatternName.BEARISH_REVERSAL_PATTERN_SHOOTING_STAR === name) {
-      className +=
-        "bearish-reversal-pattern-shooting-star-" + sInterval.toLowerCase();
-    } else if (PatternName.BULLISH_REVERSAL_PATTERN_ENGULFING === name) {
-      className +=
-        "bullish-reversal-pattern-engulfing-" + sInterval.toLowerCase();
-    } else if (PatternName.BULLISH_REVERSAL_PATTERN_HAMMER === name) {
-      className += "bullish-reversal-pattern-hammer-" + sInterval.toLowerCase();
-    } else if (PatternName.BULLISH_REVERSAL_PATTERN_HARAMI === name) {
-      className += "bullish-reversal-pattern-harami-" + sInterval.toLowerCase();
-    } else if (PatternName.BULLISH_REVERSAL_PATTERN_INVERTED_HAMMER === name) {
-      className +=
-        "bullish-reversal-pattern-inverted-hammer-" + sInterval.toLowerCase();
-    } else if (PatternName.BULLISH_REVERSAL_PATTERN_MORNING_STAR === name) {
-      className +=
-        "bullish-reversal-pattern-morning-star-" + sInterval.toLowerCase();
-    } else if (PatternName.BULLISH_REVERSAL_PATTERN_PIERCING === name) {
-      className +=
-        "bullish-reversal-pattern-piercing-" + sInterval.toLowerCase();
-    } else if (PatternName.REVERSAL_PATTERN_DOJI === name) {
-      className += "reversal-pattern-doji-" + sInterval.toLowerCase();
-    }
-    return className;
-  };
-
-  const confirmTemplate = (alert: NotificationDto) => {
-    const className = false ? "confirm" : "";
-    return <div className={className}></div>;
-  };
-
-  const possibleFutureDirectionUpTemplate = (alert: NotificationDto) => {
-    const className = alert.title ? "direction-up" : "direction-down";
-    return <div className={className}></div>;
-  };
-
-  const strengthTemplate = (alert: NotificationDto) => {
-    const className = "strength-icon strength-";
-    return <div className={className} title={alert.title}></div>;
-  };
-
-  const descriptionTemplate = (dto: NotificationDto): any => {
-    let index = dto.text.indexOf("[");
-    let description = index !== -1 ? dto.text.substr(index) : dto.text;
-    description = description.replace("CANDLE_PATTERN - ", "");
-    description = description.split("Interval")[0];
-
-    // return <div title={dto.text}>{description}</div>
-    return '<div title="' + dto.text + '">' + description + "</div>";
-  };
-
   const onIntervalChanged = (newInterval: Interval) => {
     setInterval(newInterval);
     setFilteredAlerts(
@@ -408,51 +302,19 @@ const Notifications: React.FC<Props> = ({
 
     return (
       <div
+        key={alert.title + alert.timeInterval + alert.created}
         className={
           index % 2
             ? "notifications-list-item-odd"
             : "notifications-list-item-even"
         }
         style={style}
+        onClick={() => {
+          setSelectedAlert(alert);
+          onNotificationSelected(alert);
+        }}
       >
-        <div
-          key={alert.title + alert.timeInterval + alert.created}
-          className={className}
-          onClick={() => {
-            setSelectedAlert(alert);
-            onNotificationSelected(alert);
-          }}
-        >
-          <div className="notifications-title">
-            <div
-              className="notifications-cell notifications-symbol"
-              title={alert.code}
-            >
-              {alert.code?.substr(0, 8)}
-            </div>
-            <div className="notifications-cell notifications-time">
-              {timeTemplate(alert)}
-            </div>
-            <div className="notifications-cell notifications-name">
-              {nameTemplate(alert)}
-            </div>
-            {/*<div className="alerts-cell alerts-strength">
-                        {strengthTemplate(alert)}
-                        </div>
-                        <div className="alerts-cell alerts-confirm">
-                            {confirmTemplate(alert)}
-                        </div>
-                        <div className="alerts-cell alerts-direction">
-                            {possibleFutureDirectionUpTemplate(alert)}
-                        </div>*/}
-          </div>
-          <div>
-            <div
-              className="notifications-cell notifications-description"
-              dangerouslySetInnerHTML={{ __html: descriptionTemplate(alert) }}
-            ></div>
-          </div>
-        </div>
+        <Notification alert={alert} className={className} />
       </div>
     );
   };
