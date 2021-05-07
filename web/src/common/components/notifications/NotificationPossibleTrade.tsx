@@ -23,9 +23,9 @@ const NotificationPossibleTrade: React.FC<Props> = ({ possibleTrade }) => {
   } = possibleTrade;
 
   return (
-    <div>
-      <div>
-        {secId} - {timeFrame}
+    <div className="NotificationPossibleTrade">
+      <div className="less_important">
+        Possible trade: {secId} - {timeFrame}
       </div>
       <div>
         plTarget: {plTarget} / plStop: {plStop} = {round10(plTarget / plStop)}
@@ -34,7 +34,7 @@ const NotificationPossibleTrade: React.FC<Props> = ({ possibleTrade }) => {
         {operation === OperationType.SELL ? "SELL" : "BUY"} {quantity} by{" "}
         {entryPrice}
       </div>
-      <div>
+      <div className="less_important">
         Targets:{" "}
         {targets
           .map(({ quantity, price }) => `${quantity} - ${price}`)

@@ -323,30 +323,22 @@ const Notifications: React.FC<Props> = ({
     <div className="p-grid notifications" style={{ height: viewHeight || 200 }}>
       <div className="p-col-12 notifications-head">
         <div className="notifications-head-dropdown notifications-head-class-code">
-          {filter ? (
-            classCode
-          ) : (
-            <Dropdown
-              value={classCode}
-              options={classCodes}
-              onChange={(e) => {
-                onClassCodeChanged(e.value);
-              }}
-            />
-          )}
+          <Dropdown
+            value={classCode}
+            options={classCodes}
+            onChange={(e) => {
+              onClassCodeChanged(e.value);
+            }}
+          />
         </div>
         <div className="notifications-head-dropdown notifications-head-security">
-          {filter ? (
-            secCode
-          ) : (
-            <Dropdown
-              value={secCode}
-              options={secCodes}
-              onChange={(e) => {
-                onSecCodeChanged(e.value);
-              }}
-            />
-          )}
+          <Dropdown
+            value={secCode}
+            options={secCodes}
+            onChange={(e) => {
+              onSecCodeChanged(e.value);
+            }}
+          />
         </div>
         <div className="notifications-head-dropdown notifications-head-interval">
           <Dropdown

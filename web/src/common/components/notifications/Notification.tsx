@@ -7,6 +7,7 @@ import "./styles/Signals.css";
 import moment = require("moment");
 import { DataType } from "../../data/DataType";
 import NotificationPossibleTrade from "./NotificationPossibleTrade";
+import { ClassCodeToSecTypeMap } from "../../utils/utils";
 
 type Props = {
   alert: NotificationDto;
@@ -127,14 +128,20 @@ const Notification: React.FC<Props> = ({ alert, className }) => {
           className="notifications-cell notifications-symbol"
           title={alert.code}
         >
+          <span className="notifications-symbol_secType">
+            {ClassCodeToSecTypeMap[alert.classCode]}
+          </span>{" "}
           {alert.code?.substr(0, 8)}
         </div>
-        <div className="notifications-cell notifications-time">
-          {timeTemplate(alert)}
-        </div>
+
         <div className="notifications-cell notifications-name">
           {nameTemplate(alert)}
         </div>
+
+        <div className="notifications-cell notifications-time">
+          {timeTemplate(alert)}
+        </div>
+
         {/*<div className="alerts-cell alerts-strength">
                         {strengthTemplate(alert)}
                         </div>
@@ -145,7 +152,7 @@ const Notification: React.FC<Props> = ({ alert, className }) => {
                             {possibleFutureDirectionUpTemplate(alert)}
                         </div>*/}
       </div>
-      <div>
+      <div style={{ padding: 5 }}>
         {alert.dataType === DataType.POSSIBLE_TRADE && alert.data ? (
           <NotificationPossibleTrade possibleTrade={alert.data} />
         ) : (

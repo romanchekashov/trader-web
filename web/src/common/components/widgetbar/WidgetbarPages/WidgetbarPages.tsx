@@ -55,7 +55,7 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
             console.log(n);
           }}
           viewHeight={600}
-          itemSize={150}
+          itemSize={120}
         />
       ) : null}
     </div>
