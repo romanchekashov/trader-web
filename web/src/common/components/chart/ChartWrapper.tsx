@@ -1,44 +1,34 @@
 import * as React from "react";
-import { getCandles } from "../../api/rest/traderRestApi";
-import { Interval } from "../../data/Interval";
-import { CandleStickChartForDiscontinuousIntraDay } from "./CandleStickChartForDiscontinuousIntraDay";
-import { ChartDrawType } from "./data/ChartDrawType";
-import { Candle } from "../../data/Candle";
-import { SecurityLastInfo } from "../../data/security/SecurityLastInfo";
-import { TradePremise } from "../../data/strategy/TradePremise";
-import { ChartElementAppearance } from "./data/ChartElementAppearance";
-import { Order } from "../../data/Order";
-import { getHistoryCandles } from "../../api/rest/historyRestApi";
-import { Trend } from "../../data/strategy/Trend";
-import { ActiveTrade } from "../../data/ActiveTrade";
-import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import { SubscriptionLike } from "rxjs";
-import { PatternResult } from "../alerts/data/PatternResult";
-import "./ChartWrapper.css";
-import { Dropdown } from "primereact/dropdown";
-import {
-  IntervalColor,
-  Intervals,
-  PrimeDropdownItem,
-  StoreData,
-} from "../../utils/utils";
-import { ToggleButton } from "primereact/togglebutton";
-import { TrendLineDto } from "../../data/TrendLineDto";
+import { getHistoryCandles } from "../../api/rest/historyRestApi";
+import { getCandles } from "../../api/rest/traderRestApi";
 import { getTrendLines, saveTrendLines } from "../../api/rest/TrendLineRestApi";
-import { Button } from "primereact/button";
+import { WebsocketService, WSEvent } from "../../api/WebsocketService";
+import { ActiveTrade } from "../../data/ActiveTrade";
+import { BrokerId } from "../../data/BrokerId";
+import { Candle } from "../../data/Candle";
+import { FilterDto } from "../../data/FilterDto";
+import { Interval } from "../../data/Interval";
+import { Market } from "../../data/Market";
+import { Order } from "../../data/Order";
+import { SecurityLastInfo } from "../../data/security/SecurityLastInfo";
+import { StopOrder } from "../../data/StopOrder";
+import { TradePremise } from "../../data/strategy/TradePremise";
+import { Trend } from "../../data/strategy/Trend";
+import { Trade } from "../../data/Trade";
+import { TradingPlatform } from "../../data/trading/TradingPlatform";
+import { TrendLineDto } from "../../data/TrendLineDto";
+import { TrendWrapper } from "../../data/TrendWrapper";
+import { IntervalColor, StoreData } from "../../utils/utils";
+import { PatternResult } from "../alerts/data/PatternResult";
+import { CandleStickChartForDiscontinuousIntraDay } from "./CandleStickChartForDiscontinuousIntraDay";
+import "./ChartWrapper.css";
+import ChartWrapperHead from "./ChartWrapperHead/ChartWrapperHead";
+import { ChartDrawType } from "./data/ChartDrawType";
+import { ChartElementAppearance } from "./data/ChartElementAppearance";
+import { ChartManageOrder } from "./data/ChartManageOrder";
 import { ChartTrendLine } from "./data/ChartTrendLine";
 import { ChartTrendLineType } from "./data/ChartTrendLineType";
-import { TrendWrapper } from "../../data/TrendWrapper";
-import { Calendar } from "primereact/calendar";
-import { InputText } from "primereact/inputtext";
-import { Trade } from "../../data/Trade";
-import { ChartManageOrder } from "./data/ChartManageOrder";
-import { StopOrder } from "../../data/StopOrder";
-import { Market } from "../../data/Market";
-import { BrokerId } from "../../data/BrokerId";
-import { TradingPlatform } from "../../data/trading/TradingPlatform";
-import { FilterDto } from "../../data/FilterDto";
-import { PremiseBeforeDate } from "./toolbar/PremiseBeforeDate";
 import moment = require("moment");
 
 const _ = require("lodash");
@@ -88,10 +78,6 @@ export class ChartWrapper extends React.Component<Props, States> {
   private candlesSetupSubscription: SubscriptionLike = null;
   private wsStatusSub: SubscriptionLike = null;
   private fetchingCandles: boolean = false;
-  private intervals: PrimeDropdownItem<Interval>[] = Intervals.map((val) => ({
-    label: val,
-    value: val,
-  }));
   private initialStateTrendLines: TrendLineDto[] = [];
   private chartTrendLineDefaultAppearance: ChartElementAppearance = {
     edgeFill: "#FFFFFF",
@@ -485,11 +471,10 @@ export class ChartWrapper extends React.Component<Props, States> {
 
   getSwingHighsLowsMap = (): TrendWrapper[] => {
     const { premise, interval } = this.props;
-    const intervals: Interval[] = this.swingHighsLowsTimeFrameTradingIntervals[
-      interval
-    ];
 
-    if (premise && premise.analysis.trends) {
+    if (interval && premise && premise.analysis.trends) {
+      const intervals: Interval[] = this
+        .swingHighsLowsTimeFrameTradingIntervals[interval];
       const trendWrappers = premise.analysis.trends
         .filter((trend) => intervals.indexOf(trend.interval) !== -1)
         .map((trend) => ({
@@ -810,132 +795,29 @@ export class ChartWrapper extends React.Component<Props, States> {
 
     return (
       <>
-        <div className="chart-wrapper-head">
-          <div className="chart-wrapper-head-security">{security.secCode}</div>
-          <div className="chart-wrapper-head-interval">
-            <Dropdown
-              value={innerInterval}
-              options={this.intervals}
-              onChange={this.onIntervalUpdated}
-            />
-          </div>
-          <div className="chart-wrapper-head-start-date">
-            <InputText
-              type="number"
-              min={100}
-              value={numberOfCandles}
-              onChange={this.onNumberOfCandlesUpdatedWrapper}
-            />
-          </div>
-          <div className="chart-wrapper-head-start-date">
-            <Button
-              icon="pi pi-calendar"
-              className={startCalendarVisible ? "" : "p-button-secondary"}
-              onClick={this.showStartCalendar}
-            />
-            {startCalendarVisible ? (
-              <Calendar
-                value={innerStart}
-                onChange={(e) => this.onStartUpdated(e.value as Date)}
-              />
-            ) : null}
-          </div>
-          <PremiseBeforeDate onBeforeChanged={onPremiseBeforeChanged} />
-          <div className="chart-wrapper-head-trendline">
-            <ToggleButton
-              onLabel="New Order"
-              offLabel="New Order"
-              checked={enableNewOrder}
-              onChange={this.onEnableNewOrderWrapper}
-            />
-          </div>
-          <div className="chart-wrapper-head-trendline">
-            <ToggleButton
-              onLabel="Drawing"
-              offLabel="Draw Line"
-              checked={enableTrendLine}
-              onChange={this.onEnableTrendLineWrapper}
-            />
-          </div>
-
-          {needSave ? (
-            <div className="chart-wrapper-head-trendline">
-              <Button label="Save" onClick={(e) => this.onSave()} />
-            </div>
-          ) : null}
-
-          {needSave ? (
-            <div className="chart-wrapper-head-trendline">
-              <Button
-                label="Cancel"
-                className="p-button-secondary"
-                onClick={(e) => this.onCancel()}
-              />
-            </div>
-          ) : null}
-
-          <div className="chart-wrapper-head-trendline">
-            <ToggleButton
-              onLabel="SRLevels"
-              offLabel="SRLevels"
-              checked={showSRLevels}
-              onChange={this.updateShowSRLevels}
-            />
-          </div>
-          <div className="chart-wrapper-head-legends">
-            <div
-              className="chart-wrapper-head-legend"
-              style={{ backgroundColor: IntervalColor.MONTH }}
-            >
-              MN
-            </div>
-            <div
-              className="chart-wrapper-head-legend"
-              style={{ backgroundColor: IntervalColor.WEEK }}
-            >
-              W
-            </div>
-            <div
-              className="chart-wrapper-head-legend"
-              style={{ backgroundColor: IntervalColor.DAY }}
-            >
-              D
-            </div>
-            <div
-              className="chart-wrapper-head-legend"
-              style={{ backgroundColor: IntervalColor.H4 }}
-            >
-              H4
-            </div>
-            <div
-              className="chart-wrapper-head-legend"
-              style={{ backgroundColor: IntervalColor.H2 }}
-            >
-              H2
-            </div>
-            <div
-              className="chart-wrapper-head-legend"
-              style={{ backgroundColor: IntervalColor.M60 }}
-            >
-              M60
-            </div>
-            <div
-              className="chart-wrapper-head-legend"
-              style={{ backgroundColor: IntervalColor.M30 }}
-            >
-              M30
-            </div>
-          </div>
-
-          <div className="chart-wrapper-head-trendline">
-            <ToggleButton
-              onLabel="SRZones"
-              offLabel="SRZones"
-              checked={showSRZones}
-              onChange={this.updateShowSRZones}
-            />
-          </div>
-        </div>
+        <ChartWrapperHead
+          security={security}
+          innerInterval={innerInterval}
+          onIntervalUpdated={this.onIntervalUpdated}
+          numberOfCandles={numberOfCandles}
+          onNumberOfCandlesUpdatedWrapper={this.onNumberOfCandlesUpdatedWrapper}
+          startCalendarVisible={startCalendarVisible}
+          showStartCalendar={this.showStartCalendar}
+          innerStart={innerStart}
+          onStartUpdated={this.onStartUpdated}
+          onPremiseBeforeChanged={onPremiseBeforeChanged}
+          enableNewOrder={enableNewOrder}
+          onEnableNewOrderWrapper={this.onEnableNewOrderWrapper}
+          enableTrendLine={enableTrendLine}
+          onEnableTrendLineWrapper={this.onEnableTrendLineWrapper}
+          needSave={needSave}
+          onSave={this.onSave}
+          onCancel={this.onCancel}
+          showSRLevels={showSRLevels}
+          updateShowSRLevels={this.updateShowSRLevels}
+          showSRZones={showSRZones}
+          updateShowSRZones={this.updateShowSRZones}
+        />
         {candles.length > 0 ? (
           <CandleStickChartForDiscontinuousIntraDay
             type={ChartDrawType.CANVAS_SVG}

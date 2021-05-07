@@ -1,11 +1,15 @@
-.premise-before-date .p-button.p-button-text-only .p-button-text {
-    font-size: 12px;
-    padding: 1px 2px;
+.premise-before-date {
+  margin-left: 5px;
+}
+
+.premise-before-date .p-button {
+  font-size: 12px;
+  padding: 0px 2px;
 }
 
 .premise-before-date .p-inputtext {
-    font-size: 12px;
-    padding-top: 0;
-    padding-bottom: 0;
-    width: 80px;
+  font-size: 12px;
+  padding-top: 0;
+  padding-bottom: 0;
+  width: 80px;
 }
