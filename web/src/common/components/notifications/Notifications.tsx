@@ -3,7 +3,7 @@ import { memo, useEffect, useState } from "react";
 import "./styles/Notifications.css";
 import "./styles/Signals.css";
 import { playSound } from "../../assets/assets";
-import { getNotifications } from "../../api/rest/analysisRestApi";
+import { getNotifications } from "../../api/rest/notificationsRestApi";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import {
@@ -89,7 +89,7 @@ const Notifications: React.FC<Props> = ({
       .catch((reason) => {
         setAlerts([]);
         setVisibleAlerts([]);
-        setFetchAlertsError("Cannot get alerts for " + filter.secId);
+        setFetchAlertsError("Cannot get notifications for " + filter.secId);
         if (fetchAlertsAttempt < 3) {
           fetchAlertsAttempt++;
           fetchAlerts(secId, newInterval, newStart, newTextPattern);
