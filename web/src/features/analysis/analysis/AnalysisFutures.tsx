@@ -419,7 +419,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
         </div>
         <TrendsView trends={premise ? premise.analysis.trends : []} />
         <div className="p-grid" style={{ margin: "0" }}>
-          <div className="p-col-12" ref={chart1Ref} style={{ padding: "0" }}>
+          <div className="p-col-6" ref={chart1Ref} style={{ padding: "0" }}>
             <ChartWrapper
               interval={timeFrameTrading}
               initialNumberOfCandles={500}
@@ -438,7 +438,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
             />
           </div>
           {chartNumber === 2 ? (
-            <div className="p-col-12" ref={chart2Ref} style={{ padding: "0" }}>
+            <div className="p-col-6" ref={chart2Ref} style={{ padding: "0" }}>
               <ChartWrapper
                 interval={timeFrameHigh}
                 // start={start}
