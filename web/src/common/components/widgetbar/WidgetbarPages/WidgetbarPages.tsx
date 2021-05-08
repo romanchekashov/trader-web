@@ -12,12 +12,8 @@ import { FilterDto } from "../../../data/FilterDto";
 import { BrokerId } from "../../../data/BrokerId";
 import { TradingPlatform } from "../../../data/trading/TradingPlatform";
 import Notifications from "../../notifications/Notifications";
-
-enum VisibleType {
-  HIDE = "HIDE",
-  VISIBLE = "VISIBLE",
-  VISIBLE_PART = "VISIBLE_PART",
-}
+import { useAppDispatch } from "../../../../app/hooks";
+import { setSecurityById } from "../../../../app/securities/securitiesSlice";
 
 type Props = {
   item: WidgetbarItem | undefined;
@@ -25,6 +21,7 @@ type Props = {
 };
 
 const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
+  const dispatch = useAppDispatch();
   const [filterDto, setFilterDto] = useState<FilterDto>(null);
 
   useEffect(() => {
@@ -52,6 +49,7 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
           filter={filterDto}
           security={security}
           onNotificationSelected={(n) => {
+            dispatch(setSecurityById(n.secId));
             console.log(n);
           }}
           viewHeight={600}

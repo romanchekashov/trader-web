@@ -26,7 +26,11 @@ const store = configureStore({
     // https://redux-toolkit.js.org/usage/usage-guide#working-with-non-serializable-data
     serializableCheck: {
       // Ignore these action types
-      ignoredActions: ["news/fetch/fulfilled"],
+      ignoredActions: [
+        "news/fetch/fulfilled",
+        "securities/loadLastSecurities/fulfilled",
+        "securities/setSecurityById",
+      ],
       // Ignore these field paths in all actions
       ignoredActionPaths: ["timestamp"],
     },

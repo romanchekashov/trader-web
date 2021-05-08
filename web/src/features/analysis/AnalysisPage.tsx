@@ -3,9 +3,12 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
+  loadLastSecurities,
   selectSecurities,
-  setSecurity,
+  setSecurities,
+  setSecurityById,
 } from "../../app/securities/securitiesSlice";
+import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
 import {
   StackEvent,
   StackService,
@@ -25,16 +28,26 @@ type Props = {};
 
 const AnalysisPage: React.FC<Props> = ({}) => {
   const dispatch = useAppDispatch();
-  const { filter } = useAppSelector(selectFilter);
   const { security } = useAppSelector(selectSecurities);
+  const { filter } = useAppSelector(selectFilter);
   const { shares, currencies, futures } = useAppSelector(selectAnalysis);
 
-  const [isDetailsShown, setIsDetailsShown] = useState(false);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [isTabShown, setIsTabShown] = useState(false);
 
   useEffect(() => {
     dispatch(loadFilterData(false));
+    dispatch(loadLastSecurities());
+    const lastSecuritiesSubscription = WebsocketService.getInstance()
+      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+      .subscribe((securities) => {
+        dispatch(setSecurities(securities));
+      });
+
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      lastSecuritiesSubscription.unsubscribe();
+    };
   }, []);
 
   const onSelectRow = (selectedSecurity: SecurityLastInfo) => {
@@ -43,11 +56,8 @@ const AnalysisPage: React.FC<Props> = ({}) => {
         StackEvent.SECURITY_SELECTED,
         selectedSecurity
       );
-      setIsDetailsShown(true);
-    } else {
-      setIsDetailsShown(false);
     }
-    dispatch(setSecurity(selectedSecurity));
+    dispatch(setSecurityById(selectedSecurity?.id));
     setSelectedSecurity(selectedSecurity);
   };
 
@@ -56,15 +66,12 @@ const AnalysisPage: React.FC<Props> = ({}) => {
     setIsTabShown(!isTabShown);
   };
 
-  const classDataTable = isDetailsShown ? "p-col-12" : "p-col-12";
-  const classDetails = isDetailsShown ? "p-col-12" : "hidden";
-
   return (
     <div className="p-grid sample-layout analysis">
       {/*<div className="p-col-12" style={{padding: 0}}>
                     <Filter filter={filterData} onStart={this.onStart}/>
                 </div>*/}
-      <div className={classDataTable}>
+      <div className="p-col-12">
         <div className="p-grid analysis-securities">
           <TabView
             activeIndex={activeTabIndex}
@@ -77,7 +84,7 @@ const AnalysisPage: React.FC<Props> = ({}) => {
           </TabView>
         </div>
       </div>
-      <div className={classDetails}>
+      <div className="p-col-12">
         {!security ? (
           <div>Select security</div>
         ) : Market.SPB === security.market ? (

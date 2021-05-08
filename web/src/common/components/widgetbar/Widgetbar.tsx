@@ -1,13 +1,11 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { ToggleButton } from "primereact/togglebutton";
-import WidgetbarTabs from "./WidgetbarTabs/WidgetbarTabs";
+import { useAppSelector } from "../../../app/hooks";
+import { selectSecurities } from "../../../app/securities/securitiesSlice";
 import "./Widgetbar.css";
-import WidgetbarPages from "./WidgetbarPages/WidgetbarPages";
 import { WidgetbarItem } from "./WidgetbarItem";
-import { SecurityLastInfo } from "../../data/security/SecurityLastInfo";
-import { SubscriptionLike } from "rxjs";
-import { StackEvent, StackService } from "../stack/StackService";
+import WidgetbarPages from "./WidgetbarPages/WidgetbarPages";
+import WidgetbarTabs from "./WidgetbarTabs/WidgetbarTabs";
 
 type Props = {
   width: number;
@@ -15,18 +13,9 @@ type Props = {
 };
 
 const Widgetbar: React.FC<Props> = ({ width, onWidthChange }) => {
+  const { security } = useAppSelector(selectSecurities);
+
   const [item, setItem] = useState<WidgetbarItem>();
-  const [security, setSecurity] = useState<SecurityLastInfo>();
-
-  useEffect(() => {
-    const stackEventsListener: SubscriptionLike = StackService.getInstance()
-      .on<SecurityLastInfo>(StackEvent.SECURITY_SELECTED)
-      .subscribe(setSecurity);
-
-    return () => {
-      stackEventsListener.unsubscribe();
-    };
-  }, []);
 
   useEffect(() => {
     onWidthChange(item ? 300 : 50);
