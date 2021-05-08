@@ -21,7 +21,7 @@ import "./Analysis.css";
 import Analysis from "./analysis/Analysis";
 import AnalysisFutures from "./analysis/AnalysisFutures";
 import { AnalysisTinkoff } from "./analysis/AnalysisTinkoff";
-import { loadFilterData, selectAnalysis, selectFilter } from "./AnalysisSlice";
+import { loadFilterData, selectFilter } from "./AnalysisSlice";
 import { Securities } from "./securities/Securities";
 
 type Props = {};
@@ -30,7 +30,6 @@ const AnalysisPage: React.FC<Props> = ({}) => {
   const dispatch = useAppDispatch();
   const { security } = useAppSelector(selectSecurities);
   const { filter } = useAppSelector(selectFilter);
-  const { shares, currencies, futures } = useAppSelector(selectAnalysis);
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [isTabShown, setIsTabShown] = useState(false);

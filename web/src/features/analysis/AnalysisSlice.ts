@@ -9,24 +9,15 @@ import { handleThunkError } from "../../app/reduxUtils";
 import { RootState } from "../../app/store";
 import botControlRestApi from "../../common/api/rest/botControlRestApi";
 import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
-import { SecurityCurrency } from "../../common/data/security/SecurityCurrency";
-import { SecurityFuture } from "../../common/data/security/SecurityFuture";
-import { SecurityShare } from "../../common/data/security/SecurityShare";
 
 export interface AnalysisState {
   filter?: MarketBotFilterDataDto;
   filterLoading: LoadingState;
   filterLoadingError?: string;
-  shares: SecurityShare[];
-  currencies: SecurityCurrency[];
-  futures: SecurityFuture[];
 }
 
 export const initialState: AnalysisState = {
   filterLoading: LoadingState.IDLE,
-  shares: [],
-  currencies: [],
-  futures: [],
 };
 
 export const loadFilterData = createAsyncThunk<MarketBotFilterDataDto, boolean>(
@@ -68,15 +59,6 @@ export const selectFilter = createSelector(
     filter: state.analysis.filter,
     filterLoading: state.analysis.filterLoading,
     filterLoadingError: state.analysis.filterLoadingError,
-  }),
-  (state) => state
-);
-
-export const selectAnalysis = createSelector(
-  (state: RootState) => ({
-    shares: state.analysis.shares,
-    currencies: state.analysis.currencies,
-    futures: state.analysis.futures,
   }),
   (state) => state
 );

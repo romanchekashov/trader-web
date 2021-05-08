@@ -28,12 +28,12 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
     setFilterDto({
       brokerId: BrokerId.ALFA_DIRECT,
       tradingPlatform: TradingPlatform.QUIK,
-      secId: security?.id,
+      secId: null,
       fetchByWS: false,
       history: false,
-      all: !security,
+      all: true,
     });
-  }, [security]);
+  }, []);
 
   return (
     <div className="WidgetbarPages">

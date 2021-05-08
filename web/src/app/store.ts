@@ -30,6 +30,9 @@ const store = configureStore({
         "news/fetch/fulfilled",
         "securities/loadLastSecurities/fulfilled",
         "securities/setSecurityById",
+        "securities/loadShares/fulfilled",
+        "securities/loadFutures/fulfilled",
+        "securities/loadCurrencies/fulfilled",
       ],
       // Ignore these field paths in all actions
       ignoredActionPaths: ["timestamp"],

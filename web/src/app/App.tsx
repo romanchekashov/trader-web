@@ -13,9 +13,23 @@ import { ActiveTradesPage } from "../features/active-trades/ActiveTradesPage";
 import { StackWrapper } from "../common/components/stack/StackWrapper";
 import Widgetbar from "../common/components/widgetbar/Widgetbar";
 import { useState } from "react";
+import { useAppDispatch } from "./hooks";
+import { useEffect } from "react";
+import {
+  loadCurrencies,
+  loadFutures,
+  loadShares,
+} from "./securities/securitiesSlice";
 
 export const App = () => {
+  const dispatch = useAppDispatch();
   const [widgetbarHeight, setWidgetbarHeight] = useState<number>(50);
+
+  useEffect(() => {
+    dispatch(loadShares());
+    dispatch(loadFutures());
+    dispatch(loadCurrencies());
+  }, []);
 
   return (
     <div className="container-fluid">

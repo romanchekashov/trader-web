@@ -5,6 +5,8 @@ import * as React from "react";
 import { memo, useEffect, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
+import { useAppSelector } from "../../../app/hooks";
+import { selectSecurities } from "../../../app/securities/securitiesSlice";
 import { getNotifications } from "../../api/rest/notificationsRestApi";
 import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import { playSound } from "../../assets/assets";
@@ -12,7 +14,6 @@ import { ClassCode } from "../../data/ClassCode";
 import { FilterDto } from "../../data/FilterDto";
 import { Interval } from "../../data/Interval";
 import { Security } from "../../data/security/Security";
-import { getSecuritiesByClassCode } from "../../utils/Cache";
 import {
   getRecentBusinessDate,
   Intervals,
@@ -41,13 +42,14 @@ const Notifications: React.FC<Props> = ({
   viewHeight,
   itemSize,
 }) => {
+  const { shares, currencies, futures } = useAppSelector(selectSecurities);
+
   const [interval, setInterval] = useState(null);
   const [classCode, setClassCode] = useState(null);
   const [secCode, setSecCode] = useState(null);
-  const [secCodes, setSecCodes] = useState([{ label: "ALL", value: null }]);
   const [start, setStart] = useState<Date>(
     getRecentBusinessDate(
-      moment().subtract(60, "days").hours(0).minutes(0).seconds(0).toDate()
+      moment().subtract(1, "days").hours(0).minutes(0).seconds(0).toDate()
     )
   );
   const [textPattern, setTextPattern] = useState("");
@@ -67,6 +69,34 @@ const Notifications: React.FC<Props> = ({
     ClassCode.TQBR,
     ClassCode.CETS,
   ].map((val) => ({ label: val || "ALL", value: val }));
+
+  const getSecuritiesByClassCode = (classCode: ClassCode): Security[] => {
+    switch (classCode) {
+      case ClassCode.SPBFUT:
+        return futures;
+      case ClassCode.TQBR:
+        return shares;
+      case ClassCode.CETS:
+        return currencies;
+    }
+  };
+
+  const getSecCodes = (classCode: ClassCode): PrimeDropdownItem<string>[] => {
+    const secCodes: PrimeDropdownItem<string>[] = [
+      { label: "ALL", value: null },
+    ];
+
+    if (classCode) {
+      const securities: Security[] = getSecuritiesByClassCode(classCode);
+      for (const sec of securities) {
+        secCodes.push({ label: sec.code, value: sec.code });
+      }
+    }
+
+    return secCodes;
+  };
+
+  const secCodes = getSecCodes(classCode);
 
   const fetchAlerts = (
     secId: number,
@@ -166,6 +196,11 @@ const Notifications: React.FC<Props> = ({
     };
   }, [filter]);
 
+  useEffect(() => {
+    setClassCode(security?.classCode);
+    setSecCode(security?.code);
+  }, [security]);
+
   const setAlertsReceivedFromServer = (
     newAlerts: NotificationDto[],
     newClassCode: ClassCode | undefined,
@@ -207,19 +242,7 @@ const Notifications: React.FC<Props> = ({
   };
 
   const onClassCodeChanged = (newClassCode: ClassCode) => {
-    const newSecCodes: PrimeDropdownItem<string>[] = [
-      { label: "ALL", value: null },
-    ];
-    if (newClassCode) {
-      const securities: Security[] = getSecuritiesByClassCode(newClassCode);
-      for (const sec of securities) {
-        newSecCodes.push({ label: sec.code, value: sec.code });
-      }
-    } else {
-      setSecCode(null);
-    }
     setClassCode(newClassCode);
-    setSecCodes(newSecCodes);
     setSecCode(null);
     setFilteredAlerts(alerts, newClassCode, null, interval, start, textPattern);
   };

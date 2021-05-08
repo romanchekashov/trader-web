@@ -5,7 +5,11 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import analysisRestApi from "../../common/api/rest/analysisRestApi";
+import traderRestApi from "../../common/api/rest/traderRestApi";
+import { SecurityCurrency } from "../../common/data/security/SecurityCurrency";
+import { SecurityFuture } from "../../common/data/security/SecurityFuture";
 import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
+import { SecurityShare } from "../../common/data/security/SecurityShare";
 import { LoadingState } from "../LoadingState";
 import { handleThunkError } from "../reduxUtils";
 import { RootState } from "../store";
@@ -15,11 +19,18 @@ export interface SecuritiesState {
   securities: SecurityLastInfo[];
   securitiesLoading: LoadingState;
   securitiesLoadingError?: string;
+
+  shares: SecurityShare[];
+  currencies: SecurityCurrency[];
+  futures: SecurityFuture[];
 }
 
 const initialState: SecuritiesState = {
   securities: [],
   securitiesLoading: LoadingState.IDLE,
+  shares: [],
+  currencies: [],
+  futures: [],
 };
 
 // https://www.newline.co/@bespoyasov/how-to-use-thunks-with-redux-toolkit-and-typescript--1e65fc64
@@ -27,6 +38,21 @@ export const loadLastSecurities = createAsyncThunk<SecurityLastInfo[]>(
   "securities/loadLastSecurities",
   async (_, thunkAPI) =>
     await handleThunkError(thunkAPI, analysisRestApi.getLastSecurities())
+);
+export const loadShares = createAsyncThunk<SecurityShare[]>(
+  "securities/loadShares",
+  async (_, thunkAPI) =>
+    await handleThunkError(thunkAPI, traderRestApi.getAllSecurityShares())
+);
+export const loadFutures = createAsyncThunk<SecurityFuture[]>(
+  "securities/loadFutures",
+  async (_, thunkAPI) =>
+    await handleThunkError(thunkAPI, traderRestApi.getAllSecurityFutures())
+);
+export const loadCurrencies = createAsyncThunk<SecurityCurrency[]>(
+  "securities/loadCurrencies",
+  async (_, thunkAPI) =>
+    await handleThunkError(thunkAPI, traderRestApi.getAllSecurityCurrencies())
 );
 
 export const securitiesSlice = createSlice({
@@ -69,6 +95,27 @@ export const securitiesSlice = createSlice({
       state.securitiesLoadingError = action.payload;
       state.securitiesLoading = LoadingState.ERROR;
     },
+    // load shares
+    [loadShares.fulfilled as any]: (
+      state: SecuritiesState,
+      action: PayloadAction<SecurityShare[]>
+    ) => {
+      state.shares = action.payload;
+    },
+    // load futures
+    [loadFutures.fulfilled as any]: (
+      state: SecuritiesState,
+      action: PayloadAction<SecurityFuture[]>
+    ) => {
+      state.futures = action.payload;
+    },
+    // load currencies
+    [loadCurrencies.fulfilled as any]: (
+      state: SecuritiesState,
+      action: PayloadAction<SecurityCurrency[]>
+    ) => {
+      state.currencies = action.payload;
+    },
   },
 });
 
@@ -81,6 +128,9 @@ export const selectSecurities = createSelector(
   (state: RootState) => ({
     security: state.securities.security,
     securities: state.securities.securities,
+    shares: state.securities.shares,
+    currencies: state.securities.currencies,
+    futures: state.securities.futures,
   }),
   (state) => state
 );
