@@ -125,3 +125,9 @@ export const ClassCodeToSecTypeMap = {
   [ClassCode.TQBR]: SecurityType.STOCK,
   [ClassCode.CETS]: SecurityType.CURRENCY,
 };
+
+export const Colors = {
+  GREEN: "#1F9D55",
+  RED: "#E3342F",
+  BLUE: "#0d47a1",
+};

@@ -30,6 +30,7 @@ import { ChartManageOrder } from "./data/ChartManageOrder";
 import { ChartTrendLine } from "./data/ChartTrendLine";
 import { ChartTrendLineType } from "./data/ChartTrendLineType";
 import moment = require("moment");
+import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 
 const _ = require("lodash");
 
@@ -52,6 +53,7 @@ type Props = {
   showGrid?: boolean;
   activeTrade?: ActiveTrade;
   alert?: PatternResult;
+  possibleTrade?: PossibleTrade;
 };
 
 type States = {
@@ -787,6 +789,7 @@ export class ChartWrapper extends React.Component<Props, States> {
       stops,
       activeTrade,
       onPremiseBeforeChanged,
+      possibleTrade,
     } = this.props;
 
     if (!security) {
@@ -844,6 +847,7 @@ export class ChartWrapper extends React.Component<Props, States> {
             onEnableNewOrder={this.onEnableNewOrder}
             needSave={this.onNeedSave}
             trends={trends_1}
+            possibleTrade={possibleTrade}
           />
         ) : nodata ? (
           <div>No data</div>

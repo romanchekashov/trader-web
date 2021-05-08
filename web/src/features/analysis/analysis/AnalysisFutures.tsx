@@ -41,6 +41,10 @@ import {
 } from "../../../common/utils/TimeFrameChooser";
 import moment = require("moment");
 import { Toast } from "primereact/toast";
+import TestData from "../../../common/utils/TestData";
+import { useAppSelector } from "../../../app/hooks";
+import { selectPossibleTrade } from "../../../app/possibleTrades/possibleTradesSlice";
+import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 
 type Props = {
   security: SecurityLastInfo;
@@ -49,6 +53,8 @@ type Props = {
 let prevMainWidth;
 
 const AnalysisFutures: React.FC<Props> = ({ security }) => {
+  const { possibleTrade } = useAppSelector(selectPossibleTrade);
+
   const timeFrameTradingIntervals = {
     M1: [Interval.M1],
     M3: [Interval.M3, Interval.M1],
@@ -383,6 +389,9 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
 
   if (!security) return <div>Select security for analysis</div>;
 
+  const pTrade: PossibleTrade =
+    security && security.id === possibleTrade?.secId && possibleTrade;
+
   return (
     <div className="p-grid" ref={mainRef}>
       <Toast ref={toast} />
@@ -425,6 +434,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
               trades={trades}
               activeTrade={activeTrade}
               showGrid={true}
+              possibleTrade={pTrade}
             />
           </div>
           {chartNumber === 2 ? (
@@ -440,6 +450,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
                 premise={premise}
                 trades={trades}
                 showGrid={true}
+                possibleTrade={pTrade}
               />
             </div>
           ) : null}

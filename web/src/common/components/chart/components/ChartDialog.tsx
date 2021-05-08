@@ -74,7 +74,7 @@ export class ChartDialog extends React.Component<Props, State> {
   }
 
   static getDerivedStateFromProps = (props, state) => {
-    if (props.alert && props.alert.id !== state.alert.id) {
+    if (props.alert && props.alert.id !== state.alert?.id) {
       return {
         alert: props.alert,
         type: props.alert.id.startsWith("stop_") ? "stop" : "order",
