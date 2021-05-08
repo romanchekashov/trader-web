@@ -1,14 +1,15 @@
 import {
+  Action,
   configureStore,
   getDefaultMiddleware,
   ThunkAction,
-  Action,
 } from "@reduxjs/toolkit";
-import newsReducer from "../features/news/NewsSlice";
-import securitiesReducer from "./securities/securitiesSlice";
 import analysisReducer from "../features/analysis/AnalysisSlice";
-import tradeJournalReducer from "../features/trade-journal/TradeJournalSlice";
 import botControlReducer from "../features/bot-control/BotControlSlice";
+import newsReducer from "../features/news/NewsSlice";
+import tradeJournalReducer from "../features/trade-journal/TradeJournalSlice";
+import possibleTradesReducer from "./possibleTrades/possibleTradesSlice";
+import securitiesReducer from "./securities/securitiesSlice";
 
 /**
  * redux-toolkit + typescript example
@@ -21,6 +22,7 @@ const store = configureStore({
     tradeJournal: tradeJournalReducer,
     botControl: botControlReducer,
     securities: securitiesReducer,
+    possibleTrades: possibleTradesReducer,
   },
   middleware: getDefaultMiddleware({
     // https://redux-toolkit.js.org/usage/usage-guide#working-with-non-serializable-data

@@ -1,19 +1,18 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { ToggleButton } from "primereact/togglebutton";
-import { BsNewspaper, BsCalendar } from "react-icons/bs";
-import "./WidgetbarPages.css";
-import { Tooltip } from "primereact/tooltip";
-import { WidgetbarItem } from "../WidgetbarItem";
-import { StockEventsBrief } from "../../share-event/StockEventsBrief";
-import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
+import { useAppDispatch } from "../../../../app/hooks";
+import { setPossibleTrade } from "../../../../app/possibleTrades/possibleTradesSlice";
+import { setSecurityById } from "../../../../app/securities/securitiesSlice";
 import { SecurityLastInfoView } from "../../../../features/trading-charts/security/info/SecurityLastInfoView";
-import { FilterDto } from "../../../data/FilterDto";
 import { BrokerId } from "../../../data/BrokerId";
+import { DataType } from "../../../data/DataType";
+import { FilterDto } from "../../../data/FilterDto";
+import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 import { TradingPlatform } from "../../../data/trading/TradingPlatform";
 import Notifications from "../../notifications/Notifications";
-import { useAppDispatch } from "../../../../app/hooks";
-import { setSecurityById } from "../../../../app/securities/securitiesSlice";
+import { StockEventsBrief } from "../../share-event/StockEventsBrief";
+import { WidgetbarItem } from "../WidgetbarItem";
+import "./WidgetbarPages.css";
 
 type Props = {
   item: WidgetbarItem | undefined;
@@ -50,6 +49,9 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
           security={security}
           onNotificationSelected={(n) => {
             dispatch(setSecurityById(n.secId));
+            if (n.dataType === DataType.POSSIBLE_TRADE) {
+              dispatch(setPossibleTrade(n.data));
+            }
             console.log(n);
           }}
           viewHeight={600}

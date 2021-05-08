@@ -1,6 +1,6 @@
 import * as React from "react";
 import { OperationType } from "../../data/OperationType";
-import { PossibleTrade } from "../../data/trading/PossibleTrade";
+import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 import { round10 } from "../../utils/utils";
 import "./styles/Notifications.css";
 import "./styles/Signals.css";
