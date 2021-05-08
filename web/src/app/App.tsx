@@ -3,7 +3,7 @@ import { Route, Switch } from "react-router-dom";
 import { HomePage } from "../features/home/HomePage";
 import { Header } from "../components/Header";
 import { PageNotFound } from "./PageNotFound";
-import TradeStrategyAnalysisPage from "../features/analysis/AnalysisPage";
+import AnalysisPage from "../features/analysis/AnalysisPage";
 import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
 import { EconomicCalendarPage } from "../features/economic-calendar/EconomicCalendarPage";
 import { NewsPage } from "../features/news/NewsPage";
@@ -28,7 +28,7 @@ export const App = () => {
           <Route exact path="/" component={HomePage} />
           <Route path="/news" component={NewsPage} />
           <Route path="/active-trades" component={ActiveTradesPage} />
-          <Route path="/analysis" component={TradeStrategyAnalysisPage} />
+          <Route path="/analysis" component={AnalysisPage} />
           <Route path="/trading-charts" component={TradingChartsRouter} />
           <Route path="/bot-control" component={BotControlPage} />
           <Route path="/trade-journal" component={TradeJournalPage} />

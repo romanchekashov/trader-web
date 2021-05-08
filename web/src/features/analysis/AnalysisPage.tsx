@@ -1,153 +1,95 @@
+import { TabPanel, TabView } from "primereact/tabview";
 import * as React from "react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { AppDispatch, RootState } from "../../app/store";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  loadFilterData,
-  loadSecurityCurrency,
-  loadSecurityFuture,
-  loadSecurityShares,
-} from "./AnalysisActions";
-import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
-import { MarketBotStartDto } from "../../common/data/bot/MarketBotStartDto";
-import { SecurityShare } from "../../common/data/security/SecurityShare";
-import { ClassCode } from "../../common/data/ClassCode";
-import Analysis from "./analysis/Analysis";
-import { SecurityCurrency } from "../../common/data/security/SecurityCurrency";
-import { SecurityFuture } from "../../common/data/security/SecurityFuture";
-import AnalysisFutures from "./analysis/AnalysisFutures";
-import "./Analysis.css";
-import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
-import { setSelectedSecurity } from "../../common/utils/Cache";
-import { Securities } from "./securities/Securities";
-import { Market } from "../../common/data/Market";
-import { AnalysisTinkoff } from "./analysis/AnalysisTinkoff";
+  selectSecurities,
+  setSecurity,
+} from "../../app/securities/securitiesSlice";
 import {
   StackEvent,
   StackService,
 } from "../../common/components/stack/StackService";
-import { TabPanel, TabView } from "primereact/tabview";
+import { ClassCode } from "../../common/data/ClassCode";
+import { Market } from "../../common/data/Market";
+import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
+import { setSelectedSecurity } from "../../common/utils/Cache";
+import "./Analysis.css";
+import Analysis from "./analysis/Analysis";
+import AnalysisFutures from "./analysis/AnalysisFutures";
+import { AnalysisTinkoff } from "./analysis/AnalysisTinkoff";
+import { loadFilterData, selectAnalysis, selectFilter } from "./AnalysisSlice";
+import { Securities } from "./securities/Securities";
 
-function mapStateToProps(state: RootState) {
-  return {
-    filterData: state.analysis.filter,
-    shares: state.analysis.shares,
-    currencies: state.analysis.currencies,
-    futures: state.analysis.futures,
-  };
-}
+type Props = {};
 
-function mapDispatchToProps(dispatch: AppDispatch) {
-  return {
-    actions: {
-      loadFilterData: bindActionCreators(loadFilterData, dispatch),
-      loadSecurityShares: bindActionCreators(loadSecurityShares, dispatch),
-      loadSecurityCurrency: bindActionCreators(loadSecurityCurrency, dispatch),
-      loadSecurityFuture: bindActionCreators(loadSecurityFuture, dispatch),
-    },
-  };
-}
+const AnalysisPage: React.FC<Props> = ({}) => {
+  const dispatch = useAppDispatch();
+  const { filter } = useAppSelector(selectFilter);
+  const { security } = useAppSelector(selectSecurities);
+  const { shares, currencies, futures } = useAppSelector(selectAnalysis);
 
-interface TradeStrategyAnalysisState {
-  selectedSecurity: SecurityLastInfo;
-  isDetailsShown: boolean;
-  filter: MarketBotStartDto;
-  activeTabIndex: number;
-  isTabShown: boolean;
-}
+  const [isDetailsShown, setIsDetailsShown] = useState(false);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [isTabShown, setIsTabShown] = useState(false);
 
-type Props = {
-  filterData: MarketBotFilterDataDto;
-  shares: SecurityShare[];
-  currencies: SecurityCurrency[];
-  futures: SecurityFuture[];
-} & ReturnType<typeof mapDispatchToProps>;
+  useEffect(() => {
+    dispatch(loadFilterData(false));
+  }, []);
 
-class AnalysisPage extends React.Component<Props, TradeStrategyAnalysisState> {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      selectedSecurity: null,
-      isDetailsShown: false,
-      filter: null,
-      activeTabIndex: 0,
-      isTabShown: false,
-    };
-  }
-
-  componentDidMount(): void {
-    const { actions, filterData } = this.props;
-
-    if (!filterData) {
-      actions.loadFilterData();
-    }
-  }
-
-  componentWillUnmount = (): void => {};
-
-  onSelectRow = (selectedSecurity: SecurityLastInfo) => {
+  const onSelectRow = (selectedSecurity: SecurityLastInfo) => {
     if (selectedSecurity) {
-      this.setState({ selectedSecurity, isDetailsShown: true });
-      setSelectedSecurity(selectedSecurity);
       StackService.getInstance().send(
         StackEvent.SECURITY_SELECTED,
         selectedSecurity
       );
+      setIsDetailsShown(true);
     } else {
-      this.setState({ selectedSecurity, isDetailsShown: false });
+      setIsDetailsShown(false);
     }
+    dispatch(setSecurity(selectedSecurity));
+    setSelectedSecurity(selectedSecurity);
   };
 
-  render() {
-    const {
-      selectedSecurity,
-      isDetailsShown,
-      activeTabIndex,
-      isTabShown,
-    } = this.state;
-    const classDataTable = isDetailsShown ? "p-col-12" : "p-col-12";
-    const classDetails = isDetailsShown ? "p-col-12" : "hidden";
+  const onTabChange = (e: any) => {
+    setActiveTabIndex(e.index);
+    setIsTabShown(!isTabShown);
+  };
 
-    return (
-      <div className="p-grid sample-layout analysis">
-        {/*<div className="p-col-12" style={{padding: 0}}>
+  const classDataTable = isDetailsShown ? "p-col-12" : "p-col-12";
+  const classDetails = isDetailsShown ? "p-col-12" : "hidden";
+
+  return (
+    <div className="p-grid sample-layout analysis">
+      {/*<div className="p-col-12" style={{padding: 0}}>
                     <Filter filter={filterData} onStart={this.onStart}/>
                 </div>*/}
-        <div className={classDataTable}>
-          <div className="p-grid analysis-securities">
-            <TabView
-              activeIndex={activeTabIndex}
-              onTabChange={(e) =>
-                this.setState({
-                  activeTabIndex: e.index,
-                  isTabShown: !isTabShown,
-                })
-              }
-              className={isTabShown ? "" : "analysis_tab_toggle"}
-            >
-              <TabPanel header="Screener">
-                {isTabShown ? (
-                  <Securities onSelectRow={this.onSelectRow} />
-                ) : null}
-              </TabPanel>
-            </TabView>
-          </div>
-        </div>
-        <div className={classDetails}>
-          {!selectedSecurity ? (
-            <div>Select security</div>
-          ) : Market.SPB === selectedSecurity.market ? (
-            <AnalysisTinkoff security={selectedSecurity} />
-          ) : ClassCode.SPBFUT === selectedSecurity.classCode ? (
-            <AnalysisFutures security={selectedSecurity} />
-          ) : (
-            <Analysis security={selectedSecurity} />
-          )}
+      <div className={classDataTable}>
+        <div className="p-grid analysis-securities">
+          <TabView
+            activeIndex={activeTabIndex}
+            onTabChange={onTabChange}
+            className={isTabShown ? "" : "analysis_tab_toggle"}
+          >
+            <TabPanel header="Screener">
+              {isTabShown ? <Securities onSelectRow={onSelectRow} /> : null}
+            </TabPanel>
+          </TabView>
         </div>
       </div>
-    );
-  }
-}
+      <div className={classDetails}>
+        {!security ? (
+          <div>Select security</div>
+        ) : Market.SPB === security.market ? (
+          <AnalysisTinkoff security={security} />
+        ) : ClassCode.SPBFUT === security.classCode ? (
+          <AnalysisFutures security={security} />
+        ) : (
+          <Analysis security={security} />
+        )}
+      </div>
+    </div>
+  );
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(AnalysisPage);
+export default AnalysisPage;

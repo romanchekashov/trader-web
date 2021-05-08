@@ -24,6 +24,19 @@ import { handleError, handleResponse } from "../apiUtils";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
+export default {
+  getTradePremise,
+  getTrend,
+  getCandlePatterns,
+  getMarketState,
+  getSwingStates,
+  getMoexOpenInterests,
+  getMoexApiOpenInterestList,
+  getSecurityShareEvents,
+  getSecurities,
+  getLastSecurities,
+};
+
 export function getTradePremise(
   filter: TradeStrategyAnalysisFilterDto
 ): Promise<TradePremise> {
