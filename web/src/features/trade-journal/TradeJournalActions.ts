@@ -1,28 +1,30 @@
-import {AppDispatch} from "../../app/store";
-import {ResultDto} from "../../common/data/journal/ResultDto";
-import {getStat} from "../../common/api/rest/journalRestApi";
+import { AppDispatch } from "../../app/store";
+import { ResultDto } from "../../common/data/journal/ResultDto";
 
 export const LOAD_STAT_SUCCESS = "LOAD_STAT_SUCCESS";
 
 interface LoadStatSuccessAction {
-    type: typeof LOAD_STAT_SUCCESS
-    stat: ResultDto[]
+  type: typeof LOAD_STAT_SUCCESS;
+  stat: ResultDto[];
 }
 
 export interface TradeJournalState {
-    stat: ResultDto[]
+  stat: ResultDto[];
 }
 
-export type TradeJournalActionTypes = LoadStatSuccessAction
+export type TradeJournalActionTypes = LoadStatSuccessAction;
 
-export const loadStatSuccess = (stat: ResultDto[]): LoadStatSuccessAction => ({type: LOAD_STAT_SUCCESS, stat});
+export const loadStatSuccess = (stat: ResultDto[]): LoadStatSuccessAction => ({
+  type: LOAD_STAT_SUCCESS,
+  stat,
+});
 
 export const loadStat = () => (dispatch: AppDispatch) => {
-    // getStat()
-    //     .then(stat => {
-    //         dispatch(loadStatSuccess(stat));
-    //     })
-    //     .catch(error => {
-    //         throw error;
-    //     });
+  // getStat()
+  //     .then(stat => {
+  //         dispatch(loadStatSuccess(stat));
+  //     })
+  //     .catch(error => {
+  //         throw error;
+  //     });
 };
