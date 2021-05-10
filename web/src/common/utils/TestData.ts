@@ -9,6 +9,8 @@ import { StopOrder } from "../data/StopOrder";
 import { PossibleTrade } from "../../app/possibleTrades/data/PossibleTrade";
 import { Interval } from "../data/Interval";
 import { TrendDirection } from "../data/strategy/TrendDirection";
+import { SecurityType } from "../data/security/SecurityType";
+import { StopOrderKind } from "../data/StopOrderKind";
 
 export const TEST_SESSION_RESULT: SessionTradeResult = {
   classCode: ClassCode.SPBFUT,
@@ -36,14 +38,16 @@ export const TEST_ACTIVE_TRADES: ActiveTrade[] = [
       transId: 1,
       number: 2,
       linkedOrderNum: "2",
-      classCode: ClassCode.SPBFUT,
+      securityType: SecurityType.FUTURE,
       secCode: "BRM0",
+      secId: 372,
       operation: OperationType.BUY,
       price: 33,
       conditionPrice: 33.2,
       quantity: 5,
       status: StopOrderStatus.ACTIVE,
       dateTime: new Date(),
+      kind: StopOrderKind.SIMPLE_STOP_ORDER,
     },
   },
   {
@@ -61,14 +65,16 @@ export const TEST_ACTIVE_TRADES: ActiveTrade[] = [
       transId: 1,
       number: 2,
       linkedOrderNum: "2",
-      classCode: ClassCode.SPBFUT,
+      securityType: SecurityType.FUTURE,
       secCode: "RIH1",
+      secId: 370,
       operation: OperationType.BUY,
       price: 136930,
       conditionPrice: 136990,
       quantity: 5,
       status: StopOrderStatus.ACTIVE,
       dateTime: new Date(),
+      kind: StopOrderKind.SIMPLE_STOP_ORDER,
     },
   },
 ];
@@ -89,11 +95,13 @@ const stops: StopOrder[] = [
   {
     transId: 11,
     operation: OperationType.BUY,
+    securityType: SecurityType.FUTURE,
     secCode: "BRM1",
-    classCode: ClassCode.SPBFUT,
+    secId: 372,
     price: 68,
     conditionPrice: 68.02,
     quantity: 5,
+    kind: StopOrderKind.SIMPLE_STOP_ORDER,
   },
 ];
 

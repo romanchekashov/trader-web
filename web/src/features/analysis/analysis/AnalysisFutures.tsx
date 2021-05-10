@@ -153,6 +153,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
     const stopOrdersSubscription = WebsocketService.getInstance()
       .on<StopOrder[]>(WSEvent.STOP_ORDERS)
       .subscribe((newStopOrders) => {
+        console.log(newStopOrders);
         if (stopOrders.length !== newStopOrders.length) {
           setStopOrders(newStopOrders);
         }

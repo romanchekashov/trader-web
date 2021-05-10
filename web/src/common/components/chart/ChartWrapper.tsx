@@ -33,6 +33,7 @@ import { ChartManageOrder } from "./data/ChartManageOrder";
 import { ChartTrendLine } from "./data/ChartTrendLine";
 import { ChartTrendLineType } from "./data/ChartTrendLineType";
 import moment = require("moment");
+import possibleTradesApi from "../../../app/possibleTrades/possibleTradesApi";
 
 const _ = require("lodash");
 
@@ -726,7 +727,7 @@ export class ChartWrapper extends React.Component<Props, States> {
   };
 
   manageOrder = (order: ChartManageOrder) => {
-    const { history } = this.props;
+    const { history, security } = this.props;
 
     if (order.dataType === DataType.ORDER) {
       if (order.action === CrudMode.DELETE) {
@@ -763,6 +764,18 @@ export class ChartWrapper extends React.Component<Props, States> {
     }
 
     if (order.dataType === DataType.POSSIBLE_TRADE) {
+      const possibleTrade: PossibleTrade = order.data;
+      possibleTradesApi.tradePossibleTrade({
+        brokerId: BrokerId.ALFA_DIRECT,
+        tradingPlatform: TradingPlatform.QUIK,
+        secId: security.id,
+        timeFrame: possibleTrade.timeFrame,
+        timeFrameLow: possibleTrade.timeFrameLow,
+        entryPrice: possibleTrade.entryPrice,
+        quantity: possibleTrade.quantity,
+        depositAmount: 0,
+        depositMaxRiskPerTradeInPercent: 1,
+      });
       console.log(order);
     }
   };

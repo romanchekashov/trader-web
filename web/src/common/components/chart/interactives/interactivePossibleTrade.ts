@@ -1,7 +1,7 @@
 import { InteractiveYCoordinate } from "react-financial-charts/lib/interactive";
 import { PossibleTrade } from "../../../../app/possibleTrades/data/PossibleTrade";
 import { DataType } from "../../../data/DataType";
-import { OperationType } from "../../../data/OperationType";
+import { OperationType, OperationTypePrint } from "../../../data/OperationType";
 import { Colors } from "../../../utils/utils";
 
 const possibleTrade_entryPrice = "possibleTrade_entryPrice";
@@ -38,10 +38,7 @@ const fillInteractiveMap = (
         ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
         stroke: Colors.BLUE,
         textFill: Colors.BLUE,
-        text:
-          (tradeOperation === OperationType.BUY
-            ? "PT: Entry Buy "
-            : "PT: Entry Sell ") + possibleTrade.quantity,
+        text: `PT: Entry ${OperationTypePrint[tradeOperation]} ${possibleTrade.quantity}`,
         edge: {
           ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
           stroke: Colors.BLUE,
@@ -62,10 +59,7 @@ const fillInteractiveMap = (
         ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
         stroke: Colors.RED,
         textFill: Colors.RED,
-        text:
-          (tradeCloseOperation === OperationType.BUY
-            ? "PT: Stop Buy "
-            : "PT: Stop Sell ") + possibleTrade.quantity,
+        text: `PT: Stop ${OperationTypePrint[tradeCloseOperation]} ${possibleTrade.quantity}`,
         edge: {
           ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
           stroke: Colors.RED,
@@ -86,10 +80,7 @@ const fillInteractiveMap = (
         ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
         stroke: Colors.GREEN,
         textFill: Colors.GREEN,
-        text:
-          (tradeCloseOperation === OperationType.BUY
-            ? "PT: Target Buy "
-            : "PT: Target Sell ") + target.quantity,
+        text: `PT: Target ${OperationTypePrint[tradeCloseOperation]} ${target.quantity}`,
         edge: {
           ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate.edge,
           stroke: Colors.GREEN,

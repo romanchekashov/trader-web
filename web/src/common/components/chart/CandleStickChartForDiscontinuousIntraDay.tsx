@@ -596,30 +596,17 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
   };
 
   deleteOrder = (interactiveOrderId: string) => {
-    const { orders, stops } = this.props;
-    const orderAndStopMap = this.getOrderAndStopMap(orders, stops);
-
-    const cancelOrder = interactiveOrderId.startsWith("order_")
-      ? orderAndStopMap[interactiveOrderId]
-      : null;
-    const cancelStopOrder = interactiveOrderId.startsWith("stop_")
-      ? orderAndStopMap[interactiveOrderId]
-      : null;
-
-    if (cancelOrder) {
-      this.props.onManageOrder({
-        dataType: DataType.ORDER,
-        data: cancelOrder,
-        action: CrudMode.DELETE,
-      });
-    }
-
-    if (cancelStopOrder) {
-      this.props.onManageOrder({
-        dataType: DataType.STOP_ORDER,
-        data: cancelStopOrder,
-        action: CrudMode.DELETE,
-      });
+    const { interactiveOrderMap } = this.state;
+    const interactive: Interactive = interactiveOrderMap[interactiveOrderId];
+    if (interactive) {
+      const { data, dataType } = interactive;
+      if (data) {
+        this.props.onManageOrder({
+          dataType,
+          data,
+          action: CrudMode.DELETE,
+        });
+      }
     }
   };
 
