@@ -38,6 +38,7 @@ const store = configureStore({
         "securities/loadFutures/fulfilled",
         "securities/loadCurrencies/fulfilled",
         "securities/setSecurities",
+        "possibleTrades/setPossibleTrade",
       ],
       // Ignore these field paths in all actions
       ignoredActionPaths: ["timestamp"],

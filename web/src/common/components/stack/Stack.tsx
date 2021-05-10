@@ -12,7 +12,6 @@ import { StackItem } from "./data/StackItem";
 import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import { OperationType } from "../../data/OperationType";
 import {
-  createStop,
   getActiveOrders,
   getActiveStopOrders,
   getActiveTrades,
@@ -34,6 +33,7 @@ import DepositView from "./deposit/DepositView";
 import { TEST_ACTIVE_TRADES } from "../../utils/TestData";
 import { StackEvent, StackService } from "./StackService";
 import { Toast } from "primereact/toast";
+import quikStopOrdersApi from "../../api/quik/quikStopOrdersApi";
 
 type Props = {};
 
@@ -312,14 +312,15 @@ export class Stack extends React.Component<Props, States> {
   };
 
   createStopOrder = (val: any) => {
-    const { securityLastInfo } = this.state;
-    createStop({
-      classCode: securityLastInfo.classCode,
-      secCode: securityLastInfo.secCode,
-      stop: val.price,
-    }).catch((reason) => {
-      console.log("[ERROR](createStopOrder): " + reason);
-    });
+    console.log("need impl!", val);
+    // const { securityLastInfo } = this.state;
+    // quikStopOrdersApi.createStopOrder({
+    //   classCode: securityLastInfo.classCode,
+    //   secCode: securityLastInfo.secCode,
+    //   stop: val.price,
+    // }).catch((reason) => {
+    //   console.log("[ERROR](createStopOrder): " + reason);
+    // });
   };
 
   createOrder = (val: any) => {

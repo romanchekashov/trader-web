@@ -5,10 +5,13 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Toast } from "primereact/toast";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
-import { selectPossibleTrade } from "../../../app/possibleTrades/possibleTradesSlice";
-import { selectStops } from "../../../app/stopsSlice";
+import {
+  selectPossibleTrade,
+  tradePossibleTrade,
+} from "../../../app/possibleTrades/possibleTradesSlice";
+import { createStop, deleteStop, selectStops } from "../../../app/stopsSlice";
 import { getTrades } from "../../../common/api/quik/quikRestApi";
 import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
 import {
@@ -17,6 +20,7 @@ import {
 } from "../../../common/api/WebsocketService";
 import Alerts from "../../../common/components/alerts/Alerts";
 import { ChartWrapper } from "../../../common/components/chart/ChartWrapper";
+import { ChartManageOrder } from "../../../common/components/chart/data/ChartManageOrder";
 import { EconomicCalendar } from "../../../common/components/economic-calendar/EconomicCalendar";
 import { MarketStateFilterDto } from "../../../common/components/market-state/data/MarketStateFilterDto";
 import { News } from "../../../common/components/news/News";
@@ -24,6 +28,8 @@ import Notifications from "../../../common/components/notifications/Notification
 import { TrendsView } from "../../../common/components/trend/TrendsView";
 import { ActiveTrade } from "../../../common/data/ActiveTrade";
 import { BrokerId } from "../../../common/data/BrokerId";
+import { CrudMode } from "../../../common/data/CrudMode";
+import { DataType } from "../../../common/data/DataType";
 import { FilterDto } from "../../../common/data/FilterDto";
 import { Interval } from "../../../common/data/Interval";
 import { Market } from "../../../common/data/Market";
@@ -50,6 +56,7 @@ type Props = {
 let prevMainWidth;
 
 const AnalysisFutures: React.FC<Props> = ({ security }) => {
+  const dispatch = useAppDispatch();
   const { possibleTrade } = useAppSelector(selectPossibleTrade);
   const { stops } = useAppSelector(selectStops);
 
@@ -367,6 +374,46 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
     setActiveTabIndex(tabIndex);
   };
 
+  const manageOrder = (order: ChartManageOrder) => {
+    if (order.dataType === DataType.ORDER) {
+      if (order.action === CrudMode.DELETE) {
+        WebsocketService.getInstance().send(
+          history ? WSEvent.HISTORY_CANCEL_ORDERS : WSEvent.CANCEL_ORDERS,
+          [order.data]
+        );
+      }
+      if (order.action === CrudMode.CREATE) {
+        WebsocketService.getInstance().send(
+          history ? WSEvent.HISTORY_CREATE_ORDERS : WSEvent.CREATE_ORDERS,
+          [order.data]
+        );
+      }
+    }
+
+    if (order.dataType === DataType.STOP_ORDER) {
+      if (order.action === CrudMode.DELETE)
+        dispatch(deleteStop(order.data.number));
+      if (order.action === CrudMode.CREATE) dispatch(createStop(order.data));
+    }
+
+    if (order.dataType === DataType.POSSIBLE_TRADE) {
+      const possibleTrade: PossibleTrade = order.data;
+      dispatch(
+        tradePossibleTrade({
+          brokerId: BrokerId.ALFA_DIRECT,
+          tradingPlatform: TradingPlatform.QUIK,
+          secId: security.id,
+          timeFrame: possibleTrade.timeFrame,
+          timeFrameLow: possibleTrade.timeFrameLow,
+          entryPrice: possibleTrade.entryPrice,
+          quantity: possibleTrade.quantity,
+          depositAmount: 0,
+          depositMaxRiskPerTradeInPercent: 1,
+        })
+      );
+    }
+  };
+
   if (!security) return <div>Select security for analysis</div>;
 
   const pTrade: PossibleTrade =
@@ -415,6 +462,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
               activeTrade={activeTrade}
               showGrid={true}
               possibleTrade={pTrade}
+              onManageOrder={manageOrder}
             />
           </div>
           {chartNumber === 2 ? (

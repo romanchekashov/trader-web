@@ -1,15 +1,14 @@
-import { handleError, handleResponse } from "../apiUtils";
+import { ActiveTrade } from "../../data/ActiveTrade";
 import { Candle } from "../../data/Candle";
-import { CreateStopDto } from "../../data/CreateStopDto";
+import { FuturesClientLimit } from "../../data/FuturesClientLimit";
+import { Order } from "../../data/Order";
+import { SecurityCurrency } from "../../data/security/SecurityCurrency";
 import { SecurityFuture } from "../../data/security/SecurityFuture";
 import { SecurityShare } from "../../data/security/SecurityShare";
-import { SecurityCurrency } from "../../data/security/SecurityCurrency";
+import { StopOrder } from "../../data/StopOrder";
 import { TradingPlatformDataFilter } from "../../data/TradingPlatformDataFilter";
 import { adjustShares } from "../../utils/DataUtils";
-import { FuturesClientLimit } from "../../data/FuturesClientLimit";
-import { ActiveTrade } from "../../data/ActiveTrade";
-import { Order } from "../../data/Order";
-import { StopOrder } from "../../data/StopOrder";
+import { handleError, handleResponse } from "../apiUtils";
 
 const baseUrl = process.env.API_URL + "/api/v1/";
 
@@ -19,7 +18,6 @@ export default {
   getAllSecurityFutures,
   getAllSecurityShares,
   getAllSecurityCurrencies,
-  createStop,
   getFuturesLimits,
   getActiveTrades,
   getActiveOrders,
@@ -58,16 +56,6 @@ export function getAllSecurityShares(): Promise<SecurityShare[]> {
 
 export function getAllSecurityCurrencies(): Promise<SecurityCurrency[]> {
   return fetch(`${baseUrl}security-currencies`)
-    .then(handleResponse)
-    .catch(handleError);
-}
-
-export function createStop(dto: CreateStopDto): Promise<void> {
-  return fetch(`${baseUrl}create-stop`, {
-    method: "POST", // POST for create, PUT to update when id already exists.
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(dto),
-  })
     .then(handleResponse)
     .catch(handleError);
 }

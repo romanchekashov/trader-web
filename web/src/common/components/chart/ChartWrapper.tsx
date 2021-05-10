@@ -8,8 +8,6 @@ import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import { ActiveTrade } from "../../data/ActiveTrade";
 import { BrokerId } from "../../data/BrokerId";
 import { Candle } from "../../data/Candle";
-import { CrudMode } from "../../data/CrudMode";
-import { DataType } from "../../data/DataType";
 import { FilterDto } from "../../data/FilterDto";
 import { Interval } from "../../data/Interval";
 import { Market } from "../../data/Market";
@@ -33,7 +31,6 @@ import { ChartManageOrder } from "./data/ChartManageOrder";
 import { ChartTrendLine } from "./data/ChartTrendLine";
 import { ChartTrendLineType } from "./data/ChartTrendLineType";
 import moment = require("moment");
-import possibleTradesApi from "../../../app/possibleTrades/possibleTradesApi";
 
 const _ = require("lodash");
 
@@ -57,6 +54,7 @@ type Props = {
   activeTrade?: ActiveTrade;
   alert?: PatternResult;
   possibleTrade?: PossibleTrade;
+  onManageOrder?: (manageOrder: ChartManageOrder) => void;
 };
 
 type States = {
@@ -727,57 +725,9 @@ export class ChartWrapper extends React.Component<Props, States> {
   };
 
   manageOrder = (order: ChartManageOrder) => {
-    const { history, security } = this.props;
-
-    if (order.dataType === DataType.ORDER) {
-      if (order.action === CrudMode.DELETE) {
-        WebsocketService.getInstance().send(
-          history ? WSEvent.HISTORY_CANCEL_ORDERS : WSEvent.CANCEL_ORDERS,
-          [order.data]
-        );
-      }
-      if (order.action === CrudMode.CREATE) {
-        WebsocketService.getInstance().send(
-          history ? WSEvent.HISTORY_CREATE_ORDERS : WSEvent.CREATE_ORDERS,
-          [order.data]
-        );
-      }
-    }
-
-    if (order.dataType === DataType.STOP_ORDER) {
-      if (order.action === CrudMode.DELETE) {
-        WebsocketService.getInstance().send(
-          history
-            ? WSEvent.HISTORY_CANCEL_STOP_ORDERS
-            : WSEvent.CANCEL_STOP_ORDERS,
-          [order.data]
-        );
-      }
-      if (order.action === CrudMode.CREATE) {
-        WebsocketService.getInstance().send(
-          history
-            ? WSEvent.HISTORY_CREATE_STOP_ORDERS
-            : WSEvent.CREATE_STOP_ORDERS,
-          [order.data]
-        );
-      }
-    }
-
-    if (order.dataType === DataType.POSSIBLE_TRADE) {
-      const possibleTrade: PossibleTrade = order.data;
-      possibleTradesApi.tradePossibleTrade({
-        brokerId: BrokerId.ALFA_DIRECT,
-        tradingPlatform: TradingPlatform.QUIK,
-        secId: security.id,
-        timeFrame: possibleTrade.timeFrame,
-        timeFrameLow: possibleTrade.timeFrameLow,
-        entryPrice: possibleTrade.entryPrice,
-        quantity: possibleTrade.quantity,
-        depositAmount: 0,
-        depositMaxRiskPerTradeInPercent: 1,
-      });
-      console.log(order);
-    }
+    const { onManageOrder } = this.props;
+    console.log(order);
+    if (onManageOrder) onManageOrder(order);
   };
 
   updateShowSRZones = (e: any) => this.setState({ showSRZones: e.value });
