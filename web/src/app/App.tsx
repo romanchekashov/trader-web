@@ -20,6 +20,9 @@ import {
   loadFutures,
   loadShares,
 } from "./securities/securitiesSlice";
+import { WebsocketService, WSEvent } from "../common/api/WebsocketService";
+import { StopOrder } from "../common/data/StopOrder";
+import { setStops } from "./stopsSlice";
 
 export const App = () => {
   const dispatch = useAppDispatch();
@@ -29,6 +32,25 @@ export const App = () => {
     dispatch(loadShares());
     dispatch(loadFutures());
     dispatch(loadCurrencies());
+
+    const stopOrdersSubscription = WebsocketService.getInstance()
+      .on<StopOrder[]>(WSEvent.STOP_ORDERS)
+      .subscribe((newStopOrders) => {
+        dispatch(setStops(newStopOrders));
+      });
+
+    const wsStatusSub = WebsocketService.getInstance()
+      .connectionStatus()
+      .subscribe((isConnected) => {
+        if (isConnected) {
+          console.log("isConnected");
+        }
+      });
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      stopOrdersSubscription.unsubscribe();
+      wsStatusSub.unsubscribe();
+    };
   }, []);
 
   return (

@@ -10,6 +10,7 @@ import newsReducer from "../features/news/NewsSlice";
 import tradeJournalReducer from "../features/trade-journal/TradeJournalSlice";
 import possibleTradesReducer from "./possibleTrades/possibleTradesSlice";
 import securitiesReducer from "./securities/securitiesSlice";
+import stopsReducer from "./stopsSlice";
 
 /**
  * redux-toolkit + typescript example
@@ -23,6 +24,7 @@ const store = configureStore({
     botControl: botControlReducer,
     securities: securitiesReducer,
     possibleTrades: possibleTradesReducer,
+    stops: stopsReducer,
   },
   middleware: getDefaultMiddleware({
     // https://redux-toolkit.js.org/usage/usage-guide#working-with-non-serializable-data

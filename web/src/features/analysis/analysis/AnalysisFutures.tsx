@@ -1,50 +1,47 @@
-import * as React from "react";
-import { useEffect, useRef, useState } from "react";
-import { ChartWrapper } from "../../../common/components/chart/ChartWrapper";
-import { Interval } from "../../../common/data/Interval";
-import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
-import { TrendsView } from "../../../common/components/trend/TrendsView";
-import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
-import { Dropdown } from "primereact/dropdown";
-import { PrimeDropdownItem } from "../../../common/utils/utils";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import Notifications from "../../../common/components/notifications/Notifications";
+import { Dropdown } from "primereact/dropdown";
+import { TabPanel, TabView } from "primereact/tabview";
+import { Toast } from "primereact/toast";
+import * as React from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAppSelector } from "../../../app/hooks";
+import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
+import { selectPossibleTrade } from "../../../app/possibleTrades/possibleTradesSlice";
+import { selectStops } from "../../../app/stopsSlice";
+import { getTrades } from "../../../common/api/quik/quikRestApi";
+import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
 import {
   WebsocketService,
   WSEvent,
 } from "../../../common/api/WebsocketService";
+import Alerts from "../../../common/components/alerts/Alerts";
+import { ChartWrapper } from "../../../common/components/chart/ChartWrapper";
+import { EconomicCalendar } from "../../../common/components/economic-calendar/EconomicCalendar";
+import { MarketStateFilterDto } from "../../../common/components/market-state/data/MarketStateFilterDto";
+import { News } from "../../../common/components/news/News";
+import Notifications from "../../../common/components/notifications/Notifications";
+import { TrendsView } from "../../../common/components/trend/TrendsView";
+import { ActiveTrade } from "../../../common/data/ActiveTrade";
+import { BrokerId } from "../../../common/data/BrokerId";
+import { FilterDto } from "../../../common/data/FilterDto";
+import { Interval } from "../../../common/data/Interval";
+import { Market } from "../../../common/data/Market";
+import { Order } from "../../../common/data/Order";
 import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
 import { TradePremise } from "../../../common/data/strategy/TradePremise";
-import { Order } from "../../../common/data/Order";
-import { ActiveTrade } from "../../../common/data/ActiveTrade";
-import Alerts from "../../../common/components/alerts/Alerts";
-import MarketState from "../../../common/components/market-state/MarketState";
-import SwingStateList from "../../../common/components/swing-state/SwingStateList";
-import { adjustTradePremise } from "../../../common/utils/DataUtils";
-import { MoexOpenInterestView } from "./moex-open-interest/MoexOpenInterestView";
 import { Trade } from "../../../common/data/Trade";
-import { TabPanel, TabView } from "primereact/tabview";
-import { EconomicCalendar } from "../../../common/components/economic-calendar/EconomicCalendar";
-import { News } from "../../../common/components/news/News";
-import { StopOrder } from "../../../common/data/StopOrder";
-import { getTrades } from "../../../common/api/rest/quikRestApi";
-import { BrokerId } from "../../../common/data/BrokerId";
-import { MarketStateFilterDto } from "../../../common/components/market-state/data/MarketStateFilterDto";
-import { Market } from "../../../common/data/Market";
 import { TradeStrategyAnalysisFilterDto } from "../../../common/data/TradeStrategyAnalysisFilterDto";
-import { FilterDto } from "../../../common/data/FilterDto";
-import { SupplyAndDemand } from "./supply-and-demand/SupplyAndDemand";
+import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
+import { adjustTradePremise } from "../../../common/utils/DataUtils";
 import {
   getTimeFrameHigh,
   getTimeFrameLow,
 } from "../../../common/utils/TimeFrameChooser";
+import { PrimeDropdownItem } from "../../../common/utils/utils";
+import { MoexOpenInterestView } from "./moex-open-interest/MoexOpenInterestView";
+import { SupplyAndDemand } from "./supply-and-demand/SupplyAndDemand";
 import moment = require("moment");
-import { Toast } from "primereact/toast";
-import TestData from "../../../common/utils/TestData";
-import { useAppSelector } from "../../../app/hooks";
-import { selectPossibleTrade } from "../../../app/possibleTrades/possibleTradesSlice";
-import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 
 type Props = {
   security: SecurityLastInfo;
@@ -54,6 +51,7 @@ let prevMainWidth;
 
 const AnalysisFutures: React.FC<Props> = ({ security }) => {
   const { possibleTrade } = useAppSelector(selectPossibleTrade);
+  const { stops } = useAppSelector(selectStops);
 
   const timeFrameTradingIntervals = {
     M1: [Interval.M1],
@@ -84,7 +82,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
   const [timeFrameHigh, setTimeFrameHigh] = useState<Interval>(Interval.M30);
   const [premise, setPremise] = useState<TradePremise>(null);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [stopOrders, setStopOrders] = useState<StopOrder[]>([]);
   const [activeTrade, setActiveTrade] = useState(null);
 
   const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map((val) => ({
@@ -146,24 +143,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
       ordersSetupSubscription.unsubscribe();
     };
   }, [orders]);
-
-  useEffect(() => {
-    console.log("stopOrders: ", stopOrders);
-
-    const stopOrdersSubscription = WebsocketService.getInstance()
-      .on<StopOrder[]>(WSEvent.STOP_ORDERS)
-      .subscribe((newStopOrders) => {
-        console.log(newStopOrders);
-        if (stopOrders.length !== newStopOrders.length) {
-          setStopOrders(newStopOrders);
-        }
-      });
-
-    // Specify how to clean up after this effect:
-    return function cleanup() {
-      stopOrdersSubscription.unsubscribe();
-    };
-  }, [stopOrders]);
 
   useEffect(() => {
     if (security) {
@@ -430,7 +409,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
               width={chart1Width}
               security={securityLastInfo}
               premise={premise}
-              stops={stopOrders}
+              stops={stops}
               orders={orders}
               trades={trades}
               activeTrade={activeTrade}

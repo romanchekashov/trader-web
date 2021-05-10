@@ -25,6 +25,15 @@ export function get<T>(url: string): Promise<T> {
     .catch(handleError);
 }
 
+export function del<T>(url: string): Promise<T> {
+  return fetch(url, {
+    method: "DELETE",
+    headers: { "content-type": "application/json" },
+  })
+    .then((response) => handleResponse(response))
+    .catch(handleError);
+}
+
 /**
  * How to create TS generics:
  * 1 - function foo<T>(x: T): T { return x; }
