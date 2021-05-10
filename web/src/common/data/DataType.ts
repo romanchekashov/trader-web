@@ -1,3 +1,5 @@
 export enum DataType {
   POSSIBLE_TRADE = "POSSIBLE_TRADE",
+  ORDER = "ORDER",
+  STOP_ORDER = "STOP_ORDER",
 }

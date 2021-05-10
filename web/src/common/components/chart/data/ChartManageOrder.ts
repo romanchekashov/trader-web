@@ -1,12 +1,7 @@
-import {Order} from "../../../data/Order";
-import {StopOrder} from "../../../data/StopOrder";
-
-export type ChartManageOrderType = 'order' | 'stop'
-
+import { CrudMode } from "../../../data/CrudMode";
+import { DataType } from "../../../data/DataType";
 export class ChartManageOrder {
-    public type: ChartManageOrderType
-    public createOrder?: Order
-    public cancelOrder?: Order
-    public createStopOrder?: StopOrder
-    public cancelStopOrder?: StopOrder
+  public action: CrudMode;
+  public dataType: DataType;
+  public data: any;
 }

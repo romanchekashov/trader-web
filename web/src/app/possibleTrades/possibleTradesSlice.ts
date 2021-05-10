@@ -15,10 +15,14 @@ export interface PossibleTradesState {
   possibleTrade?: PossibleTrade;
   possibleTradeLoading: LoadingState;
   possibleTradeLoadingError?: string;
+
+  tradePossibleTradeLoading: LoadingState;
+  tradePossibleTradeLoadingError?: string;
 }
 
 export const initialState: PossibleTradesState = {
   possibleTradeLoading: LoadingState.IDLE,
+  tradePossibleTradeLoading: LoadingState.IDLE,
 };
 
 export const loadPossibleTrade = createAsyncThunk<
@@ -30,6 +34,18 @@ export const loadPossibleTrade = createAsyncThunk<
     await handleThunkError(
       thunkAPI,
       possibleTradesApi.getPossibleTrade(possibleTradeRequest)
+    )
+);
+
+export const tradePossibleTrade = createAsyncThunk<
+  PossibleTrade,
+  PossibleTradeRequest
+>(
+  "possibleTrades/tradePossibleTrade",
+  async (possibleTradeRequest, thunkAPI) =>
+    await handleThunkError(
+      thunkAPI,
+      possibleTradesApi.tradePossibleTrade(possibleTradeRequest)
     )
 );
 
@@ -62,6 +78,25 @@ export const possibleTradesSlice = createSlice({
       state.possibleTradeLoadingError = action.payload;
       state.possibleTradeLoading = LoadingState.ERROR;
     },
+    // make real trade
+    [tradePossibleTrade.pending as any]: (state: PossibleTradesState) => {
+      state.possibleTrade = undefined;
+      state.tradePossibleTradeLoading = LoadingState.LOADING;
+    },
+    [tradePossibleTrade.fulfilled as any]: (
+      state: PossibleTradesState,
+      action: PayloadAction<PossibleTrade>
+    ) => {
+      state.possibleTrade = action.payload;
+      state.tradePossibleTradeLoading = LoadingState.LOADED;
+    },
+    [tradePossibleTrade.rejected as any]: (
+      state: PossibleTradesState,
+      action: PayloadAction<any>
+    ) => {
+      state.tradePossibleTradeLoadingError = action.payload;
+      state.tradePossibleTradeLoading = LoadingState.ERROR;
+    },
   },
 });
 
@@ -72,6 +107,16 @@ export const selectPossibleTrade = createSelector(
     possibleTrade: state.possibleTrades.possibleTrade,
     possibleTradeLoading: state.possibleTrades.possibleTradeLoading,
     possibleTradeLoadingError: state.possibleTrades.possibleTradeLoadingError,
+  }),
+  (state) => state
+);
+
+export const selectTradePossibleTrade = createSelector(
+  (state: RootState) => ({
+    possibleTrade: state.possibleTrades.possibleTrade,
+    tradePossibleTradeLoading: state.possibleTrades.tradePossibleTradeLoading,
+    tradePossibleTradeLoadingError:
+      state.possibleTrades.tradePossibleTradeLoadingError,
   }),
   (state) => state
 );

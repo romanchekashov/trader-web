@@ -1,95 +1,83 @@
-import * as React from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import { Security } from "../../../data/security/Security";
-import { round } from "../../../utils/utils";
-import { Order } from "../../../data/Order";
-import { OrderType } from "../../../data/OrderType";
-import { OperationType } from "../../../data/OperationType";
-import {
-  ChartManageOrder,
-  ChartManageOrderType,
-} from "../data/ChartManageOrder";
-import { StopOrder } from "../../../data/StopOrder";
 import { InputText } from "primereact/inputtext";
 import { SelectButton } from "primereact/selectbutton";
+import { ToggleButton } from "primereact/togglebutton";
+import * as React from "react";
+import { useEffect, useState } from "react";
+import { PossibleTrade } from "../../../../app/possibleTrades/data/PossibleTrade";
+import { CrudMode } from "../../../data/CrudMode";
+import { DataType } from "../../../data/DataType";
+import { OperationType } from "../../../data/OperationType";
+import { OrderType } from "../../../data/OrderType";
+import { Security } from "../../../data/security/Security";
+import { round } from "../../../utils/utils";
+import { AlertToEdit } from "../CandleStickChartForDiscontinuousIntraDay";
+import { ChartManageOrder } from "../data/ChartManageOrder";
+import { ChartManageOrderType } from "../data/ChartManageOrderType";
 
-const _ = require("lodash");
+const typeSets = [
+  { label: "Order", value: ChartManageOrderType.order },
+  { label: "Stop", value: ChartManageOrderType.stop },
+];
+
+const btnSets = [
+  { label: "Buy", value: OperationType.BUY },
+  { label: "Sell", value: OperationType.SELL },
+];
 
 type Props = {
   securityInfo: Security;
-  stops: StopOrder[];
-  orders: Order[];
   showModal: boolean;
-  alert: any;
-  chartId: any;
+  alertToEdit: AlertToEdit;
   onClose: () => void;
   onSave: (alert: any, chartId: any, manageOrder: ChartManageOrder) => void;
   onDeleteAlert: () => void;
 };
 
-type State = {
-  alert: any;
-  type: ChartManageOrderType;
-  operationType: OperationType;
-  quantity: number;
-  stopPrice: number;
-  order: Order;
-};
+export const ChartDialog: React.FC<Props> = ({
+  securityInfo,
+  showModal,
+  alertToEdit,
+  onClose,
+  onSave,
+  onDeleteAlert,
+}) => {
+  const [operationType, setOperationType] = useState<OperationType>(
+    OperationType.BUY
+  );
+  const [quantity, setQuantity] = useState<number>(1);
+  const [orderType, setOrderType] = useState<ChartManageOrderType>(
+    ChartManageOrderType.order
+  );
+  const [price, setPrice] = useState<number>();
+  const [stopPrice, setStopPrice] = useState<number>();
+  const [isMarket, setIsMarket] = useState<boolean>(false);
 
-export class ChartDialog extends React.Component<Props, State> {
-  typeSets = [
-    { label: "Order", value: "order" },
-    { label: "Stop", value: "stop" },
-  ];
+  useEffect(() => {
+    if (!alertToEdit?.alert) return;
 
-  btnSets = [
-    { label: "Buy", value: OperationType.BUY },
-    { label: "Sell", value: OperationType.SELL },
-  ];
+    console.log(alertToEdit.alert.yValue);
+    const data = alertToEdit.interactive?.data;
 
-  quantitySets = [
-    { label: "1", value: 1 },
-    { label: "2", value: 2 },
-    { label: "4", value: 4 },
-    { label: "5", value: 5 },
-    { label: "10", value: 10 },
-    { label: "15", value: 15 },
-    { label: "20", value: 20 },
-    { label: "25", value: 25 },
-  ];
+    setOrderType(
+      alertToEdit?.interactive?.dataType === DataType.STOP_ORDER
+        ? ChartManageOrderType.stop
+        : ChartManageOrderType.order
+    );
+    setOperationType(data?.operation || OperationType.BUY);
+    setQuantity(data?.quantity || 1);
+    setPrice(round(alertToEdit.alert.yValue, securityInfo.scale));
+    setStopPrice(
+      calcStopPrice(
+        data?.operation || OperationType.BUY,
+        alertToEdit.alert.yValue,
+        securityInfo
+      )
+    );
+  }, [alertToEdit?.alert, securityInfo]);
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      alert: props.alert,
-      type: "order",
-      operationType: OperationType.BUY,
-      quantity: 1,
-      order: null,
-      stopPrice: 0,
-    };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-  }
-
-  static getDerivedStateFromProps = (props, state) => {
-    if (props.alert && props.alert.id !== state.alert?.id) {
-      return {
-        alert: props.alert,
-        type: props.alert.id.startsWith("stop_") ? "stop" : "order",
-        stopPrice: ChartDialog.calcStopPrice(
-          state.operationType,
-          props.alert.yValue,
-          props.securityInfo
-        ),
-      };
-    }
-
-    return null;
-  };
-
-  static calcStopPrice = (
+  const calcStopPrice = (
     operationType: OperationType,
     price: number,
     securityInfo: Security
@@ -103,216 +91,157 @@ export class ChartDialog extends React.Component<Props, State> {
     return round(stopPrice, securityInfo.scale);
   };
 
-  // componentWillReceiveProps = (nextProps) => {
-  //     const {showModal, securityInfo} = this.props
-  //     const {operationType} = this.state
-  //
-  //     if (nextProps.alert && showModal != nextProps.showModal) {
-  //         nextProps.alert.yValue = round(nextProps.alert.yValue, securityInfo.scale)
-  //         this.setState({
-  //             alert: nextProps.alert,
-  //             type: nextProps.alert.id.startsWith("stop_") ? 'stop' : 'order',
-  //             stopPrice: ChartDialog.calcStopPrice(operationType, nextProps.alert.yValue, securityInfo)
-  //         })
-  //     }
-  // }
-
-  handleOperationTypeChange = (operationType: OperationType) => {
-    const { securityInfo } = this.props;
-    const { alert } = this.state;
-
-    this.setState({
-      operationType,
-      stopPrice: ChartDialog.calcStopPrice(
-        operationType,
-        alert.yValue,
-        securityInfo
-      ),
-    });
+  const handleOperationTypeChange = (operationType: OperationType) => {
+    setOperationType(operationType);
+    setStopPrice(calcStopPrice(operationType, price, securityInfo));
   };
 
-  handleChange = (e) => {
-    const { securityInfo } = this.props;
-    const { alert, operationType } = this.state;
+  const handleChange = (e) => {
     const price = Number(e.target.value);
-
-    this.setState({
-      alert: {
-        ...alert,
-        yValue: price,
-      },
-      stopPrice: ChartDialog.calcStopPrice(operationType, price, securityInfo),
-    });
+    setPrice(price);
+    setStopPrice(calcStopPrice(operationType, price, securityInfo));
   };
 
-  handleStopPriceChange = (e) => {
-    this.setState({
-      stopPrice: Number(e.target.value),
-    });
+  const handleStopPriceChange = (e) => {
+    setStopPrice(Number(e.target.value));
   };
 
-  getOrderAndStopMap = _.memoize((orders: Order[], stops: StopOrder[]) => {
-    const map = {};
-    if (orders && orders.length > 0) {
-      for (const order of orders) {
-        map["order_" + order.orderNum] = order;
-      }
-    }
-    if (stops && stops.length > 0) {
-      for (const stop of stops) {
-        map["stop_" + stop.transId] = stop;
-      }
-    }
-    return map;
-  });
+  const handleSave = () => {
+    const { chartId, interactive } = alertToEdit;
+    const { dataType, data } = interactive;
 
-  handleSave = () => {
-    const { chartId, securityInfo, orders, stops, onSave } = this.props;
-    const { alert, quantity, type, operationType, stopPrice } = this.state;
-    const orderAndStopMap = this.getOrderAndStopMap(orders, stops);
-
-    const cancelOrder = alert.id.startsWith("order_")
-      ? orderAndStopMap[alert.id]
-      : null;
-    const cancelStopOrder = alert.id.startsWith("stop_")
-      ? orderAndStopMap[alert.id]
-      : null;
-
-    if (type === "order") {
+    if (dataType === DataType.ORDER) {
       onSave(alert, chartId, {
-        type,
-        createOrder: {
+        dataType,
+        action: CrudMode.CREATE,
+        data: {
           secId: securityInfo.id,
-          price: alert.yValue,
+          price,
           quantity,
           operation: operationType,
           type: OrderType.LIMIT,
           classCode: securityInfo.classCode,
           secCode: securityInfo.secCode,
         },
-        cancelOrder,
       });
-    } else {
+    }
+
+    if (dataType === DataType.STOP_ORDER) {
       onSave(alert, chartId, {
-        type,
-        createStopOrder: {
+        dataType,
+        action: CrudMode.CREATE,
+        data: {
           classCode: securityInfo.classCode,
           secCode: securityInfo.secCode,
+          conditionPrice: price,
           price: stopPrice,
-          conditionPrice: alert.yValue,
           quantity,
           operation: operationType,
         },
-        cancelStopOrder,
+      });
+    }
+
+    if (dataType === DataType.POSSIBLE_TRADE) {
+      const possibleTrade: PossibleTrade = { ...alertToEdit.interactive.data };
+      possibleTrade.entryPrice = price;
+      possibleTrade.operation = operationType;
+      onSave(alert, chartId, {
+        dataType,
+        action: CrudMode.CREATE,
+        data: possibleTrade,
       });
     }
   };
 
-  onEnterPressed = (e) => {
+  const onEnterPressed = (e) => {
     if (e.key === "Enter") {
-      this.handleSave();
+      handleSave();
     }
   };
 
-  footer = (
+  const footer = (
     <div>
-      <Button
-        label="Delete Alert"
-        icon="pi pi-check"
-        onClick={this.props.onDeleteAlert}
-      />
-      <Button label="Save" icon="pi pi-times" onClick={this.handleSave} />
+      <Button label="Delete Alert" icon="pi pi-check" onClick={onDeleteAlert} />
+      <Button label="Save" icon="pi pi-times" onClick={handleSave} />
     </div>
   );
 
-  render() {
-    const { showModal, onClose, securityInfo } = this.props;
-    const { alert, type, operationType, quantity, stopPrice } = this.state;
+  if (!showModal) return null;
 
-    if (!showModal) return null;
-
-    const header = alert.id.startsWith("order_")
-      ? "Edit Order"
-      : alert.id.startsWith("stop_")
-      ? "Edit Stop"
-      : "Edit Alert";
-
-    return (
-      <Dialog
-        header={header}
-        footer={this.footer}
-        visible={showModal}
-        style={{ width: "50vw" }}
-        position="bottom"
-        modal={true}
-        onHide={onClose}
-      >
-        <div className="p-grid">
-          {header === "Edit Alert" ? (
-            <div className="p-col-3">
-              <SelectButton
-                value={type}
-                options={this.typeSets}
-                onChange={(e) => this.setState({ type: e.value })}
-              />
-            </div>
-          ) : null}
-          <div className="p-col-3">
-            <SelectButton
-              value={operationType}
-              options={this.btnSets}
-              onChange={(e) => this.handleOperationTypeChange(e.value)}
-            />
-          </div>
-          <div className="p-col-12">
-            <SelectButton
-              value={quantity}
-              options={this.quantitySets}
-              onChange={(e) => this.setState({ quantity: e.value })}
-            />
-          </div>
-          {type === "order" ? (
-            <div className="p-col-12">
-              <label htmlFor="chart-dialog-alert-price">Price: </label>
-              <InputText
-                id="chart-dialog-alert-price"
-                type="number"
-                step={securityInfo.secPriceStep}
-                value={alert.yValue}
-                onKeyDown={this.onEnterPressed}
-                onChange={this.handleChange}
-              />
-            </div>
-          ) : (
-            <>
-              <div className="p-col-12">
-                <label htmlFor="chart-dialog-alert-price">
-                  Condition Price:{" "}
-                </label>
-                <InputText
-                  id="chart-dialog-alert-price"
-                  type="number"
-                  step={securityInfo.secPriceStep}
-                  value={alert.yValue}
-                  onKeyDown={this.onEnterPressed}
-                  onChange={this.handleChange}
-                />
-              </div>
-              <div className="p-col-12">
-                <label htmlFor="chart-dialog-alert-price">Stop Price: </label>
-                <InputText
-                  id="chart-dialog-alert-price"
-                  type="number"
-                  step={securityInfo.secPriceStep}
-                  value={stopPrice}
-                  onKeyDown={this.onEnterPressed}
-                  onChange={this.handleStopPriceChange}
-                />
-              </div>
-            </>
-          )}
+  return (
+    <Dialog
+      header={alertToEdit?.alert.text}
+      footer={footer}
+      visible={showModal}
+      style={{ width: "50vw" }}
+      position="bottom"
+      modal={true}
+      onHide={onClose}
+    >
+      <div className="p-grid">
+        <div className="p-col-3">
+          <SelectButton
+            value={orderType}
+            options={typeSets}
+            onChange={(e) => setOrderType(e.value)}
+          />
         </div>
-      </Dialog>
-    );
-  }
-}
+        <div className="p-col-3">
+          <SelectButton
+            value={operationType}
+            options={btnSets}
+            onChange={(e) => handleOperationTypeChange(e.value)}
+          />
+        </div>
+        <div className="p-col-3">
+          <ToggleButton
+            style={{ width: "100%" }}
+            checked={isMarket}
+            className={isMarket ? "p-button-danger" : ""}
+            onLabel="Market"
+            offLabel="Limit"
+            onChange={(e) => setIsMarket(e.value)}
+          />
+        </div>
+      </div>
+      <div className="p-grid">
+        <div className="p-col-3">
+          <label htmlFor="chart-dialog-alert-quantity">Quantity: </label>
+          <InputText
+            id="chart-dialog-alert-quantity"
+            type="number"
+            step={1}
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))}
+          />
+        </div>
+        <div className="p-col-3">
+          <label htmlFor="chart-dialog-alert-price">
+            {orderType === "stop" ? "Condition " : ""}Price:{" "}
+          </label>
+          <InputText
+            id="chart-dialog-alert-price"
+            type="number"
+            step={securityInfo.secPriceStep}
+            value={price}
+            onKeyDown={onEnterPressed}
+            onChange={handleChange}
+          />
+        </div>
+        {orderType === "stop" ? (
+          <div className="p-col-3">
+            <label htmlFor="chart-dialog-alert-price">Stop Price: </label>
+            <InputText
+              id="chart-dialog-alert-price"
+              type="number"
+              step={securityInfo.secPriceStep}
+              value={stopPrice}
+              onKeyDown={onEnterPressed}
+              onChange={handleStopPriceChange}
+            />
+          </div>
+        ) : null}
+      </div>
+    </Dialog>
+  );
+};

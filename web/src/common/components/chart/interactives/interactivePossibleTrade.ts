@@ -1,5 +1,6 @@
 import { InteractiveYCoordinate } from "react-financial-charts/lib/interactive";
 import { PossibleTrade } from "../../../../app/possibleTrades/data/PossibleTrade";
+import { DataType } from "../../../data/DataType";
 import { OperationType } from "../../../data/OperationType";
 import { Colors } from "../../../utils/utils";
 
@@ -46,11 +47,11 @@ const fillInteractiveMap = (
           stroke: Colors.BLUE,
         },
         yValue: possibleTrade.entryPrice,
-        id: "possibleTrade_" + possibleTrade_entryPrice,
+        id: possibleTrade_entryPrice,
         draggable: true,
       },
-      type: "possibleTrade",
-      orderOrStop: possibleTrade,
+      dataType: DataType.POSSIBLE_TRADE,
+      data: possibleTrade,
     };
   }
 
@@ -70,11 +71,11 @@ const fillInteractiveMap = (
           stroke: Colors.RED,
         },
         yValue: possibleTrade.stopPrice,
-        id: "possibleTrade_" + possibleTrade_stopPrice,
+        id: possibleTrade_stopPrice,
         draggable: true,
       },
-      type: "possibleTrade",
-      orderOrStop: possibleTrade,
+      dataType: DataType.POSSIBLE_TRADE,
+      data: possibleTrade,
     };
   }
 
@@ -94,11 +95,11 @@ const fillInteractiveMap = (
           stroke: Colors.GREEN,
         },
         yValue: target.price,
-        id: "possibleTrade_" + key,
+        id: key,
         draggable: true,
       },
-      type: "possibleTrade",
-      orderOrStop: possibleTrade,
+      dataType: DataType.POSSIBLE_TRADE,
+      data: possibleTrade,
     };
   });
 };

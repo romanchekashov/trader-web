@@ -1,5 +1,6 @@
 import * as React from "react";
 import { SubscriptionLike } from "rxjs";
+import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 import { getHistoryCandles } from "../../api/rest/historyRestApi";
 import { getCandles } from "../../api/rest/traderRestApi";
 import { getTrendLines, saveTrendLines } from "../../api/rest/TrendLineRestApi";
@@ -7,6 +8,8 @@ import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import { ActiveTrade } from "../../data/ActiveTrade";
 import { BrokerId } from "../../data/BrokerId";
 import { Candle } from "../../data/Candle";
+import { CrudMode } from "../../data/CrudMode";
+import { DataType } from "../../data/DataType";
 import { FilterDto } from "../../data/FilterDto";
 import { Interval } from "../../data/Interval";
 import { Market } from "../../data/Market";
@@ -30,7 +33,6 @@ import { ChartManageOrder } from "./data/ChartManageOrder";
 import { ChartTrendLine } from "./data/ChartTrendLine";
 import { ChartTrendLineType } from "./data/ChartTrendLineType";
 import moment = require("moment");
-import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 
 const _ = require("lodash");
 
@@ -726,36 +728,42 @@ export class ChartWrapper extends React.Component<Props, States> {
   manageOrder = (order: ChartManageOrder) => {
     const { history } = this.props;
 
-    if (order.type === "order") {
-      if (order.cancelOrder) {
+    if (order.dataType === DataType.ORDER) {
+      if (order.action === CrudMode.DELETE) {
         WebsocketService.getInstance().send(
           history ? WSEvent.HISTORY_CANCEL_ORDERS : WSEvent.CANCEL_ORDERS,
-          [order.cancelOrder]
+          [order.data]
         );
       }
-      if (order.createOrder) {
+      if (order.action === CrudMode.CREATE) {
         WebsocketService.getInstance().send(
           history ? WSEvent.HISTORY_CREATE_ORDERS : WSEvent.CREATE_ORDERS,
-          [order.createOrder]
+          [order.data]
         );
       }
-    } else {
-      if (order.cancelStopOrder) {
+    }
+
+    if (order.dataType === DataType.STOP_ORDER) {
+      if (order.action === CrudMode.DELETE) {
         WebsocketService.getInstance().send(
           history
             ? WSEvent.HISTORY_CANCEL_STOP_ORDERS
             : WSEvent.CANCEL_STOP_ORDERS,
-          [order.cancelStopOrder]
+          [order.data]
         );
       }
-      if (order.createStopOrder) {
+      if (order.action === CrudMode.CREATE) {
         WebsocketService.getInstance().send(
           history
             ? WSEvent.HISTORY_CREATE_STOP_ORDERS
             : WSEvent.CREATE_STOP_ORDERS,
-          [order.createStopOrder]
+          [order.data]
         );
       }
+    }
+
+    if (order.dataType === DataType.POSSIBLE_TRADE) {
+      console.log(order);
     }
   };
 

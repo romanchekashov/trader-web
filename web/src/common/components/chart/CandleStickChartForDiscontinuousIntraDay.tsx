@@ -65,8 +65,21 @@ import { DataType } from "../../data/DataType";
 import interactiveOrder from "./interactives/interactiveOrder";
 import interactiveStop from "./interactives/interactiveStop";
 import interactivePossibleTrade from "./interactives/interactivePossibleTrade";
+import { ChartManageOrderType } from "./data/ChartManageOrderType";
+import { CrudMode } from "../../data/CrudMode";
 
 const _ = require("lodash");
+
+export interface Interactive {
+  interactiveYCoordinateItem: any;
+  dataType: DataType;
+  data: any;
+}
+export interface AlertToEdit {
+  alert: any;
+  chartId: string;
+  interactive: Interactive;
+}
 
 type Props = {
   data: Candle[];
@@ -101,7 +114,7 @@ type State = {
   yCoordinateList_1: any[];
   yCoordinateList_3: any[];
   showModal: boolean;
-  alertToEdit: any;
+  alertToEdit: AlertToEdit;
   originalAlertList: any[];
   interactiveOrderMap: any;
 };
@@ -138,7 +151,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
       yCoordinateList_1: [],
       yCoordinateList_3: [],
       showModal: false,
-      alertToEdit: {},
+      alertToEdit: null,
       originalAlertList: [],
       interactiveOrderMap: {},
     };
@@ -423,11 +436,13 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
           };
           this.handleChoosePosition(newAlert, morePropsForChart, e);
           setTimeout(() => {
+            const { interactiveOrderMap } = this.state;
             this.setState({
               showModal: true,
               alertToEdit: {
                 alert: newAlert,
                 chartId: morePropsForChart.chartConfig.id,
+                interactive: interactiveOrderMap[newAlert?.id],
               },
             });
           }, 200);
@@ -453,11 +468,14 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
   handleDoubleClickAlert = (item) => {
     if (item.type === "Trendline") {
     } else if (item.type === "InteractiveYCoordinate") {
+      const { interactiveOrderMap } = this.state;
+      const alert = item.object;
       this.setState({
         showModal: true,
         alertToEdit: {
-          alert: item.object,
+          alert,
           chartId: item.chartId,
+          interactive: interactiveOrderMap[alert?.id],
         },
       });
     }
@@ -484,7 +502,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
     if (alertToEdit.alert.id.startsWith("alert_")) {
       this.setState({
         showModal: false,
-        alertToEdit: {},
+        alertToEdit: null,
         yCoordinateList_1: yCoordinateList_1.filter((d) => {
           return d.id !== alertToEdit.alert.id;
         }),
@@ -501,7 +519,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
 
       this.setState({
         showModal: false,
-        alertToEdit: {},
+        alertToEdit: null,
         yCoordinateList_1: [...yCoordinateList_1],
       });
 
@@ -528,11 +546,14 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
 
   onDragComplete = (yCoordinateList, moreProps, draggedAlert) => {
     // this gets called on drag complete of drawing object
+    const { interactiveOrderMap } = this.state;
     const { onEnableNewOrder } = this.props;
     const { id: chartId } = moreProps.chartConfig;
 
     const key = `yCoordinateList_${chartId}`;
     const alertDragged = draggedAlert != null;
+
+    console.log(interactiveOrderMap[draggedAlert.id]);
 
     this.setState({
       yCoordinateList_1: yCoordinateList,
@@ -540,6 +561,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
       alertToEdit: {
         alert: draggedAlert,
         chartId,
+        interactive: interactiveOrderMap[draggedAlert.id],
       },
       originalAlertList: this.state[key],
     });
@@ -586,15 +608,17 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
 
     if (cancelOrder) {
       this.props.onManageOrder({
-        type: "order",
-        cancelOrder,
+        dataType: DataType.ORDER,
+        data: cancelOrder,
+        action: CrudMode.DELETE,
       });
     }
 
     if (cancelStopOrder) {
       this.props.onManageOrder({
-        type: "stop",
-        cancelStopOrder,
+        dataType: DataType.STOP_ORDER,
+        data: cancelStopOrder,
+        action: CrudMode.DELETE,
       });
     }
   };
@@ -885,11 +909,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
         </ChartCanvas>
         <ChartDialog
           securityInfo={securityInfo}
-          stops={stops}
-          orders={orders}
           showModal={showModal}
-          alert={alertToEdit.alert}
-          chartId={alertToEdit.chartId}
+          alertToEdit={alertToEdit}
           onClose={this.handleDialogClose}
           onSave={this.handleChangeAlert}
           onDeleteAlert={this.handleDeleteAlert}

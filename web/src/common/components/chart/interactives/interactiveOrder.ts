@@ -1,9 +1,14 @@
 import { InteractiveYCoordinate } from "react-financial-charts/lib/interactive";
+import { DataType } from "../../../data/DataType";
 import { OperationType } from "../../../data/OperationType";
 import { Order } from "../../../data/Order";
 import { Colors } from "../../../utils/utils";
+import { Interactive } from "../CandleStickChartForDiscontinuousIntraDay";
 
-const createInteractiveYCoordinateItem = (order: Order) => {
+const createInteractiveYCoordinateItem = (
+  id: string,
+  order: Order
+): Interactive => {
   if (OperationType.BUY === order.operation) {
     return {
       interactiveYCoordinateItem: {
@@ -16,11 +21,11 @@ const createInteractiveYCoordinateItem = (order: Order) => {
           stroke: Colors.GREEN,
         },
         yValue: order.price,
-        id: "order_" + order.orderNum,
+        id,
         draggable: true,
       },
-      type: "order",
-      orderOrStop: order,
+      dataType: DataType.ORDER,
+      data: order,
     };
   } else {
     return {
@@ -34,20 +39,19 @@ const createInteractiveYCoordinateItem = (order: Order) => {
           stroke: Colors.RED,
         },
         yValue: order.price,
-        id: "order_" + order.orderNum,
+        id,
         draggable: true,
       },
-      type: "order",
-      orderOrStop: order,
+      dataType: DataType.ORDER,
+      data: order,
     };
   }
 };
 
 const fillInteractiveMap = (interactiveOrderMap: any, orders: Order[]) => {
   for (const order of orders) {
-    interactiveOrderMap[order.orderNum] = createInteractiveYCoordinateItem(
-      order
-    );
+    const id = "order_" + order.orderNum;
+    interactiveOrderMap[id] = createInteractiveYCoordinateItem(id, order);
   }
 };
 

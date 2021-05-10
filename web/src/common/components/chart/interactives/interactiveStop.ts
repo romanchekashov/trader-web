@@ -1,9 +1,14 @@
 import { InteractiveYCoordinate } from "react-financial-charts/lib/interactive";
+import { DataType } from "../../../data/DataType";
 import { OperationType } from "../../../data/OperationType";
 import { StopOrder } from "../../../data/StopOrder";
 import { Colors } from "../../../utils/utils";
+import { Interactive } from "../CandleStickChartForDiscontinuousIntraDay";
 
-const createInteractiveYCoordinateItem = (stop: StopOrder) => {
+const createInteractiveYCoordinateItem = (
+  id: string,
+  stop: StopOrder
+): Interactive => {
   return {
     interactiveYCoordinateItem: {
       ...InteractiveYCoordinate.defaultProps.defaultPriceCoordinate,
@@ -13,17 +18,18 @@ const createInteractiveYCoordinateItem = (stop: StopOrder) => {
         (stop.operation === OperationType.BUY ? "Stop Buy " : "Stop Sell ") +
         stop.quantity,
       yValue: stop.conditionPrice,
-      id: "stop_" + stop.transId,
+      id,
       draggable: true,
     },
-    type: "stop",
-    orderOrStop: stop,
+    dataType: DataType.STOP_ORDER,
+    data: stop,
   };
 };
 
 const fillInteractiveMap = (interactiveOrderMap: any, stops: StopOrder[]) => {
   for (const stop of stops) {
-    interactiveOrderMap[stop.transId] = createInteractiveYCoordinateItem(stop);
+    const id = "stop_" + stop.transId;
+    interactiveOrderMap[id] = createInteractiveYCoordinateItem(id, stop);
   }
 };
 
