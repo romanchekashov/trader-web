@@ -131,3 +131,12 @@ export const Colors = {
   RED: "#E3342F",
   BLUE: "#0d47a1",
 };
+
+export const LineTypeMap = {
+  MONTH: "LongDashDotDot",
+  WEEK: "LongDashDot",
+  DAY: "Solid",
+  H4: "LongDash",
+  H2: "DashDot",
+  M60: "Dot",
+};
