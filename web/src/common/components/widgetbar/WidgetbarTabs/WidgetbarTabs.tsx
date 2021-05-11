@@ -7,6 +7,7 @@ import {
   BsFileEarmarkSpreadsheet,
   BsAlarm,
   BsBell,
+  BsChevronBarContract,
 } from "react-icons/bs";
 import "./WidgetbarTabs.css";
 import { Tooltip } from "primereact/tooltip";
@@ -80,6 +81,16 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
         onClick={() => select(WidgetbarItem.NOTIFICATIONS)}
       >
         <BsBell />
+      </div>
+      <div
+        className={`WidgetbarTab ${
+          item === WidgetbarItem.CONTROL_PANEL ? "active" : ""
+        }`}
+        data-pr-tooltip="Control Panel"
+        data-pr-position="left"
+        onClick={() => select(WidgetbarItem.CONTROL_PANEL)}
+      >
+        <BsChevronBarContract />
       </div>
     </div>
   );

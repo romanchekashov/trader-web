@@ -15,8 +15,8 @@ import "./ActiveTradesView.css";
 
 type Props = {
   trades?: ActiveTrade[];
-  selected: ActiveTrade;
-  onSelectRow: (e: any) => void;
+  selected?: ActiveTrade;
+  onSelectRow?: (e: any) => void;
 };
 
 const ActiveTradesView: React.FC<Props> = ({}) => {
@@ -41,8 +41,13 @@ const ActiveTradesView: React.FC<Props> = ({}) => {
   const onSelect = (e) => {
     if (!Array.isArray(e.value)) {
       const activeTrade: ActiveTrade = e.value;
-      dispatch(setSelectedActiveTrade(activeTrade));
-      dispatch(setSecurityById(activeTrade.secId));
+      if (activeTrade.secId !== selected?.secId) {
+        dispatch(setSelectedActiveTrade(activeTrade));
+        dispatch(setSecurityById(activeTrade.secId));
+      } else {
+        dispatch(setSelectedActiveTrade(undefined));
+        dispatch(setSecurityById(undefined));
+      }
     }
   };
 

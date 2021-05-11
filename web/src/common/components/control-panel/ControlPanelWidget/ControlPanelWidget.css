@@ -1,0 +1,10 @@
+.control-panel {
+  margin: 0;
+  /* z-index: -3; */
+  /* position: absolute; */
+  /* top: 20px; */
+  /* bottom: 0px; */
+  width: 300px;
+  height: 100%;
+  overflow: hidden;
+}

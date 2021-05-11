@@ -18,7 +18,7 @@ const Widgetbar: React.FC<Props> = ({ width, onWidthChange }) => {
   const [item, setItem] = useState<WidgetbarItem>();
 
   useEffect(() => {
-    onWidthChange(item ? 300 : 50);
+    onWidthChange(item ? 350 : 50);
   }, [item]);
 
   const style = item
