@@ -1,13 +1,13 @@
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import * as React from "react";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   deleteActiveTrades,
   selectActiveTrades,
 } from "../../../../app/activeTrades/activeTradesSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
+import { deleteStopOrdersBySecId } from "../../../../app/stops/stopsSlice";
 import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
 import { ActiveTrade } from "../../../data/ActiveTrade";
 
@@ -51,9 +51,7 @@ export const ControlPanelFastBtn: React.FC<Props> = ({
   };
 
   const cancelStopOrders = () => {
-    WebsocketService.getInstance().send(
-      history ? WSEvent.HISTORY_CANCEL_STOP_ORDERS : WSEvent.CANCEL_STOP_ORDERS
-    );
+    dispatch(deleteStopOrdersBySecId(activeTrade?.secId));
   };
 
   const terminatePosition = () => {

@@ -26,10 +26,7 @@ export function get<T>(url: string): Promise<T> {
 }
 
 export function del<T>(url: string): Promise<T> {
-  return fetch(url, {
-    method: "DELETE",
-    headers: { "content-type": "application/json" },
-  })
+  return fetch(url, { method: "DELETE" })
     .then((response) => handleResponse(response))
     .catch(handleError);
 }

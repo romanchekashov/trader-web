@@ -10,7 +10,7 @@ import newsReducer from "../features/news/NewsSlice";
 import tradeJournalReducer from "../features/trade-journal/TradeJournalSlice";
 import possibleTradesReducer from "./possibleTrades/possibleTradesSlice";
 import securitiesReducer from "./securities/securitiesSlice";
-import stopsReducer from "./stopsSlice";
+import stopsReducer from "./stops/stopsSlice";
 import activeTradesReducer from "./activeTrades/activeTradesSlice";
 
 /**

@@ -7,7 +7,7 @@ const getActiveTrades = (): Promise<ActiveTrade[]> =>
   get<ActiveTrade[]>(baseUrl);
 
 const deleteActiveTrades = (secId: number): Promise<void> =>
-  del<void>(`${baseUrl}${secId}`);
+  del<void>(`${baseUrl}${secId || ""}`);
 
 export default {
   getActiveTrades,

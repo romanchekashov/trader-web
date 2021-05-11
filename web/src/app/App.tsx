@@ -26,7 +26,7 @@ import {
   loadFutures,
   loadShares,
 } from "./securities/securitiesSlice";
-import { setStops } from "./stopsSlice";
+import { setStops } from "./stops/stopsSlice";
 
 export const App = () => {
   const dispatch = useAppDispatch();

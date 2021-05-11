@@ -13,7 +13,11 @@ import {
   tradePossibleTrade,
 } from "../../../app/possibleTrades/possibleTradesSlice";
 import { selectSecurities } from "../../../app/securities/securitiesSlice";
-import { createStop, deleteStop, selectStops } from "../../../app/stopsSlice";
+import {
+  createStop,
+  deleteStop,
+  selectStops,
+} from "../../../app/stops/stopsSlice";
 import { getTrades } from "../../../common/api/quik/quikRestApi";
 import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
 import {

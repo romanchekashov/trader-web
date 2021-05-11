@@ -4,11 +4,11 @@ import {
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import quikStopOrdersApi from "../common/api/quik/quikStopOrdersApi";
-import { StopOrder } from "../common/data/StopOrder";
-import { LoadingState } from "./LoadingState";
-import { handleThunkError } from "./reduxUtils";
-import { RootState } from "./store";
+import quikStopOrdersApi from "../../common/api/quik/quikStopOrdersApi";
+import { StopOrder } from "../../common/data/StopOrder";
+import { LoadingState } from "../LoadingState";
+import { handleThunkError } from "../reduxUtils";
+import { RootState } from "../store";
 
 export interface StopsState {
   stops: StopOrder[];
@@ -47,6 +47,15 @@ export const deleteStop = createAsyncThunk<StopOrder, number>(
   "stops/deleteStop",
   async (stopNum, thunkAPI) =>
     await handleThunkError(thunkAPI, quikStopOrdersApi.deleteStopOrder(stopNum))
+);
+
+export const deleteStopOrdersBySecId = createAsyncThunk<StopOrder, number>(
+  "stops/deleteStopOrdersBySecId",
+  async (secId, thunkAPI) =>
+    await handleThunkError(
+      thunkAPI,
+      quikStopOrdersApi.deleteStopOrdersBySecId(secId)
+    )
 );
 
 export const stopsSlice = createSlice({
@@ -118,6 +127,16 @@ export const stopsSlice = createSlice({
     ) => {
       state.deletedLoadingError = action.payload;
       state.deletedLoading = LoadingState.ERROR;
+    },
+
+    // delete all by sec id
+    [deleteStopOrdersBySecId.fulfilled as any]: (
+      state: StopsState,
+      action: PayloadAction<StopOrder[]>
+    ) => {
+      state.stops = state.stops.filter(
+        ({ number }) => !action.payload.find((stop) => stop.number === number)
+      );
     },
   },
 });
