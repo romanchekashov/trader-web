@@ -11,6 +11,7 @@ import {
   selectPossibleTrade,
   tradePossibleTrade,
 } from "../../../app/possibleTrades/possibleTradesSlice";
+import { selectSecurities } from "../../../app/securities/securitiesSlice";
 import { createStop, deleteStop, selectStops } from "../../../app/stopsSlice";
 import { getTrades } from "../../../common/api/quik/quikRestApi";
 import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
@@ -58,7 +59,11 @@ let prevMainWidth;
 const AnalysisFutures: React.FC<Props> = ({ security }) => {
   const dispatch = useAppDispatch();
   const { possibleTrade } = useAppSelector(selectPossibleTrade);
+  const { securities } = useAppSelector(selectSecurities);
   const { stops } = useAppSelector(selectStops);
+
+  const securityLastInfo =
+    securities?.find((o) => o.id === security.id) || security;
 
   const timeFrameTradingIntervals = {
     M1: [Interval.M1],
@@ -97,9 +102,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
   }));
   const [chartNumber, setChartNumber] = useState<number>(2);
 
-  const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(
-    null
-  );
   const [chart1Width, setChart1Width] = useState(MIN_CHART_WIDTH);
   const [chart2Width, setChart2Width] = useState(MIN_CHART_WIDTH);
   const [chartAlertsWidth, setChartAlertsWidth] = useState(MIN_CHART_WIDTH);
@@ -176,8 +178,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
       fetchPremise(timeFrameTrading);
 
       getTrades(40).then(setTrades);
-
-      setSecurityLastInfo(security);
     }
 
     const wsStatusSub = WebsocketService.getInstance()
@@ -185,22 +185,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
       .subscribe((isConnected) => {
         if (isConnected && security) {
           informServerAboutRequiredData();
-        }
-      });
-
-    const lastSecuritiesSubscription = WebsocketService.getInstance()
-      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-      .subscribe((securities) => {
-        if (security) {
-          const newSecurityLastInfo = securities.find(
-            (o) => o.secCode === security.secCode
-          );
-          if (newSecurityLastInfo) {
-            newSecurityLastInfo.lastTradeTime = new Date(
-              newSecurityLastInfo.lastTradeTime
-            );
-            setSecurityLastInfo(newSecurityLastInfo);
-          }
         }
       });
 
@@ -222,7 +206,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
     return function cleanup() {
       window.removeEventListener("resize", updateSize);
       wsStatusSub.unsubscribe();
-      lastSecuritiesSubscription.unsubscribe();
       activeTradeSubscription.unsubscribe();
     };
   }, [security]);
