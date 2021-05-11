@@ -1,5 +1,5 @@
 import * as React from "react";
-import ActiveTradeView from "./components/ActiveTradeView";
+import ActiveTradeView from "./components/ActiveTradesView";
 import { FastBtn } from "./btn/FastBtn";
 import { GeneralBtn } from "./btn/GeneralBtn";
 import { CatchBtn } from "./btn/CatchBtn";

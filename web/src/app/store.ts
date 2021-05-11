@@ -11,6 +11,7 @@ import tradeJournalReducer from "../features/trade-journal/TradeJournalSlice";
 import possibleTradesReducer from "./possibleTrades/possibleTradesSlice";
 import securitiesReducer from "./securities/securitiesSlice";
 import stopsReducer from "./stopsSlice";
+import activeTradesReducer from "./activeTradesSlice";
 
 /**
  * redux-toolkit + typescript example
@@ -25,6 +26,7 @@ const store = configureStore({
     securities: securitiesReducer,
     possibleTrades: possibleTradesReducer,
     stops: stopsReducer,
+    activeTrades: activeTradesReducer,
   },
   middleware: getDefaultMiddleware({
     // https://redux-toolkit.js.org/usage/usage-guide#working-with-non-serializable-data

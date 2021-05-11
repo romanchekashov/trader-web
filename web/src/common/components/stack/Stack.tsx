@@ -22,7 +22,7 @@ import { playSound } from "../../assets/assets";
 import { StopOrder } from "../../data/StopOrder";
 import { getSelectedSecurity } from "../../utils/Cache";
 import SessionTradeResultView from "../control-panel/components/SessionTradeResultView";
-import ActiveTradeView from "../control-panel/components/ActiveTradeView";
+import ActiveTradeView from "../control-panel/components/ActiveTradesView";
 import { SessionTradeResult } from "../../data/SessionTradeResult";
 import { ControlPanelGeneralBtn } from "./control-panel/ControlPanelGeneralBtn";
 import { ControlPanelFastBtn } from "./control-panel/ControlPanelFastBtn";

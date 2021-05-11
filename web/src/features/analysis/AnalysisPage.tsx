@@ -9,6 +9,7 @@ import {
   setSecurityById,
 } from "../../app/securities/securitiesSlice";
 import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
+import ActiveTradesView from "../../common/components/control-panel/components/ActiveTradesView";
 import {
   StackEvent,
   StackService,
@@ -79,6 +80,11 @@ const AnalysisPage: React.FC<Props> = ({}) => {
           >
             <TabPanel header="Screener">
               {isTabShown ? <Securities onSelectRow={onSelectRow} /> : null}
+            </TabPanel>
+            <TabPanel header="Active Trades">
+              {isTabShown ? (
+                <ActiveTradesView onSelectRow={null} selected={null} />
+              ) : null}
             </TabPanel>
           </TabView>
         </div>

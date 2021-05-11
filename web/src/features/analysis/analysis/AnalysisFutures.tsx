@@ -5,6 +5,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Toast } from "primereact/toast";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { selectActiveTrades } from "../../../app/activeTradesSlice";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 import {
@@ -27,7 +28,6 @@ import { MarketStateFilterDto } from "../../../common/components/market-state/da
 import { News } from "../../../common/components/news/News";
 import Notifications from "../../../common/components/notifications/Notifications";
 import { TrendsView } from "../../../common/components/trend/TrendsView";
-import { ActiveTrade } from "../../../common/data/ActiveTrade";
 import { BrokerId } from "../../../common/data/BrokerId";
 import { CrudMode } from "../../../common/data/CrudMode";
 import { DataType } from "../../../common/data/DataType";
@@ -61,9 +61,12 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
   const { possibleTrade } = useAppSelector(selectPossibleTrade);
   const { securities } = useAppSelector(selectSecurities);
   const { stops } = useAppSelector(selectStops);
+  const { activeTrades } = useAppSelector(selectActiveTrades);
 
   const securityLastInfo =
     securities?.find((o) => o.id === security.id) || security;
+
+  const activeTrade = activeTrades.find(({ secId }) => secId === security.id);
 
   const timeFrameTradingIntervals = {
     M1: [Interval.M1],
@@ -94,7 +97,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
   const [timeFrameHigh, setTimeFrameHigh] = useState<Interval>(Interval.M30);
   const [premise, setPremise] = useState<TradePremise>(null);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [activeTrade, setActiveTrade] = useState(null);
 
   const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map((val) => ({
     label: "" + val,
@@ -188,17 +190,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
         }
       });
 
-    const activeTradeSubscription = WebsocketService.getInstance()
-      .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
-      .subscribe((activeTrades) => {
-        if (security) {
-          const activeTrade = activeTrades.find(
-            (at) => at && at.secId === security.id
-          );
-          setActiveTrade(activeTrade);
-        }
-      });
-
     setTimeout(updateSize, 1000);
     window.addEventListener("resize", updateSize);
 
@@ -206,7 +197,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
     return function cleanup() {
       window.removeEventListener("resize", updateSize);
       wsStatusSub.unsubscribe();
-      activeTradeSubscription.unsubscribe();
     };
   }, [security]);
 

@@ -1,23 +1,28 @@
+import { Column } from "primereact/column";
+import { ColumnGroup } from "primereact/columngroup";
+import { DataTable } from "primereact/datatable";
+import { Row } from "primereact/row";
 import * as React from "react";
-import "./ActiveTradeView.css";
+import {
+  selectActiveTrades,
+  setSelectedActiveTrade,
+} from "../../../../app/activeTradesSlice";
+import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
+import { setSecurityById } from "../../../../app/securities/securitiesSlice";
 import { ActiveTrade } from "../../../data/ActiveTrade";
 import { OperationType } from "../../../data/OperationType";
-import { ColumnGroup } from "primereact/columngroup";
-import { Row } from "primereact/row";
-import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
+import "./ActiveTradesView.css";
 
 type Props = {
-  trades: ActiveTrade[];
+  trades?: ActiveTrade[];
   selected: ActiveTrade;
   onSelectRow: (e: any) => void;
 };
 
-const ActiveTradeView: React.FC<Props> = ({
-  trades,
-  selected,
-  onSelectRow,
-}) => {
+const ActiveTradesView: React.FC<Props> = ({}) => {
+  const dispatch = useAppDispatch();
+  const { activeTrades, selected } = useAppSelector(selectActiveTrades);
+
   const quantityTemplate = (rowData, column) => {
     return OperationType.SELL === rowData.operation
       ? "-" + rowData.quantity
@@ -35,13 +40,16 @@ const ActiveTradeView: React.FC<Props> = ({
 
   const onSelect = (e) => {
     if (!Array.isArray(e.value)) {
-      onSelectRow(e.value);
+      const activeTrade: ActiveTrade = e.value;
+      dispatch(setSelectedActiveTrade(activeTrade));
+      dispatch(setSecurityById(activeTrade.secId));
     }
   };
 
   const headerGroup = (
     <ColumnGroup>
       <Row style={{ height: "10px" }}>
+        <Column header="SecCode" />
         <Column header="Pos" />
         <Column header="Avg Price" />
         <Column header="P&L" />
@@ -51,13 +59,13 @@ const ActiveTradeView: React.FC<Props> = ({
     </ColumnGroup>
   );
 
-  if (!trades || trades.length === 0) {
+  if (activeTrades.length === 0) {
     return <>No Active Trades</>;
   }
 
   return (
     <DataTable
-      value={trades}
+      value={activeTrades}
       selectionMode="single"
       selection={selected}
       onSelectionChange={onSelect}
@@ -66,6 +74,7 @@ const ActiveTradeView: React.FC<Props> = ({
       rowClassName={rowClassName}
       virtualRowHeight={24}
     >
+      <Column field="secCode" />
       <Column field="quantity" body={quantityTemplate} />
       <Column field="avgPrice" />
       <Column field="plPrice" />
@@ -75,4 +84,4 @@ const ActiveTradeView: React.FC<Props> = ({
   );
 };
 
-export default ActiveTradeView;
+export default ActiveTradesView;

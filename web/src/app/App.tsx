@@ -1,27 +1,28 @@
 import * as React from "react";
+import { useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
-import { HomePage } from "../features/home/HomePage";
-import { Header } from "../components/Header";
-import { PageNotFound } from "./PageNotFound";
-import AnalysisPage from "../features/analysis/AnalysisPage";
-import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
-import { EconomicCalendarPage } from "../features/economic-calendar/EconomicCalendarPage";
-import { NewsPage } from "../features/news/NewsPage";
-import { TradingChartsRouter } from "../features/trading-charts/TradingChartsRouter";
-import { BotControlPage } from "../features/bot-control/BotControlPage";
-import { ActiveTradesPage } from "../features/active-trades/ActiveTradesPage";
+import { WebsocketService, WSEvent } from "../common/api/WebsocketService";
 import { StackWrapper } from "../common/components/stack/StackWrapper";
 import Widgetbar from "../common/components/widgetbar/Widgetbar";
-import { useState } from "react";
+import { ActiveTrade } from "../common/data/ActiveTrade";
+import { StopOrder } from "../common/data/StopOrder";
+import { Header } from "../components/Header";
+import { ActiveTradesPage } from "../features/active-trades/ActiveTradesPage";
+import AnalysisPage from "../features/analysis/AnalysisPage";
+import { BotControlPage } from "../features/bot-control/BotControlPage";
+import { EconomicCalendarPage } from "../features/economic-calendar/EconomicCalendarPage";
+import { HomePage } from "../features/home/HomePage";
+import { NewsPage } from "../features/news/NewsPage";
+import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
+import { TradingChartsRouter } from "../features/trading-charts/TradingChartsRouter";
+import { loadActiveTrades, setActiveTrades } from "./activeTradesSlice";
 import { useAppDispatch } from "./hooks";
-import { useEffect } from "react";
+import { PageNotFound } from "./PageNotFound";
 import {
   loadCurrencies,
   loadFutures,
   loadShares,
 } from "./securities/securitiesSlice";
-import { WebsocketService, WSEvent } from "../common/api/WebsocketService";
-import { StopOrder } from "../common/data/StopOrder";
 import { setStops } from "./stopsSlice";
 
 export const App = () => {
@@ -32,11 +33,18 @@ export const App = () => {
     dispatch(loadShares());
     dispatch(loadFutures());
     dispatch(loadCurrencies());
+    dispatch(loadActiveTrades());
 
     const stopOrdersSubscription = WebsocketService.getInstance()
       .on<StopOrder[]>(WSEvent.STOP_ORDERS)
       .subscribe((newStopOrders) => {
         dispatch(setStops(newStopOrders));
+      });
+
+    const activeTradeSubscription = WebsocketService.getInstance()
+      .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
+      .subscribe((activeTrades) => {
+        dispatch(setActiveTrades(activeTrades));
       });
 
     const wsStatusSub = WebsocketService.getInstance()
@@ -49,6 +57,7 @@ export const App = () => {
     // Specify how to clean up after this effect:
     return function cleanup() {
       stopOrdersSubscription.unsubscribe();
+      activeTradeSubscription.unsubscribe();
       wsStatusSub.unsubscribe();
     };
   }, []);
