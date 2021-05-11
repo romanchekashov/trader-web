@@ -4,11 +4,11 @@ import {
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import traderRestApi from "../common/api/rest/traderRestApi";
-import { ActiveTrade } from "../common/data/ActiveTrade";
-import { LoadingState } from "./LoadingState";
-import { handleThunkError } from "./reduxUtils";
-import { RootState } from "./store";
+import traderRestApi from "../../common/api/rest/traderRestApi";
+import { ActiveTrade } from "../../common/data/ActiveTrade";
+import { LoadingState } from "../LoadingState";
+import { handleThunkError } from "../reduxUtils";
+import { RootState } from "../store";
 
 export interface ActiveTradesState {
   activeTrades: ActiveTrade[];

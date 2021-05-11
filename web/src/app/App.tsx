@@ -15,7 +15,10 @@ import { HomePage } from "../features/home/HomePage";
 import { NewsPage } from "../features/news/NewsPage";
 import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
 import { TradingChartsRouter } from "../features/trading-charts/TradingChartsRouter";
-import { loadActiveTrades, setActiveTrades } from "./activeTradesSlice";
+import {
+  loadActiveTrades,
+  setActiveTrades,
+} from "./activeTrades/activeTradesSlice";
 import { useAppDispatch } from "./hooks";
 import { PageNotFound } from "./PageNotFound";
 import {

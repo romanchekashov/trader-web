@@ -6,7 +6,7 @@ import * as React from "react";
 import {
   selectActiveTrades,
   setSelectedActiveTrade,
-} from "../../../../app/activeTradesSlice";
+} from "../../../../app/activeTrades/activeTradesSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import { setSecurityById } from "../../../../app/securities/securitiesSlice";
 import { ActiveTrade } from "../../../data/ActiveTrade";

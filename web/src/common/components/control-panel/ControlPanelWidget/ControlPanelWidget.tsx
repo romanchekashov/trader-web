@@ -1,7 +1,7 @@
 import { Toast } from "primereact/toast";
 import * as React from "react";
 import { useRef, useState } from "react";
-import { selectActiveTrades } from "../../../../app/activeTradesSlice";
+import { selectActiveTrades } from "../../../../app/activeTrades/activeTradesSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import { selectSecurities } from "../../../../app/securities/securitiesSlice";
 import { SessionTradeResult } from "../../../data/SessionTradeResult";

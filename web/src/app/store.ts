@@ -11,7 +11,7 @@ import tradeJournalReducer from "../features/trade-journal/TradeJournalSlice";
 import possibleTradesReducer from "./possibleTrades/possibleTradesSlice";
 import securitiesReducer from "./securities/securitiesSlice";
 import stopsReducer from "./stopsSlice";
-import activeTradesReducer from "./activeTradesSlice";
+import activeTradesReducer from "./activeTrades/activeTradesSlice";
 
 /**
  * redux-toolkit + typescript example
