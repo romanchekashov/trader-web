@@ -1,7 +1,13 @@
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import * as React from "react";
+import { useEffect } from "react";
 import { useState } from "react";
+import {
+  deleteActiveTrades,
+  selectActiveTrades,
+} from "../../../../app/activeTrades/activeTradesSlice";
+import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
 import { ActiveTrade } from "../../../data/ActiveTrade";
 
@@ -16,6 +22,19 @@ export const ControlPanelFastBtn: React.FC<Props> = ({
   activeTrade,
   history,
 }) => {
+  const dispatch = useAppDispatch();
+  const { deleteActiveTradesLoadingError } = useAppSelector(selectActiveTrades);
+
+  useEffect(() => {
+    if (deleteActiveTradesLoadingError) {
+      growl.show({
+        severity: "error",
+        summary: "Error Message",
+        detail: deleteActiveTradesLoadingError,
+      });
+    }
+  }, [deleteActiveTradesLoadingError]);
+
   const [
     terminatePositionDialogVisible,
     setTerminatePositionDialogVisible,
@@ -38,33 +57,13 @@ export const ControlPanelFastBtn: React.FC<Props> = ({
   };
 
   const terminatePosition = () => {
-    if (!activeTrade) {
-      growl.show({
-        severity: "error",
-        summary: "Error Message",
-        detail: "No any active trades!",
-      });
-      return;
-    }
-
-    WebsocketService.getInstance().send(
-      history ? WSEvent.HISTORY_TERMINATE_POSITION : WSEvent.TERMINATE_POSITION
-    );
+    dispatch(deleteActiveTrades(activeTrade?.secId));
   };
 
   const reversePosition = () => {
-    if (!activeTrade) {
-      growl.show({
-        severity: "error",
-        summary: "Error Message",
-        detail: "No any active trades!",
-      });
-      return;
-    }
-
-    WebsocketService.getInstance().send(
-      history ? WSEvent.HISTORY_REVERSE_POSITION : WSEvent.REVERSE_POSITION
-    );
+    // WebsocketService.getInstance().send(
+    //   history ? WSEvent.HISTORY_REVERSE_POSITION : WSEvent.REVERSE_POSITION
+    // );
   };
 
   const renderTerminatePositionDialogFooter = () => {

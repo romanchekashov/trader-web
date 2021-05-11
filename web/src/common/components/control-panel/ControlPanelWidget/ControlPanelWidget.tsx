@@ -32,14 +32,14 @@ const ControlPanelWidget: React.FC<Props> = ({}) => {
       </div>
       <div className="p-col-12">
         <ControlPanelGeneralBtn
-          growl={toast}
+          growl={toast?.current}
           history={false}
           security={security}
         />
       </div>
       <div className="p-col-12">
         <ControlPanelFastBtn
-          growl={toast}
+          growl={toast?.current}
           history={false}
           activeTrade={selected}
         />
