@@ -4,7 +4,7 @@ import {
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import quikStopOrdersApi from "../../common/api/quik/quikStopOrdersApi";
+import quikStopOrdersApi from "./quikStopOrdersApi";
 import { StopOrder } from "../../common/data/StopOrder";
 import { LoadingState } from "../LoadingState";
 import { handleThunkError } from "../reduxUtils";

@@ -1,6 +1,9 @@
-import { StopOrder } from "../../data/StopOrder";
-import { adjustStopOrder, adjustStopOrders } from "../../utils/DataUtils";
-import { del, get, post } from "../apiUtils";
+import { StopOrder } from "../../common/data/StopOrder";
+import {
+  adjustStopOrder,
+  adjustStopOrders,
+} from "../../common/utils/DataUtils";
+import { del, get, post } from "../../common/api/apiUtils";
 
 const baseUrl = process.env.API_URL + "/api/v1/quik/stop-orders/";
 

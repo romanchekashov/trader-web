@@ -32,7 +32,7 @@ import DepositView from "./deposit/DepositView";
 import { TEST_ACTIVE_TRADES } from "../../utils/TestData";
 import { StackEvent, StackService } from "./StackService";
 import { Toast } from "primereact/toast";
-import quikStopOrdersApi from "../../api/quik/quikStopOrdersApi";
+import quikStopOrdersApi from "../../../app/stops/quikStopOrdersApi";
 import activeTradesApi from "../../../app/activeTrades/activeTradesApi";
 
 type Props = {};
