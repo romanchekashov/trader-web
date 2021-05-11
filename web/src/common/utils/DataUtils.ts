@@ -107,9 +107,13 @@ export const adjustTrades = (trades: Trade[]): any => {
   return trades;
 };
 
+export const adjustOrder = (order: Order): Order => {
+  order.dateTime = new Date(order.dateTime);
+  return order;
+};
 export const adjustOrders = (orders: Order[]): any => {
   if (orders && orders.length > 0) {
-    for (const order of orders) order.dateTime = new Date(order.dateTime);
+    for (const order of orders) adjustOrder(order);
   }
 
   return orders;

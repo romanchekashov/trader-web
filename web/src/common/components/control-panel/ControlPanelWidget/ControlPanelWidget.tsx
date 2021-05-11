@@ -30,6 +30,9 @@ const ControlPanelWidget: React.FC<Props> = ({}) => {
         <ActiveTradesView />
         <DepositView />
       </div>
+      <div>{`Selected active trade for securities: ${
+        selected ? selected.secId : "All"
+      }`}</div>
       <div className="p-col-12">
         <ControlPanelGeneralBtn
           growl={toast?.current}

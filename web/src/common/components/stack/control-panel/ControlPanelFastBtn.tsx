@@ -7,8 +7,8 @@ import {
   selectActiveTrades,
 } from "../../../../app/activeTrades/activeTradesSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
+import quikOrdersApi from "../../../../app/orders/quikOrdersApi";
 import { deleteStopOrdersBySecId } from "../../../../app/stops/stopsSlice";
-import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
 import { ActiveTrade } from "../../../data/ActiveTrade";
 
 type Props = {
@@ -45,9 +45,7 @@ export const ControlPanelFastBtn: React.FC<Props> = ({
   ] = useState<boolean>(false);
 
   const cancelActiveOrders = () => {
-    WebsocketService.getInstance().send(
-      history ? WSEvent.HISTORY_CANCEL_ORDERS : WSEvent.CANCEL_ORDERS
-    );
+    quikOrdersApi.deleteOrdersBySecId(activeTrade?.secId);
   };
 
   const cancelStopOrders = () => {
