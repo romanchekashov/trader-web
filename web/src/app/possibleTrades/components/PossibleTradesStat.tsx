@@ -37,12 +37,12 @@ const PossibleTradesStat: React.FC<Props> = ({ selected }) => {
   };
 
   const dateTimeTemplate = (rowData, column) =>
-    moment(rowData.possibleTrade.stopTrendPoint.dateTime).format("DD-MM HH:mm");
+    moment(rowData.notified).format("DD-MM HH:mm");
 
   const rowClassName = (rowData) => {
-    if (rowData.plPrice > 0) {
+    if (rowData.plResult > 0) {
       return { win: true };
-    } else if (rowData.plPrice < 0) {
+    } else if (rowData.plResult < 0) {
       return { loss: true };
     }
     return {};
@@ -67,13 +67,15 @@ const PossibleTradesStat: React.FC<Props> = ({ selected }) => {
         <Column header="SecCode" />
         <Column header="quantity" />
         <Column header="Entry Price" />
+        <Column header="TrendDirection" />
         <Column header="operation" />
         <Column header="stopPrice" />
         <Column header="Stop P&L" />
         <Column header="Target P&L" />
         <Column header="Target / Stop P&L" />
-        <Column header="Result P&L" />
-        <Column header="TrendPoint DateTime" />
+        <Column header="Result P&L" sortable={true} />
+        <Column header="HighTemp P&L" sortable={true} />
+        <Column header="Notified" />
       </Row>
     </ColumnGroup>
   );
@@ -110,16 +112,15 @@ const PossibleTradesStat: React.FC<Props> = ({ selected }) => {
       <Column field="possibleTrade.secId" body={secTemplate} />
       <Column field="possibleTrade.quantity" />
       <Column field="possibleTrade.entryPrice" />
+      <Column field="possibleTrade.stopTrendPoint.trendDirection" />
       <Column field="possibleTrade.operation" />
       <Column field="possibleTrade.stopPrice" />
       <Column field="possibleTrade.plStop" />
       <Column field="possibleTrade.plTarget" />
       <Column field="possibleTrade.plTarget" body={targetToStopTemplate} />
-      <Column field="plResult" />
-      <Column
-        field="possibleTrade.stopTrendPoint.dateTime"
-        body={dateTimeTemplate}
-      />
+      <Column field="plResult" sortable={true} />
+      <Column field="plHighTemp" sortable={true} />
+      <Column field="notified" body={dateTimeTemplate} />
     </DataTable>
   );
 };

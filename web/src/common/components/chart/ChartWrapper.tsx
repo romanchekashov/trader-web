@@ -767,6 +767,9 @@ export class ChartWrapper extends React.Component<Props, States> {
       return <>Select security for chart</>;
     }
 
+    const stopOrders: StopOrder[] =
+      stops?.filter(({ secId }) => secId === security.id) || [];
+
     return (
       <>
         <ChartWrapperHead
@@ -800,7 +803,7 @@ export class ChartWrapper extends React.Component<Props, States> {
             chartHeight={chartHeight}
             ratio={1}
             htSRLevels={this.getHighTimeFrameSRLevels()}
-            stops={stops}
+            stops={stopOrders}
             orders={orders}
             onManageOrder={this.manageOrder}
             trades={trades}

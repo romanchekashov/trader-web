@@ -426,7 +426,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
           <div className="p-col-6" ref={chart1Ref} style={{ padding: "0" }}>
             <ChartWrapper
               interval={timeFrameTrading}
-              initialNumberOfCandles={500}
+              initialNumberOfCandles={300}
               onIntervalChanged={onTradingIntervalChanged}
               onStartChanged={onStartChanged}
               onPremiseBeforeChanged={onPremiseBeforeChanged}
@@ -447,7 +447,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
               <ChartWrapper
                 interval={timeFrameHigh}
                 // start={start}
-                initialNumberOfCandles={500}
+                initialNumberOfCandles={200}
                 onIntervalChanged={(interval) => {}}
                 onStartChanged={(start) => {}}
                 width={chart2Width}

@@ -23,8 +23,9 @@ const getPossibleTradesStat = (
   filter: FilterDto
 ): Promise<PossibleTradeResult[]> =>
   post<PossibleTradeResult[]>(baseUrl + "stat", filter).then((results) => {
-    results.forEach(({ possibleTrade }) => {
-      adjustPossibleTrade(possibleTrade);
+    results.forEach((result) => {
+      result.notified = new Date(result.notified);
+      adjustPossibleTrade(result.possibleTrade);
     });
     return results;
   });
