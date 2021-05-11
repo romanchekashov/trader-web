@@ -4,11 +4,11 @@ import {
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import traderRestApi from "../../common/api/rest/traderRestApi";
 import { ActiveTrade } from "../../common/data/ActiveTrade";
 import { LoadingState } from "../LoadingState";
 import { handleThunkError } from "../reduxUtils";
 import { RootState } from "../store";
+import activeTradesApi from "./activeTradesApi";
 
 export interface ActiveTradesState {
   activeTrades: ActiveTrade[];
@@ -16,17 +16,26 @@ export interface ActiveTradesState {
   activeTradesLoadingError?: string;
 
   selected?: ActiveTrade;
+  deleteActiveTradesLoading: LoadingState;
+  deleteActiveTradesLoadingError?: string;
 }
 
 export const initialState: ActiveTradesState = {
   activeTrades: [],
   activeTradesLoading: LoadingState.IDLE,
+  deleteActiveTradesLoading: LoadingState.IDLE,
 };
 
 export const loadActiveTrades = createAsyncThunk<ActiveTrade[]>(
   "activeTrades/loadActiveTrades",
   async (_, thunkAPI) =>
-    await handleThunkError(thunkAPI, traderRestApi.getActiveTrades())
+    await handleThunkError(thunkAPI, activeTradesApi.getActiveTrades())
+);
+
+export const deleteActiveTrades = createAsyncThunk<void, number>(
+  "activeTrades/deleteActiveTrades",
+  async (secId, thunkAPI) =>
+    await handleThunkError(thunkAPI, activeTradesApi.deleteActiveTrades(secId))
 );
 
 export const activeTradesSlice = createSlice({
@@ -64,6 +73,27 @@ export const activeTradesSlice = createSlice({
       state.activeTradesLoadingError = action.payload;
       state.activeTradesLoading = LoadingState.ERROR;
     },
+    // deleteActiveTrades
+    [deleteActiveTrades.pending as any]: (state: ActiveTradesState) => {
+      state.deleteActiveTradesLoading = LoadingState.LOADING;
+    },
+    [deleteActiveTrades.fulfilled as any]: (
+      state: ActiveTradesState,
+      action: PayloadAction<void>
+    ) => {
+      state.activeTrades = state.activeTrades.filter(
+        ({ secId }) => secId !== state.selected?.secId
+      );
+      state.selected = undefined;
+      state.deleteActiveTradesLoading = LoadingState.LOADED;
+    },
+    [deleteActiveTrades.rejected as any]: (
+      state: ActiveTradesState,
+      action: PayloadAction<any>
+    ) => {
+      state.deleteActiveTradesLoadingError = action.payload;
+      state.deleteActiveTradesLoading = LoadingState.ERROR;
+    },
   },
 });
 
@@ -79,6 +109,9 @@ export const selectActiveTrades = createSelector(
     activeTradesLoadingError: state.activeTrades.activeTradesLoadingError,
 
     selected: state.activeTrades.selected,
+    deleteActiveTradesLoading: state.activeTrades.deleteActiveTradesLoading,
+    deleteActiveTradesLoadingError:
+      state.activeTrades.deleteActiveTradesLoadingError,
   }),
   (state) => state
 );

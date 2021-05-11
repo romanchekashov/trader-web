@@ -1,4 +1,3 @@
-import { ActiveTrade } from "../../data/ActiveTrade";
 import { Candle } from "../../data/Candle";
 import { FuturesClientLimit } from "../../data/FuturesClientLimit";
 import { Order } from "../../data/Order";
@@ -19,7 +18,6 @@ export default {
   getAllSecurityShares,
   getAllSecurityCurrencies,
   getFuturesLimits,
-  getActiveTrades,
   getActiveOrders,
   getActiveStopOrders,
 };
@@ -62,12 +60,6 @@ export function getAllSecurityCurrencies(): Promise<SecurityCurrency[]> {
 
 export function getFuturesLimits(): Promise<FuturesClientLimit[]> {
   return fetch(`${baseUrl}futures-limits`)
-    .then(handleResponse)
-    .catch(handleError);
-}
-
-export function getActiveTrades(): Promise<ActiveTrade[]> {
-  return fetch(`${baseUrl}active-trades`)
     .then(handleResponse)
     .catch(handleError);
 }

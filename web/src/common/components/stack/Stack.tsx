@@ -14,7 +14,6 @@ import { OperationType } from "../../data/OperationType";
 import {
   getActiveOrders,
   getActiveStopOrders,
-  getActiveTrades,
 } from "../../api/rest/traderRestApi";
 import { OrderType } from "../../data/OrderType";
 import { ActiveTrade } from "../../data/ActiveTrade";
@@ -34,6 +33,7 @@ import { TEST_ACTIVE_TRADES } from "../../utils/TestData";
 import { StackEvent, StackService } from "./StackService";
 import { Toast } from "primereact/toast";
 import quikStopOrdersApi from "../../api/quik/quikStopOrdersApi";
+import activeTradesApi from "../../../app/activeTrades/activeTradesApi";
 
 type Props = {};
 
@@ -185,7 +185,7 @@ export class Stack extends React.Component<Props, States> {
       .on<StopOrder[]>(WSEvent.STOP_ORDERS)
       .subscribe(this.updateActiveStopOrders);
 
-    getActiveTrades().then(this.updateActiveTrades);
+    activeTradesApi.getActiveTrades().then(this.updateActiveTrades);
     this.activeTradeSubscription = WebsocketService.getInstance()
       .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
       .subscribe(this.updateActiveTrades);
