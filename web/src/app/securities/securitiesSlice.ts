@@ -10,6 +10,7 @@ import { SecurityCurrency } from "../../common/data/security/SecurityCurrency";
 import { SecurityFuture } from "../../common/data/security/SecurityFuture";
 import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
 import { SecurityShare } from "../../common/data/security/SecurityShare";
+import { SEC_MAP } from "../../common/utils/Cache";
 import { LoadingState } from "../LoadingState";
 import { handleThunkError } from "../reduxUtils";
 import { RootState } from "../store";
@@ -101,6 +102,7 @@ export const securitiesSlice = createSlice({
       action: PayloadAction<SecurityShare[]>
     ) => {
       state.shares = action.payload;
+      action.payload.forEach((sec) => SEC_MAP.set(sec.id, sec));
     },
     // load futures
     [loadFutures.fulfilled as any]: (
@@ -108,6 +110,7 @@ export const securitiesSlice = createSlice({
       action: PayloadAction<SecurityFuture[]>
     ) => {
       state.futures = action.payload;
+      action.payload.forEach((sec) => SEC_MAP.set(sec.id, sec));
     },
     // load currencies
     [loadCurrencies.fulfilled as any]: (
@@ -115,6 +118,7 @@ export const securitiesSlice = createSlice({
       action: PayloadAction<SecurityCurrency[]>
     ) => {
       state.currencies = action.payload;
+      action.payload.forEach((sec) => SEC_MAP.set(sec.id, sec));
     },
   },
 });

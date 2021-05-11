@@ -2,6 +2,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import PossibleTradesStat from "../../app/possibleTrades/components/PossibleTradesStat";
 import {
   loadLastSecurities,
   selectSecurities,
@@ -85,6 +86,9 @@ const AnalysisPage: React.FC<Props> = ({}) => {
               {isTabShown ? (
                 <ActiveTradesView onSelectRow={null} selected={null} />
               ) : null}
+            </TabPanel>
+            <TabPanel header="Possible Trades Stat">
+              {isTabShown ? <PossibleTradesStat /> : null}
             </TabPanel>
           </TabView>
         </div>

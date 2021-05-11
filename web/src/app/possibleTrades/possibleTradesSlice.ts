@@ -7,8 +7,10 @@ import {
 import { LoadingState } from "../../app/LoadingState";
 import { handleThunkError } from "../../app/reduxUtils";
 import { RootState } from "../../app/store";
+import { FilterDto } from "../../common/data/FilterDto";
 import { PossibleTrade } from "./data/PossibleTrade";
 import { PossibleTradeRequest } from "./data/PossibleTradeRequest";
+import { PossibleTradeResult } from "./data/PossibleTradeResult";
 import possibleTradesApi from "./possibleTradesApi";
 
 export interface PossibleTradesState {
@@ -18,11 +20,14 @@ export interface PossibleTradesState {
 
   tradePossibleTradeLoading: LoadingState;
   tradePossibleTradeLoadingError?: string;
+
+  possibleTradesStat: PossibleTradeResult[];
 }
 
 export const initialState: PossibleTradesState = {
   possibleTradeLoading: LoadingState.IDLE,
   tradePossibleTradeLoading: LoadingState.IDLE,
+  possibleTradesStat: [],
 };
 
 export const loadPossibleTrade = createAsyncThunk<
@@ -46,6 +51,18 @@ export const tradePossibleTrade = createAsyncThunk<
     await handleThunkError(
       thunkAPI,
       possibleTradesApi.tradePossibleTrade(possibleTradeRequest)
+    )
+);
+
+export const loadPossibleTradesStat = createAsyncThunk<
+  PossibleTradeResult[],
+  FilterDto
+>(
+  "possibleTrades/loadPossibleTradesStat",
+  async (filter, thunkAPI) =>
+    await handleThunkError(
+      thunkAPI,
+      possibleTradesApi.getPossibleTradesStat(filter)
     )
 );
 
@@ -97,6 +114,13 @@ export const possibleTradesSlice = createSlice({
       state.tradePossibleTradeLoadingError = action.payload;
       state.tradePossibleTradeLoading = LoadingState.ERROR;
     },
+
+    [loadPossibleTradesStat.fulfilled as any]: (
+      state: PossibleTradesState,
+      action: PayloadAction<PossibleTradeResult[]>
+    ) => {
+      state.possibleTradesStat = action.payload;
+    },
   },
 });
 
@@ -117,6 +141,13 @@ export const selectTradePossibleTrade = createSelector(
     tradePossibleTradeLoading: state.possibleTrades.tradePossibleTradeLoading,
     tradePossibleTradeLoadingError:
       state.possibleTrades.tradePossibleTradeLoadingError,
+  }),
+  (state) => state
+);
+
+export const selectPossibleTradesStat = createSelector(
+  (state: RootState) => ({
+    possibleTradesStat: state.possibleTrades.possibleTradesStat,
   }),
   (state) => state
 );

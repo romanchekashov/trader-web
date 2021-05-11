@@ -5,7 +5,9 @@ import { WebsocketService, WSEvent } from "../common/api/WebsocketService";
 import { StackWrapper } from "../common/components/stack/StackWrapper";
 import Widgetbar from "../common/components/widgetbar/Widgetbar";
 import { ActiveTrade } from "../common/data/ActiveTrade";
+import { BrokerId } from "../common/data/BrokerId";
 import { StopOrder } from "../common/data/StopOrder";
+import { TradingPlatform } from "../common/data/trading/TradingPlatform";
 import { Header } from "../components/Header";
 import { ActiveTradesPage } from "../features/active-trades/ActiveTradesPage";
 import AnalysisPage from "../features/analysis/AnalysisPage";
@@ -21,6 +23,7 @@ import {
 } from "./activeTrades/activeTradesSlice";
 import { useAppDispatch } from "./hooks";
 import { PageNotFound } from "./PageNotFound";
+import { loadPossibleTradesStat } from "./possibleTrades/possibleTradesSlice";
 import {
   loadCurrencies,
   loadFutures,
@@ -37,6 +40,16 @@ export const App = () => {
     dispatch(loadFutures());
     dispatch(loadCurrencies());
     dispatch(loadActiveTrades());
+    dispatch(
+      loadPossibleTradesStat({
+        brokerId: BrokerId.ALFA_DIRECT,
+        tradingPlatform: TradingPlatform.QUIK,
+        fetchByWS: false,
+        history: true,
+        all: false,
+        secId: null,
+      })
+    );
 
     const stopOrdersSubscription = WebsocketService.getInstance()
       .on<StopOrder[]>(WSEvent.STOP_ORDERS)
