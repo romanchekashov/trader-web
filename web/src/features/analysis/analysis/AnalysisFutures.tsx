@@ -22,13 +22,11 @@ import {
   WebsocketService,
   WSEvent,
 } from "../../../common/api/WebsocketService";
-import Alerts from "../../../common/components/alerts/Alerts";
 import { ChartWrapper } from "../../../common/components/chart/ChartWrapper";
 import { ChartManageOrder } from "../../../common/components/chart/data/ChartManageOrder";
 import { EconomicCalendar } from "../../../common/components/economic-calendar/EconomicCalendar";
 import { MarketStateFilterDto } from "../../../common/components/market-state/data/MarketStateFilterDto";
 import { News } from "../../../common/components/news/News";
-import Notifications from "../../../common/components/notifications/Notifications";
 import { TrendsView } from "../../../common/components/trend/TrendsView";
 import TrendViewCharts from "../../../common/components/trend/TrendViewCharts/TrendViewCharts";
 import { BrokerId } from "../../../common/data/BrokerId";
@@ -460,29 +458,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
                     <div className="p-col-12">
                         <SwingStateList filter={marketStateFilterDto}/>
                     </div> */}
-          <div className="p-col-12">
-            <div className="p-grid">
-              <div className="p-col-4">
-                <Notifications
-                  filter={filterDto}
-                  security={securityLastInfo}
-                  onNotificationSelected={(n) => {
-                    console.log(n);
-                  }}
-                  viewHeight={400}
-                />
-              </div>
-              <div className="p-col-4">
-                <Alerts
-                  filter={filterDto}
-                  onAlertSelected={(n) => {
-                    console.log(n);
-                  }}
-                  alertsHeight={400}
-                />
-              </div>
-            </div>
-          </div>
           <div
             className="p-col-12"
             ref={chartAlertsRef}
