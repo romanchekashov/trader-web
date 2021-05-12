@@ -1,5 +1,3 @@
-import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Toast } from "primereact/toast";
@@ -32,6 +30,7 @@ import { MarketStateFilterDto } from "../../../common/components/market-state/da
 import { News } from "../../../common/components/news/News";
 import Notifications from "../../../common/components/notifications/Notifications";
 import { TrendsView } from "../../../common/components/trend/TrendsView";
+import TrendViewCharts from "../../../common/components/trend/TrendViewCharts/TrendViewCharts";
 import { BrokerId } from "../../../common/data/BrokerId";
 import { CrudMode } from "../../../common/data/CrudMode";
 import { DataType } from "../../../common/data/DataType";
@@ -51,9 +50,7 @@ import {
 } from "../../../common/utils/TimeFrameChooser";
 import { PrimeDropdownItem } from "../../../common/utils/utils";
 import { MoexOpenInterestView } from "./moex-open-interest/MoexOpenInterestView";
-import { SupplyAndDemand } from "./supply-and-demand/SupplyAndDemand";
 import moment = require("moment");
-import TrendViewCharts from "../../../common/components/trend/TrendViewCharts/TrendViewCharts";
 
 type Props = {
   security: SecurityLastInfo;
@@ -463,9 +460,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
                     <div className="p-col-12">
                         <SwingStateList filter={marketStateFilterDto}/>
                     </div> */}
-          <div className="p-col-12">
-            <SupplyAndDemand security={securityLastInfo} />
-          </div>
           <div className="p-col-12">
             <div className="p-grid">
               <div className="p-col-4">

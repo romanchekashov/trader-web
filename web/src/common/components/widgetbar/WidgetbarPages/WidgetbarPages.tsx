@@ -4,6 +4,7 @@ import { useAppDispatch } from "../../../../app/hooks";
 import { setPossibleTrade } from "../../../../app/possibleTrades/possibleTradesSlice";
 import Securities from "../../../../app/securities/components/Securities";
 import { setSecurityById } from "../../../../app/securities/securitiesSlice";
+import { SupplyAndDemand } from "../../../../features/analysis/analysis/supply-and-demand/SupplyAndDemand";
 import { SecurityLastInfoView } from "../../../../features/trading-charts/security/info/SecurityLastInfoView";
 import { BrokerId } from "../../../data/BrokerId";
 import { DataType } from "../../../data/DataType";
@@ -40,7 +41,12 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
     <div className="WidgetbarPages">
       <div>{item}</div>
       {item === WidgetbarItem.SECURITIES ? <Securities /> : null}
-      {item === WidgetbarItem.SEC_DATA ? <SecurityLastInfoView /> : null}
+      {item === WidgetbarItem.SEC_DATA ? (
+        <>
+          <SecurityLastInfoView />
+          <SupplyAndDemand />
+        </>
+      ) : null}
       {security && item === WidgetbarItem.NEWS ? (
         <StockEventsBrief secCode={security.secCode} height={600} />
       ) : null}
