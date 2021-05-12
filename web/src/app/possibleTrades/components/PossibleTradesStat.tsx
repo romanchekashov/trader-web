@@ -40,7 +40,7 @@ const PossibleTradesStat: React.FC<Props> = ({ selected }) => {
   };
 
   const secTemplate = (rowData, column) =>
-    SEC_MAP.get(rowData.possibleTrade.secId).secCode;
+    SEC_MAP.get(rowData.possibleTrade.secId).code;
 
   const targetToStopTemplate = (rowData, column) => {
     const { plTarget, plStop } = rowData.possibleTrade;
@@ -86,6 +86,7 @@ const PossibleTradesStat: React.FC<Props> = ({ selected }) => {
         <Column header="Target / Stop P&L" />
         <Column header={`Result P&L ${result}`} sortable field="plResult" />
         <Column header="HighTemp P&L" sortable field="plHighTemp" />
+        <Column header="targetsHit" />
         <Column header="Notified" />
       </Row>
     </ColumnGroup>
@@ -131,6 +132,7 @@ const PossibleTradesStat: React.FC<Props> = ({ selected }) => {
       <Column field="possibleTrade.plTarget" body={targetToStopTemplate} />
       <Column field="plResult" />
       <Column field="plHighTemp" />
+      <Column field="targetsHit" />
       <Column field="notified" body={dateTimeTemplate} />
     </DataTable>
   );
