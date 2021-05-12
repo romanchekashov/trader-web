@@ -40,9 +40,7 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
     <div className="WidgetbarPages">
       <div>{item}</div>
       {item === WidgetbarItem.SECURITIES ? <Securities /> : null}
-      {security && item === WidgetbarItem.SEC_DATA ? (
-        <SecurityLastInfoView security={security} />
-      ) : null}
+      {item === WidgetbarItem.SEC_DATA ? <SecurityLastInfoView /> : null}
       {security && item === WidgetbarItem.NEWS ? (
         <StockEventsBrief secCode={security.secCode} height={600} />
       ) : null}

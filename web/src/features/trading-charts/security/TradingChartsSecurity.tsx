@@ -385,7 +385,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({
         </div>
       ) : (
         <div className="p-col-2" ref={infoRef}>
-          <SecurityLastInfoView security={securityLastInfo} />
+          <SecurityLastInfoView />
           {ClassCode.SPBFUT === securityLastInfo?.classCode ? (
             <MoexOpenInterestChart
               moexOpenInterests={moexOpenInterestsForDays}

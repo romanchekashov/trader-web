@@ -404,7 +404,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
       <Toast ref={toast} />
       <div className="p-col-12">
         <div className="p-grid analysis-head">
-          <div className="p-col-12">
+          <div className="p-col-1">
             <div className="analysis-head-chart-number">
               <Dropdown
                 value={chartNumber}
@@ -413,18 +413,10 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
               />
             </div>
           </div>
-          <div className="p-col-12">
-            <DataTable value={[securityLastInfo]}>
-              <Column field="totalDemand" header="Общ спрос" />
-              <Column field="totalSupply" header="Общ предл" />
-              <Column field="futureSellDepoPerContract" header="ГО прод" />
-              <Column field="futureBuyDepoPerContract" header="ГО покуп" />
-              <Column field="lastTradePrice" header="Цена" />
-              <Column field="numTradesToday" header="Кол-во сделок" />
-            </DataTable>
+          <div className="p-col-11">
+            <TrendsView trends={premise ? premise.analysis.trends : []} />
           </div>
         </div>
-        <TrendsView trends={premise ? premise.analysis.trends : []} />
         <div className="p-grid" style={{ margin: "0" }}>
           <div className="p-col-6" ref={chart1Ref} style={{ padding: "0" }}>
             <ChartWrapper
