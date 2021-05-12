@@ -69,6 +69,14 @@ const ChartWrapperHead: React.FC<Props> = ({
     value: val,
   }));
 
+  const intervalOptionTemplate = (option) => {
+    const backgroundColor = IntervalColor[option.value];
+    const style = backgroundColor
+      ? { backgroundColor, color: "white", padding: "0px 5px" }
+      : { padding: "0px 5px" };
+    return <div style={style}>{option.label}</div>;
+  };
+
   return (
     <div className="chart-wrapper-head">
       <div className="chart-wrapper-head-security">{security.secCode}</div>
@@ -76,6 +84,7 @@ const ChartWrapperHead: React.FC<Props> = ({
         <Dropdown
           value={innerInterval}
           options={intervals}
+          itemTemplate={intervalOptionTemplate}
           onChange={onIntervalUpdated}
         />
       </div>
@@ -141,50 +150,6 @@ const ChartWrapperHead: React.FC<Props> = ({
           checked={showSRLevels}
           onChange={updateShowSRLevels}
         />
-      </div>
-      <div className="chart-wrapper-head-legends">
-        <div
-          className="chart-wrapper-head-legend"
-          style={{ backgroundColor: IntervalColor.MONTH }}
-        >
-          MN
-        </div>
-        <div
-          className="chart-wrapper-head-legend"
-          style={{ backgroundColor: IntervalColor.WEEK }}
-        >
-          W
-        </div>
-        <div
-          className="chart-wrapper-head-legend"
-          style={{ backgroundColor: IntervalColor.DAY }}
-        >
-          D
-        </div>
-        <div
-          className="chart-wrapper-head-legend"
-          style={{ backgroundColor: IntervalColor.H4 }}
-        >
-          H4
-        </div>
-        <div
-          className="chart-wrapper-head-legend"
-          style={{ backgroundColor: IntervalColor.H2 }}
-        >
-          H2
-        </div>
-        <div
-          className="chart-wrapper-head-legend"
-          style={{ backgroundColor: IntervalColor.M60 }}
-        >
-          M60
-        </div>
-        <div
-          className="chart-wrapper-head-legend"
-          style={{ backgroundColor: IntervalColor.M30 }}
-        >
-          M30
-        </div>
       </div>
 
       <div className="chart-wrapper-head-trendline">
