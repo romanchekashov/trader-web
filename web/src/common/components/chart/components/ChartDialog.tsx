@@ -26,6 +26,8 @@ const btnSets = [
   { label: "Sell", value: OperationType.SELL },
 ];
 
+let yValuePrev;
+
 type Props = {
   securityInfo: Security;
   showModal: boolean;
@@ -55,27 +57,30 @@ export const ChartDialog: React.FC<Props> = ({
   const [isMarket, setIsMarket] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!alertToEdit?.alert) return;
+    if (!alertToEdit?.interactive || yValuePrev === alertToEdit?.alert?.yValue)
+      return;
+    yValuePrev = alertToEdit?.alert?.yValue;
+    console.log("ChartDialog: ", yValuePrev);
 
-    console.log(alertToEdit.alert.yValue);
-    const data = alertToEdit.interactive?.data;
+    const { data, dataType } = alertToEdit.interactive;
+    const { operation, quantity } = data;
 
     setOrderType(
-      alertToEdit?.interactive?.dataType === DataType.STOP_ORDER
+      dataType === DataType.STOP_ORDER
         ? ChartManageOrderType.stop
         : ChartManageOrderType.order
     );
-    setOperationType(data?.operation || OperationType.BUY);
-    setQuantity(data?.quantity || 1);
+    setOperationType(operation || OperationType.BUY);
+    setQuantity(quantity || 1);
     setPrice(round(alertToEdit.alert.yValue, securityInfo.scale));
     setStopPrice(
       calcStopPrice(
-        data?.operation || OperationType.BUY,
+        operation || OperationType.BUY,
         alertToEdit.alert.yValue,
         securityInfo
       )
     );
-  }, [alertToEdit?.alert, securityInfo]);
+  }, [alertToEdit, securityInfo]);
 
   const calcStopPrice = (
     operationType: OperationType,
@@ -145,6 +150,7 @@ export const ChartDialog: React.FC<Props> = ({
       const possibleTrade: PossibleTrade = { ...alertToEdit.interactive.data };
       possibleTrade.entryPrice = price;
       possibleTrade.operation = operationType;
+      possibleTrade.quantity = quantity;
       onSave(alert, chartId, {
         dataType,
         action: CrudMode.CREATE,

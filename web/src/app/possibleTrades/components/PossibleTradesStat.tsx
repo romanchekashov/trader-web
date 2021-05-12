@@ -10,8 +10,10 @@ import { selectPossibleTradesStat } from "../possibleTradesSlice";
 import "./PossibleTradesStat.css";
 import moment = require("moment");
 import { SEC_MAP } from "../../../common/utils/Cache";
-import { round10 } from "../../../common/utils/utils";
+import { round, round10 } from "../../../common/utils/utils";
 import { Button } from "primereact/button";
+import { useState } from "react";
+import { useEffect } from "react";
 
 type Props = {
   selected?: PossibleTradeResult;
@@ -21,6 +23,15 @@ type Props = {
 const PossibleTradesStat: React.FC<Props> = ({ selected }) => {
   const dispatch = useAppDispatch();
   const { possibleTradesStat } = useAppSelector(selectPossibleTradesStat);
+  const [result, setResult] = useState<number>(0);
+
+  useEffect(() => {
+    const result = possibleTradesStat.reduce(
+      (accum, cur) => accum + cur.plResult,
+      0
+    );
+    setResult(round(result));
+  }, [possibleTradesStat]);
 
   const quantityTemplate = (rowData, column) => {
     return OperationType.SELL === rowData.operation
@@ -73,8 +84,8 @@ const PossibleTradesStat: React.FC<Props> = ({ selected }) => {
         <Column header="Stop P&L" />
         <Column header="Target P&L" />
         <Column header="Target / Stop P&L" />
-        <Column header="Result P&L" sortable={true} />
-        <Column header="HighTemp P&L" sortable={true} />
+        <Column header={`Result P&L ${result}`} sortable field="plResult" />
+        <Column header="HighTemp P&L" sortable field="plHighTemp" />
         <Column header="Notified" />
       </Row>
     </ColumnGroup>
@@ -118,8 +129,8 @@ const PossibleTradesStat: React.FC<Props> = ({ selected }) => {
       <Column field="possibleTrade.plStop" />
       <Column field="possibleTrade.plTarget" />
       <Column field="possibleTrade.plTarget" body={targetToStopTemplate} />
-      <Column field="plResult" sortable={true} />
-      <Column field="plHighTemp" sortable={true} />
+      <Column field="plResult" />
+      <Column field="plHighTemp" />
       <Column field="notified" body={dateTimeTemplate} />
     </DataTable>
   );

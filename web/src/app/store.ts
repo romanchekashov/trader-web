@@ -46,6 +46,8 @@ const store = configureStore({
         "analysis/loadFilterData/fulfilled",
         "activeTrades/setActiveTrades",
         "stops/setStops",
+        "possibleTrades/tradePossibleTrade/pending",
+        "possibleTrades/tradePossibleTrade/rejected",
       ],
       // Ignore these field paths in all actions
       ignoredActionPaths: ["timestamp"],

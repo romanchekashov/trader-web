@@ -352,6 +352,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
   };
 
   const manageOrder = (order: ChartManageOrder) => {
+    console.log("manageOrder: ", order);
     if (order.dataType === DataType.ORDER) {
       if (order.action === CrudMode.DELETE) {
         WebsocketService.getInstance().send(
@@ -384,6 +385,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
           timeFrameLow: possibleTrade.timeFrameLow,
           entryPrice: possibleTrade.entryPrice,
           quantity: possibleTrade.quantity,
+          operation: possibleTrade.operation,
           depositAmount: 0,
           depositMaxRiskPerTradeInPercent: 1,
         })
