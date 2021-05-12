@@ -2,9 +2,10 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { ToggleButton } from "primereact/togglebutton";
 import {
+  BsClipboard,
+  BsClipboardData,
   BsNewspaper,
   BsCalendar,
-  BsFileEarmarkSpreadsheet,
   BsAlarm,
   BsBell,
   BsChevronBarContract,
@@ -34,6 +35,26 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
       <Tooltip target=".WidgetbarTab" />
       <div
         className={`WidgetbarTab ${
+          item === WidgetbarItem.SECURITIES ? "active" : ""
+        }`}
+        data-pr-tooltip="Securities"
+        data-pr-position="left"
+        onClick={() => select(WidgetbarItem.SECURITIES)}
+      >
+        <BsClipboard />
+      </div>
+      <div
+        className={`WidgetbarTab ${
+          item === WidgetbarItem.SEC_DATA ? "active" : ""
+        }`}
+        data-pr-tooltip="Security Data"
+        data-pr-position="left"
+        onClick={() => select(WidgetbarItem.SEC_DATA)}
+      >
+        <BsClipboardData />
+      </div>
+      <div
+        className={`WidgetbarTab ${
           item === WidgetbarItem.NEWS ? "active" : ""
         }`}
         data-pr-tooltip="News"
@@ -51,16 +72,6 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
         onClick={() => select(WidgetbarItem.CALENDAR)}
       >
         <BsCalendar />
-      </div>
-      <div
-        className={`WidgetbarTab ${
-          item === WidgetbarItem.SEC_DATA ? "active" : ""
-        }`}
-        data-pr-tooltip="Security Data"
-        data-pr-position="left"
-        onClick={() => select(WidgetbarItem.SEC_DATA)}
-      >
-        <BsFileEarmarkSpreadsheet />
       </div>
       <div
         className={`WidgetbarTab ${

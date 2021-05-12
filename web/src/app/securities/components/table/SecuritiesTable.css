@@ -1,0 +1,29 @@
+.win-lg {
+    background-color: #27ae60aa !important;
+}
+.win {
+    background-color: #27ae6055 !important;
+}
+.win-sm {
+    background-color: #27ae6022 !important;
+}
+
+.loss-lg {
+    background-color: #e74c3caa !important;
+}
+.loss {
+    background-color: #e74c3c55 !important;
+}
+.loss-sm {
+    background-color: #e74c3c22 !important;
+}
+
+.p-datatable.active-trade-view .p-datatable-thead > tr > th {
+    padding: 2px;
+    font-size: 10px;
+}
+
+.p-datatable.active-trade-view .p-datatable-tbody td {
+    padding: 0 5px;
+    font-size: 12px;
+}

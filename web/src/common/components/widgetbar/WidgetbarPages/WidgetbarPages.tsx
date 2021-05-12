@@ -2,6 +2,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "../../../../app/hooks";
 import { setPossibleTrade } from "../../../../app/possibleTrades/possibleTradesSlice";
+import Securities from "../../../../app/securities/components/Securities";
 import { setSecurityById } from "../../../../app/securities/securitiesSlice";
 import { SecurityLastInfoView } from "../../../../features/trading-charts/security/info/SecurityLastInfoView";
 import { BrokerId } from "../../../data/BrokerId";
@@ -38,11 +39,12 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
   return (
     <div className="WidgetbarPages">
       <div>{item}</div>
-      {security && item === WidgetbarItem.NEWS ? (
-        <StockEventsBrief secCode={security.secCode} height={600} />
-      ) : null}
+      {item === WidgetbarItem.SECURITIES ? <Securities /> : null}
       {security && item === WidgetbarItem.SEC_DATA ? (
         <SecurityLastInfoView security={security} />
+      ) : null}
+      {security && item === WidgetbarItem.NEWS ? (
+        <StockEventsBrief secCode={security.secCode} height={600} />
       ) : null}
       {item === WidgetbarItem.NOTIFICATIONS ? (
         <Notifications
