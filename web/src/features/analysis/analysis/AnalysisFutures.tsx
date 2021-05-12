@@ -53,6 +53,7 @@ import { PrimeDropdownItem } from "../../../common/utils/utils";
 import { MoexOpenInterestView } from "./moex-open-interest/MoexOpenInterestView";
 import { SupplyAndDemand } from "./supply-and-demand/SupplyAndDemand";
 import moment = require("moment");
+import TrendViewCharts from "../../../common/components/trend/TrendViewCharts/TrendViewCharts";
 
 type Props = {
   security: SecurityLastInfo;
@@ -462,6 +463,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
             </div>
           ) : null}
         </div>
+        <TrendViewCharts premise={premise} security={securityLastInfo} />
         <div className="p-grid">
           {/* <div className="p-col-12">
                         <MarketState filter={marketStateFilterDto}/>
