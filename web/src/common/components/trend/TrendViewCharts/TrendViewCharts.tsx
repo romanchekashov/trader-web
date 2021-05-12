@@ -15,11 +15,16 @@ import { memo } from "react";
 type Props = {
   premise: TradePremise;
   security: Security;
+  eachChartWidth?: number;
 };
 
 let secIdPrev;
 
-const TrendViewCharts: React.FC<Props> = ({ premise, security }) => {
+const TrendViewCharts: React.FC<Props> = ({
+  premise,
+  security,
+  eachChartWidth = 360,
+}) => {
   const [levels, setLevels] = useState<SRLevel[]>([]);
 
   const [trend1, setTrend1] = useState<Trend>();
@@ -101,7 +106,7 @@ const TrendViewCharts: React.FC<Props> = ({ premise, security }) => {
           key={timeFrame1}
           trend={trend1}
           srLevels={levels}
-          width={400}
+          width={eachChartWidth}
           height={600}
         />
       </div>
@@ -110,7 +115,7 @@ const TrendViewCharts: React.FC<Props> = ({ premise, security }) => {
           key={timeFrame2}
           trend={trend2}
           srLevels={levels}
-          width={400}
+          width={eachChartWidth}
           height={600}
         />
       </div>
@@ -119,7 +124,7 @@ const TrendViewCharts: React.FC<Props> = ({ premise, security }) => {
           key={timeFrame3}
           trend={trend3}
           srLevels={levels}
-          width={400}
+          width={eachChartWidth}
           height={600}
         />
       </div>
