@@ -32,7 +32,7 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
       brokerId: BrokerId.ALFA_DIRECT,
       tradingPlatform: TradingPlatform.QUIK,
       secId: null,
-      fetchByWS: false,
+      fetchByWS: true,
       history: false,
       all: true,
     });

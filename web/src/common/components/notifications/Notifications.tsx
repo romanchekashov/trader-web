@@ -44,6 +44,7 @@ const Notifications: React.FC<Props> = ({
 }) => {
   const { shares, currencies, futures } = useAppSelector(selectSecurities);
 
+  const [lastTimeUpdate, setLastTimeUpdate] = useState<string>();
   const [interval, setInterval] = useState(null);
   const [classCode, setClassCode] = useState(null);
   const [secCode, setSecCode] = useState(null);
@@ -59,10 +60,9 @@ const Notifications: React.FC<Props> = ({
   const [fetchAlertsError, setFetchAlertsError] = useState(null);
   const [selectedAlert, setSelectedAlert] = useState(null);
 
-  const intervals: PrimeDropdownItem<Interval>[] = [
-    null,
-    ...Intervals,
-  ].map((val) => ({ label: val || "ALL", value: val }));
+  const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals].map(
+    (val) => ({ label: val || "ALL", value: val })
+  );
   const classCodes: PrimeDropdownItem<ClassCode>[] = [
     null,
     ClassCode.SPBFUT,
@@ -152,6 +152,7 @@ const Notifications: React.FC<Props> = ({
       // onSecCodeChanged(filter.secCode);
       onIntervalChanged(null);
       onTextPatternChanged("");
+      fetchAlerts(filter.secId, null, start, "");
 
       if (filter.fetchByWS) {
         setTimeout(() => getWSNotifications(filter), 500);
@@ -184,8 +185,6 @@ const Notifications: React.FC<Props> = ({
               getWSNotifications(filter);
             }
           });
-      } else {
-        fetchAlerts(filter.secId, null, start, "");
       }
     }
 
@@ -199,7 +198,7 @@ const Notifications: React.FC<Props> = ({
   useEffect(() => {
     setClassCode(security?.classCode);
     setSecCode(security?.code);
-  }, [security]);
+  }, [security?.id]);
 
   const setAlertsReceivedFromServer = (
     newAlerts: NotificationDto[],
@@ -219,6 +218,7 @@ const Notifications: React.FC<Props> = ({
       newTextPattern
     );
     notifyOnNewAlert(newAlerts);
+    setLastTimeUpdate(moment(new Date()).format("HH:mm:ss DD-MM"));
   };
 
   if (!filter) {
@@ -384,6 +384,7 @@ const Notifications: React.FC<Props> = ({
             onChange={(e) => onTextPatternChanged(e.target["value"])}
           />
         </div>
+        <div className="notifications-head-start-date">{lastTimeUpdate}</div>
       </div>
       <div
         className="p-col-12 notifications-body"
