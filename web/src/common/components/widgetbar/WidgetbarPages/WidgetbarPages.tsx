@@ -41,7 +41,13 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
   return (
     <div className="WidgetbarPages">
       <div>{item}</div>
-      {item === WidgetbarItem.SECURITIES ? <Securities /> : null}
+      {item === WidgetbarItem.SECURITIES ? (
+        <>
+          <Securities />
+          <SecurityLastInfoView />
+          <MoexOpenInterestView security={security} />
+        </>
+      ) : null}
       {item === WidgetbarItem.SEC_DATA ? (
         <>
           <SecurityLastInfoView />
