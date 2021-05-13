@@ -20,12 +20,15 @@ import { useRef } from "react";
 import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
 import { DemandSupply } from "../../../../common/components/demand-supply/DemandSupply";
 import "./MoexOpenInterestView.css";
+import { ClassCode } from "../../../../common/data/ClassCode";
 
 type Props = {
   security: SecurityLastInfo;
 };
 
 export const MoexOpenInterestView: React.FC<Props> = ({ security }) => {
+  if (security?.classCode !== ClassCode.SPBFUT) return null;
+
   const ref = useRef(null);
 
   const [moexOpenInterestsForDays, setMoexOpenInterestsForDays] = useState<
