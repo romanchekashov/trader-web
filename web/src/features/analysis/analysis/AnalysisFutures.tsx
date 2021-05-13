@@ -198,7 +198,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
       window.removeEventListener("resize", updateSize);
       wsStatusSub.unsubscribe();
     };
-  }, [security]);
+  }, [security?.id]);
 
   useEffect(() => {
     const tradePremiseSubscription = WebsocketService.getInstance()

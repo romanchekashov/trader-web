@@ -50,6 +50,7 @@ const store = configureStore({
         "possibleTrades/tradePossibleTrade/rejected",
         "activeTrades/deleteActiveTrades/fulfilled",
         "activeTrades/deleteActiveTrades/pending",
+        "activeTrades/setSelectedActiveTrade",
       ],
       // Ignore these field paths in all actions
       ignoredActionPaths: ["timestamp"],
