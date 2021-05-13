@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { ClassCode } from "../../../data/ClassCode";
 import { Interval } from "../../../data/Interval";
 import { Security } from "../../../data/security/Security";
@@ -10,15 +10,12 @@ import { CHART_MIN_WIDTH } from "../../chart/ChartWrapper";
 import TrendViewChart from "../TrendViewChart";
 import "./TrendViewCharts.css";
 import moment = require("moment");
-import { memo } from "react";
 
 type Props = {
   premise: TradePremise;
   security: Security;
   eachChartWidth?: number;
 };
-
-let secIdPrev;
 
 const TrendViewCharts: React.FC<Props> = ({
   premise,
@@ -50,11 +47,12 @@ const TrendViewCharts: React.FC<Props> = ({
     return function cleanup() {
       window.removeEventListener("resize", updateSize);
     };
-  }, [security]);
+  }, [security?.id]);
 
   useEffect(() => {
-    if (secIdPrev === security?.id || !premise) return;
-    secIdPrev = security?.id;
+    if (!premise) return;
+
+    console.log("TrendViewCharts: ", premise.security.code);
 
     const { analysis } = premise;
 
@@ -75,7 +73,7 @@ const TrendViewCharts: React.FC<Props> = ({
     setTrend1(analysis?.trends?.find((value) => value.interval === timeFrame1));
     setTrend2(analysis?.trends?.find((value) => value.interval === timeFrame2));
     setTrend3(analysis?.trends?.find((value) => value.interval === timeFrame3));
-  }, [security, premise]);
+  }, [premise]);
 
   const updateSize = () => {
     const offset = 10;
@@ -100,7 +98,7 @@ const TrendViewCharts: React.FC<Props> = ({
   if (!premise) return <div>Select security for trend analysis</div>;
 
   return (
-    <div className="p-grid">
+    <div key={security?.id} className="p-grid">
       <div className="p-col-4" ref={chart1Ref1} style={{ padding: "0" }}>
         <TrendViewChart
           key={timeFrame1}

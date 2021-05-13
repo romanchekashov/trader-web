@@ -64,7 +64,7 @@ export const MoexOpenInterestView: React.FC<Props> = ({ security }) => {
     return function cleanup() {
       clearInterval(intervalToFetchOpenInterest);
     };
-  }, [security]);
+  }, [security?.id]);
 
   const openInterestLastDay =
     moexOpenInterestsForDays.length > 0
