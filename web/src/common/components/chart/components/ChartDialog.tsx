@@ -57,29 +57,36 @@ export const ChartDialog: React.FC<Props> = ({
   const [isMarket, setIsMarket] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!alertToEdit?.interactive || yValuePrev === alertToEdit?.alert?.yValue)
+    if (
+      !alertToEdit ||
+      !securityInfo ||
+      yValuePrev === alertToEdit?.alert?.yValue
+    )
       return;
     yValuePrev = alertToEdit?.alert?.yValue;
     console.log("ChartDialog: ", yValuePrev);
 
-    const { data, dataType } = alertToEdit.interactive;
-    const { operation, quantity } = data;
+    const { alert, interactive } = alertToEdit;
+    const { secPriceStep } = securityInfo;
+    let operation = interactive?.data?.operation || OperationType.BUY;
+    let quantity = interactive?.data?.quantity || 1;
 
     setOrderType(
-      dataType === DataType.STOP_ORDER
+      interactive?.dataType === DataType.STOP_ORDER
         ? ChartManageOrderType.stop
         : ChartManageOrderType.order
     );
-    setOperationType(operation || OperationType.BUY);
-    setQuantity(quantity || 1);
-    setPrice(round(alertToEdit.alert.yValue, securityInfo.scale));
-    setStopPrice(
-      calcStopPrice(
-        operation || OperationType.BUY,
-        alertToEdit.alert.yValue,
-        securityInfo
-      )
-    );
+    setOperationType(operation);
+    setQuantity(quantity);
+
+    if (alert) {
+      let price = round(alert.yValue, securityInfo.scale);
+      if (secPriceStep > 1) {
+        price = price - (price % secPriceStep);
+      }
+      setPrice(price);
+      setStopPrice(calcStopPrice(operation, price, securityInfo));
+    }
   }, [alertToEdit, securityInfo]);
 
   const calcStopPrice = (
