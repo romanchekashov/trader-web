@@ -23,6 +23,8 @@ const ActiveTradesView: React.FC<Props> = ({}) => {
   const dispatch = useAppDispatch();
   const { activeTrades, selected } = useAppSelector(selectActiveTrades);
 
+  if (activeTrades.length === 0) return null;
+
   const quantityTemplate = (rowData, column) => {
     return OperationType.SELL === rowData.operation
       ? "-" + rowData.quantity
@@ -63,10 +65,6 @@ const ActiveTradesView: React.FC<Props> = ({}) => {
       </Row>
     </ColumnGroup>
   );
-
-  if (activeTrades.length === 0) {
-    return <>No Active Trades</>;
-  }
 
   return (
     <DataTable

@@ -49,7 +49,7 @@ export const SecuritiesFilter: React.FC<Props> = ({
 
   return (
     <div className="securities-filter-">
-      <div>
+      <div className="notifications-head-dropdown">
         <Dropdown
           value={brokerId}
           options={brokerIds}
@@ -67,9 +67,6 @@ export const SecuritiesFilter: React.FC<Props> = ({
           }}
           placeholder="Select a platform"
         />
-      </div>
-
-      <div>
         <Dropdown value={secType} options={types} onChange={updateSecType} />
         {lastTimeUpdate}
       </div>

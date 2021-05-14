@@ -1,3 +1,7 @@
 .securities-filter- {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  font-size: 12px;
   padding: 0px;
 }

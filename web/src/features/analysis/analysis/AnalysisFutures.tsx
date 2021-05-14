@@ -443,9 +443,13 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
                 width={chart2Width}
                 security={securityLastInfo}
                 premise={premise}
+                stops={stops}
+                orders={orders}
                 trades={trades}
+                activeTrade={activeTrade}
                 showGrid={true}
                 possibleTrade={pTrade}
+                onManageOrder={manageOrder}
               />
             </div>
           ) : null}

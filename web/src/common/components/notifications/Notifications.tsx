@@ -15,6 +15,7 @@ import { FilterDto } from "../../data/FilterDto";
 import { Interval } from "../../data/Interval";
 import { Security } from "../../data/security/Security";
 import {
+  DATE_TIME_FORMAT,
   getRecentBusinessDate,
   Intervals,
   PrimeDropdownItem,
@@ -218,7 +219,7 @@ const Notifications: React.FC<Props> = ({
       newTextPattern
     );
     notifyOnNewAlert(newAlerts);
-    setLastTimeUpdate(moment(new Date()).format("HH:mm:ss DD-MM"));
+    setLastTimeUpdate(moment(new Date()).format(DATE_TIME_FORMAT));
   };
 
   if (!filter) {

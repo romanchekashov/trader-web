@@ -12,9 +12,11 @@ import { DataType } from "../../../data/DataType";
 import { FilterDto } from "../../../data/FilterDto";
 import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 import { TradingPlatform } from "../../../data/trading/TradingPlatform";
+import ActiveTradesView from "../../control-panel/components/ActiveTradesView";
 import ControlPanelWidget from "../../control-panel/ControlPanelWidget/ControlPanelWidget";
 import Notifications from "../../notifications/Notifications";
 import { StockEventsBrief } from "../../share-event/StockEventsBrief";
+import DepositView from "../../stack/deposit/DepositView";
 import { WidgetbarItem } from "../WidgetbarItem";
 import "./WidgetbarPages.css";
 
@@ -40,9 +42,10 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
 
   return (
     <div className="WidgetbarPages">
-      <div>{item}</div>
       {item === WidgetbarItem.SECURITIES ? (
         <>
+          <ActiveTradesView />
+          <DepositView />
           <Securities />
           <SecurityLastInfoView />
           <MoexOpenInterestView security={security} />

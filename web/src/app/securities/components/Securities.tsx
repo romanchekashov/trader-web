@@ -6,6 +6,7 @@ import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo
 import { SecurityType } from "../../../common/data/security/SecurityType";
 import { SecurityTypeWrapper } from "../../../common/data/security/SecurityTypeWrapper";
 import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
+import { DATE_TIME_FORMAT } from "../../../common/utils/utils";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { selectSecurities, setSecurityById } from "../securitiesSlice";
 import { SecuritiesFilter } from "./filter/SecuritiesFilter";
@@ -58,7 +59,7 @@ const Securities: React.FC<Props> = ({}) => {
   };
 
   const securitiesFiltered = filterSecurities(securities, secType);
-  const lastTimeUpdate = moment(new Date()).format("HH:mm:ss DD-MM");
+  const lastTimeUpdate = moment(new Date()).format(DATE_TIME_FORMAT);
 
   return (
     <>

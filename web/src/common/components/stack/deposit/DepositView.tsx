@@ -23,23 +23,29 @@ const DepositView: React.FC<Props> = ({}) => {
   const [data, setData] = useState<RowData[]>([]);
 
   useEffect(() => {
-    setInterval(() => {
-      getFuturesLimits().then((limits) => {
-        setData(
-          limits
-            .filter((value) => value.limit_type === 0)
-            .map((value) => ({
+    loadData();
+    setInterval(loadData, 30000);
+  }, []);
+
+  const loadData = () => {
+    getFuturesLimits().then((limits) => {
+      setData(
+        limits
+          .filter((value) => value.limit_type === 0)
+          .map((value) => {
+            const margin = Math.round(value.varmargin + value.accruedint);
+            return {
               limit: Math.round(value.cbplimit),
               used: Math.round(value.cbplused),
-              margin: value.varmargin,
-              commission: value.ts_comission * 2,
+              margin,
+              commission: Math.round(value.ts_comission * 2),
               planned: Math.round(value.cbplplanned),
-              result: round100((value.varmargin * 100) / value.cbplimit),
-            }))
-        );
-      });
-    }, 30000);
-  }, []);
+              result: round100((margin * 100) / value.cbplimit),
+            };
+          })
+      );
+    });
+  };
 
   const rowClassName = (rowData) => {
     if (rowData.margin > 0) {
@@ -55,9 +61,9 @@ const DepositView: React.FC<Props> = ({}) => {
       <Row style={{ height: "10px" }}>
         <Column header="Limit" />
         <Column header="Used" />
+        <Column header="Available" />
         <Column header="Margin" />
         <Column header="Comis" />
-        <Column header="Plan" />
         <Column header="P&L %" />
       </Row>
     </ColumnGroup>
@@ -77,9 +83,9 @@ const DepositView: React.FC<Props> = ({}) => {
     >
       <Column field="limit" />
       <Column field="used" />
+      <Column field="planned" />
       <Column field="margin" />
       <Column field="commission" />
-      <Column field="planned" />
       <Column field="result" />
     </DataTable>
   );
