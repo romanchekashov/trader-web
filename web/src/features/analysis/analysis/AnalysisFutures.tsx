@@ -408,9 +408,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
               />
             </div>
           </div>
-          <div className="p-col-11">
-            <TrendsView trends={premise ? premise.analysis.trends : []} />
-          </div>
         </div>
         <div className="p-grid" style={{ margin: "0" }}>
           <div className="p-col-6" ref={chart1Ref} style={{ padding: "0" }}>
@@ -454,6 +451,7 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
             </div>
           ) : null}
         </div>
+        <TrendsView trends={premise ? premise.analysis.trends : []} />
         <TrendViewCharts premise={premise} security={securityLastInfo} />
         <div className="p-grid">
           {/* <div className="p-col-12">

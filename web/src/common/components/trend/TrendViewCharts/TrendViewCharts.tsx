@@ -72,8 +72,27 @@ const TrendViewCharts: React.FC<Props> = ({
 
     setTrend1(analysis?.trends?.find((value) => value.interval === timeFrame1));
     setTrend2(analysis?.trends?.find((value) => value.interval === timeFrame2));
-    setTrend3(analysis?.trends?.find((value) => value.interval === timeFrame3));
+    setTrend3(
+      filterTrendPoints(
+        analysis?.trends?.find((value) => value.interval === timeFrame3)
+      )
+    );
   }, [premise]);
+
+  const filterTrendPoints = (trend: Trend): Trend => {
+    if (Interval.M3 !== trend.interval && Interval.M5 !== trend.interval)
+      return trend;
+
+    const newTrend = { ...trend };
+    const date =
+      newTrend.swingHighsLows[
+        newTrend.swingHighsLows.length - 1
+      ].dateTime.getDate();
+    newTrend.swingHighsLows = newTrend.swingHighsLows.filter(
+      ({ dateTime }) => date === dateTime.getDate()
+    );
+    return newTrend;
+  };
 
   const updateSize = () => {
     const offset = 10;

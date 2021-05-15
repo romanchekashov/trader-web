@@ -33,6 +33,9 @@ const TrendViewChart: React.FC<Props> = ({
     MONTH: "DD-MM-YYYY",
     WEEK: "DD-MM-YYYY",
     DAY: "DD-MM-YYYY",
+    M5: "HH:mm",
+    M3: "HH:mm",
+    M1: "HH:mm",
   };
   const TODAY_COLOR = "#f44336";
   const options = {
@@ -58,7 +61,7 @@ const TrendViewChart: React.FC<Props> = ({
   const updateData = (trend: Trend, levels: SRLevel[]): any => {
     const color = getColor(trend.direction);
     const dateTimeFormat =
-      intervalDateTimeFormat[trend.interval] || "HH:mm DD-MM";
+      intervalDateTimeFormat[trend.interval] || "DD.MM/HH:mm";
     const datasets = [];
 
     datasets.push({
