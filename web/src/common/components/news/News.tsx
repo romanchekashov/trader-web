@@ -47,7 +47,7 @@ export const News: React.FC<Props> = ({ secId, onItemSelected }) => {
   };
 
   const updateSize = () => {
-    setHeight(window.innerHeight - 27);
+    setHeight(window.innerHeight);
   };
 
   const formatNews = (item: NewsItem) => {
