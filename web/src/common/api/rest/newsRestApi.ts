@@ -14,7 +14,7 @@ export function getNews(
   provider?: NewsProvider,
   secId?: number
 ): Promise<NewsItem[]> {
-  let url = baseUrl;
+  let url = "";
 
   if (provider && secId) {
     url += `?provider=${provider}&secId=${secId}`;
@@ -23,8 +23,11 @@ export function getNews(
   } else if (secId) {
     url += `?secId=${secId}`;
   }
-  url += `&page=0&size=1000`;
-  return fetch(url)
+
+  url += url ? "&" : "?";
+  url += `page=0&size=1000`;
+
+  return fetch(baseUrl + url)
     .then((response) => handleResponse(response).then(adjustNewsItems))
     .catch(handleError);
 }
