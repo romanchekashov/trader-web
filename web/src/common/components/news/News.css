@@ -1,4 +1,5 @@
 #news {
+  overflow: scroll;
 }
 
 #news.news_lg {

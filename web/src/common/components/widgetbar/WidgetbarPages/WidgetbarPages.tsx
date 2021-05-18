@@ -60,10 +60,11 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
           <MoexOpenInterestView security={security} />
         </>
       ) : null}
+
       {security && item === WidgetbarItem.NEWS ? (
         <>
           {ClassCode.TQBR === security.classCode ? (
-            <StockEventsBrief secCode={security.secCode} height={600} />
+            <StockEventsBrief secCode={security.secCode} height={400} />
           ) : null}
           <News secId={security.id} />
         </>
