@@ -258,12 +258,6 @@ export const TradingChartsSecurity: React.FC<Props> = ({
       <div className={chartsClassName}>
         <div className="p-grid">
           <div className="p-col-12">
-            <TrendsView
-              trends={premise?.analysis?.trends || []}
-              srLevels={premise?.analysis?.srLevels || []}
-            />
-          </div>
-          <div className="p-col-12">
             <div className="p-grid">
               <div className="p-col-6" ref={chart2Ref} style={{ padding: "0" }}>
                 <ChartWrapper
@@ -300,6 +294,11 @@ export const TradingChartsSecurity: React.FC<Props> = ({
                 />
               </div>
             </div>
+
+            <TrendsView
+              trends={premise?.analysis?.trends || []}
+              srLevels={premise?.analysis?.srLevels || []}
+            />
             <div className="p-grid">
               <div
                 className="p-col-4"
