@@ -25,6 +25,7 @@ import { MoexOpenInterestChart } from "../../analysis/analysis/moex-open-interes
 import { SecurityLastInfoView } from "./info/SecurityLastInfoView";
 import moment = require("moment");
 import { News } from "../../../common/components/news/News";
+import { MoexOpenInterestView } from "../../analysis/analysis/moex-open-interest/MoexOpenInterestView";
 
 type Props = {
   securityLastInfo: SecurityLastInfo;
@@ -388,12 +389,10 @@ export const TradingChartsSecurity: React.FC<Props> = ({
         <div className="p-col-2" ref={infoRef}>
           <SecurityLastInfoView />
           {ClassCode.SPBFUT === securityLastInfo?.classCode ? (
-            <MoexOpenInterestChart
-              moexOpenInterests={moexOpenInterestsForDays}
-              title={"Open Interest history"}
-              dateTimeFormat={"DD MMM YY"}
-              width={infoWidth}
-              height={300}
+            <MoexOpenInterestView
+              security={securityLastInfo}
+              showTable={false}
+              showRealTimeOI={false}
             />
           ) : null}
           <div style={{ marginBottom: "5px" }}></div>

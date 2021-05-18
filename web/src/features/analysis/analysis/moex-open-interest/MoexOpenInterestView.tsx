@@ -1,12 +1,13 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
-import { useAppSelector } from "../../../../app/hooks";
-import { selectSecurities } from "../../../../app/securities/securitiesSlice";
+import { useEffect, useRef, useState } from "react";
 import {
   getMoexApiOpenInterestList,
   getMoexOpenInterests,
 } from "../../../../common/api/rest/analysisRestApi";
+import { DemandSupply } from "../../../../common/components/demand-supply/DemandSupply";
+import { ClassCode } from "../../../../common/data/ClassCode";
 import { MoexOpenInterest } from "../../../../common/data/open-interest/MoexOpenInterest";
+import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
 import {
   fizLongColor,
   fizShortColor,
@@ -15,18 +16,20 @@ import {
   yurShortColor,
 } from "./MoexOpenInterestChart";
 import { MoexOpenInterestTable } from "./MoexOpenInterestTable";
-import moment = require("moment");
-import { useRef } from "react";
-import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
-import { DemandSupply } from "../../../../common/components/demand-supply/DemandSupply";
 import "./MoexOpenInterestView.css";
-import { ClassCode } from "../../../../common/data/ClassCode";
+import moment = require("moment");
 
 type Props = {
   security: SecurityLastInfo;
+  showTable?: boolean;
+  showRealTimeOI?: boolean;
 };
 
-export const MoexOpenInterestView: React.FC<Props> = ({ security }) => {
+export const MoexOpenInterestView: React.FC<Props> = ({
+  security,
+  showTable = true,
+  showRealTimeOI = true,
+}) => {
   if (security?.classCode !== ClassCode.SPBFUT) return null;
 
   const ref = useRef(null);
@@ -90,27 +93,31 @@ export const MoexOpenInterestView: React.FC<Props> = ({ security }) => {
           />
         </div>
       ) : null}
-      <div className="p-col-12">
-        <MoexOpenInterestTable moexOpenInterest={openInterestLastDay} />
-      </div>
+      {showTable ? (
+        <div className="p-col-12">
+          <MoexOpenInterestTable moexOpenInterest={openInterestLastDay} />
+        </div>
+      ) : null}
       <div className="p-col-12">
         <MoexOpenInterestChart
           moexOpenInterests={moexOpenInterestsForDays}
           title={"OI history"}
           dateTimeFormat={"DD MMM YY"}
           width={ref?.current?.clientWidth || 800}
-          height={ref?.current?.clientWidth < 500 ? 400 : 600}
+          height={ref?.current?.clientWidth < 500 ? 300 : 600}
         />
       </div>
-      <div className="p-col-12">
-        <MoexOpenInterestChart
-          moexOpenInterests={moexOpenInterests}
-          title={"Real-time OI for last date"}
-          dateTimeFormat={"HH:mm/DD MMM YY"}
-          width={ref?.current?.clientWidth || 500}
-          height={400}
-        />
-      </div>
+      {showRealTimeOI ? (
+        <div className="p-col-12">
+          <MoexOpenInterestChart
+            moexOpenInterests={moexOpenInterests}
+            title={"Real-time OI for last date"}
+            dateTimeFormat={"HH:mm/DD MMM YY"}
+            width={ref?.current?.clientWidth || 500}
+            height={400}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };
