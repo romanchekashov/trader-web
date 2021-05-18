@@ -8,12 +8,14 @@ import { MoexOpenInterestView } from "../../../../features/analysis/analysis/moe
 import { SupplyAndDemand } from "../../../../features/analysis/analysis/supply-and-demand/SupplyAndDemand";
 import { SecurityLastInfoView } from "../../../../features/trading-charts/security/info/SecurityLastInfoView";
 import { BrokerId } from "../../../data/BrokerId";
+import { ClassCode } from "../../../data/ClassCode";
 import { DataType } from "../../../data/DataType";
 import { FilterDto } from "../../../data/FilterDto";
 import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 import { TradingPlatform } from "../../../data/trading/TradingPlatform";
 import ActiveTradesView from "../../control-panel/components/ActiveTradesView";
 import ControlPanelWidget from "../../control-panel/ControlPanelWidget/ControlPanelWidget";
+import { News } from "../../news/News";
 import Notifications from "../../notifications/Notifications";
 import { StockEventsBrief } from "../../share-event/StockEventsBrief";
 import DepositView from "../../stack/deposit/DepositView";
@@ -48,7 +50,6 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
           <DepositView />
           <Securities />
           <SecurityLastInfoView />
-          <MoexOpenInterestView security={security} />
         </>
       ) : null}
       {item === WidgetbarItem.SEC_DATA ? (
@@ -59,7 +60,12 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
         </>
       ) : null}
       {security && item === WidgetbarItem.NEWS ? (
-        <StockEventsBrief secCode={security.secCode} height={600} />
+        <>
+          {ClassCode.TQBR === security.classCode ? (
+            <StockEventsBrief secCode={security.secCode} height={600} />
+          ) : null}
+          <News secId={security.id} />
+        </>
       ) : null}
       {item === WidgetbarItem.NOTIFICATIONS ? (
         <Notifications

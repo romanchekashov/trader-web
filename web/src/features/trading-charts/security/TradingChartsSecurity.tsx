@@ -24,6 +24,7 @@ import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
 import { MoexOpenInterestChart } from "../../analysis/analysis/moex-open-interest/MoexOpenInterestChart";
 import { SecurityLastInfoView } from "./info/SecurityLastInfoView";
 import moment = require("moment");
+import { News } from "../../../common/components/news/News";
 
 type Props = {
   securityLastInfo: SecurityLastInfo;
@@ -404,7 +405,11 @@ export const TradingChartsSecurity: React.FC<Props> = ({
             }}
             viewHeight={400}
           />
-          <StockEventsBrief secCode={securityLastInfo.secCode} height={400} />
+
+          {ClassCode.TQBR === securityLastInfo.classCode ? (
+            <StockEventsBrief secCode={securityLastInfo.secCode} height={400} />
+          ) : null}
+          <News secId={securityLastInfo.id} />
         </div>
       )}
     </div>
