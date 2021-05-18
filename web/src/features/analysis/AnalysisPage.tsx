@@ -1,3 +1,4 @@
+import { Dropdown } from "primereact/dropdown";
 import { TabPanel, TabView } from "primereact/tabview";
 import * as React from "react";
 import { useEffect, useState } from "react";
@@ -19,6 +20,7 @@ import { ClassCode } from "../../common/data/ClassCode";
 import { Market } from "../../common/data/Market";
 import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
 import { setSelectedSecurity } from "../../common/utils/Cache";
+import { PrimeDropdownItem } from "../../common/utils/utils";
 import "./Analysis.css";
 import Analysis from "./analysis/Analysis";
 import AnalysisFutures from "./analysis/AnalysisFutures";
@@ -35,6 +37,11 @@ const AnalysisPage: React.FC<Props> = ({}) => {
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [isTabShown, setIsTabShown] = useState(false);
+  const [chartNumber, setChartNumber] = useState<number>(2);
+  const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map((val) => ({
+    label: "" + val,
+    value: val,
+  }));
 
   useEffect(() => {
     dispatch(loadFilterData(false));
@@ -67,6 +74,10 @@ const AnalysisPage: React.FC<Props> = ({}) => {
     setIsTabShown(!isTabShown);
   };
 
+  const onChartNumberChanged = (num: number) => {
+    setChartNumber(num);
+  };
+
   return (
     <div className="p-grid sample-layout analysis">
       {/*<div className="p-col-12" style={{padding: 0}}>
@@ -91,17 +102,26 @@ const AnalysisPage: React.FC<Props> = ({}) => {
               {isTabShown ? <PossibleTradesStat /> : null}
             </TabPanel>
           </TabView>
+          <div className="p-col-1 analysis-head">
+            <div className="analysis-head-chart-number">
+              <Dropdown
+                value={chartNumber}
+                options={chartNumbers}
+                onChange={(e) => onChartNumberChanged(e.value)}
+              />
+            </div>
+          </div>
         </div>
       </div>
       <div className="p-col-12">
         {!security ? (
           <div>Select security</div>
         ) : Market.SPB === security.market ? (
-          <AnalysisTinkoff security={security} />
+          <AnalysisTinkoff security={security} chartNumber={chartNumber} />
         ) : ClassCode.SPBFUT === security.classCode ? (
-          <AnalysisFutures security={security} />
+          <AnalysisFutures security={security} chartNumber={chartNumber} />
         ) : (
-          <Analysis security={security} />
+          <Analysis security={security} chartNumber={chartNumber} />
         )}
       </div>
     </div>

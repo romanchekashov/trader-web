@@ -1,4 +1,3 @@
-import { Dropdown } from "primereact/dropdown";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Toast } from "primereact/toast";
 import * as React from "react";
@@ -46,17 +45,17 @@ import {
   getTimeFrameHigh,
   getTimeFrameLow,
 } from "../../../common/utils/TimeFrameChooser";
-import { PrimeDropdownItem } from "../../../common/utils/utils";
 import { MoexOpenInterestView } from "./moex-open-interest/MoexOpenInterestView";
 import moment = require("moment");
 
 type Props = {
   security: SecurityLastInfo;
+  chartNumber: number;
 };
 
 let prevMainWidth;
 
-const AnalysisFutures: React.FC<Props> = ({ security }) => {
+const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
   const dispatch = useAppDispatch();
   const { possibleTrade } = useAppSelector(selectPossibleTrade);
   const { securities } = useAppSelector(selectSecurities);
@@ -97,12 +96,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
   const [timeFrameHigh, setTimeFrameHigh] = useState<Interval>(Interval.M30);
   const [premise, setPremise] = useState<TradePremise>(null);
   const [orders, setOrders] = useState<Order[]>([]);
-
-  const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map((val) => ({
-    label: "" + val,
-    value: val,
-  }));
-  const [chartNumber, setChartNumber] = useState<number>(2);
 
   const [chart1Width, setChart1Width] = useState(MIN_CHART_WIDTH);
   const [chart2Width, setChart2Width] = useState(MIN_CHART_WIDTH);
@@ -310,11 +303,6 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
     load();
   };
 
-  const onChartNumberChanged = (num: number) => {
-    setChartNumber(num);
-    setTimeout(updateSize, 1000);
-  };
-
   const onTradingIntervalChanged = (interval: Interval) => {
     setTimeFrameTrading(interval);
     setTimeFrameHigh(getTimeFrameHigh(interval));
@@ -398,26 +386,15 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
     <div className="p-grid" ref={mainRef}>
       <Toast ref={toast} />
       <div className="p-col-12">
-        <div className="p-grid analysis-head">
-          <div className="p-col-1">
-            <div className="analysis-head-chart-number">
-              <Dropdown
-                value={chartNumber}
-                options={chartNumbers}
-                onChange={(e) => onChartNumberChanged(e.value)}
-              />
-            </div>
-          </div>
-        </div>
         <div className="p-grid" style={{ margin: "0" }}>
-          <div className="p-col-6" ref={chart1Ref} style={{ padding: "0" }}>
+          <div className="p-col-6" ref={chart2Ref} style={{ padding: "0" }}>
             <ChartWrapper
-              interval={timeFrameTrading}
-              initialNumberOfCandles={300}
-              onIntervalChanged={onTradingIntervalChanged}
-              onStartChanged={onStartChanged}
-              onPremiseBeforeChanged={onPremiseBeforeChanged}
-              width={chart1Width}
+              interval={timeFrameHigh}
+              // start={start}
+              initialNumberOfCandles={200}
+              onIntervalChanged={(interval) => {}}
+              onStartChanged={(start) => {}}
+              width={chart2Width}
               security={securityLastInfo}
               premise={premise}
               stops={stops}
@@ -430,14 +407,14 @@ const AnalysisFutures: React.FC<Props> = ({ security }) => {
             />
           </div>
           {chartNumber === 2 ? (
-            <div className="p-col-6" ref={chart2Ref} style={{ padding: "0" }}>
+            <div className="p-col-6" ref={chart1Ref} style={{ padding: "0" }}>
               <ChartWrapper
-                interval={timeFrameHigh}
-                // start={start}
-                initialNumberOfCandles={200}
-                onIntervalChanged={(interval) => {}}
-                onStartChanged={(start) => {}}
-                width={chart2Width}
+                interval={timeFrameTrading}
+                initialNumberOfCandles={300}
+                onIntervalChanged={onTradingIntervalChanged}
+                onStartChanged={onStartChanged}
+                onPremiseBeforeChanged={onPremiseBeforeChanged}
+                width={chart1Width}
                 security={securityLastInfo}
                 premise={premise}
                 stops={stops}

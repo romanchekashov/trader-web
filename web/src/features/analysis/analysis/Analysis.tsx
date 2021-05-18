@@ -1,6 +1,5 @@
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { Dropdown } from "primereact/dropdown";
 import { TabPanel, TabView } from "primereact/tabview";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -39,7 +38,6 @@ import {
   getTimeFrameHigh,
   getTimeFrameLow,
 } from "../../../common/utils/TimeFrameChooser";
-import { PrimeDropdownItem } from "../../../common/utils/utils";
 import moment = require("moment");
 
 export interface AnalysisState {
@@ -48,9 +46,10 @@ export interface AnalysisState {
 
 type Props = {
   security: SecurityLastInfo;
+  chartNumber: number;
 };
 
-const Analysis: React.FC<Props> = ({ security }) => {
+const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
   const timeFrameTradingIntervals = {
     M1: [Interval.M1],
     M3: [Interval.M3, Interval.M1],
@@ -77,12 +76,6 @@ const Analysis: React.FC<Props> = ({ security }) => {
   const [orders, setOrders] = useState(null);
   const [activeTrade, setActiveTrade] = useState(null);
   const [premiseBefore, setPremiseBefore] = useState<Date>(null);
-
-  const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map((val) => ({
-    label: "" + val,
-    value: val,
-  }));
-  const [chartNumber, setChartNumber] = useState<number>(2);
 
   const [securityLastInfo, setSecurityLastInfo] =
     useState<SecurityLastInfo>(null);
@@ -299,11 +292,6 @@ const Analysis: React.FC<Props> = ({ security }) => {
       });
   };
 
-  const onChartNumberChanged = (num: number) => {
-    setChartNumber(num);
-    setTimeout(updateSize, 1000);
-  };
-
   const onTradingIntervalChanged = (interval: Interval) => {
     setTimeFrameTrading(interval);
     setTimeFrameHigh(getTimeFrameHigh(interval));
@@ -326,15 +314,6 @@ const Analysis: React.FC<Props> = ({ security }) => {
       <TabView>
         <TabPanel header="Chart">
           <div className="p-grid analysis-head">
-            <div className="p-col-12">
-              <div className="analysis-head-chart-number">
-                <Dropdown
-                  value={chartNumber}
-                  options={chartNumbers}
-                  onChange={(e) => onChartNumberChanged(e.value)}
-                />
-              </div>
-            </div>
             <div className="p-col-12">
               <DataTable value={[securityLastInfo]}>
                 <Column field="totalDemand" header="Общ спрос" />
