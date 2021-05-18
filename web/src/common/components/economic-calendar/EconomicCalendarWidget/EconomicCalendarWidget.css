@@ -1,0 +1,45 @@
+#calendar {
+  max-width: 1400px;
+  margin: 40px auto;
+}
+
+.listDayEvent {
+  display: grid;
+  grid-template-columns: 1fr 1fr 6fr 2fr 2fr 2fr;
+}
+
+#calendar .fc-list-event {
+  background-color: #fff;
+  border: 1px solid #eee;
+  color: #000;
+}
+
+.valuePreviousRevised {
+  background-color: #edb23b;
+  border-radius: 5px;
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  zoom: 1;
+  margin-left: 10px;
+  cursor: pointer;
+}
+.eventType {
+  font-size: 12px;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.EconomicCalendarWidget_head {
+  display: flex;
+  padding-top: 10px;
+  font-size: 0.9rem;
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+.EconomicCalendarWidgetItem_group_title {
+  width: 100%;
+  padding: 0px 15px;
+}

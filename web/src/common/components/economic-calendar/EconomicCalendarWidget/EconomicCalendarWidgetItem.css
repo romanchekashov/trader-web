@@ -1,0 +1,58 @@
+.EconomicCalendarWidgetItem {
+  width: 100%;
+  padding: 5px;
+  font-size: 0.9rem;
+  display: flex;
+}
+
+.EconomicCalendarWidgetItem_values {
+  display: flex;
+  justify-content: space-around;
+}
+
+.EconomicCalendarWidgetItem_left {
+  width: 22%;
+  text-align: center;
+}
+.EconomicCalendarWidgetItem_right {
+  width: 78%;
+}
+
+.dot {
+  display: inline-block;
+  box-sizing: content-box;
+  width: 0;
+  height: 0;
+  border: 5px solid #3788d8;
+  border-radius: 5px;
+}
+
+.dot_old {
+  border: 5px solid #aaa;
+}
+.dot_next {
+  border: 5px solid #f00;
+}
+
+#calendar .fc-list-event {
+  background-color: #fff;
+  border: 1px solid #eee;
+  color: #000;
+}
+
+.valuePreviousRevised {
+  background-color: #edb23b;
+  border-radius: 5px;
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  zoom: 1;
+  margin-left: 10px;
+  cursor: pointer;
+}
+.eventType {
+  font-size: 12px;
+  font-style: italic;
+  font-weight: bold;
+  margin-left: 10px;
+}

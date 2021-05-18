@@ -33,17 +33,18 @@ export function getNews(
 }
 
 export function getEconomicCalendarEvents(
+  start: string,
   calendarType?: CalendarType,
   secId?: number
 ): Promise<EconomicCalendarEvent[]> {
-  let url = `${baseUrl}economic-calendar`;
+  let url = `${baseUrl}economic-calendar?start=${start}`;
 
   if (calendarType && secId) {
-    url += `?calendarType=${calendarType}&secId=${secId}`;
+    url += `&calendarType=${calendarType}&secId=${secId}`;
   } else if (calendarType) {
-    url += `?calendarType=${calendarType}`;
+    url += `&calendarType=${calendarType}`;
   } else if (secId) {
-    url += `?secId=${secId}`;
+    url += `&secId=${secId}`;
   }
 
   return fetch(url)

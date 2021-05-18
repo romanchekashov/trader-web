@@ -15,6 +15,7 @@ import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 import { TradingPlatform } from "../../../data/trading/TradingPlatform";
 import ActiveTradesView from "../../control-panel/components/ActiveTradesView";
 import ControlPanelWidget from "../../control-panel/ControlPanelWidget/ControlPanelWidget";
+import EconomicCalendarWidget from "../../economic-calendar/EconomicCalendarWidget/EconomicCalendarWidget";
 import { News } from "../../news/News";
 import Notifications from "../../notifications/Notifications";
 import { StockEventsBrief } from "../../share-event/StockEventsBrief";
@@ -67,6 +68,14 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
           <News secId={security.id} />
         </>
       ) : null}
+
+      {item === WidgetbarItem.CALENDAR ? (
+        <EconomicCalendarWidget
+          secId={security?.id}
+          onEventSelected={console.log}
+        />
+      ) : null}
+
       {item === WidgetbarItem.NOTIFICATIONS ? (
         <Notifications
           filter={filterDto}
