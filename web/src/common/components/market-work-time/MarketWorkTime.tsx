@@ -52,7 +52,7 @@ const MarketWorkTime: React.FC<{}> = ({}) => {
   })();
 
   const updateMoex = () => {
-    const START_IN_MINUTES = 10 * 60;
+    const START_IN_MINUTES = 7 * 60;
     const END_IN_MINUTES = 23 * 60 + 50;
     const FIRST_CLEAR_START_IN_MINUTES = 14 * 60;
     const FIRST_CLEAR_END_IN_MINUTES = 14 * 60 + 5;
@@ -154,23 +154,30 @@ const MarketWorkTime: React.FC<{}> = ({}) => {
 
   return (
     <div className="market-work-time">
-      <div style={{ marginLeft: "5px", display: "flex" }}>
+      <div className="MarketWorkTime_market">
         <div className="ceFlags rus market-work-time-flag"></div>
         <i className={"pi pi-clock market-work-time-" + moex}></i>
       </div>
-      <div style={{ marginLeft: "5px", display: "flex" }}>
+      <div className="MarketWorkTime_market">
         <div className="ceFlags UK market-work-time-flag"></div>
         <i className={"pi pi-clock market-work-time-" + lse}></i>
       </div>
-      <div style={{ marginLeft: "5px", display: "flex" }}>
+      <div className="MarketWorkTime_market">
         <div className="ceFlags usa market-work-time-flag"></div>
         <i className={"pi pi-clock market-work-time-" + nyse}></i>
       </div>
-      <div style={{ marginLeft: "5px", display: "flex" }}>
+      <div className="MarketWorkTime_market">
         <div className="ceFlags hkd market-work-time-flag"></div>
         <i className={"pi pi-clock market-work-time-" + hkse}></i>
       </div>
-      <div style={{ marginLeft: "5px", marginRight: "5px", display: "flex" }}>
+      <div
+        style={{
+          marginLeft: "5px",
+          marginRight: "5px",
+          display: "flex",
+          width: 100,
+        }}
+      >
         {time}
       </div>
     </div>
