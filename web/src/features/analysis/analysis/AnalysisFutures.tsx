@@ -428,8 +428,10 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
             </div>
           ) : null}
         </div>
+
         <TrendsView trends={premise ? premise.analysis.trends : []} />
         <TrendViewCharts premise={premise} security={securityLastInfo} />
+
         <div className="p-grid">
           {/* <div className="p-col-12">
                         <MarketState filter={marketStateFilterDto}/>

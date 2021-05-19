@@ -21,7 +21,9 @@ export const SecurityLastInfoView: React.FC<Props> = ({}) => {
     classCode,
     lastChange,
     lastTradePrice,
+    lastTradeQuantity,
     secPriceStep,
+    lotSize,
     numTradesToday,
     valueToday,
     totalDemand,
@@ -35,20 +37,30 @@ export const SecurityLastInfoView: React.FC<Props> = ({}) => {
       <div className="p-col-12">
         <div>
           {code}({id}) {name}(<strong>{secCode}</strong>)
-          <span> Шаг цены: {secPriceStep}</span>
         </div>
         <div>
-          Цена: <strong>{lastTradePrice}</strong>
           <span>
-            % изм: <strong>{lastChange}% </strong>
+            Шаг цены: <strong>{secPriceStep}</strong>
+          </span>{" "}
+          <span>
+            Лот: <strong>{lotSize}</strong>
+          </span>
+        </div>
+        <div>
+          Посл: Цена: <strong>{lastTradePrice}</strong>{" "}
+          <span>
+            изм(%): <strong>{lastChange}% </strong>
+          </span>{" "}
+          <span>
+            Кол-во: <strong>{lastTradeQuantity}</strong>
           </span>
         </div>
         <div>
           <span>
-            Кол-во сделок: <strong>{numTradesToday} </strong>
+            Оборот: <strong>{formatNumber(valueToday)} </strong>
           </span>
           <span>
-            Оборот: <strong>{formatNumber(valueToday)}</strong>
+            Кол-во сделок: <strong>{numTradesToday}</strong>
           </span>
         </div>
         <div>
@@ -102,6 +114,16 @@ export const SecurityLastInfoView: React.FC<Props> = ({}) => {
             Float Traded(%):{" "}
             <strong>{security.percentOfFreeFloatTradedToday}</strong>
           </div>
+        ) : null}
+        {classCode === ClassCode.TQBR ? (
+          <>
+            <div>
+              Объем обр: <strong>{security.issueSize}</strong>
+            </div>
+            <div>
+              Ср. взв. цена: <strong>{security.weightedAveragePrice}</strong>
+            </div>
+          </>
         ) : null}
         {classCode === ClassCode.SPBFUT ? (
           <div>

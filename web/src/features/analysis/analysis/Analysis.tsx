@@ -63,7 +63,7 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
     WEEK: [Interval.WEEK, Interval.DAY],
     MONTH: [Interval.MONTH, Interval.WEEK],
   };
-
+  const mainRef = useRef(null);
   const [start, setStart] = useState(
     moment().subtract(1, "days").hours(9).minutes(0).seconds(0).toDate()
   );
@@ -311,59 +311,43 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
 
   if (security) {
     return (
-      <TabView>
-        <TabPanel header="Chart">
-          <div className="p-grid analysis-head">
-            <div className="p-col-12">
-              <DataTable value={[securityLastInfo]}>
-                <Column field="totalDemand" header="Общ спрос" />
-                <Column field="totalSupply" header="Общ предл" />
-                <Column field="lastTradeQuantity" header="Кол-во посл" />
-                <Column field="lotSize" header="Лот" />
-                <Column field="issueSize" header="Объем обр" />
-                <Column field="weightedAveragePrice" header="Ср. взв. цена" />
-                <Column field="valueToday" header="Оборот" />
-                <Column field="numTradesToday" header="Кол-во сделок" />
-              </DataTable>
-            </div>
-          </div>
-          <TrendsView trends={premise ? premise.analysis.trends : []} />
+      <div className="p-grid" ref={mainRef}>
+        <div className="p-col-12">
           <div className="p-grid" style={{ margin: "0" }}>
-            <div className="p-col-12" ref={chart1Ref} style={{ padding: "0" }}>
+            <div className="p-col-6" ref={chart2Ref} style={{ padding: "0" }}>
               <ChartWrapper
-                interval={timeFrameTrading}
+                interval={timeFrameHigh}
                 initialNumberOfCandles={500}
-                onIntervalChanged={onTradingIntervalChanged}
-                onStartChanged={onStartChanged}
-                onPremiseBeforeChanged={onPremiseBeforeChanged}
-                width={chart1Width}
+                onIntervalChanged={(interval) => {}}
+                onStartChanged={(start) => {}}
+                width={chart2Width}
                 security={securityLastInfo}
                 premise={premise}
-                orders={orders}
-                activeTrade={activeTrade}
                 showGrid={true}
               />
             </div>
             {chartNumber === 2 ? (
-              <div
-                className="p-col-12"
-                ref={chart2Ref}
-                style={{ padding: "0" }}
-              >
+              <div className="p-col-6" ref={chart1Ref} style={{ padding: "0" }}>
                 <ChartWrapper
-                  interval={timeFrameHigh}
+                  interval={timeFrameTrading}
                   initialNumberOfCandles={500}
-                  onIntervalChanged={(interval) => {}}
-                  onStartChanged={(start) => {}}
-                  width={chart2Width}
+                  onIntervalChanged={onTradingIntervalChanged}
+                  onStartChanged={onStartChanged}
+                  onPremiseBeforeChanged={onPremiseBeforeChanged}
+                  width={chart1Width}
                   security={securityLastInfo}
                   premise={premise}
+                  orders={orders}
+                  activeTrade={activeTrade}
                   showGrid={true}
                 />
               </div>
             ) : null}
           </div>
+
+          <TrendsView trends={premise ? premise.analysis.trends : []} />
           <TrendViewCharts premise={premise} security={securityLastInfo} />
+
           <div className="p-grid">
             <div className="p-col-12">
               <MarketState filter={marketStateFilterDto} />
@@ -373,16 +357,6 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
             </div>
             <div className="p-col-12">
               <div className="p-grid">
-                <div className="p-col-4">
-                  <Notifications
-                    filter={filterDto}
-                    security={securityLastInfo}
-                    onNotificationSelected={(n) => {
-                      console.log(n);
-                    }}
-                    viewHeight={400}
-                  />
-                </div>
                 <div className="p-col-4">
                   <Alerts
                     filter={filterDto}
@@ -413,21 +387,25 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
               ) : null}
             </div>
           </div>
-        </TabPanel>
-        <TabPanel header="Events">
-          {security.classCode === ClassCode.TQBR ? (
-            <SecurityShareEventView secCode={security.secCode} />
-          ) : null}
-        </TabPanel>
-        <TabPanel header="News">
-          <News secId={security.id} />
-        </TabPanel>
-        <TabPanel header="Calendar">
-          {ClassCode.CETS === security.classCode ? (
-            <EconomicCalendar secId={security.id} />
-          ) : null}
-        </TabPanel>
-      </TabView>
+        </div>
+        <div className="p-col-12">
+          <TabView>
+            <TabPanel header="Events">
+              {security.classCode === ClassCode.TQBR ? (
+                <SecurityShareEventView secCode={security.secCode} />
+              ) : null}
+            </TabPanel>
+            <TabPanel header="News">
+              <News secId={security.id} />
+            </TabPanel>
+            <TabPanel header="Calendar">
+              {ClassCode.CETS === security.classCode ? (
+                <EconomicCalendar secId={security.id} />
+              ) : null}
+            </TabPanel>
+          </TabView>
+        </div>
+      </div>
     );
   } else {
     return <div>Select security for analysis</div>;
