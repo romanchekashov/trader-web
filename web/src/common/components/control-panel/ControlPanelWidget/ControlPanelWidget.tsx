@@ -30,7 +30,9 @@ const ControlPanelWidget: React.FC<Props> = ({}) => {
         <ActiveTradesView />
         <DepositView />
       </div>
-      <div>{`Selected active trade for securities: ${
+      <div
+        style={{ padding: "0 10px" }}
+      >{`Selected active trade for securities: ${
         security ? security.shortName : "All"
       }`}</div>
       <div className="p-col-12">

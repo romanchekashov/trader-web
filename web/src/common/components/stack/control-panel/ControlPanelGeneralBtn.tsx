@@ -1,13 +1,29 @@
+import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { SelectButton } from "primereact/selectbutton";
+import { ToggleButton } from "primereact/togglebutton";
 import * as React from "react";
-import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
-import { PrimeDropdownItem, round100 } from "../../../utils/utils";
+import { useEffect, useState } from "react";
+import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
 import { OperationType } from "../../../data/OperationType";
 import { Order } from "../../../data/Order";
 import { OrderType } from "../../../data/OrderType";
-import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
-import { InputText } from "primereact/inputtext";
-import { ToggleButton } from "primereact/togglebutton";
-import { Button } from "primereact/button";
+import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
+import { PrimeDropdownItem, round } from "../../../utils/utils";
+
+enum ControlOrderType {
+  ORDER = "O",
+  STOP_TARGET = "S+T",
+  TARGET = "T",
+  STOP = "S",
+}
+
+const typeSets = [
+  { label: "O", value: ControlOrderType.ORDER },
+  { label: "S+T", value: ControlOrderType.STOP_TARGET },
+  { label: "T", value: ControlOrderType.TARGET },
+  { label: "S", value: ControlOrderType.STOP },
+];
 
 type Props = {
   security: SecurityLastInfo;
@@ -24,68 +40,58 @@ type States = {
   isMarket: boolean;
 };
 
-export class ControlPanelGeneralBtn extends React.Component<Props, States> {
-  private multipliers: PrimeDropdownItem<number>[] = [
-    1,
-    2,
-    4,
-    8,
-  ].map((val) => ({ label: "" + val, value: val }));
+export const ControlPanelGeneralBtn: React.FC<Props> = ({
+  security,
+  history,
+  growl,
+}) => {
+  const multipliers: PrimeDropdownItem<number>[] = [1, 2, 4, 8].map((val) => ({
+    label: "" + val,
+    value: val,
+  }));
+  const [price, setPrice] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [steps, setSteps] = useState<number>(2);
+  const [multiplier, setMultiplier] = useState<number>(1);
+  const [btnSet, setBtnSet] = useState<string>("general");
+  const [isMarket, setIsMarket] = useState<boolean>(false);
+  const [controlOrderType, setControlOrderType] = useState<ControlOrderType>(
+    ControlOrderType.ORDER
+  );
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      price: 0,
-      quantity: 1,
-      steps: 2,
-      multiplier: 1,
-      btnSet: "general",
-      isMarket: false,
-    };
-  }
-
-  quantityChangeByKeydown = (e) => {
-    let { quantity } = this.state;
-
+  const quantityChangeByKeydown = (e) => {
     if (e.key === "ArrowUp") {
-      quantity++;
+      setQuantity(quantity + 1);
     } else if (e.key === "ArrowDown" && quantity > 1) {
-      quantity--;
+      setQuantity(quantity - 1);
     }
-
-    this.setState({ quantity });
   };
 
-  priceChangeByKeydown = (e) => {
-    let { price } = this.state;
-
+  const priceChangeByKeydown = (e) => {
     if (e.key === "ArrowUp") {
-      price += 0.01;
+      setPrice(round(price + security.secPriceStep, security.scale));
     } else if (e.key === "ArrowDown" && price > 0) {
-      price -= 0.01;
+      setPrice(round(price - security.secPriceStep, security.scale));
     }
-
-    price = round100(price);
-
-    this.setState({ price });
   };
 
-  componentDidMount = (): void => {
+  useEffect(() => {
     document
       .getElementById("td__control-panel-price")
-      .addEventListener("keydown", this.priceChangeByKeydown);
-  };
+      .addEventListener("keydown", priceChangeByKeydown);
 
-  componentWillUnmount = (): void => {
-    document
-      .getElementById("td__control-panel-price")
-      .removeEventListener("keydown", this.priceChangeByKeydown);
-  };
+    return () => {
+      document
+        .getElementById("td__control-panel-price")
+        .removeEventListener("keydown", priceChangeByKeydown);
+    };
+  }, []);
 
-  createOrder = (operation: OperationType) => {
-    const { security, history, growl } = this.props;
-    const { price, quantity, steps, multiplier } = this.state;
+  useEffect(() => {
+    setPrice(security?.lastTradePrice || 0);
+  }, [security?.id]);
 
+  const createOrder = (operation: OperationType) => {
     const orders: Order[] = [
       {
         secId: security.id,
@@ -121,85 +127,99 @@ export class ControlPanelGeneralBtn extends React.Component<Props, States> {
     );
   };
 
-  changeOrder = () => {
-    const { history } = this.props;
-
+  const changeOrder = () => {
     WebsocketService.getInstance().send(
       history ? WSEvent.HISTORY_CHANGE_ORDERS : WSEvent.CHANGE_ORDERS
     );
   };
 
-  cancelOrder = () => {
-    const { history } = this.props;
-
+  const cancelOrder = () => {
     WebsocketService.getInstance().send(
       history ? WSEvent.HISTORY_CANCEL_ORDERS : WSEvent.CANCEL_ORDERS
     );
   };
 
-  render() {
-    const { price, quantity, steps, multiplier, btnSet, isMarket } = this.state;
-
-    return (
-      <div className="p-grid">
-        <div className="p-col-4" style={{ padding: "0.5em 0" }}>
-          <span className="p-float-label">
-            <InputText
-              id="td__control-panel-price"
-              style={{ width: "100px" }}
-              value={price}
-              onChange={(e) =>
-                this.setState({ price: parseFloat(e.target["value"]) })
-              }
-            />
-            <label htmlFor="td__control-panel-price">Price</label>
-          </span>
-        </div>
-        <div className="p-col-4">
-          <span className="p-float-label">
-            <InputText
-              id="td__control-panel-quantity"
-              style={{ width: "100px" }}
-              value={quantity}
-              onKeyDown={this.quantityChangeByKeydown}
-              onChange={(e) =>
-                this.setState({ quantity: parseFloat(e.target["value"]) })
-              }
-            />
-            <label htmlFor="td__control-panel-quantity">Quantity</label>
-          </span>
-        </div>
-        <div className="p-col-4">
-          <ToggleButton
-            style={{ width: "100%" }}
-            checked={isMarket}
-            className={isMarket ? "p-button-danger" : ""}
-            onLabel="Market"
-            offLabel="Limit"
-            onChange={(e) => this.setState({ isMarket: e.value })}
-          />
-        </div>
-        <div className="p-col-6">
-          <Button
-            label="Buy"
-            className="p-button-success"
-            style={{ width: "100%", paddingTop: 4, paddingBottom: 4 }}
-            onClick={() => {
-              this.createOrder(OperationType.BUY);
-            }}
-          />
-        </div>
-        <div className="p-col-6">
-          <Button
-            label="Sell"
-            className="p-button-danger"
-            style={{ width: "100%", paddingTop: 4, paddingBottom: 4 }}
-            onClick={() => {
-              this.createOrder(OperationType.SELL);
-            }}
-          />
-        </div>
+  return (
+    <div className="p-grid">
+      <div className="p-col-8">
+        <SelectButton
+          value={controlOrderType}
+          options={typeSets}
+          onChange={(e) => setControlOrderType(e.value)}
+        />
       </div>
-    );
-  }
-}
+      <div className="p-col-4">
+        <ToggleButton
+          style={{ width: "100%" }}
+          checked={isMarket}
+          className={isMarket ? "p-button-danger" : ""}
+          onLabel="Market"
+          offLabel="Limit"
+          onChange={(e) => setIsMarket(e.value)}
+        />
+      </div>
+      <div className="p-col-4" style={{ marginTop: 5 }}>
+        <span className="p-float-label">
+          <InputText
+            id="td__control-panel-quantity"
+            style={{ width: 90 }}
+            type="number"
+            step={1}
+            value={quantity}
+            // onKeyDown={quantityChangeByKeydown}
+            onChange={(e) => setQuantity(parseInt(e.target["value"]))}
+          />
+          <label htmlFor="td__control-panel-quantity">Quantity</label>
+        </span>
+      </div>
+      <div className="p-col-4" style={{ marginTop: 5 }}>
+        <span className="p-float-label">
+          <InputText
+            id="td__control-panel-price"
+            style={{ width: 90 }}
+            type="number"
+            step={security?.secPriceStep || 1}
+            value={price}
+            onChange={(e) => setPrice(Number(e.target.value))}
+          />
+          <label htmlFor="td__control-panel-price">Price</label>
+        </span>
+      </div>
+      <div className="p-col-4" style={{ marginTop: 5 }}>
+        <span className="p-float-label">
+          <InputText
+            id="td__control-panel-price"
+            style={{ width: 90 }}
+            type="number"
+            step={security?.secPriceStep || 1}
+            value={price}
+            onChange={(e) => setPrice(Number(e.target.value))}
+          />
+          <label htmlFor="td__control-panel-price">Stop</label>
+        </span>
+      </div>
+      <div className="p-col-6">
+        <Button
+          label="Buy"
+          className="p-button-success"
+          style={{ width: "100%", paddingTop: 4, paddingBottom: 4 }}
+          onClick={() => {
+            createOrder(OperationType.BUY);
+          }}
+          disabled={!security}
+        />
+      </div>
+      <div className="p-col-6">
+        <Button
+          label="Sell"
+          className="p-button-danger"
+          style={{ width: "100%", paddingTop: 4, paddingBottom: 4 }}
+          onClick={() => {
+            createOrder(OperationType.SELL);
+          }}
+          disabled={!security}
+        />
+      </div>
+    </div>
+  );
+};
