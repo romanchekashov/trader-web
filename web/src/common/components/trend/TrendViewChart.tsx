@@ -9,6 +9,32 @@ import { IntervalColor, TrendDirectionColor } from "../../utils/utils";
 import "./TrendView.css";
 import moment = require("moment");
 
+const intervalShortName = {
+  MONTH: "MN",
+  WEEK: "W",
+  DAY: "D",
+};
+const intervalDateTimeFormat = {
+  MONTH: "DD-MM-YYYY",
+  WEEK: "DD-MM-YYYY",
+  DAY: "DD-MM-YYYY",
+  M5: "HH:mm",
+  M3: "HH:mm",
+  M1: "HH:mm",
+};
+const options = {
+  title: {
+    display: true,
+    fontSize: 12,
+  },
+  animation: {
+    duration: 0,
+  },
+  legend: {
+    display: false,
+  },
+};
+
 type Props = {
   trend: Trend;
   srLevels: SRLevel[];
@@ -22,32 +48,6 @@ const TrendViewChart: React.FC<Props> = ({
   width,
   height,
 }) => {
-  const intervalShortName = {
-    MONTH: "MN",
-    WEEK: "W",
-    DAY: "D",
-  };
-  const intervalDateTimeFormat = {
-    MONTH: "DD-MM-YYYY",
-    WEEK: "DD-MM-YYYY",
-    DAY: "DD-MM-YYYY",
-    M5: "HH:mm",
-    M3: "HH:mm",
-    M1: "HH:mm",
-  };
-  const options = {
-    title: {
-      display: true,
-      fontSize: 12,
-    },
-    animation: {
-      duration: 0,
-    },
-    legend: {
-      display: false,
-    },
-  };
-
   const getColor = (direction: TrendDirection) => {
     return TrendDirectionColor[direction] || "#3f51b5";
   };

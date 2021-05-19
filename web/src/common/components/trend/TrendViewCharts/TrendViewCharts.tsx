@@ -153,4 +153,4 @@ const areEqual = (prevProps, nextProps) => {
   return prevProps.premise?.security?.id === nextProps.premise?.security?.id;
 };
 
-export default memo(TrendViewCharts, areEqual);
+export default memo(TrendViewCharts);
