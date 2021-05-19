@@ -1,13 +1,11 @@
 import { Chart } from "primereact/chart";
 import * as React from "react";
-import { useEffect, useState } from "react";
 import { Interval } from "../../data/Interval";
 import { SRLevel } from "../../data/strategy/SRLevel";
 import { SrLevelType } from "../../data/strategy/SrLevelType";
 import { Trend } from "../../data/strategy/Trend";
 import { TrendDirection } from "../../data/strategy/TrendDirection";
-import intervalCompare from "../../utils/IntervalComporator";
-import { TrendDirectionColor } from "../../utils/utils";
+import { IntervalColor, TrendDirectionColor } from "../../utils/utils";
 import "./TrendView.css";
 import moment = require("moment");
 
@@ -37,7 +35,6 @@ const TrendViewChart: React.FC<Props> = ({
     M3: "HH:mm",
     M1: "HH:mm",
   };
-  const TODAY_COLOR = "#f44336";
   const options = {
     title: {
       display: true,
@@ -45,6 +42,9 @@ const TrendViewChart: React.FC<Props> = ({
     },
     animation: {
       duration: 0,
+    },
+    legend: {
+      display: false,
     },
   };
 
@@ -74,7 +74,7 @@ const TrendViewChart: React.FC<Props> = ({
 
     for (let lvl of levels) {
       datasets.push({
-        label: `${makeShort(lvl.type)}(${intervalShortName[lvl.interval]}): ${
+        label: `${lvl.type}(${intervalShortName[lvl.interval]}): ${
           lvl.swingHL
         }`,
         data: Array(trend.swingHighsLows.length).fill(
@@ -83,11 +83,7 @@ const TrendViewChart: React.FC<Props> = ({
           trend.swingHighsLows.length
         ),
         fill: false,
-        borderColor:
-          lvl.type === SrLevelType.TODAY_HIGH ||
-          lvl.type === SrLevelType.TODAY_LOW
-            ? TODAY_COLOR
-            : "#FFA726",
+        borderColor: IntervalColor[lvl.interval],
       });
     }
 
@@ -101,27 +97,51 @@ const TrendViewChart: React.FC<Props> = ({
 
   if (!trend) return <div>Select security for trend analysis</div>;
 
+  let max = trend.swingHighsLows[0].swingHL;
+  let min = trend.swingHighsLows[0].swingHL;
+
+  for (const d of trend.swingHighsLows) {
+    if (d.swingHL > max) max = d.swingHL;
+    if (d.swingHL < min) min = d.swingHL;
+  }
+
   let levels: SRLevel[] = [];
   if (srLevels?.length) {
-    const INTERVAL =
-      intervalCompare(trend.interval, Interval.M60) < 0
-        ? Interval.DAY
-        : intervalCompare(trend.interval, Interval.H4) < 0
-        ? Interval.WEEK
-        : Interval.MONTH;
-    levels = srLevels.filter((value) => value.interval === INTERVAL);
+    levels = srLevels.filter(
+      (value) => value.swingHL >= min && value.swingHL <= max
+    );
   }
 
   const data = updateData(trend, levels);
 
   return (
-    <Chart
-      type="line"
-      data={data}
-      options={options}
-      width={width + "px"}
-      height={height + "px"}
-    />
+    <div>
+      <div className="TrendViewChart_title">
+        {trend.interval} - {trend.power} Trend {trend.direction} | Levels:{" "}
+        <span
+          className="dot"
+          style={{ border: `5px solid ${IntervalColor[Interval.MONTH]}` }}
+        ></span>{" "}
+        MN{" "}
+        <span
+          className="dot"
+          style={{ border: `5px solid ${IntervalColor[Interval.WEEK]}` }}
+        ></span>{" "}
+        W{" "}
+        <span
+          className="dot"
+          style={{ border: `5px solid ${IntervalColor[Interval.DAY]}` }}
+        ></span>{" "}
+        D
+      </div>
+      <Chart
+        type="line"
+        data={data}
+        options={options}
+        width={width + "px"}
+        height={height + "px"}
+      />
+    </div>
   );
 };
 
