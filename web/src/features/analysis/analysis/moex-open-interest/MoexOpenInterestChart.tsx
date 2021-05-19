@@ -4,9 +4,10 @@ import { Chart } from "primereact/chart";
 import { ClientGroup } from "../../../../common/data/open-interest/ClientGroup";
 import { MoexOpenInterest } from "../../../../common/data/open-interest/MoexOpenInterest";
 import moment = require("moment");
+import { OperationTypeColor } from "../../../../common/utils/utils";
 
-export const fizLongColor = "#4caf50";
-export const fizShortColor = "#f44336";
+export const fizLongColor = OperationTypeColor.BUY;
+export const fizShortColor = OperationTypeColor.SELL;
 export const yurLongColor = "#1a237e";
 export const yurShortColor = "#870000";
 

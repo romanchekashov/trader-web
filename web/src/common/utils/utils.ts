@@ -86,15 +86,19 @@ export const IntervalColor = {
   M30: "#212121",
 };
 
+const BLUE = "#01579b";
+const GREEN = "#33691e";
+const RED = "#b71c1c";
+
 export const TrendDirectionColor = {
-  UP: "#4caf50",
-  DOWN: "#f44336",
-  SIDE: "#2196f3", // "#3f51b5"
+  UP: GREEN,
+  DOWN: RED,
+  SIDE: BLUE, // "#3f51b5"
 };
 
 export const OperationTypeColor = {
-  BUY: "#4caf50",
-  SELL: "#f44336",
+  BUY: GREEN,
+  SELL: RED,
 };
 
 export const getRecentBusinessDate = (date: Date): Date => {

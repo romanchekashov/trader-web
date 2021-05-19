@@ -43,14 +43,14 @@ const TrendViewChartWrapper: React.FC<Props> = ({
         const { trends, srLevels } = newPremise?.analysis;
         setTrend(
           filterTrendPoints(
-            trends?.find((value) => value.interval === Interval.M3)
+            trends?.find((value) => value.interval === Interval.M5)
           )
         );
         setLevels(srLevels);
         if (security) {
           const intervals = new Set(
             ClassCode.SPBFUT === security.classCode
-              ? [Interval.DAY, Interval.M30, Interval.M3]
+              ? [Interval.DAY, Interval.M60, Interval.M5]
               : [Interval.MONTH, Interval.DAY, Interval.M60]
           );
           setTrends(trends.filter(({ interval }) => intervals.has(interval)));
@@ -126,7 +126,7 @@ const TrendViewChartWrapper: React.FC<Props> = ({
       style={{ height: eachChartHeight }}
     >
       <div className="TrendViewChartWrapper_title">
-        <div>{security?.secCode}</div>
+        <div>{security?.shortName}</div>
         {trends.map(({ interval, direction }) => {
           return (
             <div

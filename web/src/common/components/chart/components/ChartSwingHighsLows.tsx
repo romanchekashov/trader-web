@@ -24,7 +24,7 @@ export const ChartSwingHighsLows: React.FC<Props> = ({ swingHighsLows }) => {
         let color = IntervalColor[trend.interval];
 
         if (isSelectedTimeFrame) {
-          color = color || "#2196f3";
+          color = color || TrendDirectionColor.SIDE;
           const up = {};
           const down = {};
           const side = {};
