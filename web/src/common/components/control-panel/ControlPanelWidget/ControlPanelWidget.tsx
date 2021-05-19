@@ -25,13 +25,13 @@ const ControlPanelWidget: React.FC<Props> = ({}) => {
   return (
     <div className="p-grid control-panel">
       <Toast ref={toast} />
-      <div className="p-col-12" style={{ padding: 0, fontSize: "12px" }}>
+      <div className="p-col-12" style={{ fontSize: "12px" }}>
         <SessionTradeResultView result={sessionResult} />
         <ActiveTradesView />
         <DepositView />
       </div>
       <div>{`Selected active trade for securities: ${
-        selected ? selected.secId : "All"
+        security ? security.shortName : "All"
       }`}</div>
       <div className="p-col-12">
         <ControlPanelGeneralBtn

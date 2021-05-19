@@ -13,3 +13,7 @@
   text-align: center;
   padding: 3px;
 }
+
+.TrendViewChartWrapper_title_sec {
+  cursor: pointer;
+}

@@ -8,7 +8,10 @@ import {
   setSelectedActiveTrade,
 } from "../../../../app/activeTrades/activeTradesSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
-import { setSecurityById } from "../../../../app/securities/securitiesSlice";
+import {
+  selectSecurities,
+  setSecurityById,
+} from "../../../../app/securities/securitiesSlice";
 import { ActiveTrade } from "../../../data/ActiveTrade";
 import { OperationType } from "../../../data/OperationType";
 import "./ActiveTradesView.css";
@@ -21,9 +24,18 @@ type Props = {
 
 const ActiveTradesView: React.FC<Props> = ({}) => {
   const dispatch = useAppDispatch();
+  const { security } = useAppSelector(selectSecurities);
   const { activeTrades, selected } = useAppSelector(selectActiveTrades);
 
   if (activeTrades.length === 0) return null;
+
+  if (selected?.secId !== security?.id && activeTrades.length) {
+    const activeTrade = activeTrades.find(
+      ({ secId }) => secId === security?.id
+    );
+    if (activeTrade?.secId !== selected?.secId)
+      dispatch(setSelectedActiveTrade(activeTrade));
+  }
 
   const quantityTemplate = (rowData, column) => {
     return OperationType.SELL === rowData.operation
@@ -44,10 +56,8 @@ const ActiveTradesView: React.FC<Props> = ({}) => {
     if (!Array.isArray(e.value)) {
       const activeTrade: ActiveTrade = e.value;
       if (activeTrade.secId !== selected?.secId) {
-        dispatch(setSelectedActiveTrade(activeTrade));
         dispatch(setSecurityById(activeTrade.secId));
       } else {
-        dispatch(setSelectedActiveTrade(undefined));
         dispatch(setSecurityById(undefined));
       }
     }

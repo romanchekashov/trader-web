@@ -19,6 +19,8 @@ import { useRef } from "react";
 import { ClassCode } from "../../../data/ClassCode";
 import { TrendDirection } from "../../../data/strategy/TrendDirection";
 import { TrendDirectionColor } from "../../../utils/utils";
+import { useAppDispatch } from "../../../../app/hooks";
+import { setSecurityById } from "../../../../app/securities/securitiesSlice";
 
 type Props = {
   security: SecurityLastInfo;
@@ -29,6 +31,8 @@ const TrendViewChartWrapper: React.FC<Props> = ({
   security,
   eachChartHeight = 300,
 }) => {
+  const dispatch = useAppDispatch();
+
   const ref = useRef(null);
   const [levels, setLevels] = useState<SRLevel[]>([]);
   const [trend, setTrend] = useState<Trend>();
@@ -126,7 +130,12 @@ const TrendViewChartWrapper: React.FC<Props> = ({
       style={{ height: eachChartHeight }}
     >
       <div className="TrendViewChartWrapper_title">
-        <div>{security?.shortName}</div>
+        <div
+          className="TrendViewChartWrapper_title_sec"
+          onClick={() => dispatch(setSecurityById(security?.id))}
+        >
+          {security?.shortName}
+        </div>
         {trends.map(({ interval, direction }) => {
           return (
             <div
