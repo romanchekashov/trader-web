@@ -164,7 +164,6 @@ export const adjustMoexOpenInterest = (item: MoexOpenInterest): any => {
 export const adjustSecurityShareEvents = (list: SecurityShareEvent[]): any => {
   if (list && list.length > 0) {
     for (const item of list) {
-      item.date = new Date(item.date);
       item.published = new Date(item.published);
     }
   }

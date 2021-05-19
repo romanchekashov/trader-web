@@ -367,15 +367,6 @@ export const AnalysisTinkoff: React.FC<Props> = ({ security, chartNumber }) => {
                     viewHeight={400}
                   />
                 </div>
-                <div className="p-col-4">
-                  <Alerts
-                    filter={filterDto}
-                    onAlertSelected={(n) => {
-                      console.log(n);
-                    }}
-                    alertsHeight={400}
-                  />
-                </div>
               </div>
             </div>
             <div

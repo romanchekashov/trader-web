@@ -1,126 +1,127 @@
+.List {
+  border: 1px solid #d9dddd;
+}
+
+.Alerts_item {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.Alerts_item.Alerts_item_selected {
+  background-color: #b3e5fc;
+}
+
+.Alerts_item_odd {
+}
+
+.Alerts_item_even {
+  background-color: #f8f8f0;
+}
+
 .alerts-body {
-    overflow-x: hidden;
-    font-size: 0.8em;
-    padding: 0;
-    margin-bottom: 5px;
+  overflow-x: hidden;
+  font-size: 0.8em;
+  padding: 0;
+  margin-bottom: 5px;
 }
 
 .alerts-body::-webkit-scrollbar {
-    width: 0.6em;
+  width: 0.6em;
 }
 
 .alerts-body::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
 }
 
 .alerts-body::-webkit-scrollbar-thumb {
-    background-color: darkgrey;
-    outline: 1px solid slategrey;
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
 }
 
 .alerts-row {
-    display: table;
-    /*border-bottom: 1px solid gray;*/
-    width: 100%;
-    cursor: pointer;
-}
-
-.alerts-row-selected {
-    background-color: #b3e5fc;
+  display: table;
+  /*border-bottom: 1px solid gray;*/
+  width: 100%;
 }
 
 .alerts-cell {
-    display: table-cell;
-    vertical-align: middle;
+  display: table-cell;
+  vertical-align: middle;
 }
 
 .alerts-time {
-    width: 100px;
-    padding-left: 0;
-    padding-right: 0;
+  width: 100px;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .alerts-name {
-    width: 40px;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+  width: 40px;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 .alerts-symbol {
-    width: 50px;
-    padding-left: 0;
-    padding-right: 0;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  width: 50px;
+  padding-left: 0;
+  padding-right: 0;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .alerts-strength {
-    width: 20px;
-    padding-left: 0px !important;
-    padding-right: 0px !important;
+  width: 20px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
 }
 
 .alerts-confirm {
-    width: 20px;
-    padding-left: 0px !important;
-    padding-right: 0px !important;
+  width: 20px;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
 }
 
 .alerts-direction {
-    width: 20px;
+  width: 20px;
 }
 
 .alerts-description {
-    padding-left: 5px;
-}
-
-.List {
-    border: 1px solid #d9dddd;
-}
-
-.ListItemEven,
-.ListItemOdd {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ListItemEven {
-    background-color: #f8f8f0;
+  padding-left: 5px;
 }
 
 .alerts-head {
-    display: flex;
-    justify-content: flex-start;
-    font-size: 12px;
-    height: 20px;
-    padding: 0;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  font-size: 12px;
+  height: 45px;
+  padding: 0;
 }
 
 .alerts-head-security,
 .alerts-head-interval {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 
 .alerts-head-dropdown .p-dropdown {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .alerts-head-dropdown .p-dropdown-label {
-    font-size: 12px;
-    padding-top: 0;
-    padding-bottom: 0;
+  font-size: 12px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .alerts-head-start-date {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 
 .alerts-head-start-date .p-inputtext {
-    font-size: 12px;
-    padding-top: 0;
-    padding-bottom: 0;
-    width: 80px;
+  font-size: 12px;
+  padding-top: 0;
+  padding-bottom: 0;
+  width: 80px;
 }

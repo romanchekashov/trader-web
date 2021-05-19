@@ -1,33 +1,39 @@
+import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
 import * as React from "react";
 import { memo, useEffect, useState } from "react";
-import { PatternResult } from "./data/PatternResult";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { FixedSizeList as List } from "react-window";
+import { getCandlePatterns } from "../../api/rest/analysisRestApi";
+import { WebsocketService, WSEvent } from "../../api/WebsocketService";
+import { playSound } from "../../assets/assets";
+import { ClassCode } from "../../data/ClassCode";
+import { FilterDto } from "../../data/FilterDto";
+import { Interval } from "../../data/Interval";
+import { Security } from "../../data/security/Security";
+import { getSecuritiesByClassCode } from "../../utils/Cache";
+import { Intervals, PrimeDropdownItem } from "../../utils/utils";
 import "./Alerts.css";
 import "./CandlePattern.css";
 import { PatternName } from "./data/PatternName";
-import { playSound } from "../../assets/assets";
-import { getCandlePatterns } from "../../api/rest/analysisRestApi";
-import { WebsocketService, WSEvent } from "../../api/WebsocketService";
-import { FixedSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { Intervals, PrimeDropdownItem } from "../../utils/utils";
-import { Interval } from "../../data/Interval";
-import { ClassCode } from "../../data/ClassCode";
-import { getSecuritiesByClassCode } from "../../utils/Cache";
-import { Security } from "../../data/security/Security";
-import { Calendar } from "primereact/calendar";
-import { FilterDto } from "../../data/FilterDto";
+import { PatternResult } from "./data/PatternResult";
 import moment = require("moment");
-import { Dropdown } from "primereact/dropdown";
 
 type Props = {
   filter: FilterDto;
+  security: Security;
   onAlertSelected: (alert: PatternResult) => void;
   alertsHeight?: number;
 };
 let fetchAlertsAttempt = 0;
 let previousAlertsCount = 0;
 
-const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
+const Alerts: React.FC<Props> = ({
+  filter,
+  security,
+  onAlertSelected,
+  alertsHeight,
+}) => {
   const [interval, setInterval] = useState(null);
   const [classCode, setClassCode] = useState(null);
   const [secCode, setSecCode] = useState(null);
@@ -41,10 +47,9 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
   const [fetchAlertsError, setFetchAlertsError] = useState(null);
   const [selectedAlert, setSelectedAlert] = useState(null);
 
-  const intervals: PrimeDropdownItem<Interval>[] = [
-    null,
-    ...Intervals,
-  ].map((val) => ({ label: val || "ALL", value: val }));
+  const intervals: PrimeDropdownItem<Interval>[] = [null, ...Intervals].map(
+    (val) => ({ label: val || "ALL", value: val })
+  );
   const classCodes: PrimeDropdownItem<ClassCode>[] = [
     null,
     ClassCode.SPBFUT,
@@ -53,8 +58,7 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
   ].map((val) => ({ label: val || "ALL", value: val }));
 
   const fetchAlerts = (
-    newClassCode: ClassCode,
-    newSecCode: string,
+    secId: number,
     newInterval: Interval,
     newStart: Date
   ) => {
@@ -62,8 +66,8 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
       .then((newAlerts) => {
         setAlertsReceivedFromServer(
           newAlerts,
-          newClassCode,
-          newSecCode,
+          security?.classCode,
+          security?.code,
           newInterval,
           newStart
         );
@@ -75,7 +79,7 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
         setFetchAlertsError("Cannot get alerts for " + filter.secId);
         if (fetchAlertsAttempt < 3) {
           fetchAlertsAttempt++;
-          fetchAlerts(newClassCode, newSecCode, newInterval, newStart);
+          fetchAlerts(secId, newInterval, newStart);
         }
       });
   };
@@ -95,6 +99,7 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
       // onClassCodeChanged(filter.classCode);
       // onSecCodeChanged(filter.secCode);
       onIntervalChanged(null);
+      fetchAlerts(filter.secId, null, start);
 
       if (filter.fetchByWS) {
         alertsSubscription = WebsocketService.getInstance()
@@ -113,8 +118,6 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
               start
             );
           });
-      } else {
-        // fetchAlerts(filter.classCode, filter.secCode, null, start);
       }
     }
 
@@ -122,7 +125,7 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
     return function cleanup() {
       if (alertsSubscription) alertsSubscription.unsubscribe();
     };
-  }, [filter, classCode, secCode, interval, start]);
+  }, [filter?.secId, classCode, secCode, interval, start]);
 
   const setAlertsReceivedFromServer = (
     newAlerts: PatternResult[],
@@ -295,19 +298,20 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
 
   const Row = ({ index, style }) => {
     const alert = visibleAlerts[index];
-    const className =
-      "alerts-row " + (selectedAlert === alert ? "alerts-row-selected" : "");
 
     return (
-      <div className={index % 2 ? "ListItemOdd" : "ListItemEven"} style={style}>
-        <div
-          key={alert.name + alert.interval + alert.candle.timestamp}
-          className={className}
-          onClick={() => {
-            setSelectedAlert(alert);
-            onAlertSelected(alert);
-          }}
-        >
+      <div
+        key={alert.name + alert.interval + alert.candle.timestamp}
+        className={`Alerts_item ${
+          selectedAlert === alert ? "Alerts_item_selected" : ""
+        } ${index % 2 ? "Alerts_item_odd" : "Alerts_item_even"}`}
+        style={style}
+        onClick={() => {
+          setSelectedAlert(alert);
+          onAlertSelected(alert);
+        }}
+      >
+        <div className="alerts-row">
           <div className="alerts-cell alerts-time">{timeTemplate(alert)}</div>
           <div className="alerts-cell alerts-name">{nameTemplate(alert)}</div>
           <div
@@ -325,9 +329,9 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
           <div className="alerts-cell alerts-direction">
             {possibleFutureDirectionUpTemplate(alert)}
           </div>
-          <div className="alerts-cell alerts-description">
-            {descriptionTemplate(alert)}
-          </div>
+        </div>
+        <div className="alerts-cell alerts-description">
+          {descriptionTemplate(alert)}
         </div>
       </div>
     );
@@ -380,7 +384,7 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
               className="List"
               height={height}
               itemCount={visibleAlerts.length}
-              itemSize={35}
+              itemSize={60}
               width={width}
             >
               {Row}
@@ -392,4 +396,11 @@ const Alerts: React.FC<Props> = ({ filter, onAlertSelected, alertsHeight }) => {
   );
 };
 
-export default memo(Alerts);
+const areEqual = (prevProps, nextProps) => {
+  return (
+    prevProps.security?.id === nextProps.security?.id &&
+    prevProps.filter?.secId === nextProps.filter?.secId
+  );
+};
+
+export default memo(Alerts, areEqual);

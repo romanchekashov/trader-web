@@ -39,6 +39,8 @@ import {
   getTimeFrameLow,
 } from "../../../common/utils/TimeFrameChooser";
 import moment = require("moment");
+import { useAppSelector } from "../../../app/hooks";
+import { selectSecurities } from "../../../app/securities/securitiesSlice";
 
 export interface AnalysisState {
   realDepo: boolean;
@@ -50,6 +52,10 @@ type Props = {
 };
 
 const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
+  const { securities } = useAppSelector(selectSecurities);
+  const securityLastInfo =
+    securities?.find((o) => o.id === security.id) || security;
+
   const timeFrameTradingIntervals = {
     M1: [Interval.M1],
     M3: [Interval.M3, Interval.M1],
@@ -76,9 +82,6 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
   const [orders, setOrders] = useState(null);
   const [activeTrade, setActiveTrade] = useState(null);
   const [premiseBefore, setPremiseBefore] = useState<Date>(null);
-
-  const [securityLastInfo, setSecurityLastInfo] =
-    useState<SecurityLastInfo>(null);
   const [chart1Width, setChart1Width] = useState(CHART_MIN_WIDTH);
   const [chart2Width, setChart2Width] = useState(CHART_MIN_WIDTH);
   const [chartAlertsWidth, setChartAlertsWidth] = useState(CHART_MIN_WIDTH);
@@ -141,8 +144,6 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
       updateMarketStateFilterDto(timeFrameTrading);
 
       fetchPremise(timeFrameTrading);
-
-      setSecurityLastInfo(security);
     }
 
     const wsStatusSub = WebsocketService.getInstance()
@@ -150,22 +151,6 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
       .subscribe((isConnected) => {
         if (isConnected && security) {
           informServerAboutRequiredData();
-        }
-      });
-
-    const lastSecuritiesSubscription = WebsocketService.getInstance()
-      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-      .subscribe((securities) => {
-        if (security) {
-          const newSecurityLastInfo = securities.find(
-            (o) => o.secCode === security.secCode
-          );
-          if (newSecurityLastInfo) {
-            newSecurityLastInfo.lastTradeTime = new Date(
-              newSecurityLastInfo.lastTradeTime
-            );
-            setSecurityLastInfo(newSecurityLastInfo);
-          }
         }
       });
 
@@ -197,12 +182,11 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
     return function cleanup() {
       window.removeEventListener("resize", updateSize);
       wsStatusSub.unsubscribe();
-      lastSecuritiesSubscription.unsubscribe();
       tradePremiseSubscription.unsubscribe();
       ordersSetupSubscription.unsubscribe();
       activeTradeSubscription.unsubscribe();
     };
-  }, [security]);
+  }, [security?.id]);
 
   const updateMarketStateFilterDto = (interval: Interval) => {
     const marketStateFilter: MarketStateFilterDto = {
@@ -360,6 +344,7 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
                 <div className="p-col-4">
                   <Alerts
                     filter={filterDto}
+                    security={security}
                     onAlertSelected={(n) => {
                       console.log(n);
                     }}

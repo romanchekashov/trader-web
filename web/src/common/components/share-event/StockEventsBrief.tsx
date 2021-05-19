@@ -24,7 +24,7 @@ export const StockEventsBrief: React.FC<Props> = ({ secCode, height }) => {
   }, [secCode]);
 
   const formatEvent = (event: SecurityShareEvent) => {
-    const date = moment(event.date).format("DD-MM-YYYY");
+    const date = moment(event.published).format("DD-MM-YYYY");
     const published = moment(event.published).format("DD-MM-YYYY HH:mm");
 
     return (
@@ -50,7 +50,7 @@ export const StockEventsBrief: React.FC<Props> = ({ secCode, height }) => {
         style={{ padding: 0, height: height || 400, overflowY: "scroll" }}
       >
         {events.map((shareEvent, index) => {
-          const date = moment(shareEvent.date).format("DD-MM-YYYY");
+          const date = moment(shareEvent.published).format("DD-MM-YYYY");
           const published = moment(shareEvent.published).format(
             "DD-MM-YYYY HH:mm"
           );

@@ -11,8 +11,10 @@ import { BrokerId } from "../../../data/BrokerId";
 import { ClassCode } from "../../../data/ClassCode";
 import { DataType } from "../../../data/DataType";
 import { FilterDto } from "../../../data/FilterDto";
+import { Market } from "../../../data/Market";
 import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 import { TradingPlatform } from "../../../data/trading/TradingPlatform";
+import Alerts from "../../alerts/Alerts";
 import ActiveTradesView from "../../control-panel/components/ActiveTradesView";
 import ControlPanelWidget from "../../control-panel/ControlPanelWidget/ControlPanelWidget";
 import EconomicCalendarWidget from "../../economic-calendar/EconomicCalendarWidget/EconomicCalendarWidget";
@@ -31,6 +33,7 @@ type Props = {
 const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
   const dispatch = useAppDispatch();
   const [filterDto, setFilterDto] = useState<FilterDto>(null);
+  const [filterAlarms, setFilterAlarms] = useState<FilterDto>(null);
 
   useEffect(() => {
     setFilterDto({
@@ -42,6 +45,23 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
       all: true,
     });
   }, []);
+
+  useEffect(() => {
+    setFilterAlarms({
+      brokerId:
+        security?.market === Market.SPB
+          ? BrokerId.TINKOFF_INVEST
+          : BrokerId.ALFA_DIRECT,
+      tradingPlatform:
+        security?.market === Market.SPB
+          ? TradingPlatform.API
+          : TradingPlatform.QUIK,
+      secId: security?.id,
+      fetchByWS: true,
+      history: false,
+      all: false,
+    });
+  }, [security?.id]);
 
   return (
     <div className="WidgetbarPages">
@@ -92,6 +112,18 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
           itemSize={120}
         />
       ) : null}
+
+      {item === WidgetbarItem.ALARMS ? (
+        <Alerts
+          filter={filterAlarms}
+          security={security}
+          onAlertSelected={(n) => {
+            console.log(n);
+          }}
+          alertsHeight={600}
+        />
+      ) : null}
+
       {item === WidgetbarItem.CONTROL_PANEL ? <ControlPanelWidget /> : null}
     </div>
   );
