@@ -43,21 +43,6 @@ const AnalysisPage: React.FC<Props> = ({}) => {
     value: val,
   }));
 
-  useEffect(() => {
-    dispatch(loadFilterData(false));
-    dispatch(loadLastSecurities());
-    const lastSecuritiesSubscription = WebsocketService.getInstance()
-      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-      .subscribe((securities) => {
-        dispatch(setSecurities(securities));
-      });
-
-    // Specify how to clean up after this effect:
-    return function cleanup() {
-      lastSecuritiesSubscription.unsubscribe();
-    };
-  }, []);
-
   const onSelectRow = (selectedSecurity: SecurityLastInfo) => {
     if (selectedSecurity) {
       StackService.getInstance().send(

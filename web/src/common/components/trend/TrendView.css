@@ -30,6 +30,7 @@
 
 .TrendViewChart_title {
   margin-bottom: -20px;
-  margin-top: 20px;
   text-align: center;
+  height: 20px;
+  font-size: 0.9rem;
 }

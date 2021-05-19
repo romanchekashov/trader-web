@@ -115,7 +115,7 @@ const TrendViewChart: React.FC<Props> = ({
   const data = updateData(trend, levels);
 
   return (
-    <div>
+    <div className="TrendViewChart" style={{ height, width }}>
       <div className="TrendViewChart_title">
         {trend.interval} - {trend.power} Trend {trend.direction} | Levels:{" "}
         <span
@@ -139,7 +139,7 @@ const TrendViewChart: React.FC<Props> = ({
         data={data}
         options={options}
         width={width + "px"}
-        height={height + "px"}
+        height={height - 20 + "px"}
       />
     </div>
   );

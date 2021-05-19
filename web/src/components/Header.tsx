@@ -44,6 +44,10 @@ export const Header = () => {
         <NavLink to="/about" activeStyle={activeStyle}>
           About
         </NavLink>
+        {" / "}
+        <NavLink to="/trend-charts" activeStyle={activeStyle}>
+          Trend Charts
+        </NavLink>
       </nav>
       <MarketWorkTime />
     </div>

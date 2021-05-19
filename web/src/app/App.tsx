@@ -6,17 +6,20 @@ import { StackWrapper } from "../common/components/stack/StackWrapper";
 import Widgetbar from "../common/components/widgetbar/Widgetbar";
 import { ActiveTrade } from "../common/data/ActiveTrade";
 import { BrokerId } from "../common/data/BrokerId";
+import { SecurityLastInfo } from "../common/data/security/SecurityLastInfo";
 import { StopOrder } from "../common/data/StopOrder";
 import { TradingPlatform } from "../common/data/trading/TradingPlatform";
 import { Header } from "../components/Header";
 import { ActiveTradesPage } from "../features/active-trades/ActiveTradesPage";
 import AnalysisPage from "../features/analysis/AnalysisPage";
+import { loadFilterData } from "../features/analysis/AnalysisSlice";
 import { BotControlPage } from "../features/bot-control/BotControlPage";
 import { EconomicCalendarPage } from "../features/economic-calendar/EconomicCalendarPage";
 import { HomePage } from "../features/home/HomePage";
 import { NewsPage } from "../features/news/NewsPage";
 import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
 import { TradingChartsRouter } from "../features/trading-charts/TradingChartsRouter";
+import TrendChartsPage from "../features/trend-charts/TrendChartsPage";
 import {
   loadActiveTrades,
   setActiveTrades,
@@ -27,7 +30,9 @@ import { loadPossibleTradesStat } from "./possibleTrades/possibleTradesSlice";
 import {
   loadCurrencies,
   loadFutures,
+  loadLastSecurities,
   loadShares,
+  setSecurities,
 } from "./securities/securitiesSlice";
 import { setStops } from "./stops/stopsSlice";
 
@@ -78,6 +83,21 @@ export const App = () => {
     };
   }, []);
 
+  useEffect(() => {
+    dispatch(loadFilterData(false));
+    dispatch(loadLastSecurities());
+    const lastSecuritiesSubscription = WebsocketService.getInstance()
+      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+      .subscribe((securities) => {
+        dispatch(setSecurities(securities));
+      });
+
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      lastSecuritiesSubscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <div className="container-fluid">
       <div style={{ width: `-webkit-calc(100% - ${widgetbarHeight}px)` }}>
@@ -94,6 +114,7 @@ export const App = () => {
           <Route path="/bot-control" component={BotControlPage} />
           <Route path="/trade-journal" component={TradeJournalPage} />
           <Route path="/economic-calendar" component={EconomicCalendarPage} />
+          <Route path="/trend-charts" component={TrendChartsPage} />
           <Route component={PageNotFound} />
         </Switch>
       </div>

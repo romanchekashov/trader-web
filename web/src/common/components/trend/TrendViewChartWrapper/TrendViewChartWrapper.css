@@ -1,0 +1,14 @@
+.TrendViewChartWrapper {
+  width: 100%;
+}
+
+.TrendViewChartWrapper_title {
+  height: 20px;
+  display: flex;
+}
+
+.TrendViewChartWrapper_title_trend {
+  font-size: 0.9rem;
+  color: #fff;
+  text-align: center;
+}
