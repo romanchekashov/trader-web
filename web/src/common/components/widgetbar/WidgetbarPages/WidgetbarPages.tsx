@@ -5,7 +5,7 @@ import { useAppDispatch } from "../../../../app/hooks";
 import { setPossibleTrade } from "../../../../app/possibleTrades/possibleTradesSlice";
 import Securities from "../../../../app/securities/components/Securities";
 import { setSecurityById } from "../../../../app/securities/securitiesSlice";
-import { MoexOpenInterestView } from "../../../../features/analysis/analysis/moex-open-interest/MoexOpenInterestView";
+import MoexOpenInterestView from "../../../../features/analysis/analysis/moex-open-interest/MoexOpenInterestView";
 import { SupplyAndDemand } from "../../../../features/analysis/analysis/supply-and-demand/SupplyAndDemand";
 import { SecurityLastInfoView } from "../../../../features/trading-charts/security/info/SecurityLastInfoView";
 import { BrokerId } from "../../../data/BrokerId";

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import {
   getMoexApiOpenInterestList,
   getMoexOpenInterests,
@@ -25,7 +25,7 @@ type Props = {
   showRealTimeOI?: boolean;
 };
 
-export const MoexOpenInterestView: React.FC<Props> = ({
+const MoexOpenInterestView: React.FC<Props> = ({
   security,
   showTable = true,
   showRealTimeOI = true,
@@ -121,3 +121,9 @@ export const MoexOpenInterestView: React.FC<Props> = ({
     </div>
   );
 };
+
+const areEqual = (prevProps, nextProps) => {
+  return prevProps.security?.id === nextProps.security?.id;
+};
+
+export default memo(MoexOpenInterestView, areEqual);

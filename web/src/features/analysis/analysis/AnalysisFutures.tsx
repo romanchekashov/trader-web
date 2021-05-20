@@ -45,7 +45,7 @@ import {
   getTimeFrameHigh,
   getTimeFrameLow,
 } from "../../../common/utils/TimeFrameChooser";
-import { MoexOpenInterestView } from "./moex-open-interest/MoexOpenInterestView";
+import MoexOpenInterestView from "./moex-open-interest/MoexOpenInterestView";
 import moment = require("moment");
 import { filter } from "rxjs/internal/operators";
 

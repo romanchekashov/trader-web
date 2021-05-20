@@ -65,6 +65,8 @@ const store = configureStore({
         "deposits/loadFuturesClientLimits/fulfilled",
         "deposits/loadFuturesClientLimits/pending",
         "orders/setOrders",
+        "deposits/setDeposits",
+        "securities/loadLastSecurities/pending",
       ],
       // Ignore these field paths in all actions
       ignoredActionPaths: ["timestamp"],

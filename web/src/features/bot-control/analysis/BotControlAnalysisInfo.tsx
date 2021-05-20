@@ -1,43 +1,41 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
-import {getMoexOpenInterests} from "../../../common/api/rest/analysisRestApi";
-import {MoexOpenInterest} from "../../../common/data/open-interest/MoexOpenInterest";
-import {MoexOpenInterestView} from "../../analysis/analysis/moex-open-interest/MoexOpenInterestView";
+import { useEffect, useState } from "react";
+import { getMoexOpenInterests } from "../../../common/api/rest/analysisRestApi";
+import { MoexOpenInterest } from "../../../common/data/open-interest/MoexOpenInterest";
+import MoexOpenInterestView from "../../analysis/analysis/moex-open-interest/MoexOpenInterestView";
 
 export interface AnalysisState {
-    realDepo: boolean
+  realDepo: boolean;
 }
 
 type Props = {
-    security: any
-}
+  security: any;
+};
 
-export const BotControlAnalysisInfo: React.FC<Props> = ({security}) => {
-    const [moexOpenInterest, setMoexOpenInterest] = useState<MoexOpenInterest>(null);
+export const BotControlAnalysisInfo: React.FC<Props> = ({ security }) => {
+  const [moexOpenInterest, setMoexOpenInterest] =
+    useState<MoexOpenInterest>(null);
 
-    useEffect(() => {
-        if (security) {
-            getMoexOpenInterests(security.classCode, security.secCode)
-                .then(value => setMoexOpenInterest(value.length > 0 ? value[0] : null));
-        }
-
-        // Specify how to clean up after this effect:
-        return function cleanup() {
-        };
-    }, [security]);
-
+  useEffect(() => {
     if (security) {
-
-        return (
-            <>
-                <div className="p-grid analysis-head">
-                    <MoexOpenInterestView security={security}/>
-                </div>
-            </>
-        )
-    } else {
-        return (
-            <div>Select security for analysis info</div>
-        )
+      getMoexOpenInterests(security.classCode, security.secCode).then((value) =>
+        setMoexOpenInterest(value.length > 0 ? value[0] : null)
+      );
     }
+
+    // Specify how to clean up after this effect:
+    return function cleanup() {};
+  }, [security]);
+
+  if (security) {
+    return (
+      <>
+        <div className="p-grid analysis-head">
+          <MoexOpenInterestView security={security} />
+        </div>
+      </>
+    );
+  } else {
+    return <div>Select security for analysis info</div>;
+  }
 };

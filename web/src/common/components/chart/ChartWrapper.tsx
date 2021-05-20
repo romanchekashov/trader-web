@@ -211,26 +211,19 @@ export class ChartWrapper extends React.Component<Props, States> {
       security == prevProps.security
     );
 
-    if (security) {
-      if (!this.fetchingCandles) {
-        if (
-          !prevProps.security ||
-          candles.length === 0 ||
-          security.secCode !== prevProps.security.secCode
-        ) {
-          this.fetchCandles(
-            security,
-            innerInterval,
-            innerStart,
-            numberOfCandles
-          );
-        }
-        if (
-          prevProps.security &&
-          security.lastTradePrice !== prevProps.security.lastTradePrice
-        ) {
-          this.updateLastCandle();
-        }
+    if (security && !this.fetchingCandles) {
+      if (
+        !prevProps.security ||
+        candles.length === 0 ||
+        security.secCode !== prevProps.security.secCode
+      ) {
+        this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
+      }
+      if (
+        prevProps.security &&
+        security.lastTradePrice !== prevProps.security.lastTradePrice
+      ) {
+        this.updateLastCandle();
       }
     }
 
@@ -476,8 +469,8 @@ export class ChartWrapper extends React.Component<Props, States> {
     const { premise, interval } = this.props;
 
     if (interval && premise && premise.analysis.trends) {
-      const intervals: Interval[] = this
-        .swingHighsLowsTimeFrameTradingIntervals[interval];
+      const intervals: Interval[] =
+        this.swingHighsLowsTimeFrameTradingIntervals[interval];
       const trendWrappers = premise.analysis.trends
         .filter((trend) => intervals.indexOf(trend.interval) !== -1)
         .map((trend) => ({

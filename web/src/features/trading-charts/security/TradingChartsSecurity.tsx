@@ -25,7 +25,7 @@ import { MoexOpenInterestChart } from "../../analysis/analysis/moex-open-interes
 import { SecurityLastInfoView } from "./info/SecurityLastInfoView";
 import moment = require("moment");
 import { News } from "../../../common/components/news/News";
-import { MoexOpenInterestView } from "../../analysis/analysis/moex-open-interest/MoexOpenInterestView";
+import MoexOpenInterestView from "../../analysis/analysis/moex-open-interest/MoexOpenInterestView";
 
 type Props = {
   securityLastInfo: SecurityLastInfo;
@@ -109,7 +109,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({
     return function cleanup() {
       window.removeEventListener("resize", updateSize);
     };
-  }, [securityLastInfo]);
+  }, [securityLastInfo?.id]);
 
   const fetchPremise = (
     security: SecurityLastInfo,
@@ -299,7 +299,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({
               trends={premise?.analysis?.trends || []}
               srLevels={premise?.analysis?.srLevels || []}
             />
-            <div className="p-grid">
+            <div className="p-grid" style={{ marginTop: 10 }}>
               <div
                 className="p-col-4"
                 ref={chart1Ref1}
