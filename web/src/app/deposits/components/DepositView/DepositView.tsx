@@ -33,19 +33,17 @@ const DepositView: React.FC<Props> = ({}) => {
     dispatch(loadFuturesClientLimits());
   };
 
-  const data: RowData[] = futuresClientLimits
-    ?.filter((value) => value.limit_type === 0)
-    .map((value) => {
-      const margin = Math.round(value.varmargin + value.accruedint);
-      return {
-        limit: Math.round(value.cbplimit),
-        used: Math.round(value.cbplused),
-        margin,
-        commission: Math.round(value.ts_comission * 2),
-        planned: Math.round(value.cbplplanned),
-        result: round100((margin * 100) / value.cbplimit),
-      };
-    });
+  const data: RowData[] = futuresClientLimits?.map((value) => {
+    const margin = Math.round(value.varmargin + value.accruedint);
+    return {
+      limit: Math.round(value.cbplimit),
+      used: Math.round(value.cbplused),
+      margin,
+      commission: Math.round(value.ts_comission * 2),
+      planned: Math.round(value.cbplplanned),
+      result: round100((margin * 100) / value.cbplimit),
+    };
+  });
 
   const rowClassName = (rowData) => {
     if (rowData.margin > 0) {

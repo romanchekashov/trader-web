@@ -1,0 +1,9 @@
+.ControlPanelGeneralBtn {
+  padding: 5px;
+}
+
+.ControlPanelGeneralBtn .p-togglebutton.p-button.p-highlight.p-button-danger {
+  color: #ffffff;
+  background: #d32f2f;
+  border: 1px solid #d32f2f;
+}

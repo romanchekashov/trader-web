@@ -4,10 +4,12 @@ import { SelectButton } from "primereact/selectbutton";
 import { ToggleButton } from "primereact/togglebutton";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { useAppDispatch } from "../../../../app/hooks";
+import { selectDeposits } from "../../../../app/deposits/depositsSlice";
+import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import quikOrdersApi from "../../../../app/orders/quikOrdersApi";
 import { createStop } from "../../../../app/stops/stopsSlice";
 import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
+import { ClassCode } from "../../../data/ClassCode";
 import { OperationType } from "../../../data/OperationType";
 import { Order } from "../../../data/Order";
 import { OrderType } from "../../../data/OrderType";
@@ -20,6 +22,7 @@ import {
   PrimeDropdownItem,
   round,
 } from "../../../utils/utils";
+import "./ControlPanelGeneralBtn.css";
 
 enum ControlOrderType {
   ORDER = "O",
@@ -56,6 +59,7 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
   growl,
 }) => {
   const dispatch = useAppDispatch();
+  const { futuresClientLimits } = useAppSelector(selectDeposits);
 
   const multipliers: PrimeDropdownItem<number>[] = [1, 2, 4, 8].map((val) => ({
     label: "" + val,
@@ -102,7 +106,19 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
 
   useEffect(() => {
     setPrice(security?.lastTradePrice || 0);
-  }, [security?.id]);
+    setPrice2(security?.lastTradePrice || 0);
+    if (
+      futuresClientLimits.length &&
+      security?.classCode === ClassCode.SPBFUT
+    ) {
+      let go = Math.min(
+        security.futureBuyDepoPerContract,
+        security.futureSellDepoPerContract
+      );
+      let maxQuantity = Math.floor(futuresClientLimits[0].cbplplanned / go);
+      setQuantity(maxQuantity);
+    }
+  }, [security?.id, futuresClientLimits]);
 
   const calcStopPrice = (
     operationType: OperationType,
@@ -314,7 +330,7 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       : "Stop";
 
   return (
-    <div className="p-grid">
+    <div className="p-grid ControlPanelGeneralBtn">
       <div className="p-col-8">
         <SelectButton
           value={controlOrderType}
