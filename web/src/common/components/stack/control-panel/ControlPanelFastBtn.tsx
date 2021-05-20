@@ -35,25 +35,39 @@ export const ControlPanelFastBtn: React.FC<Props> = ({
     }
   }, [deleteActiveTradesLoadingError]);
 
-  const [
-    terminatePositionDialogVisible,
-    setTerminatePositionDialogVisible,
-  ] = useState<boolean>(false);
-  const [
-    reversePositionDialogVisible,
-    setReversePositionDialogVisible,
-  ] = useState<boolean>(false);
+  const [terminatePositionDialogVisible, setTerminatePositionDialogVisible] =
+    useState<boolean>(false);
+  const [reversePositionDialogVisible, setReversePositionDialogVisible] =
+    useState<boolean>(false);
 
   const cancelActiveOrders = () => {
-    quikOrdersApi.deleteOrdersBySecId(activeTrade?.secId);
+    quikOrdersApi.deleteOrdersBySecId(activeTrade?.secId).then(() => {
+      growl.show({
+        severity: "success",
+        summary: "Success Message",
+        detail: "Orders canceled",
+      });
+    });
   };
 
   const cancelStopOrders = () => {
-    dispatch(deleteStopOrdersBySecId(activeTrade?.secId));
+    dispatch(deleteStopOrdersBySecId(activeTrade?.secId)).then(() => {
+      growl.show({
+        severity: "success",
+        summary: "Success Message",
+        detail: "Stop orders canceled",
+      });
+    });
   };
 
   const terminatePosition = () => {
-    dispatch(deleteActiveTrades(activeTrade?.secId));
+    dispatch(deleteActiveTrades(activeTrade?.secId)).then(() => {
+      growl.show({
+        severity: "success",
+        summary: "Success Message",
+        detail: "Possition terminated",
+      });
+    });
   };
 
   const reversePosition = () => {

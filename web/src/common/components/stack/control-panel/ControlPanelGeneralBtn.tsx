@@ -228,26 +228,9 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       kind: StopOrderKind.SIMPLE_STOP_ORDER,
       quantity,
       operation,
-      conditionPrice: calcStopPrice(operation, price, security), // stop
-      price,
+      conditionPrice: price, // activate stop
+      price: calcStopPrice(operation, price, security),
     };
-
-    if (operation === OperationType.BUY && price > security.lastTradePrice) {
-      growl.show({
-        severity: "error",
-        summary: "Error Message",
-        detail: "Cannot buy greater then current price!",
-      });
-      return;
-    }
-    if (operation === OperationType.SELL && price < security.lastTradePrice) {
-      growl.show({
-        severity: "error",
-        summary: "Error Message",
-        detail: "Cannot sell chipper then current price!",
-      });
-      return;
-    }
 
     dispatch(createStop(order)).then((result) => {
       console.log(result);
@@ -333,6 +316,15 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       ? "Target"
       : "Stop";
 
+  const buyDisabled =
+    !security ||
+    (controlOrderType === ControlOrderType.STOP &&
+      security?.lastTradePrice > price);
+  const sellDisabled =
+    !security ||
+    (controlOrderType === ControlOrderType.STOP &&
+      security?.lastTradePrice < price);
+
   return (
     <div className="p-grid ControlPanelGeneralBtn">
       <div className="p-col-8">
@@ -408,7 +400,7 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
           onClick={() => {
             create(OperationType.BUY);
           }}
-          disabled={!security}
+          disabled={buyDisabled}
         />
       </div>
       <div className="p-col-6">
@@ -419,7 +411,7 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
           onClick={() => {
             create(OperationType.SELL);
           }}
-          disabled={!security}
+          disabled={sellDisabled}
         />
       </div>
     </div>

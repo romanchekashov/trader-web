@@ -51,7 +51,7 @@ export const depositsSlice = createSlice({
       state: DepositsState,
       action: PayloadAction<any>
     ) => {
-      state.futuresClientLimits = action.payload;
+      state.futuresClientLimitsLoadingError = action.payload;
       state.futuresClientLimitsLoading = LoadingState.ERROR;
     },
   },
