@@ -65,9 +65,10 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
     label: "" + val,
     value: val,
   }));
+  const [quantity, setQuantity] = useState<number>(1);
+  const [quantityMax, setQuantityMax] = useState<number>(1);
   const [price, setPrice] = useState<number>(0);
   const [price2, setPrice2] = useState<number>(0);
-  const [quantity, setQuantity] = useState<number>(1);
   const [steps, setSteps] = useState<number>(2);
   const [multiplier, setMultiplier] = useState<number>(1);
   const [btnSet, setBtnSet] = useState<string>("general");
@@ -107,6 +108,9 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
   useEffect(() => {
     setPrice(security?.lastTradePrice || 0);
     setPrice2(security?.lastTradePrice || 0);
+  }, [security?.id]);
+
+  useEffect(() => {
     if (
       futuresClientLimits.length &&
       security?.classCode === ClassCode.SPBFUT
@@ -116,9 +120,9 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
         security.futureSellDepoPerContract
       );
       let maxQuantity = Math.floor(futuresClientLimits[0].cbplplanned / go);
-      setQuantity(maxQuantity);
+      setQuantityMax(maxQuantity);
     }
-  }, [security?.id, futuresClientLimits]);
+  }, [security?.id, futuresClientLimits, quantity]);
 
   const calcStopPrice = (
     operationType: OperationType,
@@ -359,7 +363,13 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
             // onKeyDown={quantityChangeByKeydown}
             onChange={(e) => setQuantity(parseInt(e.target["value"]))}
           />
-          <label htmlFor="td__control-panel-quantity">Quantity</label>
+          <label
+            className="clickable_label"
+            htmlFor="td__control-panel-quantity"
+            onClick={() => setQuantity(quantityMax)}
+          >
+            Qty Max: {quantityMax}
+          </label>
         </span>
       </div>
       <div className="p-col-4" style={{ marginTop: 5 }}>

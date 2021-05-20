@@ -54,3 +54,8 @@ code {
 .p-tooltip {
   font-size: "1rem";
 }
+
+.clickable_label {
+  cursor: pointer;
+  pointer-events: all !important;
+}
