@@ -11,6 +11,7 @@ import tradeJournalReducer from "../features/trade-journal/TradeJournalSlice";
 import possibleTradesReducer from "./possibleTrades/possibleTradesSlice";
 import securitiesReducer from "./securities/securitiesSlice";
 import stopsReducer from "./stops/stopsSlice";
+import depositsReducer from "./deposits/depositsSlice";
 import activeTradesReducer from "./activeTrades/activeTradesSlice";
 
 /**
@@ -26,6 +27,7 @@ const store = configureStore({
     securities: securitiesReducer,
     possibleTrades: possibleTradesReducer,
     stops: stopsReducer,
+    deposits: depositsReducer,
     activeTrades: activeTradesReducer,
   },
   middleware: getDefaultMiddleware({

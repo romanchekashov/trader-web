@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
+import DepositView from "../../../../app/deposits/components/DepositView/DepositView";
 import { useAppDispatch } from "../../../../app/hooks";
 import { setPossibleTrade } from "../../../../app/possibleTrades/possibleTradesSlice";
 import Securities from "../../../../app/securities/components/Securities";
@@ -21,7 +22,6 @@ import EconomicCalendarWidget from "../../economic-calendar/EconomicCalendarWidg
 import { News } from "../../news/News";
 import Notifications from "../../notifications/Notifications";
 import { StockEventsBrief } from "../../share-event/StockEventsBrief";
-import DepositView from "../../stack/deposit/DepositView";
 import { WidgetbarItem } from "../WidgetbarItem";
 import "./WidgetbarPages.css";
 

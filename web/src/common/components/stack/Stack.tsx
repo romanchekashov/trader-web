@@ -1,39 +1,36 @@
+import { Toast } from "primereact/toast";
 import * as React from "react";
-import "./Stack.css";
-import StackVolumes from "./volumes/StackVolumes";
 import { SubscriptionLike } from "rxjs";
-import { StackItemView } from "./StackItemView";
-import { StackItemWrapper } from "./data/StackItemWrapper";
-import { StackSwitcher } from "./StackSwitcher";
-import { SecurityLastInfo } from "../../data/security/SecurityLastInfo";
-import { Order } from "../../data/Order";
-import { SecurityVolume } from "./volumes/data/SecurityVolume";
-import { StackItem } from "./data/StackItem";
-import { WebsocketService, WSEvent } from "../../api/WebsocketService";
-import { OperationType } from "../../data/OperationType";
+import activeTradesApi from "../../../app/activeTrades/activeTradesApi";
+import DepositView from "../../../app/deposits/components/DepositView/DepositView";
 import {
   getActiveOrders,
   getActiveStopOrders,
 } from "../../api/rest/traderRestApi";
-import { OrderType } from "../../data/OrderType";
-import { ActiveTrade } from "../../data/ActiveTrade";
+import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import { playSound } from "../../assets/assets";
-import { StopOrder } from "../../data/StopOrder";
-import { getSelectedSecurity } from "../../utils/Cache";
-import SessionTradeResultView from "../control-panel/components/SessionTradeResultView";
-import ActiveTradeView from "../control-panel/components/ActiveTradesView";
+import { ActiveTrade } from "../../data/ActiveTrade";
+import { OperationType } from "../../data/OperationType";
+import { Order } from "../../data/Order";
+import { OrderType } from "../../data/OrderType";
+import { SecurityLastInfo } from "../../data/security/SecurityLastInfo";
 import { SessionTradeResult } from "../../data/SessionTradeResult";
-import { ControlPanelGeneralBtn } from "./control-panel/ControlPanelGeneralBtn";
-import { ControlPanelFastBtn } from "./control-panel/ControlPanelFastBtn";
+import { StopOrder } from "../../data/StopOrder";
 import { TradePremise } from "../../data/strategy/TradePremise";
 import { adjustTradePremise } from "../../utils/DataUtils";
 import intervalCompare from "../../utils/IntervalComporator";
-import DepositView from "./deposit/DepositView";
-import { TEST_ACTIVE_TRADES } from "../../utils/TestData";
+import ActiveTradeView from "../control-panel/components/ActiveTradesView";
+import SessionTradeResultView from "../control-panel/components/SessionTradeResultView";
+import { ControlPanelFastBtn } from "./control-panel/ControlPanelFastBtn";
+import { ControlPanelGeneralBtn } from "./control-panel/ControlPanelGeneralBtn";
+import { StackItem } from "./data/StackItem";
+import { StackItemWrapper } from "./data/StackItemWrapper";
+import "./Stack.css";
+import { StackItemView } from "./StackItemView";
 import { StackEvent, StackService } from "./StackService";
-import { Toast } from "primereact/toast";
-import quikStopOrdersApi from "../../../app/stops/quikStopOrdersApi";
-import activeTradesApi from "../../../app/activeTrades/activeTradesApi";
+import { StackSwitcher } from "./StackSwitcher";
+import { SecurityVolume } from "./volumes/data/SecurityVolume";
+import StackVolumes from "./volumes/StackVolumes";
 
 type Props = {};
 
