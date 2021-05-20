@@ -41,7 +41,7 @@ export class StopOrder {
 
   // stop
   public conditionPrice2?: number; // stop activation price for TAKE_PROFIT_AND_STOP_LIMIT_ORDER
-  public price: number;
+  public price?: number;
   // target
   public conditionPrice: number; // target activation price for TAKE_PROFIT_AND_STOP_LIMIT_ORDER
   public offset?: number;
