@@ -3,10 +3,9 @@ import { ColumnGroup } from "primereact/columngroup";
 import { DataTable } from "primereact/datatable";
 import { Row } from "primereact/row";
 import * as React from "react";
-import { useEffect } from "react";
 import { round100 } from "../../../../common/utils/utils";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { loadFuturesClientLimits, selectDeposits } from "../../depositsSlice";
+import { selectDeposits } from "../../depositsSlice";
 import "./DepositView.css";
 
 type Props = {};
@@ -23,15 +22,6 @@ interface RowData {
 const DepositView: React.FC<Props> = ({}) => {
   const dispatch = useAppDispatch();
   const { futuresClientLimits } = useAppSelector(selectDeposits);
-
-  useEffect(() => {
-    loadData();
-    setInterval(loadData, 30000);
-  }, []);
-
-  const loadData = () => {
-    dispatch(loadFuturesClientLimits());
-  };
 
   const data: RowData[] = futuresClientLimits?.map((value) => {
     const margin = Math.round(value.varmargin + value.accruedint);

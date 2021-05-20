@@ -6,6 +6,7 @@ import { StackWrapper } from "../common/components/stack/StackWrapper";
 import Widgetbar from "../common/components/widgetbar/Widgetbar";
 import { ActiveTrade } from "../common/data/ActiveTrade";
 import { BrokerId } from "../common/data/BrokerId";
+import { FuturesClientLimit } from "../common/data/FuturesClientLimit";
 import { Order } from "../common/data/Order";
 import { SecurityLastInfo } from "../common/data/security/SecurityLastInfo";
 import { StopOrder } from "../common/data/StopOrder";
@@ -25,6 +26,7 @@ import {
   loadActiveTrades,
   setActiveTrades,
 } from "./activeTrades/activeTradesSlice";
+import { loadFuturesClientLimits, setDeposits } from "./deposits/depositsSlice";
 import { useAppDispatch } from "./hooks";
 import { setOrders } from "./orders/ordersSlice";
 import { PageNotFound } from "./PageNotFound";
@@ -47,6 +49,8 @@ export const App = () => {
     dispatch(loadFutures());
     dispatch(loadCurrencies());
     dispatch(loadActiveTrades());
+    dispatch(loadFuturesClientLimits());
+
     dispatch(
       loadPossibleTradesStat({
         brokerId: BrokerId.ALFA_DIRECT,
@@ -70,6 +74,12 @@ export const App = () => {
         dispatch(setOrders(orders));
       });
 
+    const depositsSubscription = WebsocketService.getInstance()
+      .on<FuturesClientLimit[]>(WSEvent.DEPOSITS)
+      .subscribe((deposits) => {
+        dispatch(setDeposits(deposits));
+      });
+
     const activeTradeSubscription = WebsocketService.getInstance()
       .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
       .subscribe((activeTrades) => {
@@ -85,6 +95,7 @@ export const App = () => {
       });
     // Specify how to clean up after this effect:
     return function cleanup() {
+      depositsSubscription.unsubscribe();
       stopOrdersSubscription.unsubscribe();
       ordersSubscription.unsubscribe();
       activeTradeSubscription.unsubscribe();
