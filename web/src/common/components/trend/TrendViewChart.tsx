@@ -87,6 +87,18 @@ const TrendViewChart: React.FC<Props> = ({
       });
     }
 
+    const last = trend.swingHighsLows[trend.swingHighsLows.length - 1].swingHL;
+    datasets.push({
+      label: `current`,
+      data: Array(trend.swingHighsLows.length).fill(
+        last,
+        0,
+        trend.swingHighsLows.length
+      ),
+      fill: false,
+      borderColor: "#212121",
+    });
+
     return {
       labels: trend.swingHighsLows.map((value) =>
         moment(value.dateTime).format(dateTimeFormat)
