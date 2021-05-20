@@ -37,8 +37,23 @@ const TrendViewChartWrapper: React.FC<Props> = ({
   const [levels, setLevels] = useState<SRLevel[]>([]);
   const [trend, setTrend] = useState<Trend>();
   const [trends, setTrends] = useState<Trend[]>([]);
+  // const [tradeStrategyAnalysisFilter, setTradeStrategyAnalysisFilter] = useState<TradeStrategyAnalysisFilterDto>();
 
   useEffect(() => {
+    const tradeStrategyAnalysisFilter = {
+      brokerId:
+        security?.market === Market.SPB
+          ? BrokerId.TINKOFF_INVEST
+          : BrokerId.ALFA_DIRECT,
+      tradingPlatform:
+        security?.market === Market.SPB
+          ? TradingPlatform.API
+          : TradingPlatform.QUIK,
+      secId: security?.id,
+      timeFrameTrading: Interval.M3,
+      timeFrameMin: Interval.M1,
+    };
+
     const tradePremiseSubscription = WebsocketService.getInstance()
       .on<TradePremise>(WSEvent.TRADE_PREMISE)
       .pipe(filter((premise) => premise.security.id === security?.id))
@@ -65,17 +80,22 @@ const TrendViewChartWrapper: React.FC<Props> = ({
       .connectionStatus()
       .subscribe((isConnected) => {
         if (isConnected && security) {
-          informServerAboutRequiredData();
+          informServerAboutRequiredData(tradeStrategyAnalysisFilter);
         }
       });
 
     if (security) {
-      informServerAboutRequiredData();
+      informServerAboutRequiredData(tradeStrategyAnalysisFilter);
     }
 
     // Specify how to clean up after this effect:
     return function cleanup() {
       tradePremiseSubscription.unsubscribe();
+      wsStatusSub.unsubscribe();
+      WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(
+        WSEvent.UNSUBSCRIBE_TRADE_PREMISE_AND_SETUP,
+        tradeStrategyAnalysisFilter
+      );
     };
   }, [security?.id]);
 
@@ -94,29 +114,13 @@ const TrendViewChartWrapper: React.FC<Props> = ({
     return newTrend;
   };
 
-  const informServerAboutRequiredData = (): void => {
-    if (security) {
-      WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(
-        WSEvent.GET_TRADE_PREMISE_AND_SETUP,
-        {
-          brokerId:
-            security.market === Market.SPB
-              ? BrokerId.TINKOFF_INVEST
-              : BrokerId.ALFA_DIRECT,
-          tradingPlatform:
-            security.market === Market.SPB
-              ? TradingPlatform.API
-              : TradingPlatform.QUIK,
-          secId: security.id,
-          timeFrameTrading: Interval.M3,
-          timeFrameMin: Interval.M1,
-        }
-      );
-      // WebsocketService.getInstance().send<string>(
-      //   WSEvent.GET_TRADES_AND_ORDERS,
-      //   security.secCode
-      // );
-    }
+  const informServerAboutRequiredData = (
+    tradeStrategyAnalysisFilter: TradeStrategyAnalysisFilterDto
+  ): void => {
+    WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(
+      WSEvent.SUBSCRIBE_TRADE_PREMISE_AND_SETUP,
+      tradeStrategyAnalysisFilter
+    );
   };
 
   const getColor = (direction: TrendDirection) => {

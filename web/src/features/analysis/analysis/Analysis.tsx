@@ -41,6 +41,7 @@ import {
 import moment = require("moment");
 import { useAppSelector } from "../../../app/hooks";
 import { selectSecurities } from "../../../app/securities/securitiesSlice";
+import { filter } from "rxjs/internal/operators";
 
 export interface AnalysisState {
   realDepo: boolean;
@@ -156,6 +157,7 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
 
     const tradePremiseSubscription = WebsocketService.getInstance()
       .on<TradePremise>(WSEvent.TRADE_PREMISE)
+      .pipe(filter((premise) => premise.security.id === security?.id))
       .subscribe((newPremise) => {
         adjustTradePremise(newPremise);
         setPremise(newPremise);
@@ -215,7 +217,7 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
   const informServerAboutRequiredData = (): void => {
     if (security) {
       WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(
-        WSEvent.GET_TRADE_PREMISE_AND_SETUP,
+        WSEvent.SUBSCRIBE_TRADE_PREMISE_AND_SETUP,
         {
           brokerId:
             security.market === Market.SPB

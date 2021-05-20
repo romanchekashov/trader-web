@@ -47,6 +47,7 @@ import {
 } from "../../../common/utils/TimeFrameChooser";
 import { MoexOpenInterestView } from "./moex-open-interest/MoexOpenInterestView";
 import moment = require("moment");
+import { filter } from "rxjs/internal/operators";
 
 type Props = {
   security: SecurityLastInfo;
@@ -151,7 +152,7 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
   useEffect(() => {
     if (security) {
       console.log("AnalysisFutures: ", security);
-      informServerAboutRequiredData();
+      informServerAboutRequiredData(security);
 
       setFilterDto({
         brokerId:
@@ -179,7 +180,7 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
       .connectionStatus()
       .subscribe((isConnected) => {
         if (isConnected && security) {
-          informServerAboutRequiredData();
+          informServerAboutRequiredData(security);
         }
       });
 
@@ -190,12 +191,17 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
     return function cleanup() {
       window.removeEventListener("resize", updateSize);
       wsStatusSub.unsubscribe();
+      WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(
+        WSEvent.UNSUBSCRIBE_TRADE_PREMISE_AND_SETUP,
+        getTradeStrategyAnalysisFilterDto(security)
+      );
     };
   }, [security?.id]);
 
   useEffect(() => {
     const tradePremiseSubscription = WebsocketService.getInstance()
       .on<TradePremise>(WSEvent.TRADE_PREMISE)
+      .pipe(filter((premise) => premise.security.id === security?.id))
       .subscribe((newPremise) => {
         if (!premiseBefore) {
           adjustTradePremise(newPremise);
@@ -207,7 +213,7 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
     return function cleanup() {
       tradePremiseSubscription.unsubscribe();
     };
-  }, [security, premiseBefore]);
+  }, [security?.id, premiseBefore]);
 
   const updateMarketStateFilterDto = (interval: Interval) => {
     const marketStateFilter: MarketStateFilterDto = {
@@ -233,47 +239,52 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
     );
   };
 
-  const informServerAboutRequiredData = (): void => {
-    if (security) {
-      WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(
-        WSEvent.GET_TRADE_PREMISE_AND_SETUP,
-        {
-          brokerId:
-            security.market === Market.SPB
-              ? BrokerId.TINKOFF_INVEST
-              : BrokerId.ALFA_DIRECT,
-          tradingPlatform:
-            security.market === Market.SPB
-              ? TradingPlatform.API
-              : TradingPlatform.QUIK,
-          secId: security.id,
-          timeFrameTrading: Interval.M5,
-          timeFrameMin: Interval.M1,
-        }
-      );
-      WebsocketService.getInstance().send<string>(
-        WSEvent.GET_TRADES_AND_ORDERS,
-        security.secCode
-      );
-      WebsocketService.getInstance().send<MarketStateFilterDto>(
-        WSEvent.GET_MARKET_STATE,
-        {
-          brokerId:
-            security.market === Market.SPB
-              ? BrokerId.TINKOFF_INVEST
-              : BrokerId.ALFA_DIRECT,
-          tradingPlatform:
-            security.market === Market.SPB
-              ? TradingPlatform.API
-              : TradingPlatform.QUIK,
-          secId: security.id,
-          intervals: timeFrameTradingIntervals[timeFrameTrading],
-          fetchByWS: true,
-          // history: false,
-          numberOfCandles: 100,
-        }
-      );
-    }
+  const getTradeStrategyAnalysisFilterDto = (
+    security: SecurityLastInfo
+  ): TradeStrategyAnalysisFilterDto => ({
+    brokerId:
+      security?.market === Market.SPB
+        ? BrokerId.TINKOFF_INVEST
+        : BrokerId.ALFA_DIRECT,
+    tradingPlatform:
+      security?.market === Market.SPB
+        ? TradingPlatform.API
+        : TradingPlatform.QUIK,
+    secId: security?.id,
+    timeFrameTrading: Interval.M5,
+    timeFrameMin: Interval.M1,
+  });
+
+  const informServerAboutRequiredData = (security: SecurityLastInfo): void => {
+    if (!security) return;
+    WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(
+      WSEvent.SUBSCRIBE_TRADE_PREMISE_AND_SETUP,
+      getTradeStrategyAnalysisFilterDto(security)
+    );
+
+    WebsocketService.getInstance().send<string>(
+      WSEvent.GET_TRADES_AND_ORDERS,
+      security.secCode
+    );
+
+    WebsocketService.getInstance().send<MarketStateFilterDto>(
+      WSEvent.GET_MARKET_STATE,
+      {
+        brokerId:
+          security.market === Market.SPB
+            ? BrokerId.TINKOFF_INVEST
+            : BrokerId.ALFA_DIRECT,
+        tradingPlatform:
+          security.market === Market.SPB
+            ? TradingPlatform.API
+            : TradingPlatform.QUIK,
+        secId: security.id,
+        intervals: timeFrameTradingIntervals[timeFrameTrading],
+        fetchByWS: true,
+        // history: false,
+        numberOfCandles: 100,
+      }
+    );
   };
 
   const fetchPremise = (timeFrameTrading: Interval, before?: Date) => {

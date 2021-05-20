@@ -34,6 +34,7 @@ import { TradeStrategyAnalysisFilterDto } from "../../../common/data/TradeStrate
 import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
 import { adjustTradePremise } from "../../../common/utils/DataUtils";
 import moment = require("moment");
+import { filter } from "rxjs/internal/operators";
 
 export interface AnalysisState {
   realDepo: boolean;
@@ -164,6 +165,7 @@ export const AnalysisTinkoff: React.FC<Props> = ({ security, chartNumber }) => {
 
     const tradePremiseSubscription = WebsocketService.getInstance()
       .on<TradePremise>(WSEvent.TRADE_PREMISE_TINKOFF)
+      .pipe(filter((premise) => premise.security.id === security?.id))
       .subscribe((newPremise) => {
         adjustTradePremise(newPremise);
         setPremise(newPremise);
@@ -224,7 +226,7 @@ export const AnalysisTinkoff: React.FC<Props> = ({ security, chartNumber }) => {
   const informServerAboutRequiredData = (): void => {
     if (security) {
       WebsocketService.getInstance().send<TradeStrategyAnalysisFilterDto>(
-        WSEvent.GET_TRADE_PREMISE_AND_SETUP,
+        WSEvent.SUBSCRIBE_TRADE_PREMISE_AND_SETUP,
         {
           brokerId:
             security.market === Market.SPB
