@@ -150,23 +150,6 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       type: isMarket ? OrderType.MARKET : OrderType.LIMIT,
     };
 
-    if (operation === OperationType.BUY && price > security.lastTradePrice) {
-      growl.show({
-        severity: "error",
-        summary: "Error Message",
-        detail: "Cannot buy greater then current price!",
-      });
-      return;
-    }
-    if (operation === OperationType.SELL && price < security.lastTradePrice) {
-      growl.show({
-        severity: "error",
-        summary: "Error Message",
-        detail: "Cannot sell chipper then current price!",
-      });
-      return;
-    }
-
     quikOrdersApi.createOrder(order).then((order) => {
       growl.show({
         severity: "success",
@@ -348,7 +331,10 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
     (controlOrderType === ControlOrderType.TARGET &&
       security?.lastTradePrice < price) ||
     (controlOrderType === ControlOrderType.STOP_TARGET &&
-      security?.lastTradePrice < price2);
+      security?.lastTradePrice < price2) ||
+    (controlOrderType === ControlOrderType.ORDER &&
+      !isMarket &&
+      security?.lastTradePrice < price);
   const sellDisabled =
     !security ||
     ((controlOrderType === ControlOrderType.STOP ||
@@ -357,7 +343,10 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
     (controlOrderType === ControlOrderType.TARGET &&
       security?.lastTradePrice > price) ||
     (controlOrderType === ControlOrderType.STOP_TARGET &&
-      security?.lastTradePrice > price2);
+      security?.lastTradePrice > price2) ||
+    (controlOrderType === ControlOrderType.ORDER &&
+      !isMarket &&
+      security?.lastTradePrice > price);
 
   return (
     <div className="p-grid ControlPanelGeneralBtn">

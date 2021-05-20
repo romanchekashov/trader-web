@@ -12,6 +12,7 @@ import possibleTradesReducer from "./possibleTrades/possibleTradesSlice";
 import securitiesReducer from "./securities/securitiesSlice";
 import stopsReducer from "./stops/stopsSlice";
 import depositsReducer from "./deposits/depositsSlice";
+import ordersReducer from "./orders/ordersSlice";
 import activeTradesReducer from "./activeTrades/activeTradesSlice";
 
 /**
@@ -27,6 +28,7 @@ const store = configureStore({
     securities: securitiesReducer,
     possibleTrades: possibleTradesReducer,
     stops: stopsReducer,
+    orders: ordersReducer,
     deposits: depositsReducer,
     activeTrades: activeTradesReducer,
   },
@@ -62,6 +64,7 @@ const store = configureStore({
         "news/fetch/pending",
         "deposits/loadFuturesClientLimits/fulfilled",
         "deposits/loadFuturesClientLimits/pending",
+        "orders/setOrders",
       ],
       // Ignore these field paths in all actions
       ignoredActionPaths: ["timestamp"],

@@ -10,14 +10,17 @@ import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import quikOrdersApi from "../../../../app/orders/quikOrdersApi";
 import { deleteStopOrdersBySecId } from "../../../../app/stops/stopsSlice";
 import { ActiveTrade } from "../../../data/ActiveTrade";
+import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 
 type Props = {
+  security: SecurityLastInfo;
   growl: any;
   activeTrade: ActiveTrade;
   history?: boolean;
 };
 
 export const ControlPanelFastBtn: React.FC<Props> = ({
+  security,
   growl,
   activeTrade,
   history,
@@ -41,7 +44,7 @@ export const ControlPanelFastBtn: React.FC<Props> = ({
     useState<boolean>(false);
 
   const cancelActiveOrders = () => {
-    quikOrdersApi.deleteOrdersBySecId(activeTrade?.secId).then(() => {
+    quikOrdersApi.deleteOrdersBySecId(security?.id).then(() => {
       growl.show({
         severity: "success",
         summary: "Success Message",
@@ -51,7 +54,7 @@ export const ControlPanelFastBtn: React.FC<Props> = ({
   };
 
   const cancelStopOrders = () => {
-    dispatch(deleteStopOrdersBySecId(activeTrade?.secId)).then(() => {
+    dispatch(deleteStopOrdersBySecId(security?.id)).then(() => {
       growl.show({
         severity: "success",
         summary: "Success Message",
@@ -61,7 +64,7 @@ export const ControlPanelFastBtn: React.FC<Props> = ({
   };
 
   const terminatePosition = () => {
-    dispatch(deleteActiveTrades(activeTrade?.secId)).then(() => {
+    dispatch(deleteActiveTrades(security?.id)).then(() => {
       growl.show({
         severity: "success",
         summary: "Success Message",

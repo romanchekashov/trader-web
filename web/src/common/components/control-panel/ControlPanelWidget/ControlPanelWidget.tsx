@@ -24,7 +24,7 @@ const ControlPanelWidget: React.FC<Props> = ({}) => {
   const [sessionResult, setSessionResult] = useState<SessionTradeResult>();
 
   return (
-    <div className="p-grid control-panel">
+    <div className="p-grid ControlPanelWidget">
       <Toast ref={toast} />
       <div className="p-col-12" style={{ fontSize: "12px" }}>
         <SessionTradeResultView result={sessionResult} />
@@ -48,6 +48,7 @@ const ControlPanelWidget: React.FC<Props> = ({}) => {
       </div>
       <div className="p-col-12">
         <ControlPanelFastBtn
+          security={security}
           growl={toast?.current}
           history={false}
           activeTrade={selected}

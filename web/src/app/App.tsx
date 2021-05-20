@@ -6,6 +6,7 @@ import { StackWrapper } from "../common/components/stack/StackWrapper";
 import Widgetbar from "../common/components/widgetbar/Widgetbar";
 import { ActiveTrade } from "../common/data/ActiveTrade";
 import { BrokerId } from "../common/data/BrokerId";
+import { Order } from "../common/data/Order";
 import { SecurityLastInfo } from "../common/data/security/SecurityLastInfo";
 import { StopOrder } from "../common/data/StopOrder";
 import { TradingPlatform } from "../common/data/trading/TradingPlatform";
@@ -25,6 +26,7 @@ import {
   setActiveTrades,
 } from "./activeTrades/activeTradesSlice";
 import { useAppDispatch } from "./hooks";
+import { setOrders } from "./orders/ordersSlice";
 import { PageNotFound } from "./PageNotFound";
 import { loadPossibleTradesStat } from "./possibleTrades/possibleTradesSlice";
 import {
@@ -62,6 +64,12 @@ export const App = () => {
         dispatch(setStops(newStopOrders));
       });
 
+    const ordersSubscription = WebsocketService.getInstance()
+      .on<Order[]>(WSEvent.ORDERS)
+      .subscribe((orders) => {
+        dispatch(setOrders(orders));
+      });
+
     const activeTradeSubscription = WebsocketService.getInstance()
       .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
       .subscribe((activeTrades) => {
@@ -78,6 +86,7 @@ export const App = () => {
     // Specify how to clean up after this effect:
     return function cleanup() {
       stopOrdersSubscription.unsubscribe();
+      ordersSubscription.unsubscribe();
       activeTradeSubscription.unsubscribe();
       wsStatusSub.unsubscribe();
     };

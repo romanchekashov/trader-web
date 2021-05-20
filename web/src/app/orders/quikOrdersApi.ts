@@ -10,7 +10,7 @@ const getOrders = (): Promise<Order[]> =>
 const createOrder = (dto: Order): Promise<Order> =>
   post<Order>(baseUrl, dto).then(adjustOrder);
 
-const deleteOrder = (num: number): Promise<Order> =>
+const deleteOrder = (num: string): Promise<Order> =>
   del<Order>(`${baseUrl}${num || ""}`).then(adjustOrder);
 
 const deleteOrdersBySecId = (secId: number): Promise<Order[]> =>

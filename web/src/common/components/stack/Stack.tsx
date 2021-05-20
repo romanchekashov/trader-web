@@ -527,6 +527,7 @@ export class Stack extends React.Component<Props, States> {
             </div>
             <div className="p-col-12">
               <ControlPanelFastBtn
+                security={securityLastInfo}
                 growl={this.toast}
                 history={false}
                 activeTrade={selectedActiveTrade}
