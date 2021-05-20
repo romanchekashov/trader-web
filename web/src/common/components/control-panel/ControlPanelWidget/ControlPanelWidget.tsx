@@ -6,6 +6,7 @@ import DepositView from "../../../../app/deposits/components/DepositView/Deposit
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import { selectSecurities } from "../../../../app/securities/securitiesSlice";
 import { SessionTradeResult } from "../../../data/SessionTradeResult";
+import OrdersTable from "../../ordersTable/OrdersTable";
 import { ControlPanelFastBtn } from "../../stack/control-panel/ControlPanelFastBtn";
 import { ControlPanelGeneralBtn } from "../../stack/control-panel/ControlPanelGeneralBtn";
 import ActiveTradesView from "../components/ActiveTradesView";
@@ -35,6 +36,9 @@ const ControlPanelWidget: React.FC<Props> = ({}) => {
       >{`Selected active trade for securities: ${
         security ? security.shortName : "All"
       }`}</div>
+      <div className="p-col-12">
+        <OrdersTable />
+      </div>
       <div className="p-col-12">
         <ControlPanelGeneralBtn
           growl={toast?.current}

@@ -1,0 +1,13 @@
+.OrdersTable .p-button-text {
+  zoom: 0.6;
+}
+
+.p-datatable.active-trade-view .p-datatable-thead > tr > th {
+  padding: 2px;
+  font-size: 10px;
+}
+
+.p-datatable.active-trade-view .p-datatable-tbody td {
+  padding: 0 5px;
+  font-size: 12px;
+}

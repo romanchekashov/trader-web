@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { selectDeposits } from "../../../../app/deposits/depositsSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import quikOrdersApi from "../../../../app/orders/quikOrdersApi";
-import { createStop } from "../../../../app/stops/stopsSlice";
+import { createStop, selectStops } from "../../../../app/stops/stopsSlice";
 import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
 import { ClassCode } from "../../../data/ClassCode";
 import { OperationType } from "../../../data/OperationType";
@@ -60,6 +60,7 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
 }) => {
   const dispatch = useAppDispatch();
   const { futuresClientLimits } = useAppSelector(selectDeposits);
+  const { stops } = useAppSelector(selectStops);
 
   const multipliers: PrimeDropdownItem<number>[] = [1, 2, 4, 8].map((val) => ({
     label: "" + val,
@@ -188,24 +189,18 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       kind: StopOrderKind.TAKE_PROFIT_AND_STOP_LIMIT_ORDER,
       quantity,
       operation,
-      conditionPrice2: calcStopPrice(operation, price, security), // stop
-      price,
+      conditionPrice2: price, // activate stop
+      price: calcStopPrice(operation, price, security),
       conditionPrice: price2, // target
     };
 
-    if (operation === OperationType.BUY && price > security.lastTradePrice) {
+    const availableQty = getAvailableStopQuantity(order);
+
+    if (quantity <= 0 || quantity > availableQty) {
       growl.show({
         severity: "error",
         summary: "Error Message",
-        detail: "Cannot buy greater then current price!",
-      });
-      return;
-    }
-    if (operation === OperationType.SELL && price < security.lastTradePrice) {
-      growl.show({
-        severity: "error",
-        summary: "Error Message",
-        detail: "Cannot sell chipper then current price!",
+        detail: `Stop orders quantity already used! AvailableQty: ${availableQty}`,
       });
       return;
     }
@@ -232,13 +227,31 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       price: calcStopPrice(operation, price, security),
     };
 
-    dispatch(createStop(order)).then((result) => {
-      console.log(result);
-      // growl.show({
-      //   severity: "success",
-      //   summary: "Success Message",
-      //   detail: "Order created",
-      // });
+    const availableQty = getAvailableStopQuantity(order);
+
+    if (quantity <= 0 || quantity > availableQty) {
+      growl.show({
+        severity: "error",
+        summary: "Error Message",
+        detail: `Stop orders quantity already used! AvailableQty: ${availableQty}`,
+      });
+      return;
+    }
+
+    dispatch(createStop(order)).then((result: any) => {
+      if (result.error) {
+        growl.show({
+          severity: "error",
+          summary: "Error Message",
+          detail: "Cannot create stop order",
+        });
+      } else {
+        growl.show({
+          severity: "success",
+          summary: "Success Message",
+          detail: "Stop Order created",
+        });
+      }
     });
   };
 
@@ -253,31 +266,42 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       conditionPrice: price,
     };
 
-    if (operation === OperationType.BUY && price > security.lastTradePrice) {
+    const availableQty = getAvailableStopQuantity(order);
+
+    if (quantity <= 0 || quantity > availableQty) {
       growl.show({
         severity: "error",
         summary: "Error Message",
-        detail: "Cannot buy greater then current price!",
-      });
-      return;
-    }
-    if (operation === OperationType.SELL && price < security.lastTradePrice) {
-      growl.show({
-        severity: "error",
-        summary: "Error Message",
-        detail: "Cannot sell chipper then current price!",
+        detail: `Stop orders quantity already used! AvailableQty: ${availableQty}`,
       });
       return;
     }
 
-    dispatch(createStop(order)).then((result) => {
-      console.log(result);
-      // growl.show({
-      //   severity: "success",
-      //   summary: "Success Message",
-      //   detail: "Order created",
-      // });
+    dispatch(createStop(order)).then((result: any) => {
+      if (result.error) {
+        growl.show({
+          severity: "error",
+          summary: "Error Message",
+          detail: "Cannot create target order",
+        });
+      } else {
+        growl.show({
+          severity: "success",
+          summary: "Success Message",
+          detail: "Target Order created",
+        });
+      }
     });
+  };
+
+  const getAvailableStopQuantity = (order: StopOrder) => {
+    const stopQuantityUsed = stops.reduce((accum, cur) => {
+      if (cur.secId === security?.id && cur.operation === order.operation)
+        return accum + cur.quantity;
+      return accum;
+    }, 0);
+
+    return quantityMax - stopQuantityUsed;
   };
 
   const create = (operation: OperationType) => {
@@ -318,12 +342,22 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
 
   const buyDisabled =
     !security ||
-    (controlOrderType === ControlOrderType.STOP &&
-      security?.lastTradePrice > price);
+    ((controlOrderType === ControlOrderType.STOP ||
+      controlOrderType === ControlOrderType.STOP_TARGET) &&
+      security?.lastTradePrice > price) ||
+    (controlOrderType === ControlOrderType.TARGET &&
+      security?.lastTradePrice < price) ||
+    (controlOrderType === ControlOrderType.STOP_TARGET &&
+      security?.lastTradePrice < price2);
   const sellDisabled =
     !security ||
-    (controlOrderType === ControlOrderType.STOP &&
-      security?.lastTradePrice < price);
+    ((controlOrderType === ControlOrderType.STOP ||
+      controlOrderType === ControlOrderType.STOP_TARGET) &&
+      security?.lastTradePrice < price) ||
+    (controlOrderType === ControlOrderType.TARGET &&
+      security?.lastTradePrice > price) ||
+    (controlOrderType === ControlOrderType.STOP_TARGET &&
+      security?.lastTradePrice > price2);
 
   return (
     <div className="p-grid ControlPanelGeneralBtn">
@@ -351,6 +385,7 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
             style={{ width: 90 }}
             type="number"
             step={1}
+            min={1}
             value={quantity}
             // onKeyDown={quantityChangeByKeydown}
             onChange={(e) => setQuantity(parseInt(e.target["value"]))}
@@ -386,7 +421,7 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
               type="number"
               step={security?.secPriceStep || 1}
               value={price2}
-              onChange={(e) => setPrice(Number(e.target.value))}
+              onChange={(e) => setPrice2(Number(e.target.value))}
             />
             <label htmlFor="td__control-panel-price">Target</label>
           </span>
