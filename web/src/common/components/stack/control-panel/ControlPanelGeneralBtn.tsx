@@ -316,12 +316,41 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
     );
   };
 
+  const getPossibleTradeQuantity = (stop: number): number => {
+    const depositMaxRiskPerTradeInPercent = 1;
+    const depo = futuresClientLimits[0].cbplplanned;
+    const maxLossPerTradeMoney = (depo * depositMaxRiskPerTradeInPercent) / 100;
+    const stopEntryDiff = Math.abs(price - stop);
+
+    let qty = 1;
+
+    if (security?.classCode === ClassCode.SPBFUT) {
+      const minStepPrice = security.futureStepPrice / security.secPriceStep;
+      qty = maxLossPerTradeMoney / stopEntryDiff / minStepPrice;
+      qty = Math.min(quantityMax, qty);
+      qty = Math.floor(qty);
+    }
+
+    return qty;
+  };
+
+  const onChangePrice2 = (e) => {
+    const price2 = Number(e.target.value);
+    setPrice2(price2);
+    if (controlOrderType === ControlOrderType.ORDER) {
+      setQuantity(getPossibleTradeQuantity(price2));
+    }
+  };
+
   const priceLabel =
     controlOrderType === ControlOrderType.ORDER
       ? "Price"
       : controlOrderType === ControlOrderType.TARGET
       ? "Target"
       : "Stop";
+
+  const price2Label =
+    controlOrderType === ControlOrderType.ORDER ? "Stop (Risk)" : "Target";
 
   const buyDisabled =
     !security ||
@@ -401,7 +430,8 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
           <label htmlFor="td__control-panel-price">{priceLabel}</label>
         </span>
       </div>
-      {controlOrderType === ControlOrderType.STOP_TARGET ? (
+      {controlOrderType === ControlOrderType.STOP_TARGET ||
+      controlOrderType === ControlOrderType.ORDER ? (
         <div className="p-col-4" style={{ marginTop: 5 }}>
           <span className="p-float-label">
             <InputText
@@ -410,9 +440,9 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
               type="number"
               step={security?.secPriceStep || 1}
               value={price2}
-              onChange={(e) => setPrice2(Number(e.target.value))}
+              onChange={onChangePrice2}
             />
-            <label htmlFor="td__control-panel-price">Target</label>
+            <label htmlFor="td__control-panel-price">{price2Label}</label>
           </span>
         </div>
       ) : null}
