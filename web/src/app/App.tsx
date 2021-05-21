@@ -122,7 +122,7 @@ export const App = () => {
     <div className="container-fluid">
       <div style={{ width: `-webkit-calc(100% - ${widgetbarHeight}px)` }}>
         {/*<ControlPanel/>*/}
-        <StackWrapper />
+        {/* <StackWrapper /> */}
         {/*<BotControl/>*/}
         <Header />
         <Switch>

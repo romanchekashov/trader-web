@@ -22,6 +22,7 @@ import EconomicCalendarWidget from "../../economic-calendar/EconomicCalendarWidg
 import { News } from "../../news/News";
 import Notifications from "../../notifications/Notifications";
 import { StockEventsBrief } from "../../share-event/StockEventsBrief";
+import { Stack } from "../../stack/Stack";
 import { WidgetbarItem } from "../WidgetbarItem";
 import "./WidgetbarPages.css";
 
@@ -138,6 +139,8 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
       ) : null}
 
       {item === WidgetbarItem.CONTROL_PANEL ? <ControlPanelWidget /> : null}
+
+      {security && item === WidgetbarItem.LEVEL_2_QUOTES ? <Stack /> : null}
     </div>
   );
 };

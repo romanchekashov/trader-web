@@ -9,17 +9,20 @@ import {
   BsAlarm,
   BsBell,
   BsChevronBarContract,
+  BsCreditCard,
 } from "react-icons/bs";
 import "./WidgetbarTabs.css";
 import { Tooltip } from "primereact/tooltip";
 import { WidgetbarItem } from "../WidgetbarItem";
+import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 
 type Props = {
   item: WidgetbarItem | undefined;
+  security: SecurityLastInfo;
   onItemSelected: (item: WidgetbarItem | undefined) => void;
 };
 
-const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
+const WidgetbarTabs: React.FC<Props> = ({ item, security, onItemSelected }) => {
   useEffect(() => {});
 
   const select = (newItem: WidgetbarItem) => {
@@ -33,6 +36,7 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
   return (
     <div className={`WidgetbarTabs ${item ? "WidgetbarTabs_border" : ""}`}>
       <Tooltip target=".WidgetbarTab" />
+
       <div
         className={`WidgetbarTab ${
           item === WidgetbarItem.SECURITIES ? "active" : ""
@@ -43,6 +47,7 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
       >
         <BsClipboard />
       </div>
+
       <div
         className={`WidgetbarTab ${
           item === WidgetbarItem.SEC_DATA ? "active" : ""
@@ -53,6 +58,7 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
       >
         <BsClipboardData />
       </div>
+
       <div
         className={`WidgetbarTab ${
           item === WidgetbarItem.NEWS ? "active" : ""
@@ -63,6 +69,7 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
       >
         <BsNewspaper />
       </div>
+
       <div
         className={`WidgetbarTab ${
           item === WidgetbarItem.CALENDAR ? "active" : ""
@@ -73,6 +80,7 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
       >
         <BsCalendar />
       </div>
+
       <div
         className={`WidgetbarTab ${
           item === WidgetbarItem.ALARMS ? "active" : ""
@@ -83,6 +91,7 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
       >
         <BsAlarm />
       </div>
+
       <div
         className={`WidgetbarTab ${
           item === WidgetbarItem.NOTIFICATIONS ? "active" : ""
@@ -93,6 +102,7 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
       >
         <BsBell />
       </div>
+
       <div
         className={`WidgetbarTab ${
           item === WidgetbarItem.CONTROL_PANEL ? "active" : ""
@@ -101,8 +111,21 @@ const WidgetbarTabs: React.FC<Props> = ({ item, onItemSelected }) => {
         data-pr-position="left"
         onClick={() => select(WidgetbarItem.CONTROL_PANEL)}
       >
-        <BsChevronBarContract />
+        <BsCreditCard />
       </div>
+
+      {security ? (
+        <div
+          className={`WidgetbarTab ${
+            item === WidgetbarItem.LEVEL_2_QUOTES ? "active" : ""
+          }`}
+          data-pr-tooltip="Level 2 Quotes"
+          data-pr-position="left"
+          onClick={() => select(WidgetbarItem.LEVEL_2_QUOTES)}
+        >
+          <BsChevronBarContract />
+        </div>
+      ) : null}
     </div>
   );
 };

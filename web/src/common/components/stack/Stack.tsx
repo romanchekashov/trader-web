@@ -1,28 +1,25 @@
 import { Toast } from "primereact/toast";
 import * as React from "react";
-import { SubscriptionLike } from "rxjs";
-import activeTradesApi from "../../../app/activeTrades/activeTradesApi";
-import DepositView from "../../../app/deposits/components/DepositView/DepositView";
+import { useEffect, useRef, useState } from "react";
 import {
-  getActiveOrders,
-  getActiveStopOrders,
-} from "../../api/rest/traderRestApi";
+  selectActiveTrades,
+  setSelectedActiveTrade,
+} from "../../../app/activeTrades/activeTradesSlice";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { deleteOrder, selectOrders } from "../../../app/orders/ordersSlice";
+import quikOrdersApi from "../../../app/orders/quikOrdersApi";
+import { selectSecurities } from "../../../app/securities/securitiesSlice";
+import { selectStops } from "../../../app/stops/stopsSlice";
 import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import { playSound } from "../../assets/assets";
 import { ActiveTrade } from "../../data/ActiveTrade";
 import { OperationType } from "../../data/OperationType";
 import { Order } from "../../data/Order";
 import { OrderType } from "../../data/OrderType";
-import { SecurityLastInfo } from "../../data/security/SecurityLastInfo";
-import { SessionTradeResult } from "../../data/SessionTradeResult";
 import { StopOrder } from "../../data/StopOrder";
 import { TradePremise } from "../../data/strategy/TradePremise";
 import { adjustTradePremise } from "../../utils/DataUtils";
 import intervalCompare from "../../utils/IntervalComporator";
-import ActiveTradeView from "../control-panel/components/ActiveTradesView";
-import SessionTradeResultView from "../control-panel/components/SessionTradeResultView";
-import { ControlPanelFastBtn } from "./control-panel/ControlPanelFastBtn";
-import { ControlPanelGeneralBtn } from "./control-panel/ControlPanelGeneralBtn";
 import { StackItem } from "./data/StackItem";
 import { StackItemWrapper } from "./data/StackItemWrapper";
 import "./Stack.css";
@@ -34,218 +31,117 @@ import StackVolumes from "./volumes/StackVolumes";
 
 type Props = {};
 
-type States = {
-  stackItemsHeight: number;
-  items: number[];
-  stackItems: StackItem[];
-  ordersMap: any;
-  position: number;
-  orders: Order[];
-  stopOrders: StopOrder[];
-  volumes: SecurityVolume[];
-  activeTrades: ActiveTrade[];
-  selectedActiveTrade: ActiveTrade;
-  sessionResult: SessionTradeResult;
-  history?: boolean;
-  securityLastInfo: SecurityLastInfo;
-  premise: TradePremise;
-  selectedSecId: number;
-};
+let previousOrdersNumber: number = 0;
+let previousStopOrder: StopOrder;
+// TestData
+// this.setState({
+//     activeTrades: TEST_ACTIVE_TRADES,
+//     selectedActiveTrade: TEST_ACTIVE_TRADES[0],
+//     securityLastInfo: sec,
+//     stackItems: [
+//         {
+//             price: sec.lastTradePrice,
+//             quantity: 1,
+//             sell: true
+//         }, {
+//             price: sec.lastTradePrice - sec.secPriceStep,
+//             quantity: 1,
+//             sell: false
+//         }
+//     ]
+// })
 
-export class Stack extends React.Component<Props, States> {
-  private lastSecuritiesSubscription: SubscriptionLike = null;
-  private stackItemsSubscription: SubscriptionLike = null;
-  private ordersSetupSubscription: SubscriptionLike = null;
-  private volumesSubscription: SubscriptionLike = null;
-  private activeTradeSubscription: SubscriptionLike = null;
-  private tradePremiseSubscription: SubscriptionLike = null;
-  private stackEventsListener: SubscriptionLike = null;
-  private stopOrdersSubscription: SubscriptionLike = null;
+export const Stack: React.FC<Props> = ({}) => {
+  const dispatch = useAppDispatch();
+  const { security } = useAppSelector(selectSecurities);
+  const { stops } = useAppSelector(selectStops);
+  const { orders } = useAppSelector(selectOrders);
+  const { activeTrades, selected } = useAppSelector(selectActiveTrades);
 
-  private previousOrdersNumber: number = 0;
-  private previousStopOrder: StopOrder;
-  private toast: any;
+  const toast = useRef(null);
+  const [stackItemsHeight, setStackItemsHeight] = useState<number>(400);
+  const [items, setItems] = useState<number[]>([]);
+  const [stackItems, setStackItems] = useState<StackItem[]>([]);
+  const [ordersMap, setOrdersMap] = useState<any>({});
+  const [position, setPosition] = useState<number>(1);
+  const [volumes, setVolumes] = useState<SecurityVolume[]>([]);
+  const [history, setHistory] = useState<boolean>(false);
+  const [premise, setPremise] = useState<TradePremise>(null);
 
-  MOUSE_BTN_LEFT = 0;
-  MOUSE_BTN_WHEEL = 1;
-  MOUSE_BTN_RIGHT = 2;
-  MOUSE_BTN_BACKWARD = 3;
-  MOUSE_BTN_FORWARD = 4;
+  const MOUSE_BTN_LEFT = 0;
+  const MOUSE_BTN_WHEEL = 1;
+  const MOUSE_BTN_RIGHT = 2;
+  const MOUSE_BTN_BACKWARD = 3;
+  const MOUSE_BTN_FORWARD = 4;
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      stackItemsHeight: 400,
-      items: [],
-      stackItems: [],
-      ordersMap: {},
-      position: 1,
-      orders: [],
-      stopOrders: [],
-      volumes: [],
-      activeTrades: [],
-      selectedActiveTrade: null,
-      sessionResult: null,
-      history: false,
-      securityLastInfo: null,
-      premise: null,
-      selectedSecId: null,
-    };
-  }
-
-  updateSize = () => {
-    this.setState({
-      stackItemsHeight: window.innerHeight,
-    });
-  };
-
-  blockContextMenu = (evt) => {
-    evt.preventDefault();
-  };
-
-  componentDidMount = (): void => {
-    this.updateSize();
-    window.addEventListener("resize", this.updateSize);
+  useEffect(() => {
+    updateSize();
+    window.addEventListener("resize", updateSize);
 
     document
       .getElementById("stack-items-wrap-id")
-      .addEventListener("contextmenu", this.blockContextMenu);
+      .addEventListener("contextmenu", blockContextMenu);
 
-    this.stackEventsListener = StackService.getInstance()
-      .on<SecurityLastInfo>(StackEvent.SECURITY_SELECTED)
-      .subscribe((sec) => {
-        const { activeTrades } = this.state;
-        if (activeTrades.length > 0) {
-          this.setState({
-            selectedSecId: sec.id,
-            selectedActiveTrade: activeTrades.find((at) => at.secId === sec.id),
-          });
-        } else {
-          this.setState({ selectedSecId: sec.id });
-        }
-
-        // TestData
-        // this.setState({
-        //     activeTrades: TEST_ACTIVE_TRADES,
-        //     selectedActiveTrade: TEST_ACTIVE_TRADES[0],
-        //     securityLastInfo: sec,
-        //     stackItems: [
-        //         {
-        //             price: sec.lastTradePrice,
-        //             quantity: 1,
-        //             sell: true
-        //         }, {
-        //             price: sec.lastTradePrice - sec.secPriceStep,
-        //             quantity: 1,
-        //             sell: false
-        //         }
-        //     ]
-        // })
-      });
-
-    this.lastSecuritiesSubscription = WebsocketService.getInstance()
-      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-      .subscribe((securities) => {
-        const { selectedSecId } = this.state;
-        if (selectedSecId) {
-          const securityLastInfo = securities.find(
-            (o) => o.id === selectedSecId
-          );
-          if (securityLastInfo) {
-            securityLastInfo.lastTradeTime = new Date(
-              securityLastInfo.lastTradeTime
-            );
-          }
-          this.setState({ securityLastInfo });
-        }
-      });
-
-    this.stackItemsSubscription = WebsocketService.getInstance()
+    const stackItemsSubscription = WebsocketService.getInstance()
       .on<StackItem[]>(WSEvent.STACK)
-      .subscribe((stackItems) => {
-        this.setState({ stackItems });
-      });
+      .subscribe(setStackItems);
 
-    getActiveOrders().then(this.updateActiveOrders);
-    this.ordersSetupSubscription = WebsocketService.getInstance()
-      .on<Order[]>(WSEvent.ORDERS)
-      .subscribe(this.updateActiveOrders);
-
-    this.volumesSubscription = WebsocketService.getInstance()
+    const volumesSubscription = WebsocketService.getInstance()
       .on<SecurityVolume[]>(WSEvent.VOLUMES)
-      .subscribe((volumes) => {
-        this.setState({ volumes });
-      });
+      .subscribe(setVolumes);
 
-    getActiveStopOrders().then(this.updateActiveStopOrders);
-    this.stopOrdersSubscription = WebsocketService.getInstance()
-      .on<StopOrder[]>(WSEvent.STOP_ORDERS)
-      .subscribe(this.updateActiveStopOrders);
-
-    activeTradesApi.getActiveTrades().then(this.updateActiveTrades);
-    this.activeTradeSubscription = WebsocketService.getInstance()
-      .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
-      .subscribe(this.updateActiveTrades);
-
-    this.tradePremiseSubscription = WebsocketService.getInstance()
+    const tradePremiseSubscription = WebsocketService.getInstance()
       .on<TradePremise>(WSEvent.TRADE_PREMISE)
       .subscribe((premise) => {
         if (!premise) adjustTradePremise(premise);
-        this.setState({ premise });
+        setPremise(premise);
       });
-  };
 
-  componentWillUnmount = (): void => {
-    this.lastSecuritiesSubscription.unsubscribe();
-    this.stackItemsSubscription.unsubscribe();
-    this.ordersSetupSubscription.unsubscribe();
-    this.volumesSubscription.unsubscribe();
-    this.activeTradeSubscription.unsubscribe();
-    this.stackEventsListener.unsubscribe();
-    this.stopOrdersSubscription.unsubscribe();
-    window.removeEventListener("resize", this.updateSize);
-    document
-      .getElementById("stack-items-wrap-id")
-      .removeEventListener("contextmenu", this.blockContextMenu);
-  };
+    return () => {
+      stackItemsSubscription.unsubscribe();
+      volumesSubscription.unsubscribe();
+      tradePremiseSubscription.unsubscribe();
 
-  updateActiveOrders = (orders: Order[]): void => {
-    this.notifyIfOrderHit(orders);
-    this.setState({ orders, ordersMap: this.ordersMap(orders) });
-  };
+      window.removeEventListener("resize", updateSize);
+      document
+        .getElementById("stack-items-wrap-id")
+        .removeEventListener("contextmenu", blockContextMenu);
+    };
+  }, []);
 
-  updateActiveStopOrders = (newStopOrders: StopOrder[]): void => {
-    const { stopOrders } = this.state;
-    if (stopOrders.length !== newStopOrders.length) {
-      this.setState({ stopOrders: newStopOrders });
+  useEffect(() => {
+    notifyIfOrderHit(orders);
+    setOrdersMap(getOrdersMap(orders));
+  }, [orders]);
+
+  useEffect(() => {
+    if (activeTrades?.length) {
+      notifyIfStopHit(activeTrades);
     }
+
+    dispatch(
+      setSelectedActiveTrade(
+        activeTrades?.find((at) => at.secId === security?.id)
+      )
+    );
+  }, [activeTrades, security]);
+
+  const updateSize = () => {
+    setStackItemsHeight(window.innerHeight);
   };
 
-  updateActiveTrades = (activeTrades: ActiveTrade[]): void => {
-    const { securityLastInfo } = this.state;
-    if (activeTrades && activeTrades.length > 0) {
-      this.notifyIfStopHit(activeTrades);
-      this.setState({
-        activeTrades,
-        selectedActiveTrade: securityLastInfo
-          ? activeTrades.find((at) => at.secId === securityLastInfo.id)
-          : null,
-      });
-    } else {
-      this.setState({ activeTrades: [], selectedActiveTrade: null });
-    }
+  const blockContextMenu = (evt) => {
+    evt.preventDefault();
   };
 
-  notifyIfOrderHit = (orders: Order[]): void => {
-    if (orders && orders.length !== this.previousOrdersNumber) {
+  const notifyIfOrderHit = (orders: Order[]): void => {
+    if (orders && orders.length !== previousOrdersNumber) {
       playSound(1);
-      this.previousOrdersNumber = orders.length;
+      previousOrdersNumber = orders.length;
     }
   };
 
-  notifyIfStopHit = (newActiveTrades: ActiveTrade[]): void => {
-    const { activeTrades } = this.state;
-
+  const notifyIfStopHit = (newActiveTrades: ActiveTrade[]): void => {
     // todo
     // if ((!activeTrades && newActiveTrade) || (activeTrades && !newActiveTrade)) {
     //     playSound(2);
@@ -260,47 +156,46 @@ export class Stack extends React.Component<Props, States> {
     // }
   };
 
-  shouldComponentUpdate(
-    nextProps: Readonly<Props>,
-    nextState: Readonly<States>,
-    nextContext: any
-  ): boolean {
-    const { stackItems } = this.state;
-    if (
-      stackItems &&
-      nextState.stackItems &&
-      stackItems.length > 0 &&
-      stackItems.length === nextState.stackItems.length
-    ) {
-      const index = stackItems.length / 2;
-      if (
-        stackItems[index].price === nextState.stackItems[index].price &&
-        stackItems[index].quantity === nextState.stackItems[index].quantity
-      ) {
-        return false;
-      }
-    }
+  // shouldComponentUpdate(
+  //   nextProps: Readonly<Props>,
+  //   nextState: Readonly<States>,
+  //   nextContext: any
+  // ): boolean {
+  //   const { stackItems } = this.state;
+  //   if (
+  //     stackItems &&
+  //     nextState.stackItems &&
+  //     stackItems.length > 0 &&
+  //     stackItems.length === nextState.stackItems.length
+  //   ) {
+  //     const index = stackItems.length / 2;
+  //     if (
+  //       stackItems[index].price === nextState.stackItems[index].price &&
+  //       stackItems[index].quantity === nextState.stackItems[index].quantity
+  //     ) {
+  //       return false;
+  //     }
+  //   }
 
-    return true;
-  }
+  //   return true;
+  // }
 
-  clickOnStackItem = (e: any, val: any) => {
+  const clickOnStackItem = (e: any, val: any) => {
     let mouseBtn = "";
     switch (e.button) {
-      case this.MOUSE_BTN_LEFT:
+      case MOUSE_BTN_LEFT:
         mouseBtn = "left";
         break;
-      case this.MOUSE_BTN_RIGHT:
+      case MOUSE_BTN_RIGHT:
         mouseBtn = "right";
         if (e.ctrlKey) {
-          this.createStopOrder(val);
+          createStopOrder(val);
         } else {
-          const { ordersMap } = this.state;
           const order = ordersMap[val.price];
           if (order) {
-            this.cancelOrder(order);
+            cancelOrder(order);
           } else {
-            this.createOrder(val);
+            createOrder(val);
           }
         }
         break;
@@ -308,7 +203,7 @@ export class Stack extends React.Component<Props, States> {
     console.log("clicked: " + mouseBtn, e, val);
   };
 
-  createStopOrder = (val: any) => {
+  const createStopOrder = (val: any) => {
     console.log("need impl!", val);
     // const { securityLastInfo } = this.state;
     // quikStopOrdersApi.createStopOrder({
@@ -320,40 +215,34 @@ export class Stack extends React.Component<Props, States> {
     // });
   };
 
-  createOrder = (val: any) => {
-    const { position, securityLastInfo, history } = this.state;
+  const createOrder = (val: any) => {
+    const order: Order = {
+      secId: security.id,
+      price: val.price,
+      quantity: position,
+      operation:
+        val.price > security.lastTradePrice
+          ? OperationType.SELL
+          : OperationType.BUY,
+      type: OrderType.LIMIT,
+      classCode: security.classCode,
+      secCode: security.secCode,
+    };
 
-    const orders: Order[] = [
-      {
-        secId: securityLastInfo.id,
-        price: val.price,
-        quantity: position,
-        operation:
-          val.price > securityLastInfo.lastTradePrice
-            ? OperationType.SELL
-            : OperationType.BUY,
-        type: OrderType.LIMIT,
-        classCode: securityLastInfo.classCode,
-        secCode: securityLastInfo.secCode,
-      },
-    ];
-
-    // console.log(orders)
-    WebsocketService.getInstance().send(
-      history ? WSEvent.HISTORY_CREATE_ORDERS : WSEvent.CREATE_ORDERS,
-      orders
-    );
+    quikOrdersApi.createOrder(order).then((order) => {
+      toast.current.show({
+        severity: "success",
+        summary: "Success Message",
+        detail: "Order created",
+      });
+    });
   };
 
-  cancelOrder = (order: Order) => {
-    const { history } = this.state;
-    WebsocketService.getInstance().send(
-      history ? WSEvent.HISTORY_CANCEL_ORDERS : WSEvent.CANCEL_ORDERS,
-      [order]
-    );
+  const cancelOrder = ({ orderNum }: Order) => {
+    dispatch(deleteOrder(orderNum));
   };
 
-  ordersMap = (orders: Order[]): any => {
+  const getOrdersMap = (orders: Order[]): any => {
     const map = {};
     for (let i = 0, len = orders.length; i < len; i++) {
       const order = orders[i];
@@ -366,23 +255,15 @@ export class Stack extends React.Component<Props, States> {
     return map;
   };
 
-  createStackViewNew = (): StackItemWrapper[] => {
-    const {
-      ordersMap,
-      stackItems,
-      activeTrades,
-      selectedActiveTrade,
-      securityLastInfo,
-    } = this.state;
-
-    if (stackItems.length === 0 || !securityLastInfo) return [];
+  const createStackViewNew = (): StackItemWrapper[] => {
+    if (stackItems.length === 0 || !security) return [];
     const stackItemMap = {};
     for (const stackItem of stackItems) {
       stackItemMap[stackItem.price] = stackItem;
     }
 
-    const multiplier = Math.pow(10, securityLastInfo.scale);
-    const step = securityLastInfo.secPriceStep * multiplier;
+    const multiplier = Math.pow(10, security.scale);
+    const step = security.secPriceStep * multiplier;
     const offset = 20 * step;
     const stackItemsStartPrice = Math.round(stackItems[0].price * multiplier);
     const stackItemsEndPrice = Math.round(
@@ -429,17 +310,14 @@ export class Stack extends React.Component<Props, States> {
         }
       }
 
-      if (selectedActiveTrade) {
-        if (value.price === selectedActiveTrade.avgPrice) {
+      if (selected) {
+        if (value.price === selected.avgPrice) {
           stackItemOrderClassName += " active-order";
-          quantity = selectedActiveTrade.quantity;
+          quantity = selected.quantity;
         }
-        if (
-          selectedActiveTrade.stopOrder &&
-          value.price === selectedActiveTrade.stopOrder.price
-        ) {
+        if (selected.stopOrder && value.price === selected.stopOrder.price) {
           stackItemOrderClassName += " stop-order";
-          quantity = selectedActiveTrade.stopOrder.quantity;
+          quantity = selected.stopOrder.quantity;
         }
       }
 
@@ -459,12 +337,10 @@ export class Stack extends React.Component<Props, States> {
       price -= step;
     }
 
-    return this.fillWithPremise(stackItemWrappers);
+    return fillWithPremise(stackItemWrappers);
   };
 
-  fillWithPremise = (items: StackItemWrapper[]): StackItemWrapper[] => {
-    const { premise } = this.state;
-
+  const fillWithPremise = (items: StackItemWrapper[]): StackItemWrapper[] => {
     if (premise) {
       const srMap = {};
       premise.analysis.srLevels.forEach((value) => {
@@ -480,79 +356,45 @@ export class Stack extends React.Component<Props, States> {
     return items;
   };
 
-  onSelectActiveTrade = (selectedActiveTrade: ActiveTrade): void => {
-    this.setState({ selectedActiveTrade });
+  const onSelectActiveTrade = (selectedActiveTrade: ActiveTrade): void => {
+    setSelectedActiveTrade(selectedActiveTrade);
     StackService.getInstance().send(
       StackEvent.ACTIVE_TRADE_SELECTED,
       selectedActiveTrade
     );
   };
 
-  render() {
-    const {
-      volumes,
-      stackItemsHeight,
-      sessionResult,
-      activeTrades,
-      selectedActiveTrade,
-      securityLastInfo,
-    } = this.state;
-    const stackItemWrappers = this.createStackViewNew();
+  const stackItemWrappers = createStackViewNew();
 
-    return (
-      <>
-        <StackSwitcher
-          onSelectedPosition={(pos) => {
-            this.setState({ position: pos });
-          }}
-        />
-        <div className="td__stack-main">
-          <div className="p-grid control-panel">
-            <Toast ref={(el) => (this.toast = el)} />
-            <div className="p-col-12" style={{ padding: 0, fontSize: "12px" }}>
-              <SessionTradeResultView result={sessionResult} />
-              <ActiveTradeView
-                trades={activeTrades}
-                selected={selectedActiveTrade}
-                onSelectRow={this.onSelectActiveTrade}
-              />
-              <DepositView />
-            </div>
-            <div className="p-col-12">
-              <ControlPanelGeneralBtn
-                growl={this.toast}
-                history={false}
-                security={securityLastInfo}
-              />
-            </div>
-            <div className="p-col-12">
-              <ControlPanelFastBtn
-                security={securityLastInfo}
-                growl={this.toast}
-                history={false}
-                activeTrade={selectedActiveTrade}
-              />
-            </div>
-            <div className="p-col-12">
-              <StackVolumes volumes={volumes} />
-            </div>
-          </div>
-          <div id="stack-items-wrap-id" className="p-grid stack-items-wrap">
-            <div
-              className="p-col-12 stack-items"
-              style={{ height: stackItemsHeight }}
-            >
-              {stackItemWrappers.map((value) => (
-                <StackItemView
-                  key={value.price}
-                  stackItemWrapper={value}
-                  onItemClick={this.clickOnStackItem}
-                />
-              ))}
-            </div>
+  return (
+    <>
+      <StackSwitcher
+        onSelectedPosition={(pos) => {
+          setPosition(pos);
+        }}
+      />
+      <div className="td__stack-main">
+        <div className="p-grid control-panel">
+          <Toast ref={toast} />
+          <div className="p-col-12">
+            <StackVolumes volumes={volumes} />
           </div>
         </div>
-      </>
-    );
-  }
-}
+        <div id="stack-items-wrap-id" className="p-grid stack-items-wrap">
+          <div
+            className="p-col-12 stack-items"
+            style={{ height: stackItemsHeight }}
+          >
+            {stackItemWrappers.map((value) => (
+              <StackItemView
+                key={value.price}
+                stackItemWrapper={value}
+                onItemClick={clickOnStackItem}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};

@@ -6,4 +6,5 @@ export enum WidgetbarItem {
   ALARMS = "Alarms",
   NOTIFICATIONS = "Notifications",
   CONTROL_PANEL = "ControlPanel",
+  LEVEL_2_QUOTES = "Level2Quotes",
 }

@@ -34,7 +34,7 @@ const Widgetbar: React.FC<Props> = ({ width, onWidthChange }) => {
   return (
     <div className={`p-col-fixed Widgetbar`} style={style}>
       {item ? <WidgetbarPages item={item} security={security} /> : null}
-      <WidgetbarTabs item={item} onItemSelected={setItem} />
+      <WidgetbarTabs item={item} security={security} onItemSelected={setItem} />
     </div>
   );
 };
