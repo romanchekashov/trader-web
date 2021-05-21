@@ -1,26 +1,27 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { filter } from "rxjs/internal/operators";
+import { useAppDispatch } from "../../../../app/hooks";
+import { setSecurityById } from "../../../../app/securities/securitiesSlice";
 import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
 import { BrokerId } from "../../../data/BrokerId";
+import { ClassCode } from "../../../data/ClassCode";
 import { Interval } from "../../../data/Interval";
 import { Market } from "../../../data/Market";
 import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 import { SRLevel } from "../../../data/strategy/SRLevel";
 import { TradePremise } from "../../../data/strategy/TradePremise";
 import { Trend } from "../../../data/strategy/Trend";
+import { TrendDirection } from "../../../data/strategy/TrendDirection";
 import { TradeStrategyAnalysisFilterDto } from "../../../data/TradeStrategyAnalysisFilterDto";
 import { TradingPlatform } from "../../../data/trading/TradingPlatform";
+import { adjustTradePremise } from "../../../utils/DataUtils";
+import { TrendDirectionColor } from "../../../utils/utils";
 import TrendViewChart from "../TrendViewChart";
 import "./TrendViewChartWrapper.css";
 import moment = require("moment");
-import { adjustTradePremise } from "../../../utils/DataUtils";
-import { filter } from "rxjs/internal/operators";
-import { useRef } from "react";
-import { ClassCode } from "../../../data/ClassCode";
-import { TrendDirection } from "../../../data/strategy/TrendDirection";
-import { TrendDirectionColor } from "../../../utils/utils";
-import { useAppDispatch } from "../../../../app/hooks";
-import { setSecurityById } from "../../../../app/securities/securitiesSlice";
+import { addNewSignals } from "../../../../app/notifications/notificationsSlice";
+import { Signal } from "../../../data/Signal";
 
 type Props = {
   security: SecurityLastInfo;
@@ -74,6 +75,14 @@ const TrendViewChartWrapper: React.FC<Props> = ({
           );
           setTrends(trends.filter(({ interval }) => intervals.has(interval)));
         }
+
+        const signals: Signal[] = [];
+        newPremise.marketState.marketStateIntervals.forEach((o) =>
+          o.items.forEach((item) =>
+            item.signals.forEach((s) => signals.push(s))
+          )
+        );
+        dispatch(addNewSignals(signals));
       });
 
     const wsStatusSub = WebsocketService.getInstance()

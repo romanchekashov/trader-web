@@ -5,6 +5,7 @@
 .Alerts_item {
   cursor: pointer;
   padding: 5px;
+  overflow-y: scroll;
 }
 
 .Alerts_item.Alerts_item_selected {
@@ -22,7 +23,6 @@
   overflow-x: hidden;
   font-size: 0.8em;
   padding: 0;
-  margin-bottom: 5px;
 }
 
 .alerts-body::-webkit-scrollbar {
@@ -91,13 +91,20 @@
   padding-left: 5px;
 }
 
+.alerts .alerts-head {
+  padding-bottom: 0;
+}
+
 .alerts-head {
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
   font-size: 12px;
-  height: 45px;
-  padding: 0;
+  height: 50px;
+}
+
+.alerts-head > div {
+  margin: 2px;
 }
 
 .alerts-head-security,
@@ -116,7 +123,7 @@
 }
 
 .alerts-head-start-date {
-  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .alerts-head-start-date .p-inputtext {

@@ -35,7 +35,12 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
   const [filterDto, setFilterDto] = useState<FilterDto>(null);
   const [filterAlarms, setFilterAlarms] = useState<FilterDto>(null);
 
+  const [height, setHeight] = useState<number>(800);
+
   useEffect(() => {
+    updateSize();
+    window.addEventListener("resize", updateSize);
+
     setFilterDto({
       brokerId: BrokerId.ALFA_DIRECT,
       tradingPlatform: TradingPlatform.QUIK,
@@ -44,6 +49,10 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
       history: false,
       all: true,
     });
+
+    return () => {
+      window.removeEventListener("resize", updateSize);
+    };
   }, []);
 
   useEffect(() => {
@@ -62,6 +71,10 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
       all: false,
     });
   }, [security?.id]);
+
+  const updateSize = () => {
+    setHeight(window.innerHeight - 10);
+  };
 
   return (
     <div className="WidgetbarPages">
@@ -120,7 +133,7 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
           onAlertSelected={(n) => {
             console.log(n);
           }}
-          alertsHeight={600}
+          alertsHeight={height}
         />
       ) : null}
 

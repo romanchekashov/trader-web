@@ -67,7 +67,7 @@ export function getTrend(
     .catch(handleError);
 }
 
-export function getCandlePatterns(filter: FilterDto): Promise<PatternResult[]> {
+function getCandlePatterns(filter: FilterDto): Promise<PatternResult[]> {
   return fetch(baseUrl + "candle-patterns", {
     method: "POST", // POST for create, PUT to update when id already exists.
     headers: { "content-type": "application/json" },

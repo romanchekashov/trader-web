@@ -147,3 +147,9 @@ export const LineTypeMap = {
   H2: "DashDot",
   M60: "Dot",
 };
+
+export const IntervalShortName = {
+  [Interval.MONTH]: "MN",
+  [Interval.WEEK]: "W",
+  [Interval.DAY]: "D",
+};

@@ -1,18 +1,18 @@
-import { TradePremise } from "../data/strategy/TradePremise";
 import { MarketStateDto } from "../components/market-state/data/MarketStateDto";
 import { SwingStateDto } from "../components/swing-state/data/SwingStateDto";
-import { TradingStrategyResult } from "../data/history/TradingStrategyResult";
-import { Trade } from "../data/Trade";
-import { Order } from "../data/Order";
-import { StopOrder } from "../data/StopOrder";
-import { SecurityShare } from "../data/security/SecurityShare";
-import { round100 } from "./utils";
-import { MoexOpenInterest } from "../data/open-interest/MoexOpenInterest";
-import { SecurityShareEvent } from "../data/news/SecurityShareEvent";
-import { NewsItem } from "../data/news/NewsItem";
-import { EconomicCalendarEvent } from "../data/news/EconomicCalendarEvent";
-import { Security } from "../data/security/Security";
 import { Candle } from "../data/Candle";
+import { TradingStrategyResult } from "../data/history/TradingStrategyResult";
+import { EconomicCalendarEvent } from "../data/news/EconomicCalendarEvent";
+import { NewsItem } from "../data/news/NewsItem";
+import { SecurityShareEvent } from "../data/news/SecurityShareEvent";
+import { MoexOpenInterest } from "../data/open-interest/MoexOpenInterest";
+import { Order } from "../data/Order";
+import { Security } from "../data/security/Security";
+import { SecurityShare } from "../data/security/SecurityShare";
+import { StopOrder } from "../data/StopOrder";
+import { TradePremise } from "../data/strategy/TradePremise";
+import { Trade } from "../data/Trade";
+import { round100 } from "./utils";
 
 export const adjustTradingStrategyResultArray = (
   results: TradingStrategyResult[]
@@ -83,6 +83,9 @@ export const adjustMarketState = (marketState: MarketStateDto): any => {
     for (const marketStateInterval of marketState.marketStateIntervals) {
       for (const item of marketStateInterval.items) {
         item.candle.timestamp = new Date(item.candle.timestamp);
+        item.signals.forEach((signal) => {
+          signal.timestamp = new Date(signal.timestamp);
+        });
       }
     }
   }
