@@ -5,11 +5,11 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
 import { getEconomicCalendarEvents } from "../../../api/rest/newsRestApi";
 import { EconomicCalendarEvent } from "../../../data/news/EconomicCalendarEvent";
+import { ExpectedVolatility } from "../../../data/news/ExpectedVolatility";
 import { DATE_FORMAT } from "../../../utils/utils";
 import "./EconomicCalendarWidget.css";
 import EconomicCalendarWidgetItem from "./EconomicCalendarWidgetItem";
 import moment = require("moment");
-import { ExpectedVolatility } from "../../../data/news/ExpectedVolatility";
 
 export interface EventWrapper {
   id: number;
@@ -32,7 +32,7 @@ const expectedVolatilityValue = {
 const EconomicCalendarWidget: React.FC<Props> = ({
   secId,
   onEventSelected,
-  viewHeight,
+  viewHeight = 600,
 }) => {
   const [eventWrappers, setEventWrappers] = useState<EventWrapper[]>([]);
   const [selectedEvent, setSelectedEvent] =
@@ -150,7 +150,7 @@ const EconomicCalendarWidget: React.FC<Props> = ({
       </div>
       <div
         className="p-col-12 notifications-body"
-        style={{ height: (viewHeight || 700) - 30 }}
+        style={{ height: viewHeight - 62 }}
       >
         <AutoSizer>
           {({ height, width }) => (

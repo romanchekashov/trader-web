@@ -1,31 +1,31 @@
+import { Accordion, AccordionTab } from "primereact/accordion";
 import * as React from "react";
-import { useEffect, useState } from "react";
-import "./News.css";
-import { NewsItem } from "../../data/news/NewsItem";
-import moment = require("moment");
+import { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { fetchNews, selectNews } from "../../../features/news/NewsSlice";
-import { useRef } from "react";
-import { Accordion, AccordionTab } from "primereact/accordion";
+import { NewsItem } from "../../data/news/NewsItem";
+import "./News.css";
+import moment = require("moment");
 
 type Props = {
   secId?: number;
   onItemSelected?: (item: NewsItem) => void;
+  height?: number;
 };
 
-export const News: React.FC<Props> = ({ secId, onItemSelected }) => {
+export const News: React.FC<Props> = ({
+  secId,
+  onItemSelected,
+  height = 200,
+}) => {
   const { news } = useAppSelector(selectNews);
   const dispatch = useAppDispatch();
 
   const ref = useRef(null);
   const [selectedItem, setSelectedItem] = useState<NewsItem>(null);
-  const [height, setHeight] = useState<number>(200);
   const FETCH_NEWS_TIMEOUT = 5 * 60000;
 
   useEffect(() => {
-    updateSize();
-    window.addEventListener("resize", updateSize);
-
     getNews(secId);
     const setIntervalIdToFetchNews = setInterval(() => {
       getNews(secId);
@@ -33,7 +33,6 @@ export const News: React.FC<Props> = ({ secId, onItemSelected }) => {
 
     // Specify how to clean up after this effect:
     return function cleanup() {
-      window.removeEventListener("resize", updateSize);
       clearInterval(setIntervalIdToFetchNews);
     };
   }, [secId]);
@@ -44,10 +43,6 @@ export const News: React.FC<Props> = ({ secId, onItemSelected }) => {
 
   const getNews = (secId: number) => {
     dispatch(fetchNews({ provider: null, secId }));
-  };
-
-  const updateSize = () => {
-    setHeight(window.innerHeight);
   };
 
   const formatNews = (item: NewsItem) => {

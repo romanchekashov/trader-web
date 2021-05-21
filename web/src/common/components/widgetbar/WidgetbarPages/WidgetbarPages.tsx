@@ -95,12 +95,19 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
         </>
       ) : null}
 
-      {security && item === WidgetbarItem.NEWS ? (
+      {item === WidgetbarItem.NEWS ? (
         <>
-          {ClassCode.TQBR === security.classCode ? (
-            <StockEventsBrief secCode={security.secCode} height={400} />
-          ) : null}
-          <News secId={security.id} />
+          {ClassCode.TQBR === security?.classCode ? (
+            <>
+              <StockEventsBrief
+                secCode={security?.secCode}
+                height={height / 2}
+              />
+              <News secId={security?.id} height={height / 2} />
+            </>
+          ) : (
+            <News secId={security?.id} height={height} />
+          )}
         </>
       ) : null}
 
@@ -108,6 +115,7 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
         <EconomicCalendarWidget
           secId={security?.id}
           onEventSelected={console.log}
+          viewHeight={height}
         />
       ) : null}
 
@@ -122,7 +130,7 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
             }
             console.log(n);
           }}
-          viewHeight={600}
+          viewHeight={height}
           itemSize={120}
         />
       ) : null}

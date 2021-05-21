@@ -43,7 +43,7 @@ const Notifications: React.FC<Props> = ({
   filter,
   security,
   onNotificationSelected,
-  viewHeight,
+  viewHeight = 200,
   itemSize,
 }) => {
   const dispatch = useAppDispatch();
@@ -334,7 +334,7 @@ const Notifications: React.FC<Props> = ({
   };
 
   return (
-    <div className="p-grid notifications" style={{ height: viewHeight || 200 }}>
+    <div className="p-grid notifications" style={{ height: viewHeight }}>
       <div className="p-col-12 notifications-head">
         <div className="notifications-head-dropdown notifications-head-class-code">
           <Dropdown
@@ -379,7 +379,7 @@ const Notifications: React.FC<Props> = ({
       </div>
       <div
         className="p-col-12 notifications-body"
-        style={{ height: (viewHeight || 200) - 30 }}
+        style={{ height: viewHeight - 38 }}
       >
         <AutoSizer>
           {({ height, width }) => (
