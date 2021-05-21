@@ -14,6 +14,7 @@ import stopsReducer from "./stops/stopsSlice";
 import depositsReducer from "./deposits/depositsSlice";
 import ordersReducer from "./orders/ordersSlice";
 import activeTradesReducer from "./activeTrades/activeTradesSlice";
+import notificationsReducer from "./notifications/notificationsSlice";
 
 /**
  * redux-toolkit + typescript example
@@ -31,6 +32,7 @@ const store = configureStore({
     orders: ordersReducer,
     deposits: depositsReducer,
     activeTrades: activeTradesReducer,
+    notifications: notificationsReducer,
   },
   middleware: getDefaultMiddleware({
     // https://redux-toolkit.js.org/usage/usage-guide#working-with-non-serializable-data
@@ -67,6 +69,8 @@ const store = configureStore({
         "orders/setOrders",
         "deposits/setDeposits",
         "securities/loadLastSecurities/pending",
+        "notifications/loadNotifications/fulfilled",
+        "notifications/loadNotifications/pending",
       ],
       // Ignore these field paths in all actions
       ignoredActionPaths: ["timestamp"],

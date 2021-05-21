@@ -5,9 +5,12 @@ import * as React from "react";
 import { memo, useEffect, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
-import { useAppSelector } from "../../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import {
+  loadNotifications,
+  selectNotifications,
+} from "../../../app/notifications/notificationsSlice";
 import { selectSecurities } from "../../../app/securities/securitiesSlice";
-import { getNotifications } from "../../api/rest/notificationsRestApi";
 import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import { playSound } from "../../assets/assets";
 import { ClassCode } from "../../data/ClassCode";
@@ -43,7 +46,9 @@ const Notifications: React.FC<Props> = ({
   viewHeight,
   itemSize,
 }) => {
+  const dispatch = useAppDispatch();
   const { shares, currencies, futures } = useAppSelector(selectSecurities);
+  const { notifications } = useAppSelector(selectNotifications);
 
   const [lastTimeUpdate, setLastTimeUpdate] = useState<string>();
   const [interval, setInterval] = useState(null);
@@ -71,76 +76,19 @@ const Notifications: React.FC<Props> = ({
     ClassCode.CETS,
   ].map((val) => ({ label: val || "ALL", value: val }));
 
-  const getSecuritiesByClassCode = (classCode: ClassCode): Security[] => {
-    switch (classCode) {
-      case ClassCode.SPBFUT:
-        return futures;
-      case ClassCode.TQBR:
-        return shares;
-      case ClassCode.CETS:
-        return currencies;
+  useEffect(() => {
+    if (notifications.length) {
+      setAlertsReceivedFromServer(
+        notifications,
+        security?.classCode,
+        security?.code,
+        null,
+        start,
+        ""
+      );
+      setFetchAlertsError(null);
     }
-  };
-
-  const getSecCodes = (classCode: ClassCode): PrimeDropdownItem<string>[] => {
-    const secCodes: PrimeDropdownItem<string>[] = [
-      { label: "ALL", value: null },
-    ];
-
-    if (classCode) {
-      const securities: Security[] = getSecuritiesByClassCode(classCode);
-      for (const sec of securities) {
-        secCodes.push({ label: sec.code, value: sec.code });
-      }
-    }
-
-    return secCodes;
-  };
-
-  const secCodes = getSecCodes(classCode);
-
-  const fetchAlerts = (
-    secId: number,
-    newInterval: Interval,
-    newStart: Date,
-    newTextPattern: string
-  ) => {
-    getNotifications(filter)
-      .then((newAlerts) => {
-        setAlertsReceivedFromServer(
-          newAlerts,
-          security?.classCode,
-          security?.code,
-          newInterval,
-          newStart,
-          newTextPattern
-        );
-        setFetchAlertsError(null);
-      })
-      .catch((reason) => {
-        setAlerts([]);
-        setVisibleAlerts([]);
-        setFetchAlertsError("Cannot get notifications for " + filter.secId);
-        if (fetchAlertsAttempt < 3) {
-          fetchAlertsAttempt++;
-          fetchAlerts(secId, newInterval, newStart, newTextPattern);
-        }
-      });
-  };
-
-  const notifyOnNewAlert = (newAlerts: NotificationDto[]): void => {
-    if (newAlerts && newAlerts.length !== previousAlertsCount) {
-      playSound(4);
-      previousAlertsCount = newAlerts.length;
-    }
-  };
-
-  const getWSNotifications = (filter: FilterDto): void => {
-    WebsocketService.getInstance().send<FilterDto>(
-      WSEvent.GET_NOTIFICATIONS,
-      filter
-    );
-  };
+  }, [notifications]);
 
   useEffect(() => {
     let alertsSubscription;
@@ -153,7 +101,7 @@ const Notifications: React.FC<Props> = ({
       // onSecCodeChanged(filter.secCode);
       onIntervalChanged(null);
       onTextPatternChanged("");
-      fetchAlerts(filter.secId, null, start, "");
+      dispatch(loadNotifications(filter));
 
       if (filter.fetchByWS) {
         setTimeout(() => getWSNotifications(filter), 500);
@@ -200,6 +148,48 @@ const Notifications: React.FC<Props> = ({
     setClassCode(security?.classCode);
     setSecCode(security?.code);
   }, [security?.id]);
+
+  const getSecuritiesByClassCode = (classCode: ClassCode): Security[] => {
+    switch (classCode) {
+      case ClassCode.SPBFUT:
+        return futures;
+      case ClassCode.TQBR:
+        return shares;
+      case ClassCode.CETS:
+        return currencies;
+    }
+  };
+
+  const getSecCodes = (classCode: ClassCode): PrimeDropdownItem<string>[] => {
+    const secCodes: PrimeDropdownItem<string>[] = [
+      { label: "ALL", value: null },
+    ];
+
+    if (classCode) {
+      const securities: Security[] = getSecuritiesByClassCode(classCode);
+      for (const sec of securities) {
+        secCodes.push({ label: sec.code, value: sec.code });
+      }
+    }
+
+    return secCodes;
+  };
+
+  const secCodes = getSecCodes(classCode);
+
+  const notifyOnNewAlert = (newAlerts: NotificationDto[]): void => {
+    if (newAlerts && newAlerts.length !== previousAlertsCount) {
+      playSound(4);
+      previousAlertsCount = newAlerts.length;
+    }
+  };
+
+  const getWSNotifications = (filter: FilterDto): void => {
+    WebsocketService.getInstance().send<FilterDto>(
+      WSEvent.GET_NOTIFICATIONS,
+      filter
+    );
+  };
 
   const setAlertsReceivedFromServer = (
     newAlerts: NotificationDto[],
