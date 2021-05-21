@@ -25,15 +25,16 @@ type Props = {
 const ActiveTradesView: React.FC<Props> = ({}) => {
   const dispatch = useAppDispatch();
   const { security } = useAppSelector(selectSecurities);
-  const { activeTrades, selected } = useAppSelector(selectActiveTrades);
+  const { activeTrades, selectedActiveTrade } =
+    useAppSelector(selectActiveTrades);
 
   if (activeTrades.length === 0) return null;
 
-  if (selected?.secId !== security?.id && activeTrades.length) {
+  if (selectedActiveTrade?.secId !== security?.id && activeTrades.length) {
     const activeTrade = activeTrades.find(
       ({ secId }) => secId === security?.id
     );
-    if (activeTrade?.secId !== selected?.secId)
+    if (activeTrade?.secId !== selectedActiveTrade?.secId)
       dispatch(setSelectedActiveTrade(activeTrade));
   }
 
@@ -55,7 +56,7 @@ const ActiveTradesView: React.FC<Props> = ({}) => {
   const onSelect = (e) => {
     if (!Array.isArray(e.value)) {
       const activeTrade: ActiveTrade = e.value;
-      if (activeTrade.secId !== selected?.secId) {
+      if (activeTrade.secId !== selectedActiveTrade?.secId) {
         dispatch(setSecurityById(activeTrade.secId));
       } else {
         dispatch(setSecurityById(undefined));
@@ -80,7 +81,7 @@ const ActiveTradesView: React.FC<Props> = ({}) => {
     <DataTable
       value={activeTrades}
       selectionMode="single"
-      selection={selected}
+      selection={selectedActiveTrade}
       onSelectionChange={onSelect}
       className="active-trade-view"
       headerColumnGroup={headerGroup}

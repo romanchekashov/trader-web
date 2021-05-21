@@ -18,7 +18,7 @@ type Props = {};
 const ControlPanelWidget: React.FC<Props> = ({}) => {
   const dispatch = useAppDispatch();
   const { security } = useAppSelector(selectSecurities);
-  const { selected } = useAppSelector(selectActiveTrades);
+  const { selectedActiveTrade } = useAppSelector(selectActiveTrades);
 
   const toast = useRef(null);
   const [sessionResult, setSessionResult] = useState<SessionTradeResult>();
@@ -51,7 +51,7 @@ const ControlPanelWidget: React.FC<Props> = ({}) => {
           security={security}
           growl={toast?.current}
           history={false}
-          activeTrade={selected}
+          activeTrade={selectedActiveTrade}
         />
       </div>
     </div>

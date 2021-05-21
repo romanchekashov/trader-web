@@ -56,7 +56,8 @@ export const Stack: React.FC<Props> = ({}) => {
   const { security } = useAppSelector(selectSecurities);
   const { stops } = useAppSelector(selectStops);
   const { orders } = useAppSelector(selectOrders);
-  const { activeTrades, selected } = useAppSelector(selectActiveTrades);
+  const { activeTrades, selectedActiveTrade } =
+    useAppSelector(selectActiveTrades);
 
   const toast = useRef(null);
   const [stackItemsHeight, setStackItemsHeight] = useState<number>(400);
@@ -310,14 +311,17 @@ export const Stack: React.FC<Props> = ({}) => {
         }
       }
 
-      if (selected) {
-        if (value.price === selected.avgPrice) {
+      if (selectedActiveTrade) {
+        if (value.price === selectedActiveTrade.avgPrice) {
           stackItemOrderClassName += " active-order";
-          quantity = selected.quantity;
+          quantity = selectedActiveTrade.quantity;
         }
-        if (selected.stopOrder && value.price === selected.stopOrder.price) {
+        if (
+          selectedActiveTrade.stopOrder &&
+          value.price === selectedActiveTrade.stopOrder.price
+        ) {
           stackItemOrderClassName += " stop-order";
-          quantity = selected.stopOrder.quantity;
+          quantity = selectedActiveTrade.stopOrder.quantity;
         }
       }
 

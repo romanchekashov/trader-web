@@ -2,8 +2,10 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Toast } from "primereact/toast";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { filter } from "rxjs/internal/operators";
 import { selectActiveTrades } from "../../../app/activeTrades/activeTradesSlice";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { selectOrders } from "../../../app/orders/ordersSlice";
 import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 import {
   selectPossibleTrade,
@@ -34,7 +36,6 @@ import { DataType } from "../../../common/data/DataType";
 import { FilterDto } from "../../../common/data/FilterDto";
 import { Interval } from "../../../common/data/Interval";
 import { Market } from "../../../common/data/Market";
-import { Order } from "../../../common/data/Order";
 import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
 import { TradePremise } from "../../../common/data/strategy/TradePremise";
 import { Trade } from "../../../common/data/Trade";
@@ -47,7 +48,6 @@ import {
 } from "../../../common/utils/TimeFrameChooser";
 import MoexOpenInterestView from "./moex-open-interest/MoexOpenInterestView";
 import moment = require("moment");
-import { filter } from "rxjs/internal/operators";
 
 type Props = {
   security: SecurityLastInfo;
@@ -61,6 +61,7 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
   const { possibleTrade } = useAppSelector(selectPossibleTrade);
   const { securities } = useAppSelector(selectSecurities);
   const { stops } = useAppSelector(selectStops);
+  const { orders } = useAppSelector(selectOrders);
   const { activeTrades } = useAppSelector(selectActiveTrades);
 
   const securityLastInfo =
@@ -96,7 +97,6 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
   const [timeFrameMin, setTimeFrameMin] = useState<Interval>(Interval.M1);
   const [timeFrameHigh, setTimeFrameHigh] = useState<Interval>(Interval.M30);
   const [premise, setPremise] = useState<TradePremise>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
 
   const [chart1Width, setChart1Width] = useState(MIN_CHART_WIDTH);
   const [chart2Width, setChart2Width] = useState(MIN_CHART_WIDTH);
@@ -131,23 +131,6 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
         : MIN_CHART_WIDTH
     );
   };
-
-  useEffect(() => {
-    console.log("orders: ", orders);
-
-    const ordersSetupSubscription = WebsocketService.getInstance()
-      .on<Order[]>(WSEvent.ORDERS)
-      .subscribe((newOrders) => {
-        if (orders.length !== newOrders.length) {
-          setOrders(newOrders);
-        }
-      });
-
-    // Specify how to clean up after this effect:
-    return function cleanup() {
-      ordersSetupSubscription.unsubscribe();
-    };
-  }, [orders]);
 
   useEffect(() => {
     if (security) {

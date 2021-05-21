@@ -62,7 +62,8 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
   const dispatch = useAppDispatch();
   const { futuresClientLimits } = useAppSelector(selectDeposits);
   const { stops } = useAppSelector(selectStops);
-  const { activeTrades, selected } = useAppSelector(selectActiveTrades);
+  const { activeTrades, selectedActiveTrade } =
+    useAppSelector(selectActiveTrades);
 
   const multipliers: PrimeDropdownItem<number>[] = [1, 2, 4, 8].map((val) => ({
     label: "" + val,
@@ -286,8 +287,8 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       return accum;
     }, 0);
 
-    if (selected && selected.secId === security?.id) {
-      return selected.quantity - stopQuantityUsed;
+    if (selectedActiveTrade && selectedActiveTrade.secId === security?.id) {
+      return selectedActiveTrade.quantity - stopQuantityUsed;
     }
 
     return quantityMax - stopQuantityUsed;
