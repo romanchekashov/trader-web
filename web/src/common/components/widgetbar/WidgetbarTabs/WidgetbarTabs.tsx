@@ -48,16 +48,18 @@ const WidgetbarTabs: React.FC<Props> = ({ item, security, onItemSelected }) => {
         <BsClipboard />
       </div>
 
-      <div
-        className={`WidgetbarTab ${
-          item === WidgetbarItem.SEC_DATA ? "active" : ""
-        }`}
-        data-pr-tooltip="Security Data"
-        data-pr-position="left"
-        onClick={() => select(WidgetbarItem.SEC_DATA)}
-      >
-        <BsClipboardData />
-      </div>
+      {security ? (
+        <div
+          className={`WidgetbarTab ${
+            item === WidgetbarItem.SEC_DATA ? "active" : ""
+          }`}
+          data-pr-tooltip="Security Data"
+          data-pr-position="left"
+          onClick={() => select(WidgetbarItem.SEC_DATA)}
+        >
+          <BsClipboardData />
+        </div>
+      ) : null}
 
       <div
         className={`WidgetbarTab ${
