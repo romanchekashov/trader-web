@@ -4,6 +4,7 @@ import { SelectButton } from "primereact/selectbutton";
 import { ToggleButton } from "primereact/togglebutton";
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { selectActiveTrades } from "../../../../app/activeTrades/activeTradesSlice";
 import { selectDeposits } from "../../../../app/deposits/depositsSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import quikOrdersApi from "../../../../app/orders/quikOrdersApi";
@@ -61,6 +62,7 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
   const dispatch = useAppDispatch();
   const { futuresClientLimits } = useAppSelector(selectDeposits);
   const { stops } = useAppSelector(selectStops);
+  const { activeTrades, selected } = useAppSelector(selectActiveTrades);
 
   const multipliers: PrimeDropdownItem<number>[] = [1, 2, 4, 8].map((val) => ({
     label: "" + val,
@@ -283,6 +285,10 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
         return accum + cur.quantity;
       return accum;
     }, 0);
+
+    if (selected && selected.secId === security?.id) {
+      return selected.quantity - stopQuantityUsed;
+    }
 
     return quantityMax - stopQuantityUsed;
   };
