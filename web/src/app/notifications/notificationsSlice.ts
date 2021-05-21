@@ -100,6 +100,7 @@ export const notificationsSlice = createSlice({
     ) => {
       state.signals = action.payload;
       state.signalsLoading = LoadingState.LOADED;
+      state.signalsLoadingError = undefined;
     },
     [loadSignals.rejected as any]: (
       state: NotificationsState,

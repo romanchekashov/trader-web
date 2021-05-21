@@ -18,7 +18,7 @@ type Props = {};
 
 const TrendChartsPage: React.FC<Props> = ({}) => {
   const dispatch = useAppDispatch();
-  const { securities } = useAppSelector(selectSecurities);
+  const { securities, security } = useAppSelector(selectSecurities);
 
   const [height, setHeight] = useState<number>(800);
 
@@ -46,15 +46,19 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
   };
 
   return (
-    <div className="p-grid sample-layout analysis">
+    <div className="p-grid sample-layout analysis TrendChartsPage">
       {securities
         .filter(({ classCode }) => classCode === ClassCode.SPBFUT)
         .slice(0, 12)
-        .map((security) => {
+        .map((sec) => {
           return (
-            <div key={security.id} className="p-col-2" style={{ padding: 0 }}>
+            <div
+              key={sec.id}
+              className={`p-col-2 ${sec.id === security?.id ? "active" : ""}`}
+              style={{ padding: 0 }}
+            >
               <TrendViewChartWrapper
-                security={security}
+                security={sec}
                 eachChartHeight={height / 2}
               />
             </div>

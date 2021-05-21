@@ -1,8 +1,9 @@
-import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
 import { TabPanel, TabView } from "primereact/tabview";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { filter } from "rxjs/internal/operators";
+import { useAppSelector } from "../../../app/hooks";
+import { selectSecurities } from "../../../app/securities/securitiesSlice";
 import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
 import {
   WebsocketService,
@@ -17,7 +18,6 @@ import { EconomicCalendar } from "../../../common/components/economic-calendar/E
 import { MarketStateFilterDto } from "../../../common/components/market-state/data/MarketStateFilterDto";
 import MarketState from "../../../common/components/market-state/MarketState";
 import { News } from "../../../common/components/news/News";
-import Notifications from "../../../common/components/notifications/Notifications";
 import { SecurityShareEventView } from "../../../common/components/share-event/SecurityShareEventView";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
 import { TrendsView } from "../../../common/components/trend/TrendsView";
@@ -39,9 +39,6 @@ import {
   getTimeFrameLow,
 } from "../../../common/utils/TimeFrameChooser";
 import moment = require("moment");
-import { useAppSelector } from "../../../app/hooks";
-import { selectSecurities } from "../../../app/securities/securitiesSlice";
-import { filter } from "rxjs/internal/operators";
 
 export interface AnalysisState {
   realDepo: boolean;
@@ -346,7 +343,6 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
                 <div className="p-col-4">
                   <Alerts
                     filter={filterDto}
-                    security={security}
                     onAlertSelected={(n) => {
                       console.log(n);
                     }}

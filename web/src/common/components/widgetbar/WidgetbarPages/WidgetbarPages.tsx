@@ -139,7 +139,6 @@ const WidgetbarPages: React.FC<Props> = ({ item, security }) => {
       {item === WidgetbarItem.ALARMS ? (
         <Alerts
           filter={filterAlarms}
-          security={security}
           onAlertSelected={(n) => {
             console.log(n);
           }}

@@ -3,12 +3,12 @@ import { DataTable } from "primereact/datatable";
 import { TabPanel, TabView } from "primereact/tabview";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { filter } from "rxjs/internal/operators";
 import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
 import {
   WebsocketService,
   WSEvent,
 } from "../../../common/api/WebsocketService";
-import Alerts from "../../../common/components/alerts/Alerts";
 import {
   ChartWrapper,
   CHART_MIN_WIDTH,
@@ -34,7 +34,6 @@ import { TradeStrategyAnalysisFilterDto } from "../../../common/data/TradeStrate
 import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
 import { adjustTradePremise } from "../../../common/utils/DataUtils";
 import moment = require("moment");
-import { filter } from "rxjs/internal/operators";
 
 export interface AnalysisState {
   realDepo: boolean;
