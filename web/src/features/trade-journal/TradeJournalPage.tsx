@@ -11,6 +11,8 @@ import { TradeJournalFilterDto } from "./filter/TradeJournalFilterDto";
 import { TradeJournalTable } from "./table/TradeJournalTable";
 import { TradeJournalStatistic } from "./statistic/TradeJournalStatistic";
 import statisticsApi from "../../app/statistics/statisticsApi";
+import DepositChangeChart from "../../app/deposits/components/DepositChangeChart/DepositChangeChart";
+import { SecurityType } from "../../common/data/security/SecurityType";
 
 function mapStateToProps(state: RootState) {
   return {
@@ -72,8 +74,15 @@ class TradeJournalPage extends React.Component<Props, TradeJournalState> {
         <div className="p-col-12">
           <TradeJournalFilter onFilter={this.onFilter} />
         </div>
-        <div className="p-col-12">
+        <div className="p-col-8">
           <ProfitLossChart stat={stat.length > 0 ? stat[0] : null} />
+        </div>
+        <div className="p-col-4">
+          <DepositChangeChart
+            securityType={SecurityType.FUTURE}
+            width={400}
+            height={400}
+          />
         </div>
         <div className="p-col-12">
           <TradeJournalStatistic stat={stat.length > 0 ? stat[0] : null} />
