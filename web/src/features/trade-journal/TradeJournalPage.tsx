@@ -1,98 +1,80 @@
 import * as React from "react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { AppDispatch, RootState } from "../../app/store";
-import { loadStat } from "./TradeJournalActions";
+import { useEffect, useRef, useState } from "react";
+import DepositChangeChart from "../../app/deposits/components/DepositChangeChart/DepositChangeChart";
+import statisticsApi from "../../app/statistics/statisticsApi";
 import { ResultDto } from "../../common/data/journal/ResultDto";
 import { Trade } from "../../common/data/journal/Trade";
-import ProfitLossChart from "./profitLossChart/ProfitLossChart";
+import { SecurityType } from "../../common/data/security/SecurityType";
 import { TradeJournalFilter } from "./filter/TradeJournalFilter";
 import { TradeJournalFilterDto } from "./filter/TradeJournalFilterDto";
-import { TradeJournalTable } from "./table/TradeJournalTable";
+import ProfitLossChart from "./profitLossChart/ProfitLossChart";
 import { TradeJournalStatistic } from "./statistic/TradeJournalStatistic";
-import statisticsApi from "../../app/statistics/statisticsApi";
-import DepositChangeChart from "../../app/deposits/components/DepositChangeChart/DepositChangeChart";
-import { SecurityType } from "../../common/data/security/SecurityType";
+import { TradeJournalTable } from "./table/TradeJournalTable";
 
-function mapStateToProps(state: RootState) {
-  return {
-    stat: state.tradeJournal.stat,
-  };
-}
+const TradeJournalPage: React.FC<{}> = ({}) => {
+  const [stat, setStat] = useState<ResultDto[]>([]);
+  const [expandedRows, setExpandedRows] = useState<Trade[]>([]);
 
-function mapDispatchToProps(dispatch: AppDispatch) {
-  return {
-    actions: {
-      loadStat: bindActionCreators(loadStat, dispatch),
-    },
-  };
-}
+  const [profitLossChartWidth, setProfitLossChartWidth] =
+    useState<number>(1200);
+  const [depositChangeChartWidth, setDepositChangeChartWidth] =
+    useState<number>(400);
 
-interface TradeJournalState {
-  stat: ResultDto[];
-  expandedRows: Trade[];
-}
-
-type Props = ReturnType<typeof mapStateToProps> &
-  ReturnType<typeof mapDispatchToProps>;
-
-class TradeJournalPage extends React.Component<Props, TradeJournalState> {
-  constructor(props) {
-    super(props);
-    this.state = { stat: [], expandedRows: [] };
-  }
-
-  componentDidMount(): void {
-    const { actions, stat } = this.props;
-
-    if (stat.length === 0) {
-      actions.loadStat();
-    }
-  }
-
-  onFilter = (filter: TradeJournalFilterDto): void => {
-    statisticsApi
-      .getTradeJournal(filter)
-      .then((stat) => this.setState({ stat }));
+  const onFilter = (filter: TradeJournalFilterDto): void => {
+    statisticsApi.getTradeJournal(filter).then(setStat);
   };
 
-  render() {
-    const { stat } = this.state;
-
-    if (stat.length === 0) {
-      return (
-        <div className="p-grid sample-layout">
-          <div className="p-col-12">
-            <TradeJournalFilter onFilter={this.onFilter} />
-          </div>
-        </div>
-      );
-    }
-
+  if (stat.length === 0) {
     return (
       <div className="p-grid sample-layout">
         <div className="p-col-12">
-          <TradeJournalFilter onFilter={this.onFilter} />
-        </div>
-        <div className="p-col-8">
-          <ProfitLossChart stat={stat.length > 0 ? stat[0] : null} />
-        </div>
-        <div className="p-col-4">
-          <DepositChangeChart
-            securityType={SecurityType.FUTURE}
-            width={400}
-            height={400}
-          />
-        </div>
-        <div className="p-col-12">
-          <TradeJournalStatistic stat={stat.length > 0 ? stat[0] : null} />
-        </div>
-        <div className="p-col-12 journal-trades-table">
-          <TradeJournalTable stat={stat[0]} />
+          <TradeJournalFilter onFilter={onFilter} />
         </div>
       </div>
     );
   }
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(TradeJournalPage);
+  return (
+    <div className="p-grid sample-layout">
+      <div className="p-col-12">
+        <TradeJournalFilter onFilter={onFilter} />
+      </div>
+      <div
+        ref={(refElem) => {
+          if (refElem) {
+            setProfitLossChartWidth(refElem.clientWidth - 20);
+          }
+        }}
+        className="p-col-8"
+      >
+        <ProfitLossChart
+          stat={stat.length > 0 ? stat[0] : null}
+          width={profitLossChartWidth}
+          height={300}
+        />
+      </div>
+      <div
+        ref={(refElem) => {
+          if (refElem) {
+            setDepositChangeChartWidth(refElem.clientWidth - 20);
+          }
+        }}
+        className="p-col-4"
+      >
+        <DepositChangeChart
+          securityType={SecurityType.FUTURE}
+          width={depositChangeChartWidth}
+          height={300}
+        />
+      </div>
+      <div className="p-col-12">
+        <TradeJournalStatistic stat={stat.length > 0 ? stat[0] : null} />
+      </div>
+      <div className="p-col-12 journal-trades-table">
+        <TradeJournalTable stat={stat[0]} />
+      </div>
+    </div>
+  );
+};
+
+export default TradeJournalPage;
