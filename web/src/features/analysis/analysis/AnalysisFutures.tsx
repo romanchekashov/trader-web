@@ -36,6 +36,7 @@ import { DataType } from "../../../common/data/DataType";
 import { FilterDto } from "../../../common/data/FilterDto";
 import { Interval } from "../../../common/data/Interval";
 import { Market } from "../../../common/data/Market";
+import { OrderType } from "../../../common/data/OrderType";
 import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
 import { TradePremise } from "../../../common/data/strategy/TradePremise";
 import { Trade } from "../../../common/data/Trade";
@@ -360,12 +361,12 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
           tradingPlatform: TradingPlatform.QUIK,
           secId: security.id,
           timeFrame: possibleTrade.timeFrame,
-          timeFrameLow: possibleTrade.timeFrameLow,
           entryPrice: possibleTrade.entryPrice,
           quantity: possibleTrade.quantity,
           operation: possibleTrade.operation,
           depositAmount: 0,
           depositMaxRiskPerTradeInPercent: 1,
+          orderType: OrderType.MARKET,
         })
       );
     }

@@ -8,8 +8,12 @@ import { selectActiveTrades } from "../../../../app/activeTrades/activeTradesSli
 import { selectDeposits } from "../../../../app/deposits/depositsSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import quikOrdersApi from "../../../../app/orders/quikOrdersApi";
+import { PossibleTrade } from "../../../../app/possibleTrades/data/PossibleTrade";
+import { PossibleTradeRequest } from "../../../../app/possibleTrades/data/PossibleTradeRequest";
+import { tradePossibleTrade } from "../../../../app/possibleTrades/possibleTradesSlice";
 import { createStop, selectStops } from "../../../../app/stops/stopsSlice";
 import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
+import { BrokerId } from "../../../data/BrokerId";
 import { ClassCode } from "../../../data/ClassCode";
 import { OperationType } from "../../../data/OperationType";
 import { Order } from "../../../data/Order";
@@ -18,6 +22,7 @@ import { Security } from "../../../data/security/Security";
 import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 import { StopOrder } from "../../../data/StopOrder";
 import { StopOrderKind } from "../../../data/StopOrderKind";
+import { TradingPlatform } from "../../../data/trading/TradingPlatform";
 import {
   ClassCodeToSecTypeMap,
   PrimeDropdownItem,
@@ -26,6 +31,7 @@ import {
 import "./ControlPanelGeneralBtn.css";
 
 enum ControlOrderType {
+  POSSIBLE_TRADE = "PT",
   ORDER = "O",
   STOP_TARGET = "S+T",
   TARGET = "T",
@@ -33,6 +39,7 @@ enum ControlOrderType {
 }
 
 const typeSets = [
+  { label: "PT", value: ControlOrderType.POSSIBLE_TRADE },
   { label: "O", value: ControlOrderType.ORDER },
   { label: "S+T", value: ControlOrderType.STOP_TARGET },
   { label: "T", value: ControlOrderType.TARGET },
@@ -76,9 +83,9 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
   const [steps, setSteps] = useState<number>(2);
   const [multiplier, setMultiplier] = useState<number>(1);
   const [btnSet, setBtnSet] = useState<string>("general");
-  const [isMarket, setIsMarket] = useState<boolean>(false);
+  const [isMarket, setIsMarket] = useState<boolean>(true);
   const [controlOrderType, setControlOrderType] = useState<ControlOrderType>(
-    ControlOrderType.ORDER
+    ControlOrderType.POSSIBLE_TRADE
   );
 
   const quantityChangeByKeydown = (e) => {
@@ -88,26 +95,6 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       setQuantity(quantity - 1);
     }
   };
-
-  const priceChangeByKeydown = (e) => {
-    if (e.key === "ArrowUp") {
-      setPrice(round(price + security.secPriceStep, security.scale));
-    } else if (e.key === "ArrowDown" && price > 0) {
-      setPrice(round(price - security.secPriceStep, security.scale));
-    }
-  };
-
-  useEffect(() => {
-    document
-      .getElementById("td__control-panel-price")
-      .addEventListener("keydown", priceChangeByKeydown);
-
-    return () => {
-      document
-        .getElementById("td__control-panel-price")
-        .removeEventListener("keydown", priceChangeByKeydown);
-    };
-  }, []);
 
   useEffect(() => {
     setPrice(security?.lastTradePrice || 0);
@@ -140,6 +127,20 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
         : price - priceDiff;
 
     return round(stopPrice, securityInfo.scale);
+  };
+
+  const getAvailableStopQuantity = (order: StopOrder) => {
+    const stopQuantityUsed = stops.reduce((accum, cur) => {
+      if (cur.secId === security?.id && cur.operation === order.operation)
+        return accum + cur.quantity;
+      return accum;
+    }, 0);
+
+    if (selectedActiveTrade && selectedActiveTrade.secId === security?.id) {
+      return selectedActiveTrade.quantity - stopQuantityUsed;
+    }
+
+    return quantityMax - stopQuantityUsed;
   };
 
   const createOrder = (operation: OperationType) => {
@@ -280,22 +281,50 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
     });
   };
 
-  const getAvailableStopQuantity = (order: StopOrder) => {
-    const stopQuantityUsed = stops.reduce((accum, cur) => {
-      if (cur.secId === security?.id && cur.operation === order.operation)
-        return accum + cur.quantity;
-      return accum;
-    }, 0);
+  const createPossibleTrade = (operation: OperationType) => {
+    const order: PossibleTradeRequest = {
+      brokerId: BrokerId.ALFA_DIRECT,
+      tradingPlatform: TradingPlatform.QUIK,
+      secId: security.id,
+      stopPrice: price,
+      quantity,
+      operation,
+      depositAmount: 0,
+      depositMaxRiskPerTradeInPercent: 1,
+      orderType: isMarket ? OrderType.MARKET : OrderType.LIMIT,
+    };
 
-    if (selectedActiveTrade && selectedActiveTrade.secId === security?.id) {
-      return selectedActiveTrade.quantity - stopQuantityUsed;
+    if (quantity <= 0 || quantity > quantityMax) {
+      growl.show({
+        severity: "error",
+        summary: "Error Message",
+        detail: `Wrong quantity: ${quantity}`,
+      });
+      return;
     }
 
-    return quantityMax - stopQuantityUsed;
+    dispatch(tradePossibleTrade(order)).then((result: any) => {
+      if (result.error) {
+        growl.show({
+          severity: "error",
+          summary: "Error Message",
+          detail: "Cannot create Possible Trade",
+        });
+      } else {
+        growl.show({
+          severity: "success",
+          summary: "Success Message",
+          detail: "Possible Trade created",
+        });
+      }
+    });
   };
 
   const create = (operation: OperationType) => {
     switch (controlOrderType) {
+      case ControlOrderType.POSSIBLE_TRADE:
+        createPossibleTrade(operation);
+        break;
       case ControlOrderType.ORDER:
         createOrder(operation);
         break;
@@ -323,7 +352,7 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
     );
   };
 
-  const getPossibleTradeQuantity = (stop: number): number => {
+  const getPossibleTradeQuantity = (price: number, stop: number): number => {
     const depositMaxRiskPerTradeInPercent = 1;
     const depo = futuresClientLimits[0].cbplplanned;
     const maxLossPerTradeMoney = (depo * depositMaxRiskPerTradeInPercent) / 100;
@@ -341,11 +370,19 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
     return qty;
   };
 
+  const onChangePrice = (e) => {
+    const price = Number(e.target.value);
+    setPrice(price);
+    if (controlOrderType === ControlOrderType.POSSIBLE_TRADE) {
+      setQuantity(getPossibleTradeQuantity(security.lastTradePrice, price));
+    }
+  };
+
   const onChangePrice2 = (e) => {
     const price2 = Number(e.target.value);
     setPrice2(price2);
     if (controlOrderType === ControlOrderType.ORDER) {
-      setQuantity(getPossibleTradeQuantity(price2));
+      setQuantity(getPossibleTradeQuantity(price, price2));
     }
   };
 
@@ -370,7 +407,10 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       security?.lastTradePrice < price2) ||
     (controlOrderType === ControlOrderType.ORDER &&
       !isMarket &&
+      security?.lastTradePrice < price) ||
+    (controlOrderType === ControlOrderType.POSSIBLE_TRADE &&
       security?.lastTradePrice < price);
+
   const sellDisabled =
     !security ||
     ((controlOrderType === ControlOrderType.STOP ||
@@ -382,24 +422,29 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
       security?.lastTradePrice > price2) ||
     (controlOrderType === ControlOrderType.ORDER &&
       !isMarket &&
+      security?.lastTradePrice > price) ||
+    (controlOrderType === ControlOrderType.POSSIBLE_TRADE &&
       security?.lastTradePrice > price);
 
   return (
     <div className="p-grid ControlPanelGeneralBtn">
-      <div className="p-col-8">
+      <div className="p-col-10">
         <SelectButton
           value={controlOrderType}
           options={typeSets}
-          onChange={(e) => setControlOrderType(e.value)}
+          onChange={(e) => {
+            if (ControlOrderType.POSSIBLE_TRADE === e.value) setIsMarket(true);
+            setControlOrderType(e.value);
+          }}
         />
       </div>
-      <div className="p-col-4">
+      <div className="p-col-2" style={{ paddingLeft: 0 }}>
         <ToggleButton
           style={{ width: "100%" }}
           checked={isMarket}
           className={isMarket ? "p-button-danger" : ""}
-          onLabel="Market"
-          offLabel="Limit"
+          onLabel="M"
+          offLabel="L"
           onChange={(e) => setIsMarket(e.value)}
         />
       </div>
@@ -431,8 +476,9 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
             style={{ width: 90 }}
             type="number"
             step={security?.secPriceStep || 1}
+            min={0}
             value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
+            onChange={onChangePrice}
           />
           <label htmlFor="td__control-panel-price">{priceLabel}</label>
         </span>
@@ -446,6 +492,7 @@ export const ControlPanelGeneralBtn: React.FC<Props> = ({
               style={{ width: 90 }}
               type="number"
               step={security?.secPriceStep || 1}
+              min={0}
               value={price2}
               onChange={onChangePrice2}
             />
