@@ -1,19 +1,16 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { filter } from "rxjs/internal/operators";
-import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
+import { useAppDispatch } from "../../../../app/hooks";
 import { addNewSignals } from "../../../../app/notifications/notificationsSlice";
-import {
-  selectSecurities,
-  setSecurityById,
-} from "../../../../app/securities/securitiesSlice";
+import { setSecurityById } from "../../../../app/securities/securitiesSlice";
 import analysisRestApi from "../../../api/rest/analysisRestApi";
 import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
 import { BrokerId } from "../../../data/BrokerId";
-import { ClassCode } from "../../../data/ClassCode";
 import { Interval } from "../../../data/Interval";
 import { Market } from "../../../data/Market";
 import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
+import { SecurityType } from "../../../data/security/SecurityType";
 import { Signal } from "../../../data/Signal";
 import { SRLevel } from "../../../data/strategy/SRLevel";
 import { TradePremise } from "../../../data/strategy/TradePremise";
@@ -29,16 +26,17 @@ import {
 import TrendViewChart from "../TrendViewChart";
 import "./TrendViewChartWrapper.css";
 import moment = require("moment");
-import { SecurityType } from "../../../data/security/SecurityType";
 
 type Props = {
   security: SecurityLastInfo;
   eachChartHeight?: number;
+  timeFrame: Interval;
 };
 
 const TrendViewChartWrapper: React.FC<Props> = ({
   security,
   eachChartHeight = 300,
+  timeFrame,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -94,7 +92,7 @@ const TrendViewChartWrapper: React.FC<Props> = ({
         tradeStrategyAnalysisFilter
       );
     };
-  }, [security?.id]);
+  }, [security?.id, timeFrame]);
 
   const fetchPremise = (
     tradeStrategyAnalysisFilter: TradeStrategyAnalysisFilterDto
@@ -115,12 +113,8 @@ const TrendViewChartWrapper: React.FC<Props> = ({
 
   const onTradePremiseRecieved = (newPremise: TradePremise) => {
     const { trends, srLevels } = newPremise?.analysis;
-    const filterInterval =
-      security.type === SecurityType.FUTURE ? Interval.M5 : Interval.M60;
     setTrend(
-      filterTrendPoints(
-        trends?.find(({ interval }) => interval === filterInterval)
-      )
+      filterTrendPoints(trends?.find(({ interval }) => interval === timeFrame))
     );
     setLevels(srLevels);
     if (security) {

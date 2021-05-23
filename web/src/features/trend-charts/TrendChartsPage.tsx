@@ -1,3 +1,4 @@
+import { Dropdown } from "primereact/dropdown";
 import { Paginator } from "primereact/paginator";
 import * as React from "react";
 import { useEffect, useState } from "react";
@@ -9,12 +10,27 @@ import {
 } from "../../app/securities/securitiesSlice";
 import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
 import TrendViewChartWrapper from "../../common/components/trend/TrendViewChartWrapper/TrendViewChartWrapper";
+import { Interval } from "../../common/data/Interval";
 import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
+import { SecurityTypeWrapper } from "../../common/data/security/SecurityTypeWrapper";
 import { filterSecurities } from "../../common/utils/DataUtils";
+import { PrimeDropdownItem } from "../../common/utils/utils";
 import { loadFilterData } from "../analysis/AnalysisSlice";
 import "./TrendChartsPage.css";
 
 const DEFAULT_CHARTS_NUMBER = 12;
+const intervals: PrimeDropdownItem<Interval>[] = [
+  Interval.M1,
+  Interval.M3,
+  Interval.M5,
+  Interval.M15,
+  Interval.M30,
+  Interval.M60,
+  Interval.H2,
+  Interval.DAY,
+  Interval.WEEK,
+  Interval.MONTH,
+].map((val) => ({ label: val, value: val }));
 
 type Props = {};
 
@@ -25,6 +41,7 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
 
   const [page, setPage] = useState<number>(0);
   const [height, setHeight] = useState<number>(800);
+  const [interval, setInterval] = useState<Interval>(Interval.M1);
 
   useEffect(() => {
     updateSize();
@@ -47,6 +64,11 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
 
   useEffect(() => {
     setPage(0);
+    setInterval(
+      selectedSecurityTypeWrapper === SecurityTypeWrapper.FUTURE
+        ? Interval.M5
+        : Interval.M60
+    );
   }, [selectedSecurityTypeWrapper]);
 
   const updateSize = () => {
@@ -54,6 +76,16 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
   };
 
   const secs = filterSecurities(securities, selectedSecurityTypeWrapper);
+
+  const rightContent = (
+    <Dropdown
+      value={interval}
+      options={intervals}
+      onChange={(e) => {
+        setInterval(e.value);
+      }}
+    />
+  );
 
   return (
     <div className="p-grid sample-layout analysis TrendChartsPage">
@@ -64,6 +96,7 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
           totalRecords={secs.length}
           onPageChange={(e) => setPage(e.first)}
           style={{ padding: 0 }}
+          rightContent={rightContent}
         ></Paginator>
       </div>
       {secs.slice(page, page + DEFAULT_CHARTS_NUMBER).map((sec) => {
@@ -76,6 +109,7 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
             <TrendViewChartWrapper
               security={sec}
               eachChartHeight={height / 2}
+              timeFrame={interval}
             />
           </div>
         );
