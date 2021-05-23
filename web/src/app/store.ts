@@ -82,6 +82,7 @@ const store = configureStore({
         "securities/loadCurrencies/pending",
         "securities/loadFutures/rejected",
         "securities/loadShares/rejected",
+        "securities/selectSecurityType",
         "activeTrades/loadActiveTrades/pending",
         "possibleTrades/loadPossibleTradesStat/pending",
         "analysis/loadFilterData/pending",

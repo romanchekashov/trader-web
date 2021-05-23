@@ -2,8 +2,11 @@ import { Dropdown } from "primereact/dropdown";
 import * as React from "react";
 import { useEffect } from "react";
 import { BrokerId } from "../../../../common/data/BrokerId";
+import { SecurityType } from "../../../../common/data/security/SecurityType";
 import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
 import { TradingPlatform } from "../../../../common/data/trading/TradingPlatform";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { selectSecurities, selectSecurityType } from "../../securitiesSlice";
 import "./SecuritiesFilter.css";
 
 type Props = {
@@ -24,6 +27,9 @@ export const SecuritiesFilter: React.FC<Props> = ({
   secType,
   changeSecType,
 }) => {
+  const dispatch = useAppDispatch();
+  const { selectedSecurityType } = useAppSelector(selectSecurities);
+
   const types = [
     { label: "ALL", value: null },
     { label: "F", value: SecurityTypeWrapper.FUTURE },
@@ -43,7 +49,16 @@ export const SecuritiesFilter: React.FC<Props> = ({
       : [TradingPlatform.API]
   ).map((val) => ({ label: val, value: val }));
 
-  const updateSecType = (e: any): void => changeSecType(e.value);
+  const updateSecType = (e: any): void => {
+    if (e.value === SecurityTypeWrapper.FUTURE) {
+      dispatch(selectSecurityType(SecurityType.FUTURE));
+    } else if (e.value === SecurityTypeWrapper.CURRENCY) {
+      dispatch(selectSecurityType(SecurityType.CURRENCY));
+    } else {
+      dispatch(selectSecurityType(SecurityType.STOCK));
+    }
+    changeSecType(e.value);
+  };
 
   useEffect(() => {}, []);
 
