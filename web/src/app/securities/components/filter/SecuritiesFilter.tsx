@@ -5,6 +5,7 @@ import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTy
 import { TradingPlatform } from "../../../../common/data/trading/TradingPlatform";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import {
+  selectBrokerId,
   selectSecurities,
   selectSecurityTypeWrapper,
 } from "../../securitiesSlice";
@@ -12,20 +13,15 @@ import "./SecuritiesFilter.css";
 
 type Props = {
   lastTimeUpdate: string;
-  brokerId: BrokerId;
-  onBrokerId: (brokerId: BrokerId) => void;
-  platform: TradingPlatform;
-  // onPlatformChange: (platform: TradingPlatform) => void
 };
 
-export const SecuritiesFilter: React.FC<Props> = ({
-  lastTimeUpdate,
-  brokerId,
-  onBrokerId,
-  platform,
-}) => {
+export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate }) => {
   const dispatch = useAppDispatch();
-  const { selectedSecurityTypeWrapper } = useAppSelector(selectSecurities);
+  const {
+    selectedSecurityTypeWrapper,
+    selectedBrokerId,
+    selectedTradingPlatform,
+  } = useAppSelector(selectSecurities);
 
   const types = [
     { label: "ALL", value: null },
@@ -41,7 +37,7 @@ export const SecuritiesFilter: React.FC<Props> = ({
     (val) => ({ label: val, value: val })
   );
   const platforms = (
-    brokerId === BrokerId.ALFA_DIRECT
+    selectedBrokerId === BrokerId.ALFA_DIRECT
       ? [TradingPlatform.QUIK]
       : [TradingPlatform.API]
   ).map((val) => ({ label: val, value: val }));
@@ -50,16 +46,14 @@ export const SecuritiesFilter: React.FC<Props> = ({
     <div className="securities-filter-">
       <div className="notifications-head-dropdown">
         <Dropdown
-          value={brokerId}
+          value={selectedBrokerId}
           options={brokerIds}
-          onChange={(e) => {
-            onBrokerId(e.value);
-          }}
+          onChange={(e) => dispatch(selectBrokerId(e.value))}
           placeholder="Select a broker"
         />
 
         <Dropdown
-          value={platform}
+          value={selectedTradingPlatform}
           options={platforms}
           onChange={(e) => {
             // onPlatformChange(e.value)
