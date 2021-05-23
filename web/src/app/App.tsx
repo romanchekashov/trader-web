@@ -27,7 +27,7 @@ import {
   setActiveTrades,
 } from "./activeTrades/activeTradesSlice";
 import { loadFuturesClientLimits, setDeposits } from "./deposits/depositsSlice";
-import { useAppDispatch } from "./hooks";
+import { useAppDispatch, useAppSelector } from "./hooks";
 import { setOrders } from "./orders/ordersSlice";
 import { PageNotFound } from "./PageNotFound";
 import { loadPossibleTradesStat } from "./possibleTrades/possibleTradesSlice";
@@ -35,13 +35,16 @@ import {
   loadCurrencies,
   loadFutures,
   loadLastSecurities,
+  loadLastSecuritiesTinkoff,
   loadShares,
+  selectSecurities,
   setSecurities,
 } from "./securities/securitiesSlice";
 import { setStops } from "./stops/stopsSlice";
 
 export const App = () => {
   const dispatch = useAppDispatch();
+  const { selectedBrokerId } = useAppSelector(selectSecurities);
   const [widgetbarHeight, setWidgetbarHeight] = useState<number>(50);
 
   useEffect(() => {
@@ -50,6 +53,7 @@ export const App = () => {
     dispatch(loadCurrencies());
     dispatch(loadActiveTrades());
     dispatch(loadFuturesClientLimits());
+    dispatch(loadFilterData(false));
 
     dispatch(
       loadPossibleTradesStat({
@@ -104,19 +108,28 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(loadFilterData(false));
-    dispatch(loadLastSecurities());
-    const lastSecuritiesSubscription = WebsocketService.getInstance()
-      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-      .subscribe((securities) => {
-        dispatch(setSecurities(securities));
-      });
+    let lastSecuritiesSubscription;
+    if (selectedBrokerId === BrokerId.TINKOFF_INVEST) {
+      dispatch(loadLastSecuritiesTinkoff());
+      lastSecuritiesSubscription = WebsocketService.getInstance()
+        .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES_TINKOFF)
+        .subscribe((securities) => {
+          dispatch(setSecurities(securities));
+        });
+    } else {
+      dispatch(loadLastSecurities());
+      lastSecuritiesSubscription = WebsocketService.getInstance()
+        .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+        .subscribe((securities) => {
+          dispatch(setSecurities(securities));
+        });
+    }
 
     // Specify how to clean up after this effect:
     return function cleanup() {
-      lastSecuritiesSubscription.unsubscribe();
+      if (lastSecuritiesSubscription) lastSecuritiesSubscription.unsubscribe();
     };
-  }, []);
+  }, [selectedBrokerId]);
 
   return (
     <div className="container-fluid">

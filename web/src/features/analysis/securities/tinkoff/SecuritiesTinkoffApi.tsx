@@ -1,15 +1,15 @@
-import * as React from "react";
-import { useEffect, useState } from "react";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
+import * as React from "react";
+import { useEffect, useState } from "react";
+import tinkoffInvestRestApi from "../../../../common/api/rest/tinkoffInvestRestApi";
 import {
   WebsocketService,
   WSEvent,
 } from "../../../../common/api/WebsocketService";
+import { PatternName } from "../../../../common/components/alerts/data/PatternName";
 import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
 import { Signal } from "../../../../common/data/Signal";
-import { PatternName } from "../../../../common/components/alerts/data/PatternName";
-import { getLastSecurities } from "../../../../common/api/rest/tinkoffInvestRestApi";
 import moment = require("moment");
 
 type Props = {
@@ -63,7 +63,7 @@ export const SecuritiesTinkoffApi: React.FC<Props> = ({
   ];
 
   useEffect(() => {
-    getLastSecurities().then((securities) => {
+    tinkoffInvestRestApi.getLastSecurities().then((securities) => {
       setSecurities(securities);
       onLastTimeUpdate(new Date());
     });

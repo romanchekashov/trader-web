@@ -5,6 +5,7 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import analysisRestApi from "../../common/api/rest/analysisRestApi";
+import tinkoffInvestRestApi from "../../common/api/rest/tinkoffInvestRestApi";
 import traderRestApi from "../../common/api/rest/traderRestApi";
 import { BrokerId } from "../../common/data/BrokerId";
 import { SecurityCurrency } from "../../common/data/security/SecurityCurrency";
@@ -64,6 +65,12 @@ export const loadCurrencies = createAsyncThunk<SecurityCurrency[]>(
   "securities/loadCurrencies",
   async (_, thunkAPI) =>
     await handleThunkError(thunkAPI, traderRestApi.getAllSecurityCurrencies())
+);
+// tinkoff
+export const loadLastSecuritiesTinkoff = createAsyncThunk<SecurityLastInfo[]>(
+  "securities/loadLastSecuritiesTinkoff",
+  async (_, thunkAPI) =>
+    await handleThunkError(thunkAPI, tinkoffInvestRestApi.getLastSecurities())
 );
 
 export const securitiesSlice = createSlice({
@@ -152,6 +159,14 @@ export const securitiesSlice = createSlice({
     ) => {
       state.currencies = action.payload;
       action.payload.forEach((sec) => SEC_MAP.set(sec.id, sec));
+    },
+    // tinkoff
+    [loadLastSecuritiesTinkoff.fulfilled as any]: (
+      state: SecuritiesState,
+      action: PayloadAction<SecurityLastInfo[]>
+    ) => {
+      state.securities = action.payload;
+      state.securitiesLoading = LoadingState.LOADED;
     },
   },
 });
