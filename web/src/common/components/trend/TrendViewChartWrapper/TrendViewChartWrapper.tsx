@@ -1,9 +1,13 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { filter } from "rxjs/internal/operators";
-import { useAppDispatch } from "../../../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import { addNewSignals } from "../../../../app/notifications/notificationsSlice";
-import { setSecurityById } from "../../../../app/securities/securitiesSlice";
+import {
+  selectSecurities,
+  setSecurityById,
+} from "../../../../app/securities/securitiesSlice";
+import analysisRestApi from "../../../api/rest/analysisRestApi";
 import { WebsocketService, WSEvent } from "../../../api/WebsocketService";
 import { BrokerId } from "../../../data/BrokerId";
 import { ClassCode } from "../../../data/ClassCode";
@@ -18,10 +22,14 @@ import { TrendDirection } from "../../../data/strategy/TrendDirection";
 import { TradeStrategyAnalysisFilterDto } from "../../../data/TradeStrategyAnalysisFilterDto";
 import { TradingPlatform } from "../../../data/trading/TradingPlatform";
 import { adjustTradePremise } from "../../../utils/DataUtils";
-import { TrendDirectionColor } from "../../../utils/utils";
+import {
+  getRecentBusinessDate,
+  TrendDirectionColor,
+} from "../../../utils/utils";
 import TrendViewChart from "../TrendViewChart";
 import "./TrendViewChartWrapper.css";
 import moment = require("moment");
+import { SecurityType } from "../../../data/security/SecurityType";
 
 type Props = {
   security: SecurityLastInfo;
@@ -55,34 +63,14 @@ const TrendViewChartWrapper: React.FC<Props> = ({
       timeFrameMin: Interval.M1,
     };
 
+    fetchPremise(tradeStrategyAnalysisFilter);
+
     const tradePremiseSubscription = WebsocketService.getInstance()
       .on<TradePremise>(WSEvent.TRADE_PREMISE)
       .pipe(filter((premise) => premise.security.id === security?.id))
       .subscribe((newPremise) => {
         adjustTradePremise(newPremise);
-        const { trends, srLevels } = newPremise?.analysis;
-        setTrend(
-          filterTrendPoints(
-            trends?.find((value) => value.interval === Interval.M5)
-          )
-        );
-        setLevels(srLevels);
-        if (security) {
-          const intervals = new Set(
-            ClassCode.SPBFUT === security.classCode
-              ? [Interval.DAY, Interval.M60, Interval.M5]
-              : [Interval.MONTH, Interval.DAY, Interval.M60]
-          );
-          setTrends(trends.filter(({ interval }) => intervals.has(interval)));
-        }
-
-        const signals: Signal[] = [];
-        newPremise.marketState.marketStateIntervals.forEach((o) =>
-          o.items.forEach((item) =>
-            item.signals.forEach((s) => signals.push(s))
-          )
-        );
-        dispatch(addNewSignals(signals));
+        onTradePremiseRecieved(newPremise);
       });
 
     const wsStatusSub = WebsocketService.getInstance()
@@ -108,19 +96,75 @@ const TrendViewChartWrapper: React.FC<Props> = ({
     };
   }, [security?.id]);
 
-  const filterTrendPoints = (trend: Trend): Trend => {
-    if (Interval.M3 !== trend.interval && Interval.M5 !== trend.interval)
-      return trend;
+  const fetchPremise = (
+    tradeStrategyAnalysisFilter: TradeStrategyAnalysisFilterDto
+  ) => {
+    analysisRestApi
+      .getTradePremise({
+        ...tradeStrategyAnalysisFilter,
+        timestamp: getRecentBusinessDate(
+          moment().hours(0).minutes(0).seconds(0).add(1, "days").toDate()
+        ),
+      })
+      .then(onTradePremiseRecieved)
+      .catch((reason) => {
+        console.error(reason);
+        fetchPremise(tradeStrategyAnalysisFilter);
+      });
+  };
 
-    const newTrend = { ...trend };
-    const date =
-      newTrend.swingHighsLows[
-        newTrend.swingHighsLows.length - 1
-      ].dateTime.getDate();
-    newTrend.swingHighsLows = newTrend.swingHighsLows.filter(
-      ({ dateTime }) => date === dateTime.getDate()
+  const onTradePremiseRecieved = (newPremise: TradePremise) => {
+    const { trends, srLevels } = newPremise?.analysis;
+    const filterInterval =
+      security.type === SecurityType.FUTURE ? Interval.M5 : Interval.M60;
+    setTrend(
+      filterTrendPoints(
+        trends?.find(({ interval }) => interval === filterInterval)
+      )
     );
-    return newTrend;
+    setLevels(srLevels);
+    if (security) {
+      const intervals = new Set(
+        security.type === SecurityType.FUTURE
+          ? [Interval.DAY, Interval.M60, Interval.M5]
+          : [Interval.MONTH, Interval.DAY, Interval.M60]
+      );
+      setTrends(trends.filter(({ interval }) => intervals.has(interval)));
+    }
+
+    const signals: Signal[] = [];
+    newPremise.marketState.marketStateIntervals.forEach((o) =>
+      o.items.forEach((item) => item.signals.forEach((s) => signals.push(s)))
+    );
+    dispatch(addNewSignals(signals));
+  };
+
+  const filterTrendPoints = (trend: Trend): Trend => {
+    if (Interval.M3 === trend.interval || Interval.M5 === trend.interval) {
+      const newTrend = { ...trend };
+      const date =
+        newTrend.swingHighsLows[
+          newTrend.swingHighsLows.length - 1
+        ].dateTime.getDate();
+      newTrend.swingHighsLows = newTrend.swingHighsLows.filter(
+        ({ dateTime }) => date === dateTime.getDate()
+      );
+      return newTrend;
+    } else if (Interval.M60 === trend.interval) {
+      const newTrend = { ...trend };
+      const time = moment(
+        newTrend.swingHighsLows[newTrend.swingHighsLows.length - 1].dateTime
+      )
+        .subtract(14, "days")
+        .toDate()
+        .getTime();
+      newTrend.swingHighsLows = newTrend.swingHighsLows.filter(
+        ({ dateTime }) => dateTime.getTime() > time
+      );
+      return newTrend;
+    }
+
+    return trend;
   };
 
   const informServerAboutRequiredData = (

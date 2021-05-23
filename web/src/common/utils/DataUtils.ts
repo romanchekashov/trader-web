@@ -8,7 +8,10 @@ import { SecurityShareEvent } from "../data/news/SecurityShareEvent";
 import { MoexOpenInterest } from "../data/open-interest/MoexOpenInterest";
 import { Order } from "../data/Order";
 import { Security } from "../data/security/Security";
+import { SecurityLastInfo } from "../data/security/SecurityLastInfo";
 import { SecurityShare } from "../data/security/SecurityShare";
+import { SecurityType } from "../data/security/SecurityType";
+import { SecurityTypeWrapper } from "../data/security/SecurityTypeWrapper";
 import { StopOrder } from "../data/StopOrder";
 import { TradePremise } from "../data/strategy/TradePremise";
 import { Trade } from "../data/Trade";
@@ -206,4 +209,26 @@ export const adjustCandles = (candles: Candle[]): any => {
   }
 
   return candles;
+};
+
+export const filterSecurities = (
+  securities: SecurityLastInfo[],
+  secType: SecurityTypeWrapper
+): SecurityLastInfo[] => {
+  return securities.filter((value) => {
+    switch (secType) {
+      case SecurityTypeWrapper.FUTURE:
+        return value.type === SecurityType.FUTURE;
+      case SecurityTypeWrapper.STOCK:
+        return value.type === SecurityType.STOCK;
+      case SecurityTypeWrapper.STOCK_1:
+        return value.type === SecurityType.STOCK && value.shareSection === 1;
+      case SecurityTypeWrapper.STOCK_2:
+        return value.type === SecurityType.STOCK && value.shareSection === 2;
+      case SecurityTypeWrapper.STOCK_3:
+        return value.type === SecurityType.STOCK && value.shareSection === 3;
+      case SecurityTypeWrapper.CURRENCY:
+        return value.type === SecurityType.CURRENCY;
+    }
+  });
 };

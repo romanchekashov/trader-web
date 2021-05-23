@@ -61,7 +61,7 @@ const TrendViewChart: React.FC<Props> = ({
   const updateData = (trend: Trend, levels: SRLevel[]): any => {
     const color = getColor(trend.direction);
     const dateTimeFormat =
-      intervalDateTimeFormat[trend.interval] || "DD.MM/HH:mm";
+      intervalDateTimeFormat[trend.interval] || "DD.MM / HH:mm";
     const datasets = [];
 
     datasets.push({

@@ -1,12 +1,13 @@
 import { Dropdown } from "primereact/dropdown";
 import * as React from "react";
-import { useEffect } from "react";
 import { BrokerId } from "../../../../common/data/BrokerId";
-import { SecurityType } from "../../../../common/data/security/SecurityType";
 import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
 import { TradingPlatform } from "../../../../common/data/trading/TradingPlatform";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { selectSecurities, selectSecurityType } from "../../securitiesSlice";
+import {
+  selectSecurities,
+  selectSecurityTypeWrapper,
+} from "../../securitiesSlice";
 import "./SecuritiesFilter.css";
 
 type Props = {
@@ -15,8 +16,6 @@ type Props = {
   onBrokerId: (brokerId: BrokerId) => void;
   platform: TradingPlatform;
   // onPlatformChange: (platform: TradingPlatform) => void
-  secType: SecurityTypeWrapper;
-  changeSecType: (secType: SecurityTypeWrapper) => void;
 };
 
 export const SecuritiesFilter: React.FC<Props> = ({
@@ -24,11 +23,9 @@ export const SecuritiesFilter: React.FC<Props> = ({
   brokerId,
   onBrokerId,
   platform,
-  secType,
-  changeSecType,
 }) => {
   const dispatch = useAppDispatch();
-  const { selectedSecurityType } = useAppSelector(selectSecurities);
+  const { selectedSecurityTypeWrapper } = useAppSelector(selectSecurities);
 
   const types = [
     { label: "ALL", value: null },
@@ -48,19 +45,6 @@ export const SecuritiesFilter: React.FC<Props> = ({
       ? [TradingPlatform.QUIK]
       : [TradingPlatform.API]
   ).map((val) => ({ label: val, value: val }));
-
-  const updateSecType = (e: any): void => {
-    if (e.value === SecurityTypeWrapper.FUTURE) {
-      dispatch(selectSecurityType(SecurityType.FUTURE));
-    } else if (e.value === SecurityTypeWrapper.CURRENCY) {
-      dispatch(selectSecurityType(SecurityType.CURRENCY));
-    } else {
-      dispatch(selectSecurityType(SecurityType.STOCK));
-    }
-    changeSecType(e.value);
-  };
-
-  useEffect(() => {}, []);
 
   return (
     <div className="securities-filter-">
@@ -82,7 +66,11 @@ export const SecuritiesFilter: React.FC<Props> = ({
           }}
           placeholder="Select a platform"
         />
-        <Dropdown value={secType} options={types} onChange={updateSecType} />
+        <Dropdown
+          value={selectedSecurityTypeWrapper}
+          options={types}
+          onChange={(e) => dispatch(selectSecurityTypeWrapper(e.value))}
+        />
         {lastTimeUpdate}
       </div>
     </div>
