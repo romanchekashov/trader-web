@@ -101,8 +101,6 @@ const AnalysisPage: React.FC<Props> = ({}) => {
       <div className="p-col-12">
         {!security ? (
           <div>Select security</div>
-        ) : Market.SPB === security.market ? (
-          <AnalysisTinkoff security={security} chartNumber={chartNumber} />
         ) : ClassCode.SPBFUT === security.classCode ? (
           <AnalysisFutures security={security} chartNumber={chartNumber} />
         ) : (

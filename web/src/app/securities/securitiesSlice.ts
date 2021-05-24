@@ -4,9 +4,7 @@ import {
   createSlice,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import analysisRestApi from "../../common/api/rest/analysisRestApi";
 import tinkoffInvestRestApi from "../../common/api/rest/tinkoffInvestRestApi";
-import traderRestApi from "../../common/api/rest/traderRestApi";
 import { BrokerId } from "../../common/data/BrokerId";
 import { SecurityCurrency } from "../../common/data/security/SecurityCurrency";
 import { SecurityFuture } from "../../common/data/security/SecurityFuture";
@@ -18,6 +16,7 @@ import { SEC_MAP } from "../../common/utils/Cache";
 import { LoadingState } from "../LoadingState";
 import { handleThunkError } from "../reduxUtils";
 import { RootState } from "../store";
+import securitiesApi from "./securitiesApi";
 
 export interface SecuritiesState {
   security?: SecurityLastInfo;
@@ -49,22 +48,22 @@ const initialState: SecuritiesState = {
 export const loadLastSecurities = createAsyncThunk<SecurityLastInfo[]>(
   "securities/loadLastSecurities",
   async (_, thunkAPI) =>
-    await handleThunkError(thunkAPI, analysisRestApi.getLastSecurities())
+    await handleThunkError(thunkAPI, securitiesApi.getLastSecurities())
 );
 export const loadShares = createAsyncThunk<SecurityShare[]>(
   "securities/loadShares",
   async (_, thunkAPI) =>
-    await handleThunkError(thunkAPI, traderRestApi.getAllSecurityShares())
+    await handleThunkError(thunkAPI, securitiesApi.getAllSecurityShares())
 );
 export const loadFutures = createAsyncThunk<SecurityFuture[]>(
   "securities/loadFutures",
   async (_, thunkAPI) =>
-    await handleThunkError(thunkAPI, traderRestApi.getAllSecurityFutures())
+    await handleThunkError(thunkAPI, securitiesApi.getAllSecurityFutures())
 );
 export const loadCurrencies = createAsyncThunk<SecurityCurrency[]>(
   "securities/loadCurrencies",
   async (_, thunkAPI) =>
-    await handleThunkError(thunkAPI, traderRestApi.getAllSecurityCurrencies())
+    await handleThunkError(thunkAPI, securitiesApi.getAllSecurityCurrencies())
 );
 // tinkoff
 export const loadLastSecuritiesTinkoff = createAsyncThunk<SecurityLastInfo[]>(

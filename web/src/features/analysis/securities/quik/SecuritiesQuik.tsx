@@ -9,13 +9,13 @@ import {
 import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
 import { Signal } from "../../../../common/data/Signal";
 import { PatternName } from "../../../../common/components/alerts/data/PatternName";
-import { getLastSecurities } from "../../../../common/api/rest/analysisRestApi";
 import "./SecuritiesQuik.css";
 import { SecurityType } from "../../../../common/data/security/SecurityType";
 import { DemandSupply } from "../../../../common/components/demand-supply/DemandSupply";
 import moment = require("moment");
 import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
 import { formatNumber } from "../../../../common/utils/utils";
+import securitiesApi from "../../../../app/securities/securitiesApi";
 
 type Props = {
   secType: SecurityTypeWrapper;
@@ -85,7 +85,7 @@ export const SecuritiesQuik: React.FC<Props> = ({
   ];
 
   useEffect(() => {
-    getLastSecurities().then((securities) => {
+    securitiesApi.getLastSecurities().then((securities) => {
       if (secType && securities?.length > 0) {
         setSecurities(filterSecurities(securities, secType));
       } else {

@@ -5,7 +5,7 @@ import { Panel } from "primereact/panel";
 import * as React from "react";
 import { memo, useEffect, useState } from "react";
 import depositsApi from "../../../app/deposits/depositsApi";
-import { getLastSecurities } from "../../../common/api/rest/analysisRestApi";
+import securitiesApi from "../../../app/securities/securitiesApi";
 import { getSecurityHistoryDates } from "../../../common/api/rest/botControlRestApi";
 import { HistoryDateDto } from "../../../common/data/bot/HistoryDateDto";
 import { MarketBotFilterDataDto } from "../../../common/data/bot/MarketBotFilterDataDto";
@@ -232,9 +232,9 @@ const BotControlFilter: React.FC<Props> = ({
       ).security;
     setSecCode(newSecCode);
     setSecId(security?.id);
-    getLastSecurities(security?.id).then((value) =>
-      setSelectedSecurity(value[0])
-    );
+    securitiesApi
+      .getLastSecurities(security?.id)
+      .then((value) => setSelectedSecurity(value[0]));
     updateHistoryDates(newSecCode, minInterval);
   };
 

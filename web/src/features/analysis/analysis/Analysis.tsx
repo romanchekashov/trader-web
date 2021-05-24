@@ -153,7 +153,9 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
       });
 
     const tradePremiseSubscription = WebsocketService.getInstance()
-      .on<TradePremise>(WSEvent.TRADE_PREMISE)
+      .on<TradePremise>(
+        security?.quik ? WSEvent.TRADE_PREMISE : WSEvent.TRADE_PREMISE_TINKOFF
+      )
       .pipe(filter((premise) => premise.security.id === security?.id))
       .subscribe((newPremise) => {
         adjustTradePremise(newPremise);
@@ -161,11 +163,13 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
       });
 
     const ordersSetupSubscription = WebsocketService.getInstance()
-      .on<Order[]>(WSEvent.ORDERS)
+      .on<Order[]>(security?.quik ? WSEvent.ORDERS : WSEvent.ORDERS_TINKOFF)
       .subscribe(setOrders);
 
     const activeTradeSubscription = WebsocketService.getInstance()
-      .on<ActiveTrade[]>(WSEvent.ACTIVE_TRADES)
+      .on<ActiveTrade[]>(
+        security?.quik ? WSEvent.ACTIVE_TRADES : WSEvent.ACTIVE_TRADES_TINKOFF
+      )
       .subscribe((activeTrades) => {
         if (securityLastInfo) {
           const activeTrade = activeTrades.find(

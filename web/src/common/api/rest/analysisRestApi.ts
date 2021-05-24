@@ -7,15 +7,12 @@ import { FilterDto } from "../../data/FilterDto";
 import { Interval } from "../../data/Interval";
 import { SecurityShareEvent } from "../../data/news/SecurityShareEvent";
 import { MoexOpenInterest } from "../../data/open-interest/MoexOpenInterest";
-import { SecurityAnalysis } from "../../data/security/SecurityAnalysis";
-import { SecurityLastInfo } from "../../data/security/SecurityLastInfo";
 import { TradePremise } from "../../data/strategy/TradePremise";
 import { Trend } from "../../data/strategy/Trend";
 import { TradeStrategyAnalysisFilterDto } from "../../data/TradeStrategyAnalysisFilterDto";
 import {
   adjustMarketState,
   adjustMoexOpenInterestList,
-  adjustSecurities,
   adjustSecurityShareEvents,
   adjustSwingStateDto,
   adjustTradePremise,
@@ -33,8 +30,6 @@ export default {
   getMoexOpenInterests,
   getMoexApiOpenInterestList,
   getSecurityShareEvents,
-  getSecurities,
-  getLastSecurities,
 };
 
 export function getTradePremise(
@@ -153,17 +148,5 @@ export function getSecurityShareEvents(
     .then((response) =>
       handleResponse(response).then(adjustSecurityShareEvents)
     )
-    .catch(handleError);
-}
-
-export function getSecurities(): Promise<SecurityAnalysis[]> {
-  return fetch(`${baseUrl}securities`)
-    .then((response) => handleResponse(response).then(adjustSecurities))
-    .catch(handleError);
-}
-
-export function getLastSecurities(secId?: number): Promise<SecurityLastInfo[]> {
-  return fetch(`${baseUrl}last-securities` + (secId ? `?secId=${secId}` : ""))
-    .then((response) => handleResponse(response).then(adjustSecurities))
     .catch(handleError);
 }

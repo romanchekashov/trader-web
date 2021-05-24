@@ -52,7 +52,7 @@ const TrendViewCharts: React.FC<Props> = ({
   useEffect(() => {
     if (!premise) return;
 
-    console.log("TrendViewCharts: ", premise.security.code);
+    console.log("TrendViewCharts: ", security?.code);
 
     const { analysis } = premise;
 
@@ -77,7 +77,7 @@ const TrendViewCharts: React.FC<Props> = ({
         analysis?.trends?.find((value) => value.interval === timeFrame3)
       )
     );
-  }, [premise]);
+  }, [premise, security?.id]);
 
   const filterTrendPoints = (trend: Trend): Trend => {
     if (Interval.M3 !== trend.interval && Interval.M5 !== trend.interval)

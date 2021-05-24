@@ -1,15 +1,10 @@
+import securitiesApi from "../../app/securities/securitiesApi";
 import { ClassCode } from "../data/ClassCode";
-import {
-  getAllSecurityCurrencies,
-  getAllSecurityFutures,
-  getAllSecurityShares,
-} from "../api/rest/traderRestApi";
+import { Market } from "../data/Market";
 import { Security } from "../data/security/Security";
-import { sortAlphabetically } from "./utils";
 import { SecurityLastInfo } from "../data/security/SecurityLastInfo";
 import { SecurityType } from "../data/security/SecurityType";
-import { Market } from "../data/Market";
-import { getLastSecurities } from "../api/rest/analysisRestApi";
+import { sortAlphabetically } from "./utils";
 
 const securityMap = {};
 let futures = [];
@@ -19,7 +14,8 @@ let lastSecurities: SecurityLastInfo[] = [];
 export const SEC_MAP: Map<number, Security> = new Map();
 
 const fetchSecurityFutures = () => {
-  getAllSecurityFutures()
+  securitiesApi
+    .getAllSecurityFutures()
     .then((securities) => {
       futures = sortAlphabetically(securities, "secCode");
       for (const security of securities) {
@@ -29,7 +25,8 @@ const fetchSecurityFutures = () => {
     .catch(fetchSecurityFutures);
 };
 const fetchSecurityShares = () => {
-  getAllSecurityShares()
+  securitiesApi
+    .getAllSecurityShares()
     .then((securities) => {
       shares = sortAlphabetically(securities, "secCode");
       for (const security of securities) {
@@ -39,7 +36,8 @@ const fetchSecurityShares = () => {
     .catch(fetchSecurityShares);
 };
 const fetchSecurityCurrencies = () => {
-  getAllSecurityCurrencies()
+  securitiesApi
+    .getAllSecurityCurrencies()
     .then((securities) => {
       currencies = sortAlphabetically(securities, "secCode");
       for (const security of securities) {
@@ -53,7 +51,8 @@ const fetchSecurityCurrencies = () => {
 // fetchSecurityCurrencies();
 
 const fetchLastSecurities = () => {
-  getLastSecurities()
+  securitiesApi
+    .getLastSecurities()
     .then((securities) => {
       lastSecurities = sortAlphabetically(securities, "secCode");
       for (const security of securities) {
