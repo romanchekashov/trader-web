@@ -109,14 +109,6 @@ const Alerts: React.FC<Props> = ({
     }
   };
 
-  if (!filter) {
-    return <>Filter for alerts is not set.</>;
-  }
-
-  if (filter && signalsLoadingError) {
-    return <div style={{ color: "red" }}>{signalsLoadingError}</div>;
-  }
-
   const getSecuritiesByClassCode = (classCode: ClassCode): Security[] => {
     switch (classCode) {
       case ClassCode.SPBFUT:
@@ -235,6 +227,14 @@ const Alerts: React.FC<Props> = ({
       </div>
     );
   };
+
+  if (!filter) {
+    return <>Filter for alerts is not set.</>;
+  }
+
+  // if (filter && signalsLoadingError) {
+  //   return <div style={{ color: "red" }}>{signalsLoadingError}</div>;
+  // }
 
   return (
     <div className="p-grid alerts" style={{ height: alertsHeight }}>

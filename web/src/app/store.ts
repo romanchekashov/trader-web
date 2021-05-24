@@ -62,6 +62,7 @@ const store = configureStore({
         "stops/deleteStopOrdersBySecId/pending",
         "possibleTrades/tradePossibleTrade/pending",
         "possibleTrades/tradePossibleTrade/rejected",
+        "possibleTrades/loadPossibleTradesStat/rejected",
         "activeTrades/deleteActiveTrades/fulfilled",
         "activeTrades/deleteActiveTrades/pending",
         "activeTrades/setSelectedActiveTrade",

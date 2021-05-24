@@ -26,8 +26,6 @@ export const TradingChartsSecurityPage: React.FC<
 
   useEffect(() => {
     document.getElementById("main-nav").style.display = "none";
-    // document.getElementById("control-panel").style.display = "none";
-    document.getElementById("stack").style.display = "none";
 
     securitiesApi.getLastSecurities(secId).then((securities) => {
       const security = securities.find((value) => value.id === secId);

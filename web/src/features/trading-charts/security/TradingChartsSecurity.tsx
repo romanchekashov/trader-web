@@ -26,6 +26,10 @@ import { SecurityLastInfoView } from "./info/SecurityLastInfoView";
 import moment = require("moment");
 import { News } from "../../../common/components/news/News";
 import MoexOpenInterestView from "../../analysis/analysis/moex-open-interest/MoexOpenInterestView";
+import Alerts from "../../../common/components/alerts/Alerts";
+import { Signal } from "../../../common/data/Signal";
+import { useAppDispatch } from "../../../app/hooks";
+import { addNewSignals } from "../../../app/notifications/notificationsSlice";
 
 type Props = {
   securityLastInfo: SecurityLastInfo;
@@ -38,6 +42,8 @@ export const TradingChartsSecurity: React.FC<Props> = ({
   start,
   layout,
 }) => {
+  const dispatch = useAppDispatch();
+
   const CHART_HEIGHT = 600;
   const [premise, setPremise] = useState<TradePremise>(null);
   const [orders, setOrders] = useState(null);
@@ -125,8 +131,15 @@ export const TradingChartsSecurity: React.FC<Props> = ({
       timeFrameMin,
       timestamp: before,
     })
-      .then((value) => {
-        setPremise(value);
+      .then((newPremise) => {
+        setPremise(newPremise);
+        const signals: Signal[] = [];
+        newPremise.marketState.marketStateIntervals.forEach((o) =>
+          o.items.forEach((item) =>
+            item.signals.forEach((s) => signals.push(s))
+          )
+        );
+        dispatch(addNewSignals(signals));
       })
       .catch((reason) => {
         console.error(reason);
@@ -395,19 +408,18 @@ export const TradingChartsSecurity: React.FC<Props> = ({
             />
           ) : null}
           <div style={{ marginBottom: "5px" }}></div>
-          <Notifications
+          <Alerts
             filter={filterDto}
-            security={securityLastInfo}
-            onNotificationSelected={(n) => {
+            onAlertSelected={(n) => {
               console.log(n);
             }}
-            viewHeight={400}
+            alertsHeight={400}
           />
 
           {ClassCode.TQBR === securityLastInfo.classCode ? (
             <StockEventsBrief secCode={securityLastInfo.secCode} height={400} />
           ) : null}
-          <News secId={securityLastInfo.id} />
+          <News secId={securityLastInfo.id} height={450} />
         </div>
       )}
     </div>
