@@ -86,19 +86,21 @@ export const IntervalColor = {
   M30: "#212121",
 };
 
-const BLUE = "#01579b";
-const GREEN = "#33691e";
-const RED = "#b71c1c";
+export const Colors = {
+  GREEN: "#1F9D55",
+  RED: "#E3342F",
+  BLUE: "#0d47a1",
+};
 
 export const TrendDirectionColor = {
-  UP: GREEN,
-  DOWN: RED,
-  SIDE: BLUE, // "#3f51b5"
+  UP: Colors.GREEN,
+  DOWN: Colors.RED,
+  SIDE: Colors.BLUE, // "#3f51b5"
 };
 
 export const OperationTypeColor = {
-  BUY: GREEN,
-  SELL: RED,
+  BUY: Colors.GREEN,
+  SELL: Colors.RED,
 };
 
 export const getRecentBusinessDate = (date: Date): Date => {
@@ -131,12 +133,6 @@ export const ClassCodeToSecTypeMap = {
   [ClassCode.SPBFUT]: SecurityType.FUTURE,
   [ClassCode.TQBR]: SecurityType.STOCK,
   [ClassCode.CETS]: SecurityType.CURRENCY,
-};
-
-export const Colors = {
-  GREEN: "#1F9D55",
-  RED: "#E3342F",
-  BLUE: "#0d47a1",
 };
 
 export const LineTypeMap = {

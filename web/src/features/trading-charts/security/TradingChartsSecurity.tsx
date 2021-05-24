@@ -30,6 +30,7 @@ import Alerts from "../../../common/components/alerts/Alerts";
 import { Signal } from "../../../common/data/Signal";
 import { useAppDispatch } from "../../../app/hooks";
 import { addNewSignals } from "../../../app/notifications/notificationsSlice";
+import { SecurityType } from "../../../common/data/security/SecurityType";
 
 type Props = {
   securityLastInfo: SecurityLastInfo;
@@ -275,7 +276,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({
               <div className="p-col-6" ref={chart2Ref} style={{ padding: "0" }}>
                 <ChartWrapper
                   interval={timeFrame2}
-                  initialNumberOfCandles={500}
+                  initialNumberOfCandles={120}
                   start={start2}
                   onIntervalChanged={() => {}}
                   onStartChanged={() => {}}
@@ -292,7 +293,7 @@ export const TradingChartsSecurity: React.FC<Props> = ({
               <div className="p-col-6" ref={chart3Ref} style={{ padding: "0" }}>
                 <ChartWrapper
                   interval={timeFrame3}
-                  initialNumberOfCandles={500}
+                  initialNumberOfCandles={120}
                   start={start3}
                   onIntervalChanged={() => {}}
                   onStartChanged={() => {}}
