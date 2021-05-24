@@ -20,6 +20,7 @@ import { Security } from "../../data/security/Security";
 import { Signal } from "../../data/Signal";
 import {
   ClassCodeToSecTypeMap,
+  DATE_TIME_FORMAT,
   getRecentBusinessDate,
   Intervals,
   PrimeDropdownItem,
@@ -269,6 +270,7 @@ const Alerts: React.FC<Props> = ({
         <div className="alerts-head-start-date">
           <Calendar value={start} onChange={(e) => setStart(e.value as Date)} />
         </div>
+        <div>{moment(new Date()).format(DATE_TIME_FORMAT)}</div>
       </div>
       <div
         className="p-col-12 alerts-body"

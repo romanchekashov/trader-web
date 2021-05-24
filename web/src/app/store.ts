@@ -78,7 +78,7 @@ const store = configureStore({
         "notifications/loadSignals/fulfilled",
         "notifications/loadSignals/pending",
         "notifications/loadSignals/rejected",
-        "notifications.newSignals",
+        "notifications/setSignals",
         "securities/loadFutures/pending",
         "securities/loadCurrencies/pending",
         "securities/loadFutures/rejected",
