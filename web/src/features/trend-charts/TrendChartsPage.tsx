@@ -18,7 +18,7 @@ import { PrimeDropdownItem } from "../../common/utils/utils";
 import { loadFilterData } from "../analysis/AnalysisSlice";
 import "./TrendChartsPage.css";
 
-const DEFAULT_CHARTS_NUMBER = 12;
+const DEFAULT_CHARTS_NUMBER = 8;
 const intervals: PrimeDropdownItem<Interval>[] = [
   Interval.M1,
   Interval.M3,
@@ -103,7 +103,7 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
         return (
           <div
             key={sec.id}
-            className={`p-col-2 ${sec.id === security?.id ? "active" : ""}`}
+            className={`p-col-3 ${sec.id === security?.id ? "active" : ""}`}
             style={{ padding: 0 }}
           >
             <TrendViewChartWrapper
