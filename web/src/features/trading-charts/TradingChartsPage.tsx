@@ -11,7 +11,7 @@ import { TradePremise } from "../../common/data/strategy/TradePremise";
 import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
 import { Interval } from "../../common/data/Interval";
 import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
-import { adjustTradePremise } from "../../common/utils/DataUtils";
+import { adjustTradePremise, filterSecurities } from "../../common/utils/DataUtils";
 import { Order } from "../../common/data/Order";
 import { ActiveTrade } from "../../common/data/ActiveTrade";
 import { TradingChartsSecurities } from "./TradingChartsSecurities";
@@ -20,13 +20,40 @@ import { TrendsView } from "../../common/components/trend/TrendsView";
 import { TradeStrategyAnalysisFilterDto } from "../../common/data/TradeStrategyAnalysisFilterDto";
 import { Market } from "../../common/data/Market";
 import { BrokerId } from "../../common/data/BrokerId";
+import { PrimeDropdownItem } from "../../common/utils/utils";
+import { Paginator } from "primereact/paginator";
+import { Dropdown } from "primereact/dropdown";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { selectSecurities } from "../../app/securities/securitiesSlice";
+
+const intervals: PrimeDropdownItem<Interval>[] = [
+  Interval.M1,
+  Interval.M3,
+  Interval.M5,
+  Interval.M15,
+  Interval.M30,
+  Interval.M60,
+  Interval.H2,
+  Interval.DAY,
+  Interval.WEEK,
+  Interval.MONTH,
+].map((val) => ({ label: val, value: val }));
+const chartsNumbers: PrimeDropdownItem<number>[] = [4, 8].map((val) => ({ label: "" + val, value: val }));
 
 export const TradingChartsPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { securities, security, selectedSecurityTypeWrapper } =
+    useAppSelector(selectSecurities);
+
+    const [page, setPage] = useState<number>(0);
+    const [height, setHeight] = useState<number>(800);
+    const [interval, setInterval] = useState<Interval>(Interval.M1);
+    const [chartsNumber, setChartsNumber] = useState<number>(8);
+    
   const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null);
   const [filter, setFilter] = useState<MarketBotStartDto>(null);
   const [securityLastInfo, setSecurityLastInfo] =
     useState<SecurityLastInfo>(null);
-  const [securities, setSecurities] = useState<SecurityLastInfo[]>([]);
   const [premise, setPremise] = useState<TradePremise>(null);
   const [orders, setOrders] = useState(null);
   const [activeTrade, setActiveTrade] = useState(null);
@@ -58,15 +85,6 @@ export const TradingChartsPage: React.FC = () => {
         }
       });
 
-    const lastSecuritiesSubscription = WebsocketService.getInstance()
-      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-      .subscribe((securities) => {
-        for (const sec of securities) {
-          sec.lastTradeTime = new Date(sec.lastTradeTime);
-        }
-        setSecurities(securities);
-      });
-
     const tradePremiseSubscription = WebsocketService.getInstance()
       .on<TradePremise>(WSEvent.TRADE_PREMISE)
       .subscribe((newPremise) => {
@@ -96,7 +114,6 @@ export const TradingChartsPage: React.FC = () => {
     return function cleanup() {
       window.removeEventListener("resize", updateSize);
       wsStatusSub.unsubscribe();
-      lastSecuritiesSubscription.unsubscribe();
       tradePremiseSubscription.unsubscribe();
       ordersSetupSubscription.unsubscribe();
       activeTradeSubscription.unsubscribe();
@@ -104,6 +121,7 @@ export const TradingChartsPage: React.FC = () => {
   }, []);
 
   const updateSize = () => {
+    setHeight(window.innerHeight - 20 - 37);
     setChart1Width(
       chart1Ref.current ? chart1Ref.current.clientWidth : CHART_MIN_WIDTH
     );
@@ -157,13 +175,41 @@ export const TradingChartsPage: React.FC = () => {
     informServerAboutRequiredData(secLastInfo);
   };
 
+  const secs = filterSecurities(securities, selectedSecurityTypeWrapper);
+
+  const rightContent = (
+    <>
+    <Dropdown
+      value={interval}
+      options={intervals}
+      onChange={(e) => {
+        setInterval(e.value);
+      }}
+    />
+    <Dropdown
+      value={chartsNumber}
+      options={chartsNumbers}
+      onChange={(e) => {
+        setChartsNumber(e.value);
+      }}
+    />
+    </>
+  );
+
   return (
     <div className="p-grid sample-layout analysis">
       {/*<div className="p-col-12" style={{padding: 0}}>
                 <Filter filter={filterData} onStart={onStart}/>
             </div>*/}
-      <div className="p-col-12">
-        <TrendsView trends={premise ? premise.analysis.trends : []} />
+      <div className="p-col-12" style={{ padding: 0 }}>
+        <Paginator
+          first={page}
+          rows={chartsNumber}
+          totalRecords={secs.length}
+          onPageChange={(e) => setPage(e.first)}
+          style={{ padding: 0 }}
+          rightContent={rightContent}
+        ></Paginator>
       </div>
       <div className="p-col-12">
         <div className="p-grid">
