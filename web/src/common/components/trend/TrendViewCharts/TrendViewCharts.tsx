@@ -52,7 +52,7 @@ const TrendViewCharts: React.FC<Props> = ({
   useEffect(() => {
     if (!premise) return;
 
-    console.log("TrendViewCharts: ", security?.code);
+    // console.log("TrendViewCharts: ", security?.code);
 
     const { analysis } = premise;
 

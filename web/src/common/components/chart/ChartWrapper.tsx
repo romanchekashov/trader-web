@@ -1,5 +1,5 @@
 import * as React from "react";
-import { SubscriptionLike } from "rxjs";
+import { useState, useEffect } from "react";
 import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 import { getHistoryCandles } from "../../api/rest/historyRestApi";
 import { getCandles } from "../../api/rest/traderRestApi";
@@ -23,7 +23,6 @@ import { TrendWrapper } from "../../data/TrendWrapper";
 import { IntervalColor, StoreData } from "../../utils/utils";
 import { PatternResult } from "../alerts/data/PatternResult";
 import { CandleStickChartForDiscontinuousIntraDay } from "./CandleStickChartForDiscontinuousIntraDay";
-import "./ChartWrapper.css";
 import ChartWrapperHead from "./ChartWrapperHead/ChartWrapperHead";
 import { ChartDrawType } from "./data/ChartDrawType";
 import { ChartElementAppearance } from "./data/ChartElementAppearance";
@@ -31,8 +30,38 @@ import { ChartManageOrder } from "./data/ChartManageOrder";
 import { ChartTrendLine } from "./data/ChartTrendLine";
 import { ChartTrendLineType } from "./data/ChartTrendLineType";
 import moment = require("moment");
+import "./ChartWrapper.css";
 
 const _ = require("lodash");
+
+export const CHART_MIN_WIDTH = 200;
+
+const chartTrendLineDefaultAppearance: ChartElementAppearance = {
+  edgeFill: "#FFFFFF",
+  edgeStroke: "#000000",
+  edgeStrokeWidth: 1,
+  r: 6,
+  stroke: "#000000",
+  strokeDasharray: "Solid",
+  strokeOpacity: 1,
+  strokeWidth: 1,
+};
+
+const swingHighsLowsTimeFrameTradingIntervals = {
+  M1: [Interval.M3, Interval.M1],
+  M3: [Interval.M30, Interval.M3],
+  M5: [Interval.M60, Interval.M5],
+  M15: [Interval.H2, Interval.M15],
+  M30: [Interval.H4, Interval.M30],
+  M60: [Interval.DAY, Interval.M60],
+  H2: [Interval.DAY, Interval.H2],
+  H4: [Interval.WEEK, Interval.H4],
+  DAY: [Interval.WEEK, Interval.DAY],
+  WEEK: [Interval.MONTH, Interval.WEEK],
+  MONTH: [Interval.MONTH, Interval.WEEK],
+};
+
+let initialStateTrendLines: TrendLineDto[] = [];
 
 type Props = {
   interval: Interval;
@@ -57,199 +86,97 @@ type Props = {
   onManageOrder?: (manageOrder: ChartManageOrder) => void;
 };
 
-type States = {
-  candles: Candle[];
-  numberOfCandles: number;
-  nodata: boolean;
-  secCode: string;
-  innerInterval: Interval;
-  innerStart: Date;
-  enableTrendLine: boolean;
-  enableNewOrder: boolean;
-  needSave: boolean;
-  showSRLevels: boolean;
-  showSRZones: boolean;
-  storeData: StoreData<TrendLineDto[]>;
-  trendLines: TrendLineDto[];
-  trends_1: ChartTrendLine[];
-  startCalendarVisible: boolean;
-};
+export const ChartWrapper: React.FC<Props> = ({
+  interval,
+  onIntervalChanged,
+  onStartChanged,
+  onPremiseBeforeChanged,
+  width,
+  chartHeight,
+  start,
+  initialNumberOfCandles = 500,
+  security,
+  premise,
+  stops,
+  orders,
+  trades,
+  history,
+  trend,
+  showGrid,
+  activeTrade,
+  alert,
+  possibleTrade,
+  onManageOrder
+}) => {
 
-export const CHART_MIN_WIDTH = 200;
+  const [candles, setCandles] = useState<Candle[]>([]);
+  const [lastCandles, setLastCandles] = useState<Candle[]>([]);
+  const [nodata, setNodata] = useState<boolean>(false);
+  const [innerInterval, setInnerInterval] = useState<Interval>(interval);
+  const [innerStart, setInnerStart] = useState<Date>(start);
+  const [enableTrendLine, setEnableTrendLine] = useState<boolean>(false);
+  const [enableNewOrder, setEnableNewOrder] = useState<boolean>(false);
+  const [needSave, setNeedSave] = useState<boolean>(false);
+  const [storeData, setStoreData] = useState<StoreData<TrendLineDto[]>>();
+  const [trendLines, setTrendLines] = useState<TrendLineDto[]>([]);
+  const [trends_1, setTrends_1] = useState<ChartTrendLine[]>([]);
+  const [showSRLevels, setShowSRLevels] = useState<boolean>(true);
+  const [showSRZones, setShowSRZones] = useState<boolean>(true);
+  const [numberOfCandles, setNumberOfCandles] = useState<number>(initialNumberOfCandles);
+  const [startCalendarVisible, setStartCalendarVisible] = useState<boolean>(!!start);
 
-export class ChartWrapper extends React.Component<Props, States> {
-  private candlesSetupSubscription: SubscriptionLike = null;
-  private wsStatusSub: SubscriptionLike = null;
-  private fetchingCandles: boolean = false;
-  private initialStateTrendLines: TrendLineDto[] = [];
-  private chartTrendLineDefaultAppearance: ChartElementAppearance = {
-    edgeFill: "#FFFFFF",
-    edgeStroke: "#000000",
-    edgeStrokeWidth: 1,
-    r: 6,
-    stroke: "#000000",
-    strokeDasharray: "Solid",
-    strokeOpacity: 1,
-    strokeWidth: 1,
-  };
-  private wsCandleFilter: FilterDto;
+  useEffect(() => {
+    const wsCandleFilter = getWsCandleFilter(security, innerInterval);
 
-  constructor(props) {
-    super(props);
-    const { interval, initialNumberOfCandles, start } = props;
-
-    this.state = {
-      candles: [],
-      nodata: false,
-      secCode: null,
-      innerInterval: interval,
-      innerStart: start,
-      enableTrendLine: false,
-      enableNewOrder: false,
-      needSave: false,
-      storeData: null,
-      trendLines: [],
-      trends_1: [],
-      showSRLevels: true,
-      showSRZones: true,
-      numberOfCandles: initialNumberOfCandles || 500,
-      startCalendarVisible: !!start,
-    };
-  }
-
-  componentDidMount = () => {
-    console.log("ChartWrapper: componentDidMount", this.props);
-    // this.reinit();
-  };
-
-  componentWillUnmount = (): void => {
-    console.log("ChartWrapper: componentWillUnmount", this.props);
-    // this.cleanUp();
-  };
-
-  reinit = () => {
-    this.candlesSetupSubscription = WebsocketService.getInstance()
+    const candlesSetupSubscription = WebsocketService.getInstance()
       .on<Candle[]>(WSEvent.CANDLES)
-      .subscribe((lastCandles) => {
-        // console.log("lastCandles: ", lastCandles[0].interval)
-        const { innerInterval, candles, trendLines } = this.state;
-        if (
-          candles.length > 2 &&
-          lastCandles.length > 0 &&
-          innerInterval === lastCandles[0].interval
-        ) {
-          const candlesIndexMap = {};
-          let newCandles = null;
-          let needUpdateTrendLines = false;
-          candlesIndexMap[candles[candles.length - 2].timestamp.getTime()] =
-            candles.length - 2;
-          candlesIndexMap[candles[candles.length - 1].timestamp.getTime()] =
-            candles.length - 1;
+      .subscribe(setLastCandles);
 
-          for (const candle of lastCandles) {
-            candle.timestamp = new Date(candle.timestamp);
-            const index = candlesIndexMap[candle.timestamp.getTime()];
-            if (index) {
-              candles[index] = candle;
-            } else {
-              newCandles = candles.slice(1);
-              newCandles.push(candle);
-              needUpdateTrendLines = true;
-            }
-          }
-
-          newCandles = newCandles ? newCandles : [...candles];
-          // console.log('componentDidMount', lastCandles)
-
-          if (needUpdateTrendLines) {
-            this.setState({
-              candles: newCandles,
-              trends_1: this.mapTrendLinesFromPropsToState(
-                trendLines,
-                newCandles
-              ),
-            });
-          } else {
-            this.setState({ candles: newCandles });
-          }
-        }
-      });
-
-    this.wsStatusSub = WebsocketService.getInstance()
+    const wsStatusSub = WebsocketService.getInstance()
       .connectionStatus()
       .subscribe((isConnected) => {
         if (isConnected) {
-          this.requestCandles(this.props.security);
+          requestCandles(security);
         }
       });
 
-    setTimeout(() => {
-      const { numberOfCandles } = this.state;
-      this.onNumberOfCandlesUpdated(numberOfCandles);
-    }, 1000);
-  };
+    // setTimeout(() => {
+    //   onNumberOfCandlesUpdated(numberOfCandles);
+    // }, 1000);
 
-  cleanUp = () => {
-    if (this.candlesSetupSubscription)
-      this.candlesSetupSubscription.unsubscribe();
-    if (this.wsStatusSub) this.wsStatusSub.unsubscribe();
-    if (this.wsCandleFilter) {
+    return () => {
+      if (candlesSetupSubscription)
+        candlesSetupSubscription.unsubscribe();
+      if (wsStatusSub) wsStatusSub.unsubscribe();
       WebsocketService.getInstance().send<FilterDto>(
         WSEvent.REMOVE_CANDLES,
-        this.wsCandleFilter
+        wsCandleFilter
       );
     }
-  };
+  }, [security?.id, innerInterval]);
 
-  componentDidUpdate = (prevProps: Props) => {
-    const { security, interval, start } = this.props;
-    const { candles, innerInterval, innerStart, numberOfCandles } = this.state;
-    const isSecUpdated = !(
-      (security &&
-        prevProps.security &&
-        security.id === prevProps.security.id) ||
-      security == prevProps.security
-    );
+  useEffect(() => {
+    setInnerStart(start);
+  }, [start]);
 
-    if (security && !this.fetchingCandles) {
-      if (
-        !prevProps.security ||
-        candles.length === 0 ||
-        security.secCode !== prevProps.security.secCode
-      ) {
-        this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
-      }
-      if (
-        prevProps.security &&
-        security.lastTradePrice !== prevProps.security.lastTradePrice
-      ) {
-        this.updateLastCandle();
-      }
-    }
+  useEffect(() => {
+    setInnerInterval(interval);
+  }, [interval]);
 
-    if (interval !== innerInterval) {
-      this.setState({ innerInterval: interval });
-    }
+  useEffect(() => {
+    fetchTrendLines(interval);
+  }, [security?.id, interval]);
 
-    if (start !== innerStart) {
-      this.setState({ innerStart: start });
-    }
+  useEffect(() => {
+    fetchCandles(security, innerInterval, innerStart, numberOfCandles);
+  }, [security?.id, innerInterval, innerStart, numberOfCandles]);
 
-    if (isSecUpdated) {
-      this.fetchTrendLines(interval);
-      this.cleanUp();
-      this.reinit();
-    }
-  };
-
-  getNewCandles = (
+  const getNewCandles = (
     security: SecurityLastInfo,
     interval: Interval,
     start: Date,
     numberOfCandles: number
   ): Promise<Candle[]> => {
-    const { history } = this.props;
-    const { startCalendarVisible } = this.state;
 
     if (history) {
       return getHistoryCandles(
@@ -273,58 +200,47 @@ export class ChartWrapper extends React.Component<Props, States> {
     }
   };
 
-  updateCandles = (candles: Candle[], security: SecurityLastInfo) => {
-    // console.log('updateCandles', candles)
-    if (candles && candles.length <= 1) {
-      this.setState({
-        candles: [],
-        nodata: true,
-      });
-    } else {
-      const { trendLines } = this.state;
+  const updateCandles = (candles: Candle[], security: SecurityLastInfo) => {
+    // console.log('updateCandles', candles[0].symbol, candles[0].interval, candles.length);
 
-      this.setState({
-        candles,
-        nodata: false,
-        trends_1: this.mapTrendLinesFromPropsToState(trendLines, candles),
-      });
-      this.requestCandles(security);
+    if (candles && candles.length <= 1) {
+      setCandles([]);
+      setNodata(true);
+    } else {
+      setCandles(candles);
+      setNodata(false);
+      setTrends_1(mapTrendLinesFromPropsToState(trendLines, candles));
+      requestCandles(security);
     }
   };
 
-  fetchCandles = (
+  const fetchCandles = (
     security: SecurityLastInfo,
     interval: Interval,
     start: Date,
     numberOfCandles: number
   ) => {
-    if (security && !this.fetchingCandles) {
-      let setIntervalIdForFetchCandles: NodeJS.Timeout = null;
-      this.fetchingCandles = true;
-      this.setState({
-        candles: [],
-      });
+    if (!security) return;
 
-      this.getNewCandles(security, interval, start, numberOfCandles)
-        .then((data) => {
-          this.updateCandles(
-            data.map((c) => {
-              c.timestamp = new Date(c.timestamp);
-              return c;
-            }),
-            security
-          );
-          this.fetchingCandles = false;
-        })
-        .catch((reason) => {
-          this.fetchingCandles = false;
-          this.fetchCandles(security, interval, start, numberOfCandles);
-        });
-    }
+    setCandles([]);
+    setLastCandles([]);
+
+    getNewCandles(security, interval, start, numberOfCandles)
+      .then((data) => {
+        updateCandles(
+          data.map((c) => {
+            c.timestamp = new Date(c.timestamp);
+            return c;
+          }),
+          security
+        );
+      })
+      .catch((reason) => {
+        fetchCandles(security, interval, start, numberOfCandles);
+      });
   };
 
-  fetchTrendLines = (interval: Interval): void => {
-    const { security } = this.props;
+  const fetchTrendLines = (interval: Interval): void => {
     if (security) {
       getTrendLines({
         brokerId:
@@ -338,39 +254,34 @@ export class ChartWrapper extends React.Component<Props, States> {
         secId: security.id,
         interval,
       })
-        .then(this.setTrendLinesFromServer)
+        .then(setTrendLinesFromServer)
         .catch((e) => console.error(e));
     }
   };
 
-  setTrendLinesFromServer = (trendLinesFromServer: TrendLineDto[]): void => {
-    const { candles, trendLines } = this.state;
-
+  const setTrendLinesFromServer = (trendLinesFromServer: TrendLineDto[]): void => {
     if (trendLines.length !== trendLinesFromServer.length) {
       for (const t of trendLinesFromServer) {
         t.startTimestamp = new Date(t.startTimestamp);
         t.endTimestamp = new Date(t.endTimestamp);
       }
 
-      this.initialStateTrendLines = trendLinesFromServer;
-      this.setState({
-        trendLines: trendLinesFromServer,
-        trends_1: this.mapTrendLinesFromPropsToState(
-          trendLinesFromServer,
-          candles
-        ),
-      });
+      initialStateTrendLines = trendLinesFromServer;
+      setTrendLines(trendLinesFromServer);
+      setTrends_1(mapTrendLinesFromPropsToState(
+        trendLinesFromServer,
+        candles
+      ));
     }
   };
 
-  mapTrendLinesFromPropsToState = (
+  const mapTrendLinesFromPropsToState = (
     trendLines: TrendLineDto[],
     candles: Candle[]
   ): ChartTrendLine[] => {
-    const { innerInterval } = this.state;
-    this.chartTrendLineDefaultAppearance.stroke =
+    chartTrendLineDefaultAppearance.stroke =
       IntervalColor[innerInterval] || "#000000";
-    this.chartTrendLineDefaultAppearance.edgeStroke =
+    chartTrendLineDefaultAppearance.edgeStroke =
       IntervalColor[innerInterval] || "#000000";
 
     const newTrends: ChartTrendLine[] = [];
@@ -388,7 +299,7 @@ export class ChartWrapper extends React.Component<Props, States> {
           end: [endIndex, t.end],
           selected: false,
           type: ChartTrendLineType.RAY,
-          appearance: this.chartTrendLineDefaultAppearance,
+          appearance: chartTrendLineDefaultAppearance,
           id: t.id,
         });
       }
@@ -396,48 +307,30 @@ export class ChartWrapper extends React.Component<Props, States> {
     return newTrends;
   };
 
-  updateLastCandle = () => {
-    const { security } = this.props;
-    const { candles } = this.state;
+  const getWsCandleFilter = (security, innerInterval): FilterDto => ({
+    brokerId:
+      security?.market === Market.SPB
+        ? BrokerId.TINKOFF_INVEST
+        : BrokerId.ALFA_DIRECT,
+    tradingPlatform:
+      security?.market === Market.SPB
+        ? TradingPlatform.API
+        : TradingPlatform.QUIK,
+    secId: security?.id,
+    interval: innerInterval,
+    numberOfCandles: 2,
+  });
 
-    const lastCandle = candles[candles.length - 1];
-    if (lastCandle) {
-      if (security.lastTradePrice > lastCandle.high) {
-        lastCandle.high = security.lastTradePrice;
-      } else if (security.lastTradePrice < lastCandle.low) {
-        lastCandle.low = security.lastTradePrice;
-      }
-      lastCandle.close = security.lastTradePrice;
-      lastCandle.volume += security.lastTradeQuantity;
-      this.setState({ candles: [...candles], nodata: false });
-    }
-  };
-
-  requestCandles = (security: SecurityLastInfo): void => {
-    const { innerInterval } = this.state;
-
+  const requestCandles = (security: SecurityLastInfo): void => {
     if (security && innerInterval) {
-      this.wsCandleFilter = {
-        brokerId:
-          security.market === Market.SPB
-            ? BrokerId.TINKOFF_INVEST
-            : BrokerId.ALFA_DIRECT,
-        tradingPlatform:
-          security.market === Market.SPB
-            ? TradingPlatform.API
-            : TradingPlatform.QUIK,
-        secId: security.id,
-        interval: innerInterval,
-        numberOfCandles: 2,
-      };
       WebsocketService.getInstance().send<FilterDto>(
         WSEvent.GET_CANDLES,
-        this.wsCandleFilter
+        getWsCandleFilter(security, innerInterval)
       );
     }
   };
 
-  getHighTimeFrameSRLevels = () => {
+  const getHighTimeFrameSRLevels = () => {
     // const {premise} = this.props;
     //
     // if (premise && premise.analysis.htSRLevels) {
@@ -451,26 +344,11 @@ export class ChartWrapper extends React.Component<Props, States> {
     return [];
   };
 
-  private swingHighsLowsTimeFrameTradingIntervals = {
-    M1: [Interval.M3, Interval.M1],
-    M3: [Interval.M30, Interval.M3],
-    M5: [Interval.M60, Interval.M5],
-    M15: [Interval.H2, Interval.M15],
-    M30: [Interval.H4, Interval.M30],
-    M60: [Interval.DAY, Interval.M60],
-    H2: [Interval.DAY, Interval.H2],
-    H4: [Interval.WEEK, Interval.H4],
-    DAY: [Interval.WEEK, Interval.DAY],
-    WEEK: [Interval.MONTH, Interval.WEEK],
-    MONTH: [Interval.MONTH, Interval.WEEK],
-  };
-
-  getSwingHighsLowsMap = (): TrendWrapper[] => {
-    const { premise, interval } = this.props;
+  const getSwingHighsLowsMap = (): TrendWrapper[] => {
 
     if (interval && premise && premise.analysis.trends) {
       const intervals: Interval[] =
-        this.swingHighsLowsTimeFrameTradingIntervals[interval];
+        swingHighsLowsTimeFrameTradingIntervals[interval];
       const trendWrappers = premise.analysis.trends
         .filter((trend) => intervals.indexOf(trend.interval) !== -1)
         .map((trend) => ({
@@ -511,9 +389,7 @@ export class ChartWrapper extends React.Component<Props, States> {
     return null;
   };
 
-  getCandlePatternsUp = () => {
-    const { alert } = this.props;
-
+  const getCandlePatternsUp = () => {
     let map = null;
     if (alert && alert.possibleFutureDirectionUp) {
       map = {};
@@ -523,9 +399,7 @@ export class ChartWrapper extends React.Component<Props, States> {
     return map;
   };
 
-  getCandlePatternsDown = () => {
-    const { alert } = this.props;
-
+  const getCandlePatternsDown = () => {
     let map = null;
     if (alert && !alert.possibleFutureDirectionUp) {
       map = {};
@@ -536,69 +410,57 @@ export class ChartWrapper extends React.Component<Props, States> {
     return map;
   };
 
-  onIntervalUpdated = (e: any) => {
+  const onIntervalUpdated = (e: any) => {
     const innerInterval: Interval = e.value;
-    this.fetchTrendLines(innerInterval);
-    this.setState({ innerInterval });
-
-    const { security, onIntervalChanged } = this.props;
-    const { innerStart, numberOfCandles } = this.state;
-
+    setInnerInterval(innerInterval);
+    fetchTrendLines(innerInterval);
     onIntervalChanged(innerInterval);
-    this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
+    fetchCandles(security, innerInterval, innerStart, numberOfCandles);
   };
 
-  onStartUpdated = (innerStart: Date) => {
-    this.setState({ innerStart });
-
-    const { security, onStartChanged } = this.props;
-    const { innerInterval, numberOfCandles } = this.state;
-
+  const onStartUpdated = (innerStart: Date) => {
+    setInnerStart(innerStart);
     onStartChanged(innerStart);
-    this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
+    fetchCandles(security, innerInterval, innerStart, numberOfCandles);
   };
 
-  onNumberOfCandlesUpdated = (numberOfCandles: number) => {
-    const { security } = this.props;
-    const { innerInterval, innerStart } = this.state;
-
-    this.setState({ numberOfCandles });
-
-    this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
+  const onNumberOfCandlesUpdated = (numberOfCandles: number) => {
+    setNumberOfCandles(numberOfCandles);
+    fetchCandles(security, innerInterval, innerStart, numberOfCandles);
   };
 
-  onNumberOfCandlesUpdatedWrapper = (e: any) => {
-    this.onNumberOfCandlesUpdated(e.target["value"]);
+  const onNumberOfCandlesUpdatedWrapper = (e: any) => {
+    onNumberOfCandlesUpdated(e.target["value"]);
   };
 
-  onEnableTrendLine = (enableTrendLine: boolean) => {
-    this.setState({ enableTrendLine });
+  const onEnableTrendLine = (enableTrendLine: boolean) => {
+    setEnableTrendLine(enableTrendLine);
   };
 
-  onEnableTrendLineWrapper = (e: any) => {
-    this.onEnableTrendLine(e.value);
+  const onEnableTrendLineWrapper = (e: any) => {
+    onEnableTrendLine(e.value);
   };
 
-  onEnableNewOrder = (enableNewOrder: boolean) => {
-    this.setState({ enableNewOrder });
+  const onEnableNewOrder = (enableNewOrder: boolean) => {
+    setEnableNewOrder(enableNewOrder);
   };
 
-  onEnableNewOrderWrapper = (e: any) => {
-    this.onEnableNewOrder(e.value);
+  const onEnableNewOrderWrapper = (e: any) => {
+    onEnableNewOrder(e.value);
   };
 
-  onSave = () => {
-    const { security } = this.props;
-    const { storeData } = this.state;
+  const onSave = () => {
     if (storeData) {
       console.log(storeData);
       const saving = [];
+
       if (storeData.save && storeData.save.length > 0) {
         for (const trendLine of storeData.save) {
           trendLine.secId = security.id;
           saving.push(trendLine);
         }
       }
+
       if (storeData.delete && storeData.delete.length > 0) {
         for (const trendLine of storeData.delete) {
           trendLine.secId = security.id;
@@ -606,32 +468,25 @@ export class ChartWrapper extends React.Component<Props, States> {
           saving.push(trendLine);
         }
       }
+
       if (saving.length > 0) {
         saveTrendLines(saving)
-          .then(this.setTrendLinesFromServer)
+          .then(setTrendLinesFromServer)
           .catch(console.error);
       }
     }
-    this.setState({ needSave: false });
+
+    setNeedSave(false);
   };
 
-  onCancel = () => {
-    const { candles } = this.state;
-
-    this.setState({
-      needSave: false,
-      storeData: null,
-      trendLines: this.initialStateTrendLines,
-      trends_1: this.mapTrendLinesFromPropsToState(
-        this.initialStateTrendLines,
-        candles
-      ),
-    });
+  const onCancel = () => {
+    setNeedSave(false);
+    setStoreData(null);
+    setTrendLines(initialStateTrendLines);
+    setTrends_1(mapTrendLinesFromPropsToState(initialStateTrendLines, candles));
   };
 
-  onNeedSave = (storeData: StoreData<TrendLineDto[]>): void => {
-    const { candles } = this.state;
-
+  const onNeedSave = (storeData: StoreData<TrendLineDto[]>): void => {
     const newTrendLines = [];
     if (storeData.save && storeData.save.length > 0) {
       for (const trendLine of storeData.save) {
@@ -639,35 +494,25 @@ export class ChartWrapper extends React.Component<Props, States> {
       }
     }
 
-    this.setState({
-      storeData,
-      needSave: true,
-      trendLines: newTrendLines,
-      trends_1: this.mapTrendLinesFromPropsToState(newTrendLines, candles),
-    });
+    setStoreData(storeData);
+    setNeedSave(true);
+    setTrendLines(newTrendLines);
+    setTrends_1(mapTrendLinesFromPropsToState(newTrendLines, candles));
   };
 
-  showStartCalendar = () => {
-    const { security } = this.props;
-    const { startCalendarVisible, numberOfCandles, innerInterval } = this.state;
-
+  const showStartCalendar = () => {
     const newStartCalendarVisible = !startCalendarVisible;
     const innerStart = newStartCalendarVisible
       ? moment().subtract(1, "days").hours(9).minutes(0).seconds(0).toDate()
       : null;
 
-    this.setState({
-      startCalendarVisible: newStartCalendarVisible,
-      innerStart,
-    });
+    setStartCalendarVisible(newStartCalendarVisible);
+    setInnerStart(innerStart);
 
-    this.fetchCandles(security, innerInterval, innerStart, numberOfCandles);
+    fetchCandles(security, innerInterval, innerStart, numberOfCandles);
   };
 
-  getSRLevels = () => {
-    const { innerInterval, showSRLevels } = this.state;
-    const { premise } = this.props;
-
+  const getSRLevels = () => {
     if (!premise || !showSRLevels) return null;
 
     // return premise.analysis.srLevels.filter(value => {
@@ -717,111 +562,131 @@ export class ChartWrapper extends React.Component<Props, States> {
     });
   };
 
-  manageOrder = (order: ChartManageOrder) => {
-    const { onManageOrder } = this.props;
-    console.log(order);
+  const manageOrder = (order: ChartManageOrder) => {
     if (onManageOrder) onManageOrder(order);
   };
 
-  updateShowSRZones = (e: any) => this.setState({ showSRZones: e.value });
-  updateShowSRLevels = (e: any) => this.setState({ showSRLevels: e.value });
+  let visibleCandles = candles;
 
-  render() {
-    const {
-      candles,
-      nodata,
-      innerInterval,
-      innerStart,
-      enableTrendLine,
-      enableNewOrder,
-      needSave,
-      trends_1,
-      showSRLevels,
-      showSRZones,
-      numberOfCandles,
-      startCalendarVisible,
-    } = this.state;
+  // if (security?.lastTradePrice) {
+  //   const lastCandle = candles[candles.length - 1];
 
-    const {
-      width,
-      chartHeight,
-      showGrid,
-      premise,
-      security,
-      trades,
-      orders,
-      stops,
-      activeTrade,
-      onPremiseBeforeChanged,
-      possibleTrade,
-    } = this.props;
+  //   if (lastCandle) {
 
-    if (!security) {
-      return <>Select security for chart</>;
+  //     if (security.lastTradePrice > lastCandle.high) {
+  //       lastCandle.high = security.lastTradePrice;
+  //     } else if (security.lastTradePrice < lastCandle.low) {
+  //       lastCandle.low = security.lastTradePrice;
+  //     }
+
+  //     lastCandle.close = security.lastTradePrice;
+  //     lastCandle.volume += security.lastTradeQuantity;
+
+  //     visibleCandles = [...candles];
+  //   }
+  // }
+
+  if (lastCandles.length && candles.length > 2 && lastCandles.length > 0 && innerInterval === lastCandles[0].interval) {
+    // console.log("lastCandles: ", lastCandles[0].interval)
+    const candlesIndexMap = {};
+    let newCandles = null;
+    let needUpdateTrendLines = false;
+    candlesIndexMap[candles[candles.length - 2].timestamp.getTime()] =
+      candles.length - 2;
+    candlesIndexMap[candles[candles.length - 1].timestamp.getTime()] =
+      candles.length - 1;
+
+    for (const candle of lastCandles) {
+      candle.timestamp = new Date(candle.timestamp);
+      const index = candlesIndexMap[candle.timestamp.getTime()];
+      if (index) {
+        candles[index] = candle;
+      } else {
+        newCandles = candles.slice(1);
+        newCandles.push(candle);
+        needUpdateTrendLines = true;
+      }
     }
 
-    const stopOrders: StopOrder[] =
-      stops?.filter(({ secId }) => secId === security.id) || [];
+    newCandles = newCandles ? newCandles : [...candles];
+    visibleCandles = newCandles;
 
-    return (
-      <>
-        <ChartWrapperHead
-          security={security}
-          innerInterval={innerInterval}
-          onIntervalUpdated={this.onIntervalUpdated}
-          numberOfCandles={numberOfCandles}
-          onNumberOfCandlesUpdatedWrapper={this.onNumberOfCandlesUpdatedWrapper}
-          startCalendarVisible={startCalendarVisible}
-          showStartCalendar={this.showStartCalendar}
-          innerStart={innerStart}
-          onStartUpdated={this.onStartUpdated}
-          onPremiseBeforeChanged={onPremiseBeforeChanged}
-          enableNewOrder={enableNewOrder}
-          onEnableNewOrderWrapper={this.onEnableNewOrderWrapper}
-          enableTrendLine={enableTrendLine}
-          onEnableTrendLineWrapper={this.onEnableTrendLineWrapper}
-          needSave={needSave}
-          onSave={this.onSave}
-          onCancel={this.onCancel}
-          showSRLevels={showSRLevels}
-          updateShowSRLevels={this.updateShowSRLevels}
-          showSRZones={showSRZones}
-          updateShowSRZones={this.updateShowSRZones}
-        />
-        {candles.length > 0 ? (
-          <CandleStickChartForDiscontinuousIntraDay
-            type={ChartDrawType.CANVAS_SVG}
-            data={candles}
-            width={width}
-            chartHeight={chartHeight}
-            ratio={1}
-            htSRLevels={this.getHighTimeFrameSRLevels()}
-            stops={stopOrders}
-            orders={orders}
-            onManageOrder={this.manageOrder}
-            trades={trades}
-            activeTrade={activeTrade}
-            swingHighsLows={this.getSwingHighsLowsMap()}
-            showGrid={showGrid}
-            zones={premise && showSRZones ? premise.analysis.srZones : null}
-            srLevels={this.getSRLevels()}
-            candlePatternsUp={this.getCandlePatternsUp()}
-            candlePatternsDown={this.getCandlePatternsDown()}
-            securityInfo={security}
-            enableTrendLine={enableTrendLine}
-            onEnableTrendLine={this.onEnableTrendLine}
-            enableNewOrder={enableNewOrder}
-            onEnableNewOrder={this.onEnableNewOrder}
-            needSave={this.onNeedSave}
-            trends={trends_1}
-            possibleTrade={possibleTrade}
-          />
-        ) : nodata ? (
-          <div>No data</div>
-        ) : (
-          <div>Loading...</div>
-        )}
-      </>
-    );
+    if (needUpdateTrendLines) {
+      setCandles(newCandles);
+      if (trendLines.length) {
+        setTrends_1(mapTrendLinesFromPropsToState(
+          trendLines,
+          newCandles
+        ));
+      }
+    }
   }
+
+  if (!security) {
+    return <>Select security for chart</>;
+  }
+
+  const stopOrders: StopOrder[] =
+    stops?.filter(({ secId }) => secId === security.id) || [];
+
+  return (
+    <>
+      <ChartWrapperHead
+        security={security}
+        innerInterval={innerInterval}
+        onIntervalUpdated={onIntervalUpdated}
+        numberOfCandles={numberOfCandles}
+        onNumberOfCandlesUpdatedWrapper={onNumberOfCandlesUpdatedWrapper}
+        startCalendarVisible={startCalendarVisible}
+        showStartCalendar={showStartCalendar}
+        innerStart={innerStart}
+        onStartUpdated={onStartUpdated}
+        onPremiseBeforeChanged={onPremiseBeforeChanged}
+        enableNewOrder={enableNewOrder}
+        onEnableNewOrderWrapper={onEnableNewOrderWrapper}
+        enableTrendLine={enableTrendLine}
+        onEnableTrendLineWrapper={onEnableTrendLineWrapper}
+        needSave={needSave}
+        onSave={onSave}
+        onCancel={onCancel}
+        showSRLevels={showSRLevels}
+        updateShowSRLevels={e => setShowSRLevels(e.value)}
+        showSRZones={showSRZones}
+        updateShowSRZones={e => setShowSRZones(e.value)}
+      />
+      {candles.length > 0 ? (
+        <CandleStickChartForDiscontinuousIntraDay
+          type={ChartDrawType.CANVAS_SVG}
+          data={visibleCandles}
+          width={width}
+          chartHeight={chartHeight}
+          ratio={1}
+          htSRLevels={getHighTimeFrameSRLevels()}
+          stops={stopOrders}
+          orders={orders}
+          onManageOrder={manageOrder}
+          trades={trades}
+          activeTrade={activeTrade}
+          swingHighsLows={getSwingHighsLowsMap()}
+          showGrid={showGrid}
+          zones={premise && showSRZones ? premise.analysis.srZones : null}
+          srLevels={getSRLevels()}
+          candlePatternsUp={getCandlePatternsUp()}
+          candlePatternsDown={getCandlePatternsDown()}
+          securityInfo={security}
+          enableTrendLine={enableTrendLine}
+          onEnableTrendLine={onEnableTrendLine}
+          enableNewOrder={enableNewOrder}
+          onEnableNewOrder={onEnableNewOrder}
+          needSave={onNeedSave}
+          trends={trends_1}
+          possibleTrade={possibleTrade}
+        />
+      ) : nodata ? (
+        <div>No data</div>
+      ) : (
+        <div>Loading...</div>
+      )}
+    </>
+  );
 }
