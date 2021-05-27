@@ -130,7 +130,11 @@ export const ChartWrapper: React.FC<Props> = ({
 
     const candlesSetupSubscription = WebsocketService.getInstance()
       .on<Candle[]>(WSEvent.CANDLES)
-      .subscribe(setLastCandles);
+      .subscribe(lastCandles => {
+        if (security?.id === lastCandles[0].secId && innerInterval === lastCandles[0].interval) {
+          setLastCandles(lastCandles);
+        }
+      });
 
     const wsStatusSub = WebsocketService.getInstance()
       .connectionStatus()
@@ -586,7 +590,7 @@ export const ChartWrapper: React.FC<Props> = ({
   //   }
   // }
 
-  if (lastCandles.length && candles.length > 2 && lastCandles.length > 0 && innerInterval === lastCandles[0].interval) {
+  if (lastCandles.length && candles.length > 2 && lastCandles.length > 0) {
     // console.log("lastCandles: ", lastCandles[0].interval)
     const candlesIndexMap = {};
     let newCandles = null;

@@ -13,20 +13,28 @@ export const Header = () => {
           Home
         </NavLink>
         {" / "}
+        <NavLink to="/trading-charts" activeStyle={activeStyle}>
+          TCharts
+        </NavLink>
+        {" / "}
+        <NavLink to="/trend-charts" activeStyle={activeStyle}>
+          Trend Charts
+        </NavLink>
+        {" / "}
+        <NavLink to="/analysis" activeStyle={activeStyle}>
+          Analysis
+        </NavLink>
+        {" / "}
+        <NavLink to="/trade-journal" activeStyle={activeStyle}>
+          Journal
+        </NavLink>
+        {" / "}
         <NavLink to="/economic-calendar" activeStyle={activeStyle}>
           Calendar
         </NavLink>
         {" / "}
         <NavLink to="/news" activeStyle={activeStyle}>
           News
-        </NavLink>
-        {" / "}
-        <NavLink to="/trading-charts" activeStyle={activeStyle}>
-          TCharts
-        </NavLink>
-        {" / "}
-        <NavLink to="/analysis" activeStyle={activeStyle}>
-          Analysis
         </NavLink>
         {" / "}
         <NavLink to="/bot-control" activeStyle={activeStyle}>
@@ -37,16 +45,8 @@ export const Header = () => {
           ActiveTrades
         </NavLink>
         {" / "}
-        <NavLink to="/trade-journal" activeStyle={activeStyle}>
-          Journal
-        </NavLink>
-        {" / "}
         <NavLink to="/about" activeStyle={activeStyle}>
           About
-        </NavLink>
-        {" / "}
-        <NavLink to="/trend-charts" activeStyle={activeStyle}>
-          Trend Charts
         </NavLink>
       </nav>
       <MarketWorkTime />

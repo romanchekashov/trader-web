@@ -112,8 +112,9 @@ const ChartWrapperHead: React.FC<Props> = ({
       <PremiseBeforeDate onBeforeChanged={onPremiseBeforeChanged} />
       <div className="chart-wrapper-head-trendline">
         <ToggleButton
-          onLabel="New Order"
-          offLabel="New Order"
+          onLabel="O"
+          offLabel="O"
+          tooltip="Create Order"
           checked={enableNewOrder}
           onChange={onEnableNewOrderWrapper}
         />
@@ -121,7 +122,8 @@ const ChartWrapperHead: React.FC<Props> = ({
       <div className="chart-wrapper-head-trendline">
         <ToggleButton
           onLabel="Drawing"
-          offLabel="Draw Line"
+          offLabel="Draw"
+          tooltip="Draw Trendline"
           checked={enableTrendLine}
           onChange={onEnableTrendLineWrapper}
         />
@@ -145,8 +147,9 @@ const ChartWrapperHead: React.FC<Props> = ({
 
       <div className="chart-wrapper-head-trendline">
         <ToggleButton
-          onLabel="SRLevels"
-          offLabel="SRLevels"
+          onLabel="SRL"
+          offLabel="SRL"
+          tooltip="SRLevels"
           checked={showSRLevels}
           onChange={updateShowSRLevels}
         />
@@ -154,8 +157,9 @@ const ChartWrapperHead: React.FC<Props> = ({
 
       <div className="chart-wrapper-head-trendline">
         <ToggleButton
-          onLabel="SRZones"
-          offLabel="SRZones"
+          onLabel="SRZ"
+          offLabel="SRZ"
+          tooltip="SRZones"
           checked={showSRZones}
           onChange={updateShowSRZones}
         />
