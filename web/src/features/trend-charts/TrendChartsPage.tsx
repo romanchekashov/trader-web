@@ -18,7 +18,6 @@ import { PrimeDropdownItem } from "../../common/utils/utils";
 import { loadFilterData } from "../analysis/AnalysisSlice";
 import "./TrendChartsPage.css";
 
-const DEFAULT_CHARTS_NUMBER = 8;
 const intervals: PrimeDropdownItem<Interval>[] = [
   Interval.M1,
   Interval.M3,
@@ -31,6 +30,7 @@ const intervals: PrimeDropdownItem<Interval>[] = [
   Interval.WEEK,
   Interval.MONTH,
 ].map((val) => ({ label: val, value: val }));
+const chartsNumbers: PrimeDropdownItem<number>[] = [4, 8].map((val) => ({ label: "" + val, value: val }));
 
 type Props = {};
 
@@ -42,6 +42,7 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
   const [page, setPage] = useState<number>(0);
   const [height, setHeight] = useState<number>(800);
   const [interval, setInterval] = useState<Interval>(Interval.M1);
+  const [chartsNumber, setChartsNumber] = useState<number>(8);
 
   useEffect(() => {
     updateSize();
@@ -71,6 +72,10 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
     );
   }, [selectedSecurityTypeWrapper]);
 
+  useEffect(() => {
+    setPage(0);
+  }, [chartsNumber]);
+
   const updateSize = () => {
     setHeight(window.innerHeight - 20 - 37);
   };
@@ -78,6 +83,7 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
   const secs = filterSecurities(securities, selectedSecurityTypeWrapper);
 
   const rightContent = (
+    <>
     <Dropdown
       value={interval}
       options={intervals}
@@ -85,25 +91,35 @@ const TrendChartsPage: React.FC<Props> = ({}) => {
         setInterval(e.value);
       }}
     />
+    <Dropdown
+      value={chartsNumber}
+      options={chartsNumbers}
+      onChange={(e) => {
+        setChartsNumber(e.value);
+      }}
+    />
+    </>
   );
+
+  const pColNum = chartsNumber === 8 ? 3 : 6;
 
   return (
     <div className="p-grid sample-layout analysis TrendChartsPage">
       <div className="p-col-12" style={{ padding: 0 }}>
         <Paginator
           first={page}
-          rows={DEFAULT_CHARTS_NUMBER}
+          rows={chartsNumber}
           totalRecords={secs.length}
           onPageChange={(e) => setPage(e.first)}
           style={{ padding: 0 }}
           rightContent={rightContent}
         ></Paginator>
       </div>
-      {secs.slice(page, page + DEFAULT_CHARTS_NUMBER).map((sec) => {
+      {secs.slice(page, page + chartsNumber).map((sec) => {
         return (
           <div
             key={sec.id}
-            className={`p-col-3 ${sec.id === security?.id ? "active" : ""}`}
+            className={`p-col-${pColNum} ${sec.id === security?.id ? "active" : ""}`}
             style={{ padding: 0 }}
           >
             <TrendViewChartWrapper
