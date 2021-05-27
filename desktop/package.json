@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "browserslist": "^4.16.1",
+    "browserslist": "^4.16.5",
     "caniuse-lite": "^1.0.30001177",
     "chart.js": "^2.9.4",
     "classnames": "^2.2.6",
