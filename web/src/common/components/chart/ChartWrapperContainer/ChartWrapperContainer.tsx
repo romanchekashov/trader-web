@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { filter } from "rxjs/internal/operators";
 import { selectActiveTrades } from "../../../../app/activeTrades/activeTradesSlice";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
+import { addNewSignals } from "../../../../app/notifications/notificationsSlice";
 import { selectOrders } from "../../../../app/orders/ordersSlice";
 import { PossibleTrade } from "../../../../app/possibleTrades/data/PossibleTrade";
 import { selectPossibleTrade, tradePossibleTrade } from "../../../../app/possibleTrades/possibleTradesSlice";
@@ -19,6 +20,7 @@ import { Market } from "../../../data/Market";
 import { OrderType } from "../../../data/OrderType";
 import { SecurityLastInfo } from "../../../data/security/SecurityLastInfo";
 import { SecurityType } from "../../../data/security/SecurityType";
+import { Signal } from "../../../data/Signal";
 import { TradePremise } from "../../../data/strategy/TradePremise";
 import { TradeStrategyAnalysisFilterDto } from "../../../data/TradeStrategyAnalysisFilterDto";
 import { TradingPlatform } from "../../../data/trading/TradingPlatform";
@@ -87,6 +89,12 @@ const ChartWrapperContainer: React.FC<Props> = ({
             .subscribe((newPremise) => {
                 adjustTradePremise(newPremise);
                 setPremise(newPremise);
+
+                const signals: Signal[] = [];
+                newPremise.marketState.marketStateIntervals.forEach((o) =>
+                  o.items.forEach((item) => item.signals.forEach((s) => signals.push(s)))
+                );
+                dispatch(addNewSignals(signals));
             });
 
         const wsStatusSub = WebsocketService.getInstance()
