@@ -3,6 +3,7 @@ import { ColumnGroup } from "primereact/columngroup";
 import { DataTable } from "primereact/datatable";
 import { Row } from "primereact/row";
 import * as React from "react";
+import { useEffect } from "react";
 import {
   selectActiveTrades,
   setSelectedActiveTrade,
@@ -22,7 +23,7 @@ type Props = {
   onSelectRow?: (e: any) => void;
 };
 
-const ActiveTradesView: React.FC<Props> = ({}) => {
+const ActiveTradesView: React.FC<Props> = ({ }) => {
   const dispatch = useAppDispatch();
   const { security } = useAppSelector(selectSecurities);
   const { activeTrades, selectedActiveTrade } =
@@ -30,13 +31,15 @@ const ActiveTradesView: React.FC<Props> = ({}) => {
 
   if (activeTrades.length === 0) return null;
 
-  if (selectedActiveTrade?.secId !== security?.id && activeTrades.length) {
-    const activeTrade = activeTrades.find(
-      ({ secId }) => secId === security?.id
-    );
-    if (activeTrade?.secId !== selectedActiveTrade?.secId)
-      dispatch(setSelectedActiveTrade(activeTrade));
-  }
+  useEffect(() => {
+    if (selectedActiveTrade?.secId !== security?.id && activeTrades.length) {
+      const activeTrade = activeTrades.find(
+        ({ secId }) => secId === security?.id
+      );
+      if (activeTrade?.secId !== selectedActiveTrade?.secId)
+        dispatch(setSelectedActiveTrade(activeTrade));
+    }
+  }, [security?.id, selectedActiveTrade?.secId, activeTrades.length]);
 
   const quantityTemplate = (rowData, column) => {
     return OperationType.SELL === rowData.operation
