@@ -3,13 +3,18 @@ import { SecurityCurrency } from "../../common/data/security/SecurityCurrency";
 import { SecurityFuture } from "../../common/data/security/SecurityFuture";
 import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
 import { SecurityShare } from "../../common/data/security/SecurityShare";
-import { adjustSecurities, adjustShares } from "../../common/utils/DataUtils";
+import { adjustSecurities, adjustSecurity, adjustShares } from "../../common/utils/DataUtils";
 
 const baseUrl = process.env.API_URL + "/api/v1/securities";
 
-const getLastSecurities = (secId?: number): Promise<SecurityLastInfo[]> =>
-  get<SecurityLastInfo[]>(`${baseUrl}` + (secId ? `?secId=${secId}` : "")).then(
+const getLastSecurities = (): Promise<SecurityLastInfo[]> =>
+  get<SecurityLastInfo[]>(baseUrl).then(
     adjustSecurities
+  );
+
+const getLastSecurityInfo = (secId: number): Promise<SecurityLastInfo> =>
+  get<SecurityLastInfo>(`${baseUrl}/${secId}`).then(
+    adjustSecurity
   );
 
 const getFutureInfo = (secCode: string): Promise<SecurityFuture> =>
@@ -26,6 +31,7 @@ const getAllSecurityCurrencies = (): Promise<SecurityCurrency[]> =>
 
 export default {
   getLastSecurities,
+  getLastSecurityInfo,
   getFutureInfo,
   getAllSecurityFutures,
   getAllSecurityShares,

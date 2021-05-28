@@ -233,8 +233,8 @@ const BotControlFilter: React.FC<Props> = ({
     setSecCode(newSecCode);
     setSecId(security?.id);
     securitiesApi
-      .getLastSecurities(security?.id)
-      .then((value) => setSelectedSecurity(value[0]));
+      .getLastSecurityInfo(security?.id)
+      .then((value) => setSelectedSecurity(value));
     updateHistoryDates(newSecCode, minInterval);
   };
 

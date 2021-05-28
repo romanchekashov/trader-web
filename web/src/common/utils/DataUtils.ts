@@ -195,9 +195,14 @@ export const adjustEconomicCalendarEvents = (
   return list;
 };
 
+export const adjustSecurity = (item: Security): any => {
+  item.lastTradeTime = new Date(item.lastTradeTime);
+  return item;
+};
+
 export const adjustSecurities = (list: Security[]): any => {
   if (list && list.length > 0) {
-    for (const item of list) item.lastTradeTime = new Date(item.lastTradeTime);
+    for (const item of list) adjustSecurity(item);
   }
 
   return list;

@@ -27,15 +27,17 @@ export const TradingChartsSecurityPage: React.FC<
   useEffect(() => {
     document.getElementById("main-nav").style.display = "none";
 
-    securitiesApi.getLastSecurities(secId).then((securities) => {
-      const security = securities.find((value) => value.id === secId);
-      if (security) {
-        setSecurityLastInfo(security);
-      }
+    securitiesApi.getLastSecurityInfo(secId).then((security) => {
+      document.title = `${security.secCode} - ${security.lastChange}% - ${security.lastTradePrice}`;
+      setSecurityLastInfo(security);
     });
+  }, []);
+
+  useEffect(() => {
+    document.getElementById("main-nav").style.display = "none";
 
     const lastSecuritiesSubscription = WebsocketService.getInstance()
-      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
+      .on<SecurityLastInfo[]>(securityLastInfo?.quik ? WSEvent.LAST_SECURITIES : WSEvent.LAST_SECURITIES_TINKOFF)
       .pipe(
         map((securities) =>
           securities.find((security) => security.id === secId)
@@ -50,7 +52,7 @@ export const TradingChartsSecurityPage: React.FC<
     return function cleanup() {
       lastSecuritiesSubscription.unsubscribe();
     };
-  }, []);
+  }, [securityLastInfo?.id]);
 
   if (!securityLastInfo) return <div>No Data</div>;
 
