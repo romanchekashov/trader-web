@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {Interval} from "../../../common/data/Interval";
 import {TrendsView} from "../../../common/components/trend/TrendsView";
-import {CHART_MIN_WIDTH, ChartWrapper} from "../../../common/components/chart/ChartWrapper";
+import ChartWrapper, {CHART_MIN_WIDTH} from "../../../common/components/chart/ChartWrapper";
 import {Dropdown} from "primereact/dropdown";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";

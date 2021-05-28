@@ -10,8 +10,7 @@ import {
   WSEvent,
 } from "../../../common/api/WebsocketService";
 import Alerts from "../../../common/components/alerts/Alerts";
-import {
-  ChartWrapper,
+import ChartWrapper, {
   CHART_MIN_WIDTH,
 } from "../../../common/components/chart/ChartWrapper";
 import { EconomicCalendar } from "../../../common/components/economic-calendar/EconomicCalendar";

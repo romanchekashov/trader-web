@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 import { getHistoryCandles } from "../../api/rest/historyRestApi";
 import { getCandles } from "../../api/rest/traderRestApi";
@@ -86,7 +86,7 @@ type Props = {
   onManageOrder?: (manageOrder: ChartManageOrder) => void;
 };
 
-export const ChartWrapper: React.FC<Props> = ({
+const ChartWrapper: React.FC<Props> = ({
   interval,
   onIntervalChanged,
   onStartChanged,
@@ -694,3 +694,5 @@ export const ChartWrapper: React.FC<Props> = ({
     </>
   );
 }
+
+export default memo(ChartWrapper);

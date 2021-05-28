@@ -26,7 +26,7 @@ import { TradeStrategyAnalysisFilterDto } from "../../../data/TradeStrategyAnaly
 import { TradingPlatform } from "../../../data/trading/TradingPlatform";
 import { adjustTradePremise } from "../../../utils/DataUtils";
 import { getRecentBusinessDate } from "../../../utils/utils";
-import { ChartWrapper } from "../ChartWrapper";
+import ChartWrapper from "../ChartWrapper";
 import { ChartManageOrder } from "../data/ChartManageOrder";
 
 type Props = {

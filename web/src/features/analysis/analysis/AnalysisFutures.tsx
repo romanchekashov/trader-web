@@ -23,7 +23,7 @@ import {
   WebsocketService,
   WSEvent,
 } from "../../../common/api/WebsocketService";
-import { ChartWrapper } from "../../../common/components/chart/ChartWrapper";
+import ChartWrapper from "../../../common/components/chart/ChartWrapper";
 import { ChartManageOrder } from "../../../common/components/chart/data/ChartManageOrder";
 import { EconomicCalendar } from "../../../common/components/economic-calendar/EconomicCalendar";
 import { MarketStateFilterDto } from "../../../common/components/market-state/data/MarketStateFilterDto";

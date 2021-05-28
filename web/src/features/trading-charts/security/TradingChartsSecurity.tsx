@@ -4,8 +4,7 @@ import {
   getMoexOpenInterests,
   getTradePremise,
 } from "../../../common/api/rest/analysisRestApi";
-import {
-  ChartWrapper,
+import ChartWrapper, {
   CHART_MIN_WIDTH,
 } from "../../../common/components/chart/ChartWrapper";
 import Notifications from "../../../common/components/notifications/Notifications";
