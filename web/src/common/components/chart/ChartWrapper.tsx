@@ -615,7 +615,7 @@ export const ChartWrapper: React.FC<Props> = ({
     newCandles = newCandles ? newCandles : [...candles];
     visibleCandles = newCandles;
 
-    if (needUpdateTrendLines) {
+    if (needUpdateTrendLines || trendLines.length != trends_1.length) {
       setCandles(newCandles);
       if (trendLines.length) {
         setTrends_1(mapTrendLinesFromPropsToState(
