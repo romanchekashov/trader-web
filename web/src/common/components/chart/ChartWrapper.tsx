@@ -110,6 +110,8 @@ const ChartWrapper: React.FC<Props> = ({
 }) => {
 
   const [candles, setCandles] = useState<Candle[]>([]);
+  const [lastCandles, setLastCandles] = useState<Candle[]>([]);
+  const [needUpdateTrendLines, setNeedUpdateTrendLines] = useState<boolean>(false);
   const [nodata, setNodata] = useState<boolean>(false);
   const [innerInterval, setInnerInterval] = useState<Interval>(interval);
   const [innerStart, setInnerStart] = useState<Date>(start);
@@ -129,41 +131,10 @@ const ChartWrapper: React.FC<Props> = ({
 
     const candlesSetupSubscription = WebsocketService.getInstance()
       .on<Candle[]>(WSEvent.CANDLES)
-      .subscribe(lastCandles => {
-        if (!lastCandles.length || candles.length < 2 || security?.id !== lastCandles[0].secId || innerInterval !== lastCandles[0].interval) return;
-
-        // console.log("lastCandles: ", lastCandles[0].interval)
-        const candlesIndexMap = {};
-        let newCandles = null;
-        let needUpdateTrendLines = false;
-        candlesIndexMap[candles[candles.length - 2].timestamp.getTime()] =
-          candles.length - 2;
-        candlesIndexMap[candles[candles.length - 1].timestamp.getTime()] =
-          candles.length - 1;
-
-        for (const candle of lastCandles) {
-          candle.timestamp = new Date(candle.timestamp);
-          const index = candlesIndexMap[candle.timestamp.getTime()];
-          if (index) {
-            candles[index] = candle;
-          } else {
-            newCandles = candles.slice(1);
-            newCandles.push(candle);
-            needUpdateTrendLines = true;
-          }
-        }
-
-        newCandles = newCandles ? newCandles : [...candles];
-
-        setCandles(newCandles);
-
-        if (needUpdateTrendLines) {
-          setTrends_1(mapTrendLinesFromPropsToState(
-            trendLines,
-            newCandles
-          ));
-        }
-      });
+      .subscribe(candles => setLastCandles(candles.map(candle => {
+        candle.timestamp = new Date(candle.timestamp);
+        return candle;
+      })));
 
     const wsStatusSub = WebsocketService.getInstance()
       .connectionStatus()
@@ -177,11 +148,6 @@ const ChartWrapper: React.FC<Props> = ({
     //   onNumberOfCandlesUpdated(numberOfCandles);
     // }, 1000);
 
-    
-    if (candles.length) {
-      fetchTrendLines(interval);
-    }
-
     return () => {
       if (candlesSetupSubscription)
         candlesSetupSubscription.unsubscribe();
@@ -190,6 +156,22 @@ const ChartWrapper: React.FC<Props> = ({
         WSEvent.REMOVE_CANDLES,
         wsCandleFilter
       );
+    }
+  }, [security?.id, innerInterval]);
+
+  useEffect(() => {
+    if (needUpdateTrendLines) {
+      setTrends_1(mapTrendLinesFromPropsToState(
+        trendLines,
+        candles
+      ));
+      setNeedUpdateTrendLines(false);
+    }
+  }, [needUpdateTrendLines, trendLines, candles]);
+
+  useEffect(() => {
+    if (candles.length && innerInterval === candles[0].interval) {
+      fetchTrendLines(innerInterval);
     }
   }, [security?.id, innerInterval, candles.length]);
 
@@ -584,6 +566,28 @@ const ChartWrapper: React.FC<Props> = ({
     if (onManageOrder) onManageOrder(order);
   };
 
+  if (lastCandles.length && candles.length > 2 && security?.id === lastCandles[0].secId && innerInterval === lastCandles[0].interval) {
+    // console.log("lastCandles: ", lastCandles[0].interval)
+    const candlesIndexMap = {};
+    candlesIndexMap[candles[candles.length - 2].timestamp.getTime()] =
+      candles.length - 2;
+    candlesIndexMap[candles[candles.length - 1].timestamp.getTime()] =
+      candles.length - 1;
+
+    let newCandles = null;
+
+    for (const candle of lastCandles) {
+      const index = candlesIndexMap[candle.timestamp.getTime()];
+      if (index) {
+        candles[index] = candle;
+      } else {
+        newCandles = candles.slice(1);
+        newCandles.push(candle);
+        setCandles(newCandles);
+        setNeedUpdateTrendLines(true);
+      }
+    }
+  }
 
   if (!security) {
     return <>Select security for chart</>;

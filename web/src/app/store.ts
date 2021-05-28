@@ -70,6 +70,7 @@ const store = configureStore({
         "news/fetch/pending",
         "deposits/loadFuturesClientLimits/fulfilled",
         "deposits/loadFuturesClientLimits/pending",
+        "deposits/loadFuturesClientLimits/rejected",
         "orders/setOrders",
         "deposits/setDeposits",
         "securities/loadLastSecurities/pending",
