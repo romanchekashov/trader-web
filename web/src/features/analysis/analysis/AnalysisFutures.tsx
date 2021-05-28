@@ -119,6 +119,11 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
     prevMainWidth = mainRef?.current?.clientWidth;
   });
 
+  useEffect(() => {
+    updateSize();
+    prevMainWidth = mainRef?.current?.clientWidth;
+  }, [chartNumber]);
+
   const updateSize = () => {
     setChart1Width(
       chart1Ref.current ? chart1Ref.current.clientWidth : MIN_CHART_WIDTH
@@ -377,12 +382,14 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
   const pTrade: PossibleTrade =
     security && security.id === possibleTrade?.secId && possibleTrade;
 
+  const pColCharts = chartNumber === 1 ? "p-col-12" : "p-col-6"; 
+
   return (
     <div className="p-grid" ref={mainRef}>
       <Toast ref={toast} />
       <div className="p-col-12">
         <div className="p-grid" style={{ margin: "0" }}>
-          <div className="p-col-6" ref={chart2Ref} style={{ padding: "0" }}>
+          <div className={pColCharts} ref={chart2Ref} style={{ padding: "0" }}>
             <ChartWrapper
               interval={timeFrameHigh}
               // start={start}
@@ -390,6 +397,7 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
               onIntervalChanged={(interval) => {}}
               onStartChanged={(start) => {}}
               width={chart2Width}
+              chartHeight={600}
               security={securityLastInfo}
               premise={premise}
               stops={stops}
@@ -410,6 +418,7 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
                 onStartChanged={onStartChanged}
                 onPremiseBeforeChanged={onPremiseBeforeChanged}
                 width={chart1Width}
+                chartHeight={600}
                 security={securityLastInfo}
                 premise={premise}
                 stops={stops}
