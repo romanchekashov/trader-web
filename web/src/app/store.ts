@@ -16,6 +16,7 @@ import ordersReducer from "./orders/ordersSlice";
 import possibleTradesReducer from "./possibleTrades/possibleTradesSlice";
 import securitiesReducer from "./securities/securitiesSlice";
 import stopsReducer from "./stops/stopsSlice";
+import strategiesReducer from "./strategies/strategiesSlice";
 
 // https://github.com/reduxjs/redux-toolkit/issues/466
 enableMapSet();
@@ -36,6 +37,7 @@ const store = configureStore({
     deposits: depositsReducer,
     activeTrades: activeTradesReducer,
     notifications: notificationsReducer,
+    strategies: strategiesReducer,
   },
   middleware: getDefaultMiddleware({
     // https://redux-toolkit.js.org/usage/usage-guide#working-with-non-serializable-data
