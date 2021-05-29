@@ -192,7 +192,7 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
                    rowsPerPageOptions={[15, 30, 50]}>
             <Column selectionMode="multiple" headerStyle={{width: '10px'}}/>
             <Column field="id" style={{width: '10px'}} header="№" headerStyle={{width: '10px'}}/>
-            <Column field="name" style={{width: '30px'}} header="Strategy" headerStyle={{width: '30px'}}/>
+            <Column field="name" style={{width: '30px', overflow: "hidden"}} header="Strategy" headerStyle={{width: '30px'}}/>
             <Column field="type" style={{width: '20px'}} header="Type" headerStyle={{width: '20px'}}/>
             <Column field="start" style={{width: '30px'}} header="Start" headerStyle={{width: '30px'}}/>
             <Column field="secName" style={{width: '30px'}} header="Sec. Name" headerStyle={{width: '30px'}}/>
