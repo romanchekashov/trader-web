@@ -3,14 +3,7 @@ import { useEffect, useState } from "react";
 import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
 import BotControlFilter from "./filter/BotControlFilter";
 import { MarketBotStartDto } from "../../common/data/bot/MarketBotStartDto";
-import botControlRestApi, {
-    getFilterData,
-    runHistory,
-    search,
-    searchByTradingStrategyId,
-    startBot,
-    stopHistory
-} from "../../app/strategies/botControlRestApi";
+import strategiesApi from "../../app/strategies/strategiesApi";
 import { TradingStrategyResult } from "../../common/data/history/TradingStrategyResult";
 import { HistoryStrategyResultTable } from "./table/HistoryStrategyResultTable";
 import { TradeSystemType } from "../../common/data/trading/TradeSystemType";
@@ -51,7 +44,7 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
     const [selectedTsId, setSelectedTsId] = useState<number>(null)
 
     useEffect(() => {
-        getFilterData(false)
+        strategiesApi.getFilterData(false)
             .then(setFilterData)
     }, [])
 
@@ -87,25 +80,25 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
 
     const onStart = (data: MarketBotStartDto): void => {
         if (data.systemType === TradeSystemType.HISTORY) {
-            runHistory(data)
+            strategiesApi.runHistory(data)
                 .then(setSelectedTSResult)
                 .catch(console.error)
         } else {
-            startBot(data).then(value => {
+            strategiesApi.startBot(data).then(value => {
                 console.log(data, value);
             }).catch(console.error)
         }
     }
 
     const onSearch = (data: MarketBotStartDto): void => {
-        search(data)
+        strategiesApi.search(data)
             .then(setSelectedTSResult)
             .catch(console.error)
     }
 
     const onStopHistory = (data: MarketBotStartDto): void => {
         if (data.systemType === TradeSystemType.HISTORY) {
-            stopHistory(data)
+            strategiesApi.stopHistory(data)
                 .then(value => {
                     console.log(data, value)
                 })
@@ -118,7 +111,7 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
         setSelectedSecurity(result.tradePremise?.security)
 
         if (result.tradingStrategyData.id) {
-            searchByTradingStrategyId(result.tradingStrategyData.id)
+            strategiesApi.searchByTradingStrategyId(result.tradingStrategyData.id)
                 .then(tsResult => {
                     setSelectedTSResult(tsResult)
                     setSelectedSecurity(tsResult.tradePremise?.security)

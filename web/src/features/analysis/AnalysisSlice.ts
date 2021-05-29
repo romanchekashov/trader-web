@@ -7,7 +7,7 @@ import {
 import { LoadingState } from "../../app/LoadingState";
 import { handleThunkError } from "../../app/reduxUtils";
 import { RootState } from "../../app/store";
-import botControlRestApi from "../../app/strategies/botControlRestApi";
+import botControlRestApi from "../../app/strategies/strategiesApi";
 import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
 
 export interface AnalysisState {

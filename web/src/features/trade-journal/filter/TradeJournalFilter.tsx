@@ -4,7 +4,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Toolbar } from "primereact/toolbar";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { getFilterData } from "../../../app/strategies/botControlRestApi";
+import strategiesApi from "../../../app/strategies/strategiesApi";
 import { MarketSecuritiesDto } from "../../../common/data/bot/MarketSecuritiesDto";
 import { Security } from "../../../common/data/security/Security";
 import { SecurityInfo } from "../../../common/data/security/SecurityInfo";
@@ -46,7 +46,7 @@ export const TradeJournalFilter: React.FC<Props> = ({ onFilter }) => {
   const [end, setEnd] = useState(initState.end);
 
   useEffect(() => {
-    getFilterData(false).then((marketBotFilterDataDto) => {
+    strategiesApi.getFilterData(false).then((marketBotFilterDataDto) => {
       setMarkets(marketBotFilterDataDto.marketSecurities);
       const marketSec = marketBotFilterDataDto.marketSecurities[0];
       setMarket(marketSec);

@@ -1,5 +1,5 @@
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
-import {getFilterData} from "../../app/strategies/botControlRestApi";
+import {getFilterData} from "../../app/strategies/strategiesApi";
 import {AppDispatch} from "../../app/store";
 
 export const LOAD_FILTER_DATA_SUCCESS = "LOAD_FILTER_DATA_SUCCESS";

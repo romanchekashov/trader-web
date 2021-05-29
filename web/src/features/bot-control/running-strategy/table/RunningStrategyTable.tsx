@@ -15,7 +15,7 @@ import { TradeSystemType } from "../../../../common/data/trading/TradeSystemType
 import moment = require("moment");
 import { OperationType } from "../../../../common/data/OperationType";
 import { TradingStrategyStatus } from "../../../../common/data/trading/TradingStrategyStatus";
-import botControlRestApi from "../../../../app/strategies/botControlRestApi";
+import botControlRestApi from "../../../../app/strategies/strategiesApi";
 import { useEffect } from "react";
 
 interface TableElementData {

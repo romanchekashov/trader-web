@@ -1,4 +1,4 @@
-import { get, handleError, handleResponse } from "../../common/api/apiUtils";
+import { get, handleError, handleResponse, post } from "../../common/api/apiUtils";
 import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
 import { MarketBotStartDto } from "../../common/data/bot/MarketBotStartDto";
 import { TradingStrategyResult } from "../../common/data/history/TradingStrategyResult";
@@ -13,62 +13,30 @@ import { Page } from "../../common/data/Page";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 
-export function getFilterData(
+const getFilterData = (
   history: boolean
-): Promise<MarketBotFilterDataDto> {
-  return fetch(baseUrl + "filter-data?history=" + history)
-    .then(handleResponse)
-    .catch(handleError);
-}
+): Promise<MarketBotFilterDataDto> => get(`${baseUrl}filter-data?history=${history}`);
 
-export function getSecurityHistoryDates(
+const getSecurityHistoryDates = (
   type: SecurityType,
   secCode: string
-): Promise<SecurityHistoryDatesDto> {
-  return fetch(
-    `${baseUrl}security-history-dates?type=${type}&secCode=${secCode}`
-  )
-    .then(handleResponse)
-    .catch(handleError);
-}
+): Promise<SecurityHistoryDatesDto> => get(`${baseUrl}security-history-dates?type=${type}&secCode=${secCode}`)
 
-export function startBot(dto: MarketBotStartDto): Promise<any> {
-  return fetch(baseUrl + "start-bot", {
-    method: "POST", // POST for create, PUT to update when id already exists.
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(dto),
-  })
-    .then(handleResponse)
-    .catch(handleError);
-}
+const startBot = (dto: MarketBotStartDto): Promise<any> => post(`${baseUrl}start-bot`, dto);
 
-export function switchBotStatus(
+const switchBotStatus = (
   tradingStrategyId: number,
   tradingStrategyStatus: TradingStrategyStatus
-): Promise<void> {
-  return fetch(
-    `${baseUrl}switch-bot-status?tradingStrategyId=${tradingStrategyId}&tradingStrategyStatus=${tradingStrategyStatus}`
-  )
-    .then(handleResponse)
-    .catch(handleError);
-}
+): Promise<void> => get(`${baseUrl}switch-bot-status?tradingStrategyId=${tradingStrategyId}&tradingStrategyStatus=${tradingStrategyStatus}`);
 
 const getAllStrategies = (page: number, size: number): Promise<Page<TradingStrategyResult>> =>
   get(`${baseUrl}all-strategies?page=${page}&size=${size}`).then(adjustTradingStrategyResultArray)
 
-export function search(dto: MarketBotStartDto): Promise<TradingStrategyResult> {
-  return fetch(baseUrl + "search", {
-    method: "POST", // POST for create, PUT to update when id already exists.
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(dto),
-  })
-    .then(handleResponse)
-    .catch(handleError);
-}
+const search = (dto: MarketBotStartDto): Promise<TradingStrategyResult> => post(`${baseUrl}search`, dto);
 
-export function searchByTradingStrategyId(
+const searchByTradingStrategyId = (
   id: number
-): Promise<TradingStrategyResult> {
+): Promise<TradingStrategyResult> => {
   return fetch(baseUrl + "search?tradingStrategyId=" + id)
     .then((response) =>
       handleResponse(response).then(adjustTradingStrategyResult)
@@ -76,9 +44,9 @@ export function searchByTradingStrategyId(
     .catch(handleError);
 }
 
-export function runHistory(
+const runHistory = (
   dto: MarketBotStartDto
-): Promise<TradingStrategyResult> {
+): Promise<TradingStrategyResult> => {
   return fetch(baseUrl + "run-history", {
     method: "POST", // POST for create, PUT to update when id already exists.
     headers: { "content-type": "application/json" },
@@ -88,7 +56,7 @@ export function runHistory(
     .catch(handleError);
 }
 
-export function stopHistory(dto: MarketBotStartDto): Promise<any> {
+const stopHistory = (dto: MarketBotStartDto): Promise<any> => {
   return fetch(baseUrl + "stop-history", {
     method: "POST", // POST for create, PUT to update when id already exists.
     headers: { "content-type": "application/json" },

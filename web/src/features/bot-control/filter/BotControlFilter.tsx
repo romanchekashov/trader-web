@@ -6,7 +6,7 @@ import * as React from "react";
 import { memo, useEffect, useState } from "react";
 import depositsApi from "../../../app/deposits/depositsApi";
 import securitiesApi from "../../../app/securities/securitiesApi";
-import { getSecurityHistoryDates } from "../../../app/strategies/botControlRestApi";
+import strategiesApi from "../../../app/strategies/strategiesApi";
 import { HistoryDateDto } from "../../../common/data/bot/HistoryDateDto";
 import { MarketBotFilterDataDto } from "../../../common/data/bot/MarketBotFilterDataDto";
 import { MarketBotStartDto } from "../../../common/data/bot/MarketBotStartDto";
@@ -245,7 +245,7 @@ const BotControlFilter: React.FC<Props> = ({
   };
 
   const updateHistoryDates = (newSecCode: string, minInterval: Interval) => {
-    getSecurityHistoryDates(securityType, newSecCode).then((value) => {
+    strategiesApi.getSecurityHistoryDates(securityType, newSecCode).then((value) => {
       const dto: HistoryDateDto = value.historyDates.find(
         (value) => value.interval === minInterval
       );
