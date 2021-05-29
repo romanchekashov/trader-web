@@ -1,10 +1,9 @@
 import * as React from "react";
-import {useEffect, useState} from "react";
-import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
+import { useEffect, useState } from "react";
+import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
 import BotControlFilter from "./filter/BotControlFilter";
-import {MarketBotStartDto} from "../../common/data/bot/MarketBotStartDto";
-import {
-    getAllStrategies,
+import { MarketBotStartDto } from "../../common/data/bot/MarketBotStartDto";
+import botControlRestApi, {
     getFilterData,
     runHistory,
     search,
@@ -12,33 +11,34 @@ import {
     startBot,
     stopHistory
 } from "../../common/api/rest/botControlRestApi";
-import {TradingStrategyResult} from "../../common/data/history/TradingStrategyResult";
-import {HistoryStrategyResultTable} from "./table/HistoryStrategyResultTable";
-import {TradeSystemType} from "../../common/data/trading/TradeSystemType";
+import { TradingStrategyResult } from "../../common/data/history/TradingStrategyResult";
+import { HistoryStrategyResultTable } from "./table/HistoryStrategyResultTable";
+import { TradeSystemType } from "../../common/data/trading/TradeSystemType";
 import ProfitLossChart from "../trade-journal/profitLossChart/ProfitLossChart";
-import {TradeJournalStatistic} from "../trade-journal/statistic/TradeJournalStatistic";
-import {TradeJournalTable} from "../trade-journal/table/TradeJournalTable";
-import {BotControlLastInfo} from "./last-info/BotControlLastInfo";
-import {TabPanel, TabView} from "primereact/tabview";
-import {BotControlAnalysis} from "./analysis/BotControlAnalysis";
-import {getSecurity} from "../../common/utils/Cache";
-import {BotControlAnalysisInfo} from "./analysis/BotControlAnalysisInfo";
-import {RunningStrategy} from "./running-strategy/RunningStrategy";
-import {EconomicCalendar} from "../../common/components/economic-calendar/EconomicCalendar";
-import {WebsocketService, WSEvent} from "../../common/api/WebsocketService";
-import {adjustTradingStrategyResultArray} from "../../common/utils/DataUtils";
-import {TradingStrategyStatus} from "../../common/data/trading/TradingStrategyStatus";
-import {SecurityLastInfo} from "../../common/data/security/SecurityLastInfo";
+import { TradeJournalStatistic } from "../trade-journal/statistic/TradeJournalStatistic";
+import { TradeJournalTable } from "../trade-journal/table/TradeJournalTable";
+import { BotControlLastInfo } from "./last-info/BotControlLastInfo";
+import { TabPanel, TabView } from "primereact/tabview";
+import { BotControlAnalysis } from "./analysis/BotControlAnalysis";
+import { getSecurity } from "../../common/utils/Cache";
+import { BotControlAnalysisInfo } from "./analysis/BotControlAnalysisInfo";
+import { RunningStrategy } from "./running-strategy/RunningStrategy";
+import { EconomicCalendar } from "../../common/components/economic-calendar/EconomicCalendar";
+import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
+import { adjustTradingStrategyResultArray } from "../../common/utils/DataUtils";
+import { TradingStrategyStatus } from "../../common/data/trading/TradingStrategyStatus";
+import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
+import { BotState } from "./running-strategy/bot-state/BotState";
 
 type Props = {}
 
-export const BotControlPage: React.FC<Props> = ({}) => {
+export const BotControlPage: React.FC<Props> = ({ }) => {
 
     const items = [
-        {label: 'Current State', icon: 'pi pi-fw pi-home'},
-        {label: 'Real Deposit Stats', icon: 'pi pi-fw pi-calendar'},
-        {label: 'Demo Deposit Stats', icon: 'pi pi-fw pi-pencil'},
-        {label: 'History Stats', icon: 'pi pi-fw pi-file'}
+        { label: 'Current State', icon: 'pi pi-fw pi-home' },
+        { label: 'Real Deposit Stats', icon: 'pi pi-fw pi-calendar' },
+        { label: 'Demo Deposit Stats', icon: 'pi pi-fw pi-pencil' },
+        { label: 'History Stats', icon: 'pi pi-fw pi-file' }
     ]
 
     const [filterData, setFilterData] = useState<MarketBotFilterDataDto>(null)
@@ -53,8 +53,6 @@ export const BotControlPage: React.FC<Props> = ({}) => {
     useEffect(() => {
         getFilterData(false)
             .then(setFilterData)
-
-        reloadHistory()
     }, [])
 
     useEffect(() => {
@@ -85,17 +83,6 @@ export const BotControlPage: React.FC<Props> = ({}) => {
 
     const tabSelected = (index: number): void => {
         setActiveIndex(index)
-        if (index === 1) reloadHistory()
-    }
-
-    const reloadHistory = () => {
-        getAllStrategies()
-            .then(results => {
-                setNonRunning(results
-                    .filter(value => value.tradingStrategyData.status !== TradingStrategyStatus.RUNNING)
-                    .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id))
-            })
-            .catch(console.error)
     }
 
     const onStart = (data: MarketBotStartDto): void => {
@@ -144,9 +131,9 @@ export const BotControlPage: React.FC<Props> = ({}) => {
         <div className="p-grid sample-layout">
             <div className="p-col-12">
                 <BotControlFilter filter={filterData}
-                                  onStart={onStart}
-                                  onSearch={onSearch}
-                                  onStopHistory={onStopHistory}/>
+                    onStart={onStart}
+                    onSearch={onSearch}
+                    onStopHistory={onStopHistory} />
             </div>
 
             <div className="p-col-12">
@@ -156,44 +143,48 @@ export const BotControlPage: React.FC<Props> = ({}) => {
                             <TabPanel header={"Running: " + running.length}>
                                 <RunningStrategy
                                     results={running}
-                                    onStrategyResultSelected={onStrategyResultSelected}/>
+                                    onStrategyResultSelected={onStrategyResultSelected} />
                             </TabPanel>
                             <TabPanel header={"History: " + nonRunning.length}>
                                 <BotControlLastInfo
                                     results={nonRunning}
                                     outerHeight={400}
-                                    onStrategyResultSelected={onStrategyResultSelected}/>
+                                    onStrategyResultSelected={onStrategyResultSelected} />
                             </TabPanel>
                         </TabView>
                     </div>
                     <div className="p-col-6">
-                        <BotControlAnalysis security={selectedSecurity}
-                                            tradingStrategyResult={selectedTSResult}/>
+                        {selectedTSResult ? <>
+                            <BotState tradingStrategyResult={selectedTSResult} />
+                            <BotControlAnalysis security={selectedSecurity}
+                                tradingStrategyResult={selectedTSResult} />
+                        </> : null}
+
                     </div>
                 </div>
             </div>
 
-            <div className="p-col-12" style={{padding: 0}}>
+            <div className="p-col-12" style={{ padding: 0 }}>
                 <TabView>
                     <TabPanel header="Trades">
-                        <TradeJournalTable stat={selectedTSResult?.stat}/>
+                        <TradeJournalTable stat={selectedTSResult?.stat} />
                     </TabPanel>
                     <TabPanel header="Strategy Stat">
-                        <HistoryStrategyResultTable stat={selectedTSResult}/>
+                        <HistoryStrategyResultTable stat={selectedTSResult} />
                     </TabPanel>
                     <TabPanel header="Profit Loss Stat">
                         <div className="p-col-12">
-                            <ProfitLossChart stat={selectedTSResult?.stat}/>
+                            <ProfitLossChart stat={selectedTSResult?.stat} />
                         </div>
                         <div className="p-col-12">
-                            <TradeJournalStatistic stat={selectedTSResult?.stat}/>
+                            <TradeJournalStatistic stat={selectedTSResult?.stat} />
                         </div>
                     </TabPanel>
                     <TabPanel header="Info">
-                        <BotControlAnalysisInfo security={selectedSecurity}/>
+                        <BotControlAnalysisInfo security={selectedSecurity} />
                     </TabPanel>
                     <TabPanel header="Calendar">
-                        <EconomicCalendar secId={selectedSecurity?.id}/>
+                        <EconomicCalendar secId={selectedSecurity?.id} />
                     </TabPanel>
                 </TabView>
             </div>

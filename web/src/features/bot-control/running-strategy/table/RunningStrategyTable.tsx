@@ -1,20 +1,22 @@
 import * as React from "react";
-import {useState} from "react";
+import { useState } from "react";
 import "./RunningStrategyTable.css";
-import {Column} from "primereact/column";
-import {DataTable} from "primereact/datatable";
-import {ColumnGroup} from "primereact/columngroup";
-import {Row} from "primereact/row";
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
+import { ColumnGroup } from "primereact/columngroup";
+import { Row } from "primereact/row";
 import TreeNode from "primereact/components/treenode/TreeNode";
-import {TradingStrategyResult} from "../../../../common/data/history/TradingStrategyResult";
-import {ClassCode} from "../../../../common/data/ClassCode";
-import {JournalTradeDto} from "../../../../common/data/journal/JournalTradeDto";
-import {TradingStrategyTrade} from "../../../../common/data/history/TradingStrategyTrade";
-import {TradingStrategyTradeState} from "../../../../common/data/history/TradingStrategyTradeState";
-import {TradeSystemType} from "../../../../common/data/trading/TradeSystemType";
+import { TradingStrategyResult } from "../../../../common/data/history/TradingStrategyResult";
+import { ClassCode } from "../../../../common/data/ClassCode";
+import { JournalTradeDto } from "../../../../common/data/journal/JournalTradeDto";
+import { TradingStrategyTrade } from "../../../../common/data/history/TradingStrategyTrade";
+import { TradingStrategyTradeState } from "../../../../common/data/history/TradingStrategyTradeState";
+import { TradeSystemType } from "../../../../common/data/trading/TradeSystemType";
 import moment = require("moment");
-import {OperationType} from "../../../../common/data/OperationType";
-import {TradingStrategyStatus} from "../../../../common/data/trading/TradingStrategyStatus";
+import { OperationType } from "../../../../common/data/OperationType";
+import { TradingStrategyStatus } from "../../../../common/data/trading/TradingStrategyStatus";
+import botControlRestApi from "../../../../common/api/rest/botControlRestApi";
+import { useEffect } from "react";
 
 interface TableElementData {
     id: number
@@ -29,15 +31,40 @@ interface TableElementData {
     total: number
 }
 
+interface LazyParams {
+    first: number;
+    rows: number;
+    page: number;
+}
+
 type Props = {
     results: TradingStrategyResult[]
     onSelectedTsId: (tsId: number) => void
 }
 
-export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId}) => {
+export const RunningStrategyTable: React.FC<Props> = ({ results, onSelectedTsId }) => {
     const [selectedTsId, setSelectedTsId] = useState<number>(null)
     const classCodes = [ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
     const [selectedRows, setSelectedRows] = useState<TableElementData[]>([])
+    const [loading, setLoading] = useState<boolean>(false);
+    const [totalRecords, setTotalRecords] = useState<number>(0);
+    const [lazyParams, setLazyParams] = useState<LazyParams>({
+        first: 0,
+        rows: 15,
+        page: 1
+    });
+    const [nonRunning, setNonRunning] = useState<TradingStrategyResult[]>([])
+
+    useEffect(() => {
+        botControlRestApi.getAllStrategies(lazyParams.first, lazyParams.rows)
+            .then(page => {
+                setTotalRecords(page.totalElements);
+                setNonRunning(page.content
+                    .filter(value => value.tradingStrategyData.status !== TradingStrategyStatus.RUNNING)
+                    .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id))
+            })
+            .catch(console.error)
+    }, [lazyParams]);
 
     const mapToData = (results: TradingStrategyResult[]): TableElementData[] => (results
         .map(result => {
@@ -76,19 +103,19 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
         return nodes;
     }
 
-    const isShortTemplate = (rowData: any, {field}) => {
+    const isShortTemplate = (rowData: any, { field }) => {
         return rowData[field] ? <span className="fin-short">S</span> : <span className="fin-long">L</span>;
     };
 
-    const dateTemplate = (rowData: any, {field}) => {
+    const dateTemplate = (rowData: any, { field }) => {
         return moment(rowData[field]).format("DD-MM-YYYY");
     };
 
-    const dayOfWeekTemplate = (rowData: any, {field}) => {
+    const dayOfWeekTemplate = (rowData: any, { field }) => {
         return moment(rowData[field]).format("ddd");
     };
 
-    const timeTemplate = (rowData: any, {field}) => {
+    const timeTemplate = (rowData: any, { field }) => {
         return moment(rowData[field]).format("HH:mm:ss");
     };
 
@@ -164,43 +191,49 @@ export const RunningStrategyTable: React.FC<Props> = ({results, onSelectedTsId})
     const footerGroup = (
         <ColumnGroup>
             <Row>
-                <Column footer="Totals:" colSpan={10} footerStyle={{textAlign: 'right'}}/>
-                <Column footer={sum()}/>
+                <Column footer="Totals:" colSpan={10} footerStyle={{ textAlign: 'right' }} />
+                <Column footer={sum()} />
             </Row>
         </ColumnGroup>
     )
 
     return (
         <DataTable value={mapToData(results)}
-                   className="history-strategy-result-table"
-                   footerColumnGroup={footerGroup}
-                   onRowClick={e => {
-                       if (e.originalEvent.target["innerHTML"].indexOf('checkbox') === -1) {
-                           onSelectedTsId(e.data.id)
-                       }
-                   }}
-                   rowClassName={rowBgColor}
-                   dataKey="id"
-                   selection={selectedRows}
-                   onSelectionChange={e => {
-                       setSelectedRows(e.value)
-                   }}
-                   paginator
-                   paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
-                   rows={15}
-                   rowsPerPageOptions={[15, 30, 50]}>
-            <Column selectionMode="multiple" headerStyle={{width: '10px'}}/>
-            <Column field="id" style={{width: '10px'}} header="№" headerStyle={{width: '10px'}}/>
-            <Column field="name" style={{width: '30px', overflow: "hidden"}} header="Strategy" headerStyle={{width: '30px'}}/>
-            <Column field="type" style={{width: '20px'}} header="Type" headerStyle={{width: '20px'}}/>
-            <Column field="start" style={{width: '30px'}} header="Start" headerStyle={{width: '30px'}}/>
-            <Column field="secName" style={{width: '30px'}} header="Sec. Name" headerStyle={{width: '30px'}}/>
-            <Column field="deposit" style={{width: '30px'}} header="Deposit" headerStyle={{width: '30px'}}/>
-            <Column field="lastTradeOperation" style={{width: '30px'}} header="LT Op" headerStyle={{width: '30px'}}/>
-            <Column field="lastTradeEntryRealPrice" style={{width: '30px'}} header="LT Entry R" headerStyle={{width: '30px'}}/>
-            <Column field="lastTradeState" style={{width: '30px', overflow: 'hidden'}} header="LT State" headerStyle={{width: '30px'}}/>
-            <Column field="total" style={{width: '30px'}} header="Result" headerStyle={{width: '30px'}}/>
+            className="history-strategy-result-table"
+            footerColumnGroup={footerGroup}
+            onRowClick={e => {
+                if (e.originalEvent.target["innerHTML"].indexOf('checkbox') === -1) {
+                    onSelectedTsId(e.data.id)
+                }
+            }}
+            rowClassName={rowBgColor}
+            dataKey="id"
+            selection={selectedRows}
+            onSelectionChange={e => {
+                setSelectedRows(e.value)
+            }}
+            lazy
+            first={lazyParams.first}
+            paginator
+            paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            rows={lazyParams.rows}
+            rowsPerPageOptions={[15, 30, 50]}
+            totalRecords={totalRecords}
+            loading={loading}
+            onPage={console.log}
+        >
+            <Column selectionMode="multiple" headerStyle={{ width: '10px' }} />
+            <Column field="id" style={{ width: '10px' }} header="№" headerStyle={{ width: '10px' }} />
+            <Column field="name" filter style={{ width: '30px', overflow: "hidden" }} header="Strategy" headerStyle={{ width: '30px' }} />
+            <Column field="type" filter style={{ width: '20px' }} header="Type" headerStyle={{ width: '20px' }} />
+            <Column field="start" style={{ width: '30px' }} header="Start" headerStyle={{ width: '30px' }} />
+            <Column field="secName" filter style={{ width: '30px' }} header="Sec. Name" headerStyle={{ width: '30px' }} />
+            <Column field="deposit" style={{ width: '30px' }} header="Deposit" headerStyle={{ width: '30px' }} />
+            <Column field="lastTradeOperation" style={{ width: '30px' }} header="LT Op" headerStyle={{ width: '30px' }} />
+            <Column field="lastTradeEntryRealPrice" style={{ width: '30px' }} header="LT Entry R" headerStyle={{ width: '30px' }} />
+            <Column field="lastTradeState" style={{ width: '30px', overflow: 'hidden' }} header="LT State" headerStyle={{ width: '30px' }} />
+            <Column field="total" style={{ width: '30px' }} header="Result" headerStyle={{ width: '30px' }} />
 
             {/*<Column field="operation" style={{width: '30px'}}/>*/}
             {/*<Column field="enterOrderNumber" style={{overflow: 'auto'}}/>*/}

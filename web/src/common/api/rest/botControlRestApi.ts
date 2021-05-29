@@ -1,4 +1,4 @@
-import { handleError, handleResponse } from "../apiUtils";
+import { get, handleError, handleResponse } from "../apiUtils";
 import { MarketBotFilterDataDto } from "../../data/bot/MarketBotFilterDataDto";
 import { MarketBotStartDto } from "../../data/bot/MarketBotStartDto";
 import { TradingStrategyResult } from "../../data/history/TradingStrategyResult";
@@ -9,20 +9,9 @@ import {
 import { TradingStrategyStatus } from "../../data/trading/TradingStrategyStatus";
 import { SecurityHistoryDatesDto } from "../../data/bot/SecurityHistoryDatesDto";
 import { SecurityType } from "../../data/security/SecurityType";
+import { Page } from "../../data/Page";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
-
-export default {
-  getFilterData,
-  getSecurityHistoryDates,
-  startBot,
-  switchBotStatus,
-  getAllStrategies,
-  search,
-  searchByTradingStrategyId,
-  runHistory,
-  stopHistory,
-};
 
 export function getFilterData(
   history: boolean
@@ -64,13 +53,8 @@ export function switchBotStatus(
     .catch(handleError);
 }
 
-export function getAllStrategies(): Promise<TradingStrategyResult[]> {
-  return fetch(baseUrl + "all-strategies")
-    .then((response) =>
-      handleResponse(response).then(adjustTradingStrategyResultArray)
-    )
-    .catch(handleError);
-}
+const getAllStrategies = (page: number, size: number): Promise<Page<TradingStrategyResult>> =>
+  get(`${baseUrl}all-strategies?page=${page}&size=${size}`).then(adjustTradingStrategyResultArray)
 
 export function search(dto: MarketBotStartDto): Promise<TradingStrategyResult> {
   return fetch(baseUrl + "search", {
@@ -113,3 +97,15 @@ export function stopHistory(dto: MarketBotStartDto): Promise<any> {
     .then(handleResponse)
     .catch(handleError);
 }
+
+export default {
+  getFilterData,
+  getSecurityHistoryDates,
+  startBot,
+  switchBotStatus,
+  getAllStrategies,
+  search,
+  searchByTradingStrategyId,
+  runHistory,
+  stopHistory,
+};

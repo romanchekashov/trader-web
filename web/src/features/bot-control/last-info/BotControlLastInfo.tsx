@@ -78,7 +78,6 @@ export const BotControlLastInfo: React.FC<Props> = ({results, onStrategyResultSe
                 </div>*/}
                 <RunningStrategyTable results={results}
                                       onSelectedTsId={onResultSelected}/>
-                <BotState tradingStrategyResult={selectedResult}/>
             </>
         )
     } else {
