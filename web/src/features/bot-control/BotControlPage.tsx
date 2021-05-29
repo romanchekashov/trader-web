@@ -10,7 +10,7 @@ import botControlRestApi, {
     searchByTradingStrategyId,
     startBot,
     stopHistory
-} from "../../common/api/rest/botControlRestApi";
+} from "../../app/strategies/botControlRestApi";
 import { TradingStrategyResult } from "../../common/data/history/TradingStrategyResult";
 import { HistoryStrategyResultTable } from "./table/HistoryStrategyResultTable";
 import { TradeSystemType } from "../../common/data/trading/TradeSystemType";

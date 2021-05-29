@@ -6,7 +6,7 @@ import * as React from "react";
 import { memo, useEffect, useState } from "react";
 import depositsApi from "../../../app/deposits/depositsApi";
 import securitiesApi from "../../../app/securities/securitiesApi";
-import { getSecurityHistoryDates } from "../../../common/api/rest/botControlRestApi";
+import { getSecurityHistoryDates } from "../../../app/strategies/botControlRestApi";
 import { HistoryDateDto } from "../../../common/data/bot/HistoryDateDto";
 import { MarketBotFilterDataDto } from "../../../common/data/bot/MarketBotFilterDataDto";
 import { MarketBotStartDto } from "../../../common/data/bot/MarketBotStartDto";

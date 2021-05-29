@@ -1,7 +1,7 @@
 import securitiesApi from "../../app/securities/securitiesApi";
 import { AppDispatch } from "../../app/store";
 import { getTradePremise } from "../../common/api/rest/analysisRestApi";
-import { getFilterData } from "../../common/api/rest/botControlRestApi";
+import { getFilterData } from "../../app/strategies/botControlRestApi";
 import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
 import { SecurityCurrency } from "../../common/data/security/SecurityCurrency";
 import { SecurityFuture } from "../../common/data/security/SecurityFuture";

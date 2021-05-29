@@ -3,7 +3,7 @@ import {useEffect} from "react";
 import {Button} from "primereact/button";
 import {TradingStrategyResult} from "../../../../../common/data/history/TradingStrategyResult";
 import {TradeSystemType} from "../../../../../common/data/trading/TradeSystemType";
-import {switchBotStatus} from "../../../../../common/api/rest/botControlRestApi";
+import {switchBotStatus} from "../../../../../app/strategies/botControlRestApi";
 import {TradingStrategyStatus} from "../../../../../common/data/trading/TradingStrategyStatus";
 import moment = require("moment");
 import "./StrategyInfo.css"

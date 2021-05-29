@@ -4,7 +4,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Toolbar } from "primereact/toolbar";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { getFilterData } from "../../../common/api/rest/botControlRestApi";
+import { getFilterData } from "../../../app/strategies/botControlRestApi";
 import { MarketSecuritiesDto } from "../../../common/data/bot/MarketSecuritiesDto";
 import { Security } from "../../../common/data/security/Security";
 import { SecurityInfo } from "../../../common/data/security/SecurityInfo";

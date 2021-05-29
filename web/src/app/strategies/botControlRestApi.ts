@@ -1,15 +1,15 @@
-import { get, handleError, handleResponse } from "../apiUtils";
-import { MarketBotFilterDataDto } from "../../data/bot/MarketBotFilterDataDto";
-import { MarketBotStartDto } from "../../data/bot/MarketBotStartDto";
-import { TradingStrategyResult } from "../../data/history/TradingStrategyResult";
+import { get, handleError, handleResponse } from "../../common/api/apiUtils";
+import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
+import { MarketBotStartDto } from "../../common/data/bot/MarketBotStartDto";
+import { TradingStrategyResult } from "../../common/data/history/TradingStrategyResult";
 import {
   adjustTradingStrategyResult,
   adjustTradingStrategyResultArray,
-} from "../../utils/DataUtils";
-import { TradingStrategyStatus } from "../../data/trading/TradingStrategyStatus";
-import { SecurityHistoryDatesDto } from "../../data/bot/SecurityHistoryDatesDto";
-import { SecurityType } from "../../data/security/SecurityType";
-import { Page } from "../../data/Page";
+} from "../../common/utils/DataUtils";
+import { TradingStrategyStatus } from "../../common/data/trading/TradingStrategyStatus";
+import { SecurityHistoryDatesDto } from "../../common/data/bot/SecurityHistoryDatesDto";
+import { SecurityType } from "../../common/data/security/SecurityType";
+import { Page } from "../../common/data/Page";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 
