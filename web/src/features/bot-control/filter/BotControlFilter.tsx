@@ -147,6 +147,7 @@ const BotControlFilter: React.FC<Props> = ({
     TradingStrategyName.UNIVERSAL_2EMA_KEL,
     TradingStrategyName.TWO_EMA_CROSS,
     TradingStrategyName.KELTNER_CHANNEL,
+    TradingStrategyName.TREND_POINT_IN_KELTNER_CHANNEL,
   ].map((val) => ({ label: val, value: val }));
   const [strategy, setStrategy] = useState(initState.strategy);
 
