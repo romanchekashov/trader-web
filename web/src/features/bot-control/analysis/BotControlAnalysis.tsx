@@ -138,7 +138,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             window.removeEventListener('resize', updateSize)
             lastSecuritiesSubscription.unsubscribe()
         }
-    }, [security, tradingStrategyResult])
+    }, [security?.id, tradingStrategyResult])
 
     const onChartNumberChanged = (num: number) => {
         setChartNumber(num)
@@ -189,7 +189,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             <div className="p-grid" style={{margin: '0'}}>
                 <div className="p-col-12" ref={chart1Ref} style={{padding: '0'}}>
                     <ChartWrapper interval={timeFrameTrading}
-                                  initialNumberOfCandles={1000}
+                                  initialNumberOfCandles={500}
                                   start={start}
                                   onPremiseBeforeChanged={onPremiseBeforeChanged}
                                   onIntervalChanged={interval => {
