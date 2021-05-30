@@ -265,14 +265,13 @@ export const RunningStrategyTable: React.FC<Props> = ({ status, onSelectedStrate
         options={secs}
         onChange={onSecChange}
         filter={true}
-        style={{ width: "150px" }}
     />
 
     return (
         <DataTable
             ref={dt}
             value={mapToData(results)}
-            className="history-strategy-result-table"
+            className="RunningStrategyTable history-strategy-result-table p-datatable-sm"
             footerColumnGroup={footerGroup}
             onRowClick={e => {
                 if (e.originalEvent.target["innerHTML"].indexOf('checkbox') === -1) {
