@@ -1,80 +1,89 @@
+import { Button } from "primereact/button";
 import * as React from "react";
-import {useEffect} from "react";
-import {Button} from "primereact/button";
-import {TradingStrategyResult} from "../../../../../common/data/history/TradingStrategyResult";
-import {TradeSystemType} from "../../../../../common/data/trading/TradeSystemType";
 import strategiesApi from "../../../../../app/strategies/strategiesApi";
-import {TradingStrategyStatus} from "../../../../../common/data/trading/TradingStrategyStatus";
+import { TradingStrategyResult } from "../../../../../common/data/history/TradingStrategyResult";
+import { TradeSystemType } from "../../../../../common/data/trading/TradeSystemType";
+import { TradingStrategyStatus } from "../../../../../common/data/trading/TradingStrategyStatus";
+import "./StrategyInfo.css";
+import { StrategyStat } from "./StrategyStat";
 import moment = require("moment");
-import "./StrategyInfo.css"
-import {StrategyStat} from "./StrategyStat";
-import {SecurityInfo} from "../../../../../common/data/security/SecurityInfo";
 
 type Props = {
     tradingStrategyResult: TradingStrategyResult
 }
 
-export const StrategyInfo: React.FC<Props> = ({tradingStrategyResult}) => {
+export const StrategyInfo: React.FC<Props> = ({ tradingStrategyResult }) => {
 
-    if (!tradingStrategyResult) return null
+    if (!tradingStrategyResult?.tradingStrategyData) return null
 
-    useEffect(() => {
-        // Specify how to clean up after this effect:
-        return function cleanup() {
-        }
-    }, [])
+    const {
+        id,
+        name,
+        start,
+        end,
+        security,
+        deposit,
+        status,
+        broker,
+        tradingPlatform,
+        maxRiskPerTradeInPercent,
+        maxRiskPerSessionInPercent,
+        firstTakeProfitPerTradeFactor,
+        secondTakeProfitPerTradeFactor,
+        systemType,
+        interval,
+        intervalHistoryMin
+    } = tradingStrategyResult?.tradingStrategyData;
 
-    const momentStartDate = moment(tradingStrategyResult.tradingStrategyData.start)
-    const momentEndDate = moment(tradingStrategyResult.tradingStrategyData.end || new Date())
-
-    const security: SecurityInfo = tradingStrategyResult.tradingStrategyData.security
+    const momentStartDate = moment(start || new Date())
+    const momentEndDate = moment(end || new Date())
 
     return (
         <div className="p-grid strategy-info">
-            <div className="p-col-6 strategy-info-short-info" style={{paddingBottom: "0"}}>
-                <div>{tradingStrategyResult.tradingStrategyData.name}-{tradingStrategyResult.tradingStrategyData.id}</div>
+            <div className="p-col-6 strategy-info-short-info" style={{ paddingBottom: "0" }}>
+                <div>{name}-{id}</div>
                 <div><strong>{security.shortName}</strong>({security.secCode})</div>
-                <div>D: {tradingStrategyResult.tradingStrategyData.deposit}</div>
+                <div>D: {deposit}</div>
             </div>
             <div className="p-col-6">
-                <strong>{tradingStrategyResult.tradingStrategyData.status}</strong>
+                <strong>{status}</strong>
                 <Button label="Start" className="p-button-success bot-control-button"
-                        onClick={(e) => strategiesApi.switchBotStatus(tradingStrategyResult.tradingStrategyData.id, TradingStrategyStatus.RUNNING)}
-                        disabled={TradingStrategyStatus.FINISHED === tradingStrategyResult.tradingStrategyData.status || TradingStrategyStatus.RUNNING === tradingStrategyResult.tradingStrategyData.status}/>
+                    onClick={(e) => strategiesApi.switchBotStatus(id, TradingStrategyStatus.RUNNING)}
+                    disabled={TradingStrategyStatus.FINISHED === status || TradingStrategyStatus.RUNNING === status} />
                 {/*
                 <Button label="Stop" className="p-button-warning bot-control-button"
                         onClick={(e) => strategiesApi.switchBotStatus(tradingStrategyResult.tradingStrategyData.id, TradingStrategyStatus.STOPPED)}
                         disabled={TradingStrategyStatus.FINISHED === tradingStrategyResult.tradingStrategyData.status || TradingStrategyStatus.STOPPED === tradingStrategyResult.tradingStrategyData.status}/>
                 */}
                 <Button label="Finish" className="p-button-danger bot-control-button"
-                        onClick={(e) => strategiesApi.switchBotStatus(tradingStrategyResult.tradingStrategyData.id, TradingStrategyStatus.FINISHED)}
-                        disabled={TradingStrategyStatus.FINISHED === tradingStrategyResult.tradingStrategyData.status}/>
+                    onClick={(e) => strategiesApi.switchBotStatus(id, TradingStrategyStatus.FINISHED)}
+                    disabled={TradingStrategyStatus.FINISHED === status} />
             </div>
 
-            <StrategyStat stat={tradingStrategyResult.stat}/>
+            <StrategyStat stat={tradingStrategyResult.stat} />
 
-            <div className="p-col-12" style={{display: "flex", justifyContent: "space-around", paddingBottom: "0"}}>
+            <div className="p-col-12" style={{ display: "flex", justifyContent: "space-around", paddingBottom: "0" }}>
                 <div>Start: {momentStartDate.format("HH:mm/DD MMM YY")}</div>
-                <div>End: {tradingStrategyResult.tradingStrategyData.end ? momentEndDate.format("HH:mm/DD MMM YY") : "-"}</div>
+                <div>End: {end ? momentEndDate.format("HH:mm/DD MMM YY") : "-"}</div>
                 <div>{moment.duration(momentStartDate.diff(momentEndDate)).humanize()}</div>
             </div>
-            <div className="p-col-12" style={{display: "flex"}}>
-                <div>{tradingStrategyResult.tradingStrategyData.broker.id}-{tradingStrategyResult.tradingStrategyData.tradingPlatform}</div>
+            <div className="p-col-12" style={{ display: "flex" }}>
+                <div>{broker.id}-{tradingPlatform}</div>
             </div>
             <div className="p-col-12 bot-state-deposit">
-                <div>Deposit: {tradingStrategyResult.tradingStrategyData.deposit}</div>
-                <div>MaxRiskPerTrade: {tradingStrategyResult.tradingStrategyData.maxRiskPerTradeInPercent}%</div>
-                <div>MaxRiskPerSession: {tradingStrategyResult.tradingStrategyData.maxRiskPerSessionInPercent}%</div>
+                <div>Deposit: {deposit}</div>
+                <div>MaxRiskPerTrade: {maxRiskPerTradeInPercent}%</div>
+                <div>MaxRiskPerSession: {maxRiskPerSessionInPercent}%</div>
                 <div>T1
-                    factor:{tradingStrategyResult.tradingStrategyData.firstTakeProfitPerTradeFactor}</div>
+                    factor:{firstTakeProfitPerTradeFactor}</div>
                 <div>T2
-                    factor:{tradingStrategyResult.tradingStrategyData.secondTakeProfitPerTradeFactor}</div>
+                    factor:{secondTakeProfitPerTradeFactor}</div>
             </div>
             <div
-                className="p-col-12">{tradingStrategyResult.tradingStrategyData.systemType}-{tradingStrategyResult.tradingStrategyData.interval} {
-                TradeSystemType.HISTORY === tradingStrategyResult.tradingStrategyData.systemType ?
-                    <span>Min TF: {tradingStrategyResult.tradingStrategyData.intervalHistoryMin}</span> : null
-            }</div>
+                className="p-col-12">{systemType}-{interval} {
+                    TradeSystemType.HISTORY === systemType ?
+                        <span>Min TF: {intervalHistoryMin}</span> : null
+                }</div>
         </div>
     )
 }

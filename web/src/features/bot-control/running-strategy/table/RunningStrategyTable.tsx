@@ -67,7 +67,7 @@ export const RunningStrategyTable: React.FC<Props> = ({ status, onSelectedStrate
     const [selectedRows, setSelectedRows] = useState<TableElementData[]>([])
     const [lazyParams, setLazyParams] = useState<LazyParams>({
         first: 0,
-        rows: 15,
+        rows: 30,
         page: 0
     });
 
@@ -88,9 +88,9 @@ export const RunningStrategyTable: React.FC<Props> = ({ status, onSelectedStrate
     const totalRecords = page.totalElements;
 
     useEffect(() => {
-        console.log(lazyParams);
         let secId = null;
         if (lazyParams.filters && lazyParams.filters.secName) {
+            console.log(lazyParams);
             secId = strategiesSecurities.find(({ shortName }) => shortName === lazyParams.filters.secName.value)?.id;
         }
 

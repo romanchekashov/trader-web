@@ -90,7 +90,7 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
     const onStart = (data: MarketBotStartDto): void => {
         if (data.systemType === TradeSystemType.HISTORY) {
             strategiesApi.runHistory(data)
-                .then(setSelectedTSResult)
+                .then(onStrategyResultSelected)
                 .catch(console.error)
         } else {
             strategiesApi.startBot(data).then(value => {
@@ -101,7 +101,7 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
 
     const onSearch = (data: MarketBotStartDto): void => {
         strategiesApi.search(data)
-            .then(setSelectedTSResult)
+            .then(onStrategyResultSelected)
             .catch(console.error)
     }
 
