@@ -69,6 +69,7 @@ const store = configureStore({
         "activeTrades/deleteActiveTrades/pending",
         "activeTrades/setSelectedActiveTrade",
         "activeTrades/deleteActiveTrades/rejected",
+        "activeTrades/loadActiveTrades/rejected",
         "news/fetch/pending",
         "deposits/loadFuturesClientLimits/fulfilled",
         "deposits/loadFuturesClientLimits/pending",
@@ -97,6 +98,12 @@ const store = configureStore({
         "securities/loadShares/pending",
         "notifications/addNewSignals",
         "securities/loadLastSecurities/rejected",
+        "strategies/loadStrategies/pending",
+        "strategies/loadStrategies/rejected",
+        "strategies/loadStrategies/fulfilled",
+        "strategies/loadStrategiesHistory/pending",
+        "strategies/loadStrategiesHistory/rejected",
+        "strategies/loadStrategiesHistory/fulfilled"
       ],
       // Ignore these field paths in all actions
       ignoredActionPaths: ["timestamp"],

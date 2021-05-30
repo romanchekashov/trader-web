@@ -17,6 +17,10 @@ import { OperationType } from "../../../../common/data/OperationType";
 import { TradingStrategyStatus } from "../../../../common/data/trading/TradingStrategyStatus";
 import botControlRestApi from "../../../../app/strategies/strategiesApi";
 import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
+import { loadStrategies, loadStrategiesHistory, selectStrategies } from "../../../../app/strategies/strategiesSlice";
+import { LoadingState } from "../../../../app/LoadingState";
+import { Page } from "../../../../common/data/Page";
 
 interface TableElementData {
     id: number
@@ -38,33 +42,36 @@ interface LazyParams {
 }
 
 type Props = {
-    results: TradingStrategyResult[]
+    history?: boolean
     onSelectedTsId: (tsId: number) => void
 }
 
-export const RunningStrategyTable: React.FC<Props> = ({ results, onSelectedTsId }) => {
+export const RunningStrategyTable: React.FC<Props> = ({ history, onSelectedTsId }) => {
+
+    const dispatch = useAppDispatch();
+    const { strategyResultsHistory, strategyResultsHistoryLoading, strategyResults, strategyResultsLoading } = useAppSelector(selectStrategies);
+
     const [selectedTsId, setSelectedTsId] = useState<number>(null)
     const classCodes = [ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
     const [selectedRows, setSelectedRows] = useState<TableElementData[]>([])
-    const [loading, setLoading] = useState<boolean>(false);
-    const [totalRecords, setTotalRecords] = useState<number>(0);
     const [lazyParams, setLazyParams] = useState<LazyParams>({
         first: 0,
         rows: 15,
-        page: 1
+        page: 0
     });
-    const [nonRunning, setNonRunning] = useState<TradingStrategyResult[]>([])
+    const page: Page<TradingStrategyResult> = history ? strategyResultsHistory : strategyResults;
+    const results: TradingStrategyResult[] = page.content;
+    const totalRecords = page.totalElements;
+    const loading = history ? strategyResultsHistoryLoading === LoadingState.LOADING : strategyResultsLoading === LoadingState.LOADING;
+    const last = page.totalPages;
 
     useEffect(() => {
-        botControlRestApi.getAllStrategies(lazyParams.first, lazyParams.rows)
-            .then(page => {
-                setTotalRecords(page.totalElements);
-                setNonRunning(page.content
-                    .filter(value => value.tradingStrategyData.status !== TradingStrategyStatus.RUNNING)
-                    .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id))
-            })
-            .catch(console.error)
-    }, [lazyParams]);
+        if (history) {
+            dispatch(loadStrategiesHistory({ page: lazyParams.page, size: lazyParams.rows }));
+        } else {
+            dispatch(loadStrategies({ page: lazyParams.page, size: lazyParams.rows }));
+        }
+    }, [history, lazyParams]);
 
     const mapToData = (results: TradingStrategyResult[]): TableElementData[] => (results
         .map(result => {
@@ -213,7 +220,7 @@ export const RunningStrategyTable: React.FC<Props> = ({ results, onSelectedTsId 
                 setSelectedRows(e.value)
             }}
             lazy
-            first={lazyParams.first}
+            first={lazyParams.page}
             paginator
             paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
@@ -221,7 +228,7 @@ export const RunningStrategyTable: React.FC<Props> = ({ results, onSelectedTsId 
             rowsPerPageOptions={[15, 30, 50]}
             totalRecords={totalRecords}
             loading={loading}
-            onPage={console.log}
+            onPage={e => setLazyParams({ ...lazyParams, ...e })}
         >
             <Column selectionMode="multiple" headerStyle={{ width: '10px' }} />
             <Column field="id" style={{ width: '10px' }} header="№" headerStyle={{ width: '10px' }} />

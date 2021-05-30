@@ -58,35 +58,25 @@ export const BotControlLastInfo: React.FC<Props> = ({results, onStrategyResultSe
         );
     };
 
-    if (results.length > 0) {
-        return (
-            <>
-                {/*<div className="p-grid bot-control-demo" style={{height: outerHeight || 200}}>
-                    <AutoSizer>
-                        {({height, width}) => (
-                            <List
-                                className="List"
-                                height={height}
-                                itemCount={results.length}
-                                itemSize={60}
-                                width={width}
-                            >
-                                {Row}
-                            </List>
-                        )}
-                    </AutoSizer>
-                </div>*/}
-                <RunningStrategyTable results={results}
-                                      onSelectedTsId={onResultSelected}/>
-            </>
-        )
-    } else {
-        return (
-            <div className="p-grid">
-                <div className="p-col-12">
-                    No Finished Trading Strategy Bots
-                </div>
-            </div>
-        )
-    }
+    return (
+        <>
+            {/*<div className="p-grid bot-control-demo" style={{height: outerHeight || 200}}>
+                <AutoSizer>
+                    {({height, width}) => (
+                        <List
+                            className="List"
+                            height={height}
+                            itemCount={results.length}
+                            itemSize={60}
+                            width={width}
+                        >
+                            {Row}
+                        </List>
+                    )}
+                </AutoSizer>
+            </div>*/}
+            <RunningStrategyTable history={true}
+                                  onSelectedTsId={onResultSelected}/>
+        </>
+    )
 }

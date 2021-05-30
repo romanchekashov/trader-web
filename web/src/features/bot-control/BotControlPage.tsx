@@ -22,11 +22,15 @@ import { adjustTradingStrategyResultArray } from "../../common/utils/DataUtils";
 import { TradingStrategyStatus } from "../../common/data/trading/TradingStrategyStatus";
 import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
 import { BotState } from "./running-strategy/bot-state/BotState";
+import { loadStrategies, loadStrategiesHistory, selectStrategies } from "../../app/strategies/strategiesSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 
 type Props = {}
 
 export const BotControlPage: React.FC<Props> = ({ }) => {
 
+    const dispatch = useAppDispatch();
+    const { strategyResultsHistory, strategyResults } = useAppSelector(selectStrategies);
     const items = [
         { label: 'Current State', icon: 'pi pi-fw pi-home' },
         { label: 'Real Deposit Stats', icon: 'pi pi-fw pi-calendar' },
@@ -45,7 +49,8 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
 
     useEffect(() => {
         strategiesApi.getFilterData(false)
-            .then(setFilterData)
+            .then(setFilterData);
+        dispatch(loadStrategiesHistory({ page: 0, size: 1 }));
     }, [])
 
     useEffect(() => {
@@ -133,12 +138,12 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
                 <div className="p-grid">
                     <div className="p-col-6">
                         <TabView onTabChange={e => tabSelected(e.index)} activeIndex={activeIndex}>
-                            <TabPanel header={"Running: " + running.length}>
+                            <TabPanel header={"Running: " + strategyResults.totalElements}>
                                 <RunningStrategy
                                     results={running}
                                     onStrategyResultSelected={onStrategyResultSelected} />
                             </TabPanel>
-                            <TabPanel header={"History: " + nonRunning.length}>
+                            <TabPanel header={"History: " + strategyResultsHistory.totalElements}>
                                 <BotControlLastInfo
                                     results={nonRunning}
                                     outerHeight={400}

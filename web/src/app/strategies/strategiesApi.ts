@@ -29,8 +29,12 @@ const switchBotStatus = (
   tradingStrategyStatus: TradingStrategyStatus
 ): Promise<void> => get(`${baseUrl}switch-bot-status?tradingStrategyId=${tradingStrategyId}&tradingStrategyStatus=${tradingStrategyStatus}`);
 
-const getAllStrategies = (page: number, size: number): Promise<Page<TradingStrategyResult>> =>
-  get(`${baseUrl}all-strategies?page=${page}&size=${size}`).then(adjustTradingStrategyResultArray)
+const getAllStrategies = (status: TradingStrategyStatus, page: number, size: number): Promise<Page<TradingStrategyResult>> =>
+  get<Page<TradingStrategyResult>>(`${baseUrl}all-strategies?${status ? `status=${status}&` : ""}page=${page}&size=${size}`)
+  .then(page => {
+    page.content.forEach(adjustTradingStrategyResult);
+    return page;
+  })
 
 const search = (dto: MarketBotStartDto): Promise<TradingStrategyResult> => post(`${baseUrl}search`, dto);
 

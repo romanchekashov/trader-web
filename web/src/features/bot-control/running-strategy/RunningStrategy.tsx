@@ -20,8 +20,7 @@ export const RunningStrategy: React.FC<Props> = ({results, onStrategyResultSelec
 
     return (
         <div>
-            <RunningStrategyTable results={results}
-                                  onSelectedTsId={setSelectedTsId}/>
+            <RunningStrategyTable onSelectedTsId={setSelectedTsId}/>
             <BotState tradingStrategyResult={selectedTs}/>
         </div>
     )
