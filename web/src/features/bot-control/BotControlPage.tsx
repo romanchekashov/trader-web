@@ -1,36 +1,35 @@
+import { TabPanel, TabView } from "primereact/tabview";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
-import BotControlFilter from "./filter/BotControlFilter";
-import { MarketBotStartDto } from "../../common/data/bot/MarketBotStartDto";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import strategiesApi from "../../app/strategies/strategiesApi";
+import { loadStrategiesHistory, loadStrategiesStopped, selectStrategies, setRunning } from "../../app/strategies/strategiesSlice";
+import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
+import { EconomicCalendar } from "../../common/components/economic-calendar/EconomicCalendar";
+import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
+import { MarketBotStartDto } from "../../common/data/bot/MarketBotStartDto";
 import { TradingStrategyResult } from "../../common/data/history/TradingStrategyResult";
-import { HistoryStrategyResultTable } from "./table/HistoryStrategyResultTable";
+import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
 import { TradeSystemType } from "../../common/data/trading/TradeSystemType";
+import { TradingStrategyStatus } from "../../common/data/trading/TradingStrategyStatus";
+import { adjustTradingStrategyResultArray } from "../../common/utils/DataUtils";
 import ProfitLossChart from "../trade-journal/profitLossChart/ProfitLossChart";
 import { TradeJournalStatistic } from "../trade-journal/statistic/TradeJournalStatistic";
 import { TradeJournalTable } from "../trade-journal/table/TradeJournalTable";
-import { BotControlLastInfo } from "./last-info/BotControlLastInfo";
-import { TabPanel, TabView } from "primereact/tabview";
 import { BotControlAnalysis } from "./analysis/BotControlAnalysis";
-import { getSecurity } from "../../common/utils/Cache";
 import { BotControlAnalysisInfo } from "./analysis/BotControlAnalysisInfo";
-import { RunningStrategy } from "./running-strategy/RunningStrategy";
-import { EconomicCalendar } from "../../common/components/economic-calendar/EconomicCalendar";
-import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
-import { adjustTradingStrategyResultArray } from "../../common/utils/DataUtils";
-import { TradingStrategyStatus } from "../../common/data/trading/TradingStrategyStatus";
-import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
+import BotControlFilter from "./filter/BotControlFilter";
 import { BotState } from "./running-strategy/bot-state/BotState";
-import { loadStrategies, loadStrategiesHistory, selectStrategies } from "../../app/strategies/strategiesSlice";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { RunningStrategyTable } from "./running-strategy/table/RunningStrategyTable";
+import { HistoryStrategyResultTable } from "./table/HistoryStrategyResultTable";
+import "./BotControlPage.css";
 
 type Props = {}
 
 export const BotControlPage: React.FC<Props> = ({ }) => {
 
     const dispatch = useAppDispatch();
-    const { strategyResultsHistory, strategyResults } = useAppSelector(selectStrategies);
+    const { strategyResultsRunning, strategyResultsStopped, strategyResultsHistory } = useAppSelector(selectStrategies);
     const items = [
         { label: 'Current State', icon: 'pi pi-fw pi-home' },
         { label: 'Real Deposit Stats', icon: 'pi pi-fw pi-calendar' },
@@ -43,17 +42,17 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
     const [activeIndex, setActiveIndex] = useState<number>(0)
     const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
     const [selectedTSResult, setSelectedTSResult] = useState<TradingStrategyResult>(null)
-    const [nonRunning, setNonRunning] = useState<TradingStrategyResult[]>([])
-    const [running, setRunning] = useState<TradingStrategyResult[]>([])
-    const [selectedTsId, setSelectedTsId] = useState<number>(null)
 
     useEffect(() => {
         strategiesApi.getFilterData(false)
             .then(setFilterData);
+        dispatch(loadStrategiesStopped({ page: 0, size: 1 }));
         dispatch(loadStrategiesHistory({ page: 0, size: 1 }));
     }, [])
 
     useEffect(() => {
+        const selectedTsId = selectedTSResult?.tradingStrategyData?.id;
+
         const wsStatusSub = WebsocketService.getInstance()
             .connectionStatus()
             .subscribe(isConnected => {
@@ -65,11 +64,15 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
         const tradingStrategiesStatesSubscription = WebsocketService.getInstance()
             .on<TradingStrategyResult[]>(WSEvent.TRADING_STRATEGIES_RESULTS)
             .subscribe(data => {
-                const newResults: TradingStrategyResult[] = adjustTradingStrategyResultArray(data)
-                    .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id)
-                setRunning(newResults)
-                if (selectedTsId) setSelectedTSResult(newResults
-                    .find(value => value.tradingStrategyData.id === selectedTsId))
+                const running = adjustTradingStrategyResultArray(data)
+                    .sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id);
+
+                setRunning(running);
+
+                if (selectedTsId) {
+                    const result = running.find(({ tradingStrategyData }) => tradingStrategyData.id === selectedTsId);
+                    if (result) setSelectedTSResult(result);
+                }
             })
 
         // Specify how to clean up after this effect:
@@ -77,7 +80,7 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
             if (wsStatusSub) wsStatusSub.unsubscribe()
             if (tradingStrategiesStatesSubscription) tradingStrategiesStatesSubscription.unsubscribe()
         }
-    }, [selectedTsId])
+    }, [selectedTSResult?.tradingStrategyData?.id])
 
     const tabSelected = (index: number): void => {
         setActiveIndex(index)
@@ -126,7 +129,7 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
     }
 
     return (
-        <div className="p-grid sample-layout">
+        <div className="p-grid sample-layout BotControlPage">
             <div className="p-col-12">
                 <BotControlFilter filter={filterData}
                     onStart={onStart}
@@ -138,16 +141,14 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
                 <div className="p-grid">
                     <div className="p-col-6">
                         <TabView onTabChange={e => tabSelected(e.index)} activeIndex={activeIndex}>
-                            <TabPanel header={"Running: " + strategyResults.totalElements}>
-                                <RunningStrategy
-                                    results={running}
-                                    onStrategyResultSelected={onStrategyResultSelected} />
+                            <TabPanel header={"Running: " + strategyResultsRunning.totalElements}>
+                                <RunningStrategyTable status={TradingStrategyStatus.RUNNING} onSelectedStrategyResult={onStrategyResultSelected} />
+                            </TabPanel>
+                            <TabPanel header={"Stopped: " + strategyResultsStopped.totalElements}>
+                                <RunningStrategyTable status={TradingStrategyStatus.STOPPED} onSelectedStrategyResult={onStrategyResultSelected} />
                             </TabPanel>
                             <TabPanel header={"History: " + strategyResultsHistory.totalElements}>
-                                <BotControlLastInfo
-                                    results={nonRunning}
-                                    outerHeight={400}
-                                    onStrategyResultSelected={onStrategyResultSelected} />
+                                <RunningStrategyTable status={TradingStrategyStatus.FINISHED} onSelectedStrategyResult={onStrategyResultSelected} />
                             </TabPanel>
                         </TabView>
                     </div>

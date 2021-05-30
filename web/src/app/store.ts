@@ -2,7 +2,7 @@ import {
   Action,
   configureStore,
   getDefaultMiddleware,
-  ThunkAction,
+  ThunkAction
 } from "@reduxjs/toolkit";
 import { enableMapSet } from "immer";
 import analysisReducer from "../features/analysis/AnalysisSlice";
@@ -98,9 +98,12 @@ const store = configureStore({
         "securities/loadShares/pending",
         "notifications/addNewSignals",
         "securities/loadLastSecurities/rejected",
-        "strategies/loadStrategies/pending",
-        "strategies/loadStrategies/rejected",
-        "strategies/loadStrategies/fulfilled",
+        "strategies/loadStrategiesRunning/pending",
+        "strategies/loadStrategiesRunning/rejected",
+        "strategies/loadStrategiesRunning/fulfilled",
+        "strategies/loadStrategiesStopped/pending",
+        "strategies/loadStrategiesStopped/rejected",
+        "strategies/loadStrategiesStopped/fulfilled",
         "strategies/loadStrategiesHistory/pending",
         "strategies/loadStrategiesHistory/rejected",
         "strategies/loadStrategiesHistory/fulfilled"

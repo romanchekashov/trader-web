@@ -1,7 +1,7 @@
 import securitiesApi from "../../app/securities/securitiesApi";
 import { AppDispatch } from "../../app/store";
+import strategiesApi from "../../app/strategies/strategiesApi";
 import { getTradePremise } from "../../common/api/rest/analysisRestApi";
-import { getFilterData } from "../../app/strategies/strategiesApi";
 import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
 import { SecurityCurrency } from "../../common/data/security/SecurityCurrency";
 import { SecurityFuture } from "../../common/data/security/SecurityFuture";
@@ -69,7 +69,7 @@ export const loadFilterDataSuccess = (
   filter,
 });
 export const loadFilterData = () => (dispatch: AppDispatch) => {
-  getFilterData(false)
+  strategiesApi.getFilterData(false)
     .then((filter) => {
       dispatch(loadFilterDataSuccess(filter));
     })

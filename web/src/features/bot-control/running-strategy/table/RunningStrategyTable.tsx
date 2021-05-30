@@ -1,26 +1,24 @@
-import * as React from "react";
-import { useState } from "react";
-import "./RunningStrategyTable.css";
 import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
 import { ColumnGroup } from "primereact/columngroup";
-import { Row } from "primereact/row";
 import TreeNode from "primereact/components/treenode/TreeNode";
-import { TradingStrategyResult } from "../../../../common/data/history/TradingStrategyResult";
+import { DataTable } from "primereact/datatable";
+import { Row } from "primereact/row";
+import * as React from "react";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
+import { LoadingState } from "../../../../app/LoadingState";
+import { loadStrategiesHistory, loadStrategiesRunning, loadStrategiesStopped, selectStrategies } from "../../../../app/strategies/strategiesSlice";
 import { ClassCode } from "../../../../common/data/ClassCode";
-import { JournalTradeDto } from "../../../../common/data/journal/JournalTradeDto";
+import { TradingStrategyResult } from "../../../../common/data/history/TradingStrategyResult";
 import { TradingStrategyTrade } from "../../../../common/data/history/TradingStrategyTrade";
 import { TradingStrategyTradeState } from "../../../../common/data/history/TradingStrategyTradeState";
-import { TradeSystemType } from "../../../../common/data/trading/TradeSystemType";
-import moment = require("moment");
+import { JournalTradeDto } from "../../../../common/data/journal/JournalTradeDto";
 import { OperationType } from "../../../../common/data/OperationType";
-import { TradingStrategyStatus } from "../../../../common/data/trading/TradingStrategyStatus";
-import botControlRestApi from "../../../../app/strategies/strategiesApi";
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
-import { loadStrategies, loadStrategiesHistory, selectStrategies } from "../../../../app/strategies/strategiesSlice";
-import { LoadingState } from "../../../../app/LoadingState";
 import { Page } from "../../../../common/data/Page";
+import { TradeSystemType } from "../../../../common/data/trading/TradeSystemType";
+import { TradingStrategyStatus } from "../../../../common/data/trading/TradingStrategyStatus";
+import "./RunningStrategyTable.css";
+import moment = require("moment");
 
 interface TableElementData {
     id: number
@@ -42,14 +40,18 @@ interface LazyParams {
 }
 
 type Props = {
-    history?: boolean
-    onSelectedTsId: (tsId: number) => void
+    status: TradingStrategyStatus
+    onSelectedStrategyResult: (tsId: TradingStrategyResult) => void
 }
 
-export const RunningStrategyTable: React.FC<Props> = ({ history, onSelectedTsId }) => {
+export const RunningStrategyTable: React.FC<Props> = ({ status, onSelectedStrategyResult }) => {
 
     const dispatch = useAppDispatch();
-    const { strategyResultsHistory, strategyResultsHistoryLoading, strategyResults, strategyResultsLoading } = useAppSelector(selectStrategies);
+    const {
+        strategyResultsRunning, strategyResultsRunningLoading,
+        strategyResultsStopped, strategyResultsStoppedLoading,
+        strategyResultsHistory, strategyResultsHistoryLoading
+    } = useAppSelector(selectStrategies);
 
     const [selectedTsId, setSelectedTsId] = useState<number>(null)
     const classCodes = [ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
@@ -59,19 +61,37 @@ export const RunningStrategyTable: React.FC<Props> = ({ history, onSelectedTsId 
         rows: 15,
         page: 0
     });
-    const page: Page<TradingStrategyResult> = history ? strategyResultsHistory : strategyResults;
+
+    let page: Page<TradingStrategyResult> = strategyResultsHistory;
+    let loading = strategyResultsHistoryLoading === LoadingState.LOADING;
+
+    if (status === TradingStrategyStatus.RUNNING) {
+        page = strategyResultsRunning;
+        loading = strategyResultsRunningLoading === LoadingState.LOADING;
+    }
+
+    if (status === TradingStrategyStatus.STOPPED) {
+        page = strategyResultsStopped;
+        loading = strategyResultsStoppedLoading === LoadingState.LOADING;
+    }
+
     const results: TradingStrategyResult[] = page.content;
     const totalRecords = page.totalElements;
-    const loading = history ? strategyResultsHistoryLoading === LoadingState.LOADING : strategyResultsLoading === LoadingState.LOADING;
-    const last = page.totalPages;
 
     useEffect(() => {
-        if (history) {
-            dispatch(loadStrategiesHistory({ page: lazyParams.page, size: lazyParams.rows }));
-        } else {
-            dispatch(loadStrategies({ page: lazyParams.page, size: lazyParams.rows }));
+        switch (status) {
+            case TradingStrategyStatus.RUNNING:
+                dispatch(loadStrategiesRunning({ page: lazyParams.page, size: lazyParams.rows }));
+                break;
+            case TradingStrategyStatus.STOPPED:
+                dispatch(loadStrategiesStopped({ page: lazyParams.page, size: lazyParams.rows }));
+                break;
+            case TradingStrategyStatus.FINISHED:
+                dispatch(loadStrategiesHistory({ page: lazyParams.page, size: lazyParams.rows }));
+                break;
+
         }
-    }, [history, lazyParams]);
+    }, [status, lazyParams]);
 
     const mapToData = (results: TradingStrategyResult[]): TableElementData[] => (results
         .map(result => {
@@ -88,7 +108,8 @@ export const RunningStrategyTable: React.FC<Props> = ({ history, onSelectedTsId 
                 lastTradeOperation: lastTrade?.operation,
                 lastTradeEntryRealPrice: lastTrade?.entryRealPrice,
                 lastTradeState: lastTrade?.state,
-                total: result.stat?.totalGainAndLoss
+                total: result.stat?.totalGainAndLoss,
+                data: result
             }
         }))
 
@@ -210,7 +231,7 @@ export const RunningStrategyTable: React.FC<Props> = ({ history, onSelectedTsId 
             footerColumnGroup={footerGroup}
             onRowClick={e => {
                 if (e.originalEvent.target["innerHTML"].indexOf('checkbox') === -1) {
-                    onSelectedTsId(e.data.id)
+                    onSelectedStrategyResult(e.data.data)
                 }
             }}
             rowClassName={rowBgColor}

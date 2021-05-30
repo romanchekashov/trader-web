@@ -33,6 +33,7 @@ const getAllStrategies = (status: TradingStrategyStatus, page: number, size: num
   get<Page<TradingStrategyResult>>(`${baseUrl}all-strategies?${status ? `status=${status}&` : ""}page=${page}&size=${size}`)
   .then(page => {
     page.content.forEach(adjustTradingStrategyResult);
+    page.content.sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id);
     return page;
   })
 

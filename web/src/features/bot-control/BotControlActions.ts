@@ -1,5 +1,5 @@
 import {MarketBotFilterDataDto} from "../../common/data/bot/MarketBotFilterDataDto";
-import {getFilterData} from "../../app/strategies/strategiesApi";
+import strategiesApi from "../../app/strategies/strategiesApi";
 import {AppDispatch} from "../../app/store";
 
 export const LOAD_FILTER_DATA_SUCCESS = "LOAD_FILTER_DATA_SUCCESS";
@@ -19,7 +19,7 @@ export type TradeStrategyBotControlActionTypes = LoadFilterSuccessAction
 export const loadFilterDataSuccess = (filter: MarketBotFilterDataDto): LoadFilterSuccessAction => ({type: LOAD_FILTER_DATA_SUCCESS, filter});
 
 export const loadFilterData = () => (dispatch: AppDispatch) => {
-    getFilterData(false)
+    strategiesApi.getFilterData(false)
         .then(filter => {
             dispatch(loadFilterDataSuccess(filter));
         })
