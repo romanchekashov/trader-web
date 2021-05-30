@@ -1,15 +1,15 @@
 import { get, handleError, handleResponse, post } from "../../common/api/apiUtils";
 import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
 import { MarketBotStartDto } from "../../common/data/bot/MarketBotStartDto";
-import { TradingStrategyResult } from "../../common/data/history/TradingStrategyResult";
-import {
-  adjustTradingStrategyResult,
-  adjustTradingStrategyResultArray,
-} from "../../common/utils/DataUtils";
-import { TradingStrategyStatus } from "../../common/data/trading/TradingStrategyStatus";
 import { SecurityHistoryDatesDto } from "../../common/data/bot/SecurityHistoryDatesDto";
-import { SecurityType } from "../../common/data/security/SecurityType";
+import { TradingStrategyResult } from "../../common/data/history/TradingStrategyResult";
 import { Page } from "../../common/data/Page";
+import { SecurityInfo } from "../../common/data/security/SecurityInfo";
+import { SecurityType } from "../../common/data/security/SecurityType";
+import { TradingStrategyStatus } from "../../common/data/trading/TradingStrategyStatus";
+import {
+  adjustTradingStrategyResult
+} from "../../common/utils/DataUtils";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-bot-control/";
 
@@ -29,13 +29,16 @@ const switchBotStatus = (
   tradingStrategyStatus: TradingStrategyStatus
 ): Promise<void> => get(`${baseUrl}switch-bot-status?tradingStrategyId=${tradingStrategyId}&tradingStrategyStatus=${tradingStrategyStatus}`);
 
-const getAllStrategies = (status: TradingStrategyStatus, page: number, size: number): Promise<Page<TradingStrategyResult>> =>
-  get<Page<TradingStrategyResult>>(`${baseUrl}all-strategies?${status ? `status=${status}&` : ""}page=${page}&size=${size}`)
-  .then(page => {
-    page.content.forEach(adjustTradingStrategyResult);
-    page.content.sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id);
-    return page;
-  })
+const getAllStrategies = (secId: number, status: TradingStrategyStatus, page: number, size: number): Promise<Page<TradingStrategyResult>> =>
+  get<Page<TradingStrategyResult>>(`${baseUrl}all-strategies?${secId ? `secId=${secId}&` : ""}${status ? `status=${status}&` : ""}page=${page}&size=${size}`)
+    .then(page => {
+      page.content.forEach(adjustTradingStrategyResult);
+      page.content.sort((a, b) => b.tradingStrategyData.id - a.tradingStrategyData.id);
+      return page;
+    })
+
+const getAllStrategiesSecurities = (): Promise<SecurityInfo[]> =>
+  get<SecurityInfo[]>(`${baseUrl}all-strategies/securities-info`);
 
 const search = (dto: MarketBotStartDto): Promise<TradingStrategyResult> => post(`${baseUrl}search`, dto);
 
@@ -77,6 +80,7 @@ export default {
   startBot,
   switchBotStatus,
   getAllStrategies,
+  getAllStrategiesSecurities,
   search,
   searchByTradingStrategyId,
   runHistory,

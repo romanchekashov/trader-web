@@ -2,9 +2,10 @@ import { Column } from "primereact/column";
 import { ColumnGroup } from "primereact/columngroup";
 import TreeNode from "primereact/components/treenode/TreeNode";
 import { DataTable } from "primereact/datatable";
+import { Dropdown } from "primereact/dropdown";
 import { Row } from "primereact/row";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import { LoadingState } from "../../../../app/LoadingState";
 import { loadStrategiesHistory, loadStrategiesRunning, loadStrategiesStopped, selectStrategies } from "../../../../app/strategies/strategiesSlice";
@@ -15,8 +16,10 @@ import { TradingStrategyTradeState } from "../../../../common/data/history/Tradi
 import { JournalTradeDto } from "../../../../common/data/journal/JournalTradeDto";
 import { OperationType } from "../../../../common/data/OperationType";
 import { Page } from "../../../../common/data/Page";
+import { SecurityInfo } from "../../../../common/data/security/SecurityInfo";
 import { TradeSystemType } from "../../../../common/data/trading/TradeSystemType";
 import { TradingStrategyStatus } from "../../../../common/data/trading/TradingStrategyStatus";
+import { PrimeDropdownItem } from "../../../../common/utils/utils";
 import "./RunningStrategyTable.css";
 import moment = require("moment");
 
@@ -37,6 +40,7 @@ interface LazyParams {
     first: number;
     rows: number;
     page: number;
+    filters?: any;
 }
 
 type Props = {
@@ -48,11 +52,16 @@ export const RunningStrategyTable: React.FC<Props> = ({ status, onSelectedStrate
 
     const dispatch = useAppDispatch();
     const {
+        strategiesSecurities,
         strategyResultsRunning, strategyResultsRunningLoading,
         strategyResultsStopped, strategyResultsStoppedLoading,
         strategyResultsHistory, strategyResultsHistoryLoading
     } = useAppSelector(selectStrategies);
 
+    const dt = useRef(null);
+
+    const [sec, setSec] = useState<SecurityInfo>(null);
+    const [secs, setSecs] = useState<PrimeDropdownItem<SecurityInfo>[]>([{ label: "ALL", value: null }]);
     const [selectedTsId, setSelectedTsId] = useState<number>(null)
     const classCodes = [ClassCode.SPBFUT, ClassCode.TQBR, ClassCode.CETS]
     const [selectedRows, setSelectedRows] = useState<TableElementData[]>([])
@@ -79,19 +88,39 @@ export const RunningStrategyTable: React.FC<Props> = ({ status, onSelectedStrate
     const totalRecords = page.totalElements;
 
     useEffect(() => {
+        console.log(lazyParams);
+        let secId = null;
+        if (lazyParams.filters && lazyParams.filters.secName) {
+            secId = strategiesSecurities.find(({ shortName }) => shortName === lazyParams.filters.secName.value)?.id;
+        }
+
         switch (status) {
             case TradingStrategyStatus.RUNNING:
-                dispatch(loadStrategiesRunning({ page: lazyParams.page, size: lazyParams.rows }));
+                dispatch(loadStrategiesRunning({ secId, page: lazyParams.page, size: lazyParams.rows }));
                 break;
             case TradingStrategyStatus.STOPPED:
-                dispatch(loadStrategiesStopped({ page: lazyParams.page, size: lazyParams.rows }));
+                dispatch(loadStrategiesStopped({ secId, page: lazyParams.page, size: lazyParams.rows }));
                 break;
             case TradingStrategyStatus.FINISHED:
-                dispatch(loadStrategiesHistory({ page: lazyParams.page, size: lazyParams.rows }));
+                dispatch(loadStrategiesHistory({ secId, page: lazyParams.page, size: lazyParams.rows }));
                 break;
 
         }
-    }, [status, lazyParams]);
+    }, [status, lazyParams, strategiesSecurities]);
+
+    useEffect(() => {
+        if (!strategiesSecurities.length) return;
+
+        const newSecCodes: PrimeDropdownItem<SecurityInfo>[] = [
+            { label: "ALL", value: null },
+        ];
+
+        for (const sec of strategiesSecurities) {
+            newSecCodes.push({ label: sec.shortName, value: sec });
+        }
+
+        setSecs(newSecCodes);
+    }, [strategiesSecurities]);
 
     const mapToData = (results: TradingStrategyResult[]): TableElementData[] => (results
         .map(result => {
@@ -216,6 +245,12 @@ export const RunningStrategyTable: React.FC<Props> = ({ status, onSelectedStrate
         return Math.floor(sum)
     }
 
+    const onSecChange = (e) => {
+        const sec: SecurityInfo = e.value;
+        dt.current.filter(sec?.shortName, 'secName', 'equals');
+        setSec(sec);
+    }
+
     const footerGroup = (
         <ColumnGroup>
             <Row>
@@ -225,8 +260,18 @@ export const RunningStrategyTable: React.FC<Props> = ({ status, onSelectedStrate
         </ColumnGroup>
     )
 
+    const secFilter = <Dropdown
+        value={sec}
+        options={secs}
+        onChange={onSecChange}
+        filter={true}
+        style={{ width: "150px" }}
+    />
+
     return (
-        <DataTable value={mapToData(results)}
+        <DataTable
+            ref={dt}
+            value={mapToData(results)}
             className="history-strategy-result-table"
             footerColumnGroup={footerGroup}
             onRowClick={e => {
@@ -248,15 +293,17 @@ export const RunningStrategyTable: React.FC<Props> = ({ status, onSelectedStrate
             rows={lazyParams.rows}
             rowsPerPageOptions={[15, 30, 50]}
             totalRecords={totalRecords}
-            loading={loading}
             onPage={e => setLazyParams({ ...lazyParams, ...e })}
+            onFilter={e => setLazyParams({ ...lazyParams, ...e, first: 0, page: 0 })}
+            filters={lazyParams.filters}
+            loading={loading}
         >
             <Column selectionMode="multiple" headerStyle={{ width: '10px' }} />
             <Column field="id" style={{ width: '10px' }} header="№" headerStyle={{ width: '10px' }} />
             <Column field="name" filter style={{ width: '30px', overflow: "hidden" }} header="Strategy" headerStyle={{ width: '30px' }} />
             <Column field="type" filter style={{ width: '20px' }} header="Type" headerStyle={{ width: '20px' }} />
             <Column field="start" style={{ width: '30px' }} header="Start" headerStyle={{ width: '30px' }} />
-            <Column field="secName" filter style={{ width: '30px' }} header="Sec. Name" headerStyle={{ width: '30px' }} />
+            <Column field="secName" filter filterElement={secFilter} style={{ width: '30px' }} header="Sec. Name" headerStyle={{ width: '30px' }} />
             <Column field="deposit" style={{ width: '30px' }} header="Deposit" headerStyle={{ width: '30px' }} />
             <Column field="lastTradeOperation" style={{ width: '30px' }} header="LT Op" headerStyle={{ width: '30px' }} />
             <Column field="lastTradeEntryRealPrice" style={{ width: '30px' }} header="LT Entry R" headerStyle={{ width: '30px' }} />

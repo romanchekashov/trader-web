@@ -106,7 +106,10 @@ const store = configureStore({
         "strategies/loadStrategiesStopped/fulfilled",
         "strategies/loadStrategiesHistory/pending",
         "strategies/loadStrategiesHistory/rejected",
-        "strategies/loadStrategiesHistory/fulfilled"
+        "strategies/loadStrategiesHistory/fulfilled",
+        "strategies/loadStrategiesSecurities/pending",
+        "strategies/loadStrategiesSecurities/rejected",
+        "strategies/loadStrategiesSecurities/fulfilled"
       ],
       // Ignore these field paths in all actions
       ignoredActionPaths: ["timestamp"],

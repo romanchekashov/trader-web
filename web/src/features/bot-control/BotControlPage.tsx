@@ -3,7 +3,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import strategiesApi from "../../app/strategies/strategiesApi";
-import { loadStrategiesHistory, loadStrategiesStopped, selectStrategies, setRunning } from "../../app/strategies/strategiesSlice";
+import { loadStrategiesHistory, loadStrategiesSecurities, loadStrategiesStopped, selectStrategies, setRunning } from "../../app/strategies/strategiesSlice";
 import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
 import { EconomicCalendar } from "../../common/components/economic-calendar/EconomicCalendar";
 import { MarketBotFilterDataDto } from "../../common/data/bot/MarketBotFilterDataDto";
@@ -18,11 +18,11 @@ import { TradeJournalStatistic } from "../trade-journal/statistic/TradeJournalSt
 import { TradeJournalTable } from "../trade-journal/table/TradeJournalTable";
 import { BotControlAnalysis } from "./analysis/BotControlAnalysis";
 import { BotControlAnalysisInfo } from "./analysis/BotControlAnalysisInfo";
+import "./BotControlPage.css";
 import BotControlFilter from "./filter/BotControlFilter";
 import { BotState } from "./running-strategy/bot-state/BotState";
 import { RunningStrategyTable } from "./running-strategy/table/RunningStrategyTable";
 import { HistoryStrategyResultTable } from "./table/HistoryStrategyResultTable";
-import "./BotControlPage.css";
 
 type Props = {}
 
@@ -46,6 +46,7 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
     useEffect(() => {
         strategiesApi.getFilterData(false)
             .then(setFilterData);
+        dispatch(loadStrategiesSecurities());
         dispatch(loadStrategiesStopped({ page: 0, size: 1 }));
         dispatch(loadStrategiesHistory({ page: 0, size: 1 }));
     }, [])
