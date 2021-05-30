@@ -220,7 +220,7 @@ export const RunningStrategyTable: React.FC<Props> = ({ history, onSelectedTsId 
                 setSelectedRows(e.value)
             }}
             lazy
-            first={lazyParams.page}
+            first={lazyParams.first}
             paginator
             paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
