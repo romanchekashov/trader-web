@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect, memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
 import { getHistoryCandles } from "../../api/rest/historyRestApi";
 import { getCandles } from "../../api/rest/traderRestApi";
@@ -23,6 +23,7 @@ import { TrendWrapper } from "../../data/TrendWrapper";
 import { IntervalColor, StoreData } from "../../utils/utils";
 import { PatternResult } from "../alerts/data/PatternResult";
 import { CandleStickChartForDiscontinuousIntraDay } from "./CandleStickChartForDiscontinuousIntraDay";
+import "./ChartWrapper.css";
 import ChartWrapperHead from "./ChartWrapperHead/ChartWrapperHead";
 import { ChartDrawType } from "./data/ChartDrawType";
 import { ChartElementAppearance } from "./data/ChartElementAppearance";
@@ -30,7 +31,6 @@ import { ChartManageOrder } from "./data/ChartManageOrder";
 import { ChartTrendLine } from "./data/ChartTrendLine";
 import { ChartTrendLineType } from "./data/ChartTrendLineType";
 import moment = require("moment");
-import "./ChartWrapper.css";
 
 const _ = require("lodash");
 
@@ -143,10 +143,6 @@ const ChartWrapper: React.FC<Props> = ({
           requestCandles(security);
         }
       });
-
-    // setTimeout(() => {
-    //   onNumberOfCandlesUpdated(numberOfCandles);
-    // }, 1000);
 
     return () => {
       if (candlesSetupSubscription)

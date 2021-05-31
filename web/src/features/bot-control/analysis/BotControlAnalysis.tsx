@@ -1,28 +1,29 @@
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
+import { Dropdown } from "primereact/dropdown";
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
-import {Interval} from "../../../common/data/Interval";
-import {TrendsView} from "../../../common/components/trend/TrendsView";
-import ChartWrapper, {CHART_MIN_WIDTH} from "../../../common/components/chart/ChartWrapper";
-import {Dropdown} from "primereact/dropdown";
-import {DataTable} from "primereact/datatable";
-import {Column} from "primereact/column";
-import {getRecentBusinessDate, PrimeDropdownItem} from "../../../common/utils/utils";
+import { useEffect, useRef, useState } from "react";
+import { useAppSelector } from "../../../app/hooks";
+import { selectSecurities } from "../../../app/securities/securitiesSlice";
+import { getTradePremise } from "../../../common/api/rest/analysisRestApi";
+import ChartWrapper, { CHART_MIN_WIDTH } from "../../../common/components/chart/ChartWrapper";
+import { MarketStateDto } from "../../../common/components/market-state/data/MarketStateDto";
 import MarketState from "../../../common/components/market-state/MarketState";
+import { SwingStateDto } from "../../../common/components/swing-state/data/SwingStateDto";
 import SwingStateList from "../../../common/components/swing-state/SwingStateList";
-import {TradingStrategyResult} from "../../../common/data/history/TradingStrategyResult";
-import {SwingStateDto} from "../../../common/components/swing-state/data/SwingStateDto";
-import {MarketStateDto} from "../../../common/components/market-state/data/MarketStateDto";
-import {TradingStrategyTrade} from "../../../common/data/history/TradingStrategyTrade";
+import { TrendsView } from "../../../common/components/trend/TrendsView";
+import { BrokerId } from "../../../common/data/BrokerId";
+import { TradingStrategyResult } from "../../../common/data/history/TradingStrategyResult";
+import { TradingStrategyTrade } from "../../../common/data/history/TradingStrategyTrade";
+import { Interval } from "../../../common/data/Interval";
+import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
+import { TradePremise } from "../../../common/data/strategy/TradePremise";
+import { Trade } from "../../../common/data/Trade";
+import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
+import { getTimeFrameHigh, getTimeFrameLow } from "../../../common/utils/TimeFrameChooser";
+import { getRecentBusinessDate, PrimeDropdownItem } from "../../../common/utils/utils";
 import "./BotControlAnalysis.css";
-import {WebsocketService, WSEvent} from "../../../common/api/WebsocketService";
-import {SecurityLastInfo} from "../../../common/data/security/SecurityLastInfo";
-import {Trade} from "../../../common/data/Trade";
-import {getTradePremise} from "../../../common/api/rest/analysisRestApi";
-import {BrokerId} from "../../../common/data/BrokerId";
-import {TradingPlatform} from "../../../common/data/trading/TradingPlatform";
-import {getTimeFrameHigh, getTimeFrameLow} from "../../../common/utils/TimeFrameChooser";
 import moment = require("moment");
-import {TradePremise} from "../../../common/data/strategy/TradePremise";
 
 export interface AnalysisState {
     realDepo: boolean
@@ -34,6 +35,11 @@ type Props = {
 }
 
 export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyResult}) => {
+    
+    const { securities } = useAppSelector(selectSecurities);
+
+    const securityLastInfo = security && securities.find(({id}) => id === security.id);
+
     const timeFrameTradingIntervals = {
         "M1": [Interval.M1],
         "M3": [Interval.M3, Interval.M1],
@@ -60,7 +66,6 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
     const chartNumbers: PrimeDropdownItem<number>[] = [1, 2].map(val => ({label: "" + val, value: val}))
     const [chartNumber, setChartNumber] = useState<number>(2)
 
-    const [securityLastInfo, setSecurityLastInfo] = useState<SecurityLastInfo>(null)
     const [chart1Width, setChart1Width] = useState(CHART_MIN_WIDTH)
     const [chart2Width, setChart2Width] = useState(CHART_MIN_WIDTH)
     const [chartAlertsWidth, setChartAlertsWidth] = useState(CHART_MIN_WIDTH)
@@ -100,10 +105,9 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             setHasData(true)
             const trades = tradingStrategyResult.tradingStrategyData.trades
             setTsTrade(trades.length > 0 ? trades[0] : null)
-            setSecurityLastInfo(security)
             const startDate = getRecentBusinessDate(tradingStrategyResult?.tradingStrategyData?.start)
-            setStart(moment(startDate).subtract(1, 'days').hours(9).minutes(0).seconds(0).toDate())
-            setStartHigh(moment(startDate).subtract(15, 'days').hours(9).minutes(0).seconds(0).toDate())
+            setStart(moment(startDate).hours(6).minutes(0).seconds(0).toDate())
+            setStartHigh(moment(startDate).subtract(10, 'days').hours(6).minutes(0).seconds(0).toDate())
         } else {
             setHasData(false)
         }
@@ -118,25 +122,12 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             setTrades(trades)
         }
 
-        const lastSecuritiesSubscription = WebsocketService.getInstance()
-            .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-            .subscribe(securities => {
-                if (security) {
-                    const newSecurityLastInfo = securities.find(o => o.secCode === security.secCode)
-                    if (newSecurityLastInfo) {
-                        newSecurityLastInfo.lastTradeTime = new Date(newSecurityLastInfo.lastTradeTime)
-                        setSecurityLastInfo(newSecurityLastInfo)
-                    }
-                }
-            })
-
         setTimeout(updateSize, 1000)
         window.addEventListener('resize', updateSize)
 
         // Specify how to clean up after this effect:
-        return function cleanup() {
+        return () => {
             window.removeEventListener('resize', updateSize)
-            lastSecuritiesSubscription.unsubscribe()
         }
     }, [security?.id, tradingStrategyResult])
 
@@ -189,7 +180,7 @@ export const BotControlAnalysis: React.FC<Props> = ({security, tradingStrategyRe
             <div className="p-grid" style={{margin: '0'}}>
                 <div className="p-col-12" ref={chart1Ref} style={{padding: '0'}}>
                     <ChartWrapper interval={timeFrameTrading}
-                                  initialNumberOfCandles={500}
+                                  initialNumberOfCandles={350}
                                   start={start}
                                   onPremiseBeforeChanged={onPremiseBeforeChanged}
                                   onIntervalChanged={interval => {

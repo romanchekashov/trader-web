@@ -1,27 +1,25 @@
+import { Dropdown } from "primereact/dropdown";
+import { InputText } from "primereact/inputtext";
 import * as React from "react";
 import { useState } from "react";
-import { DepositSetup } from "../../../common/data/DepositSetup";
-import { InputText } from "primereact/inputtext";
-import { PrimeDropdownItem, round10 } from "../../../common/utils/utils";
-import { Dropdown } from "primereact/dropdown";
 import { Deposit } from "../../../common/data/Deposit";
-import { ClassCode } from "../../../common/data/ClassCode";
+import { DepositSetup } from "../../../common/data/DepositSetup";
 import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
+import { getMinDepoPerContract } from "../../../common/utils/DataUtils";
+import { PrimeDropdownItem, round10 } from "../../../common/utils/utils";
 
 type Props = {
   security: SecurityLastInfo;
   realDeposit: Deposit;
   setup: DepositSetup;
   onChange: (setup: DepositSetup) => void;
-  canTrade: (canTrade: boolean) => void;
 };
 
 export const DepositSetupView: React.FC<Props> = ({
   security,
   realDeposit,
   setup,
-  onChange,
-  canTrade,
+  onChange
 }) => {
   const takeProfitNumbers: PrimeDropdownItem<number>[] = [1, 2].map((val) => ({
     label: "" + val,
@@ -52,28 +50,13 @@ export const DepositSetupView: React.FC<Props> = ({
 
   const [stop, setStop] = useState(getStop(setup.maxRiskPerTradeInPercent));
 
-  let minDepoPerContract = 1;
-
-  switch (security?.classCode) {
-    case ClassCode.CETS:
-      break;
-    case ClassCode.SPBFUT:
-      minDepoPerContract =
-        security.futureBuyDepoPerContract > security.futureSellDepoPerContract
-          ? security.futureBuyDepoPerContract
-          : security.futureSellDepoPerContract;
-      break;
-    case ClassCode.TQBR:
-      break;
-  }
-
+  let minDepoPerContract = getMinDepoPerContract(security);
   let maxQuantity = 0;
   let maxDepo = 0;
 
   if (realDeposit) {
     maxQuantity = Math.floor(realDeposit.amount / minDepoPerContract);
     maxDepo = Math.ceil(maxQuantity * minDepoPerContract);
-    canTrade(setup.initAmount > minDepoPerContract);
   }
 
   return (

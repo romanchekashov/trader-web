@@ -237,3 +237,16 @@ export const filterSecurities = (
     }
   });
 };
+
+export const getMinDepoPerContract = (security: SecurityLastInfo): number => {
+  
+  if (security) {
+    const { futureBuyDepoPerContract, futureSellDepoPerContract } = security;
+
+    if (futureBuyDepoPerContract && futureSellDepoPerContract) {
+      return futureBuyDepoPerContract > futureSellDepoPerContract ? futureBuyDepoPerContract : futureSellDepoPerContract;
+    }
+  }
+
+  return 1;
+}

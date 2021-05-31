@@ -2,7 +2,6 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
 import { WebsocketService, WSEvent } from "../common/api/WebsocketService";
-import { StackWrapper } from "../common/components/stack/StackWrapper";
 import Widgetbar from "../common/components/widgetbar/Widgetbar";
 import { ActiveTrade } from "../common/data/ActiveTrade";
 import { BrokerId } from "../common/data/BrokerId";
@@ -24,7 +23,7 @@ import { TradingChartsRouter } from "../features/trading-charts/TradingChartsRou
 import TrendChartsPage from "../features/trend-charts/TrendChartsPage";
 import {
   loadActiveTrades,
-  setActiveTrades,
+  setActiveTrades
 } from "./activeTrades/activeTradesSlice";
 import { loadFuturesClientLimits, setDeposits } from "./deposits/depositsSlice";
 import { useAppDispatch, useAppSelector } from "./hooks";
@@ -38,7 +37,7 @@ import {
   loadLastSecuritiesTinkoff,
   loadShares,
   selectSecurities,
-  setSecurities,
+  setSecurities
 } from "./securities/securitiesSlice";
 import { setStops } from "./stops/stopsSlice";
 
@@ -114,6 +113,9 @@ export const App = () => {
       lastSecuritiesSubscription = WebsocketService.getInstance()
         .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES_TINKOFF)
         .subscribe((securities) => {
+          securities.forEach(newSecurityLastInfo => {
+            newSecurityLastInfo.lastTradeTime = new Date(newSecurityLastInfo.lastTradeTime);
+          });
           dispatch(setSecurities(securities));
         });
     } else {

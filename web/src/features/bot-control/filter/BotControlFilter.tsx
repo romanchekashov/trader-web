@@ -23,6 +23,7 @@ import { SecurityType } from "../../../common/data/security/SecurityType";
 import { TradeSystemType } from "../../../common/data/trading/TradeSystemType";
 import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
 import { TradingStrategyName } from "../../../common/data/trading/TradingStrategyName";
+import { getMinDepoPerContract } from "../../../common/utils/DataUtils";
 import { Intervals, PrimeDropdownItem } from "../../../common/utils/utils";
 import "./BotControlFilter.css";
 import { DepositSetupView } from "./DepositSetupView";
@@ -137,7 +138,6 @@ const BotControlFilter: React.FC<Props> = ({
 
   const [selectedSecurity, setSelectedSecurity] =
     useState<SecurityLastInfo>(null);
-  const [canTrade, setCanTrade] = useState<boolean>(false);
 
   const strategies: PrimeDropdownItem<TradingStrategyName>[] = [
     TradingStrategyName.STRATEGY_1,
@@ -158,6 +158,29 @@ const BotControlFilter: React.FC<Props> = ({
       setPlatform(initState.platform);
     }
   }, [filter]);
+
+  useEffect(() => {
+    
+    const newSecCodes: PrimeDropdownItem<string>[] = [
+      { label: "ALL", value: null },
+    ];
+
+    if (securityType) {
+      depositsApi.getCurrentDeposit(securityType).then(setRealDeposit);
+
+      const securities: Security[] = filter.marketSecurities
+        .find((value) => value.securityType === securityType)
+        .securityHistoryDates.map((value) => value.security);
+      
+        for (const sec of securities) {
+        newSecCodes.push({ label: sec.shortName, value: sec.secCode });
+      }
+    }
+
+    setSecCodes(newSecCodes);
+    setSecCode(null);
+
+  }, [securityType]);
 
   const getDto = (): MarketBotStartDto => {
     return {
@@ -204,27 +227,6 @@ const BotControlFilter: React.FC<Props> = ({
     updateHistoryDates(secCode, newInterval);
   };
 
-  const onSecurityTypeChanged = (type: SecurityType) => {
-    depositsApi.getCurrentDeposit(type).then(setRealDeposit);
-
-    const newSecCodes: PrimeDropdownItem<string>[] = [
-      { label: "ALL", value: null },
-    ];
-    if (type) {
-      const securities: Security[] = filter.marketSecurities
-        .find((value) => value.securityType === type)
-        .securityHistoryDates.map((value) => value.security);
-      for (const sec of securities) {
-        newSecCodes.push({ label: sec.shortName, value: sec.secCode });
-      }
-    } else {
-      setSecCode(null);
-    }
-    setSecurityType(type);
-    setSecCodes(newSecCodes);
-    setSecCode(null);
-  };
-
   const onSecCodeChanged = (newSecCode: string) => {
     const security = filter.marketSecurities
       .find((value) => value.securityType === securityType)
@@ -261,6 +263,8 @@ const BotControlFilter: React.FC<Props> = ({
   const onDepositSetupChanged = (newSetup: DepositSetup): void => {
     setDepositSetup(Object.assign({}, newSetup));
   };
+
+  const canTrade = depositSetup?.initAmount > getMinDepoPerContract(selectedSecurity);
 
   return (
     <Panel
@@ -334,9 +338,7 @@ const BotControlFilter: React.FC<Props> = ({
               <Dropdown
                 value={securityType}
                 options={securityTypes}
-                onChange={(e) => {
-                  onSecurityTypeChanged(e.value);
-                }}
+                onChange={e => setSecurityType(e.value)}
                 style={{ width: "90px" }}
               />
             </div>
@@ -403,7 +405,6 @@ const BotControlFilter: React.FC<Props> = ({
             realDeposit={realDeposit}
             setup={depositSetup}
             onChange={onDepositSetupChanged}
-            canTrade={setCanTrade}
           />
         </div>
         <div className="p-col-12">

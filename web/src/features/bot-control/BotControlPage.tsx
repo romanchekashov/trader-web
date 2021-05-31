@@ -119,7 +119,7 @@ export const BotControlPage: React.FC<Props> = ({ }) => {
         setSelectedTSResult(result)
         setSelectedSecurity(result.tradePremise?.security)
 
-        if (result.tradingStrategyData.id) {
+        if (result.tradingStrategyData?.id) {
             strategiesApi.searchByTradingStrategyId(result.tradingStrategyData.id)
                 .then(tsResult => {
                     setSelectedTSResult(tsResult)
