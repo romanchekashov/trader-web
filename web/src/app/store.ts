@@ -7,10 +7,10 @@ import {
 import { enableMapSet } from "immer";
 import analysisReducer from "../features/analysis/AnalysisSlice";
 import botControlReducer from "../features/bot-control/BotControlSlice";
-import newsReducer from "./news/newsSlice";
 import tradeJournalReducer from "../features/trade-journal/TradeJournalSlice";
 import activeTradesReducer from "./activeTrades/activeTradesSlice";
 import depositsReducer from "./deposits/depositsSlice";
+import newsReducer from "./news/newsSlice";
 import notificationsReducer from "./notifications/notificationsSlice";
 import ordersReducer from "./orders/ordersSlice";
 import possibleTradesReducer from "./possibleTrades/possibleTradesSlice";
@@ -104,9 +104,19 @@ const store = configureStore({
         "strategies/loadStrategiesStopped/pending",
         "strategies/loadStrategiesStopped/rejected",
         "strategies/loadStrategiesStopped/fulfilled",
+
         "strategies/loadStrategiesHistory/pending",
         "strategies/loadStrategiesHistory/rejected",
         "strategies/loadStrategiesHistory/fulfilled",
+
+        "news/loadNews/pending",
+        "news/loadNews/rejected",
+        "news/loadNews/fulfilled",
+
+        "news/loadEconomicCalendarEvents/pending",
+        "news/loadEconomicCalendarEvents/rejected",
+        "news/loadEconomicCalendarEvents/fulfilled",
+
         "strategies/loadStrategiesSecurities/pending",
         "strategies/loadStrategiesSecurities/rejected",
         "strategies/loadStrategiesSecurities/fulfilled"

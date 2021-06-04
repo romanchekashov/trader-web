@@ -2,7 +2,7 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { fetchNews, selectNews } from "../../../app/news/newsSlice";
+import { loadNews, selectNews } from "../../../app/news/newsSlice";
 import { NewsItem } from "../../data/news/NewsItem";
 import "./News.css";
 import moment = require("moment");
@@ -18,8 +18,8 @@ export const News: React.FC<Props> = ({
   onItemSelected,
   height = 200,
 }) => {
-  const { news } = useAppSelector(selectNews);
   const dispatch = useAppDispatch();
+  const { news } = useAppSelector(selectNews);
 
   const ref = useRef(null);
   const [selectedItem, setSelectedItem] = useState<NewsItem>(null);
@@ -42,7 +42,7 @@ export const News: React.FC<Props> = ({
   }, [news]);
 
   const getNews = (secId: number) => {
-    dispatch(fetchNews({ provider: null, secId }));
+    dispatch(loadNews({ provider: null, secId }));
   };
 
   const formatNews = (item: NewsItem) => {

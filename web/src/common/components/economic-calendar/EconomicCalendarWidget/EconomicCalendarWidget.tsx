@@ -3,9 +3,9 @@ import * as React from "react";
 import { memo, useEffect, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
-import newsApi from "../../../../app/news/newsApi";
+import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
+import { loadEconomicCalendarEvents, selectEconomicCalendarEvents } from "../../../../app/news/newsSlice";
 import { EconomicCalendarEvent } from "../../../data/news/EconomicCalendarEvent";
-import { ExpectedVolatility } from "../../../data/news/ExpectedVolatility";
 import { DATE_FORMAT } from "../../../utils/utils";
 import "./EconomicCalendarWidget.css";
 import EconomicCalendarWidgetItem from "./EconomicCalendarWidgetItem";
@@ -23,63 +23,43 @@ type Props = {
   viewHeight?: number;
 };
 
-const expectedVolatilityValue = {
-  [ExpectedVolatility.High]: 3,
-  [ExpectedVolatility.Moderate]: 2,
-  [ExpectedVolatility.Low]: 1,
-};
-
 const EconomicCalendarWidget: React.FC<Props> = ({
   secId,
   onEventSelected,
   viewHeight = 600,
 }) => {
-  const [eventWrappers, setEventWrappers] = useState<EventWrapper[]>([]);
+  const dispatch = useAppDispatch();
+  const { economicCalendarEvents } = useAppSelector(selectEconomicCalendarEvents);
+  
   const [selectedEvent, setSelectedEvent] =
     useState<EconomicCalendarEvent>(null);
   const listRef = useRef(null);
 
   useEffect(() => {
-    newsApi.getEconomicCalendarEvents(
-      moment().subtract(1, "weeks").format(DATE_FORMAT),
-      null,
-      secId
-    ).then((events) => {
-      events.sort((a, b) => {
-        const diff = a.dateTime.getTime() - b.dateTime.getTime();
-        if (diff !== 0) return diff;
-        return (
-          expectedVolatilityValue[b.expectedVolatility] -
-          expectedVolatilityValue[a.expectedVolatility]
-        );
-      });
-      const eventWrappers: EventWrapper[] = [];
-      let day;
-
-      for (let i = 0; i < events.length; i++) {
-        const event = events[i];
-
-        if (day !== event.dateTime.getDate()) {
-          eventWrappers.push({
-            title: moment(event.dateTime).format("ddd, MMM D"),
-            id: event.dateTime.getTime(),
-          });
-          day = event.dateTime.getDate();
-        }
-
-        eventWrappers.push({ event, id: event.id });
-      }
-
-      setEventWrappers(eventWrappers);
-    });
-
-    // Specify how to clean up after this effect:
-    return function cleanup() {};
+    const start = moment().subtract(1, "weeks").format(DATE_FORMAT);
+    dispatch(loadEconomicCalendarEvents({start, secId}));
   }, [secId]);
 
   useEffect(() => {
     scrollToNearestEvent();
-  }, [eventWrappers]);
+  }, [economicCalendarEvents]);
+
+  const eventWrappers: EventWrapper[] = [];
+  let day;
+
+  for (let i = 0; i < economicCalendarEvents.length; i++) {
+    const event = economicCalendarEvents[i];
+
+    if (day !== event.dateTime.getDate()) {
+      eventWrappers.push({
+        title: moment(event.dateTime).format("ddd, MMM D"),
+        id: event.dateTime.getTime(),
+      });
+      day = event.dateTime.getDate();
+    }
+
+    eventWrappers.push({ event, id: event.id });
+  }
 
   const scrollToNearestEvent = () => {
     listRef?.current?.scrollToItem(nearestEventIndex(eventWrappers), "center");

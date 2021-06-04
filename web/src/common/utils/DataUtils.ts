@@ -3,6 +3,7 @@ import { SwingStateDto } from "../components/swing-state/data/SwingStateDto";
 import { Candle } from "../data/Candle";
 import { TradingStrategyResult } from "../data/history/TradingStrategyResult";
 import { EconomicCalendarEvent } from "../data/news/EconomicCalendarEvent";
+import { ExpectedVolatility } from "../data/news/ExpectedVolatility";
 import { NewsItem } from "../data/news/NewsItem";
 import { SecurityShareEvent } from "../data/news/SecurityShareEvent";
 import { MoexOpenInterest } from "../data/open-interest/MoexOpenInterest";
@@ -185,12 +186,27 @@ export const adjustNewsItems = (list: NewsItem[]): any => {
   return list;
 };
 
+const expectedVolatilityValue = {
+  [ExpectedVolatility.High]: 3,
+  [ExpectedVolatility.Moderate]: 2,
+  [ExpectedVolatility.Low]: 1,
+};
+
 export const adjustEconomicCalendarEvents = (
   list: EconomicCalendarEvent[]
 ): any => {
   if (list && list.length > 0) {
     for (const item of list) item.dateTime = new Date(item.dateTime);
   }
+
+  list.sort((a, b) => {
+    const diff = a.dateTime.getTime() - b.dateTime.getTime();
+    if (diff !== 0) return diff;
+    return (
+      expectedVolatilityValue[b.expectedVolatility] -
+      expectedVolatilityValue[a.expectedVolatility]
+    );
+  })
 
   return list;
 };
