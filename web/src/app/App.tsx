@@ -1,3 +1,4 @@
+import moment = require("moment");
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Route, Switch } from "react-router-dom";
@@ -10,6 +11,7 @@ import { Order } from "../common/data/Order";
 import { SecurityLastInfo } from "../common/data/security/SecurityLastInfo";
 import { StopOrder } from "../common/data/StopOrder";
 import { TradingPlatform } from "../common/data/trading/TradingPlatform";
+import { DATE_FORMAT } from "../common/utils/utils";
 import { Header } from "../components/Header";
 import { ActiveTradesPage } from "../features/active-trades/ActiveTradesPage";
 import AnalysisPage from "../features/analysis/AnalysisPage";
@@ -27,6 +29,7 @@ import {
 } from "./activeTrades/activeTradesSlice";
 import { loadFuturesClientLimits, setDeposits } from "./deposits/depositsSlice";
 import { useAppDispatch, useAppSelector } from "./hooks";
+import { loadEconomicCalendarEvents } from "./news/newsSlice";
 import { setOrders } from "./orders/ordersSlice";
 import { PageNotFound } from "./PageNotFound";
 import { loadPossibleTradesStat } from "./possibleTrades/possibleTradesSlice";

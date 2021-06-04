@@ -46,6 +46,7 @@ import { TrendWrapper } from "../../data/TrendWrapper";
 import { round, StoreData } from "../../utils/utils";
 import { ChartDialog } from "./components/ChartDialog";
 import { ChartLevels } from "./components/ChartLevels";
+import ChartNews from "./components/ChartNews";
 import { ChartSwingHighsLows } from "./components/ChartSwingHighsLows";
 import { ChartTrades } from "./components/ChartTrades";
 import ChartZones from "./components/ChartZones";
@@ -861,6 +862,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
             {/*<LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()}/>*/}
             <LineSeries yAccessor={ema7.accessor()} stroke={ema7.stroke()} />
 
+            <ChartNews candles={data} />
             <ChartTrades candles={data} trades={trades} />
 
             <TrendLine

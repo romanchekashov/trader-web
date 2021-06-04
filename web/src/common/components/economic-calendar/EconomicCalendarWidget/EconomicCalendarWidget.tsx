@@ -36,11 +36,6 @@ const EconomicCalendarWidget: React.FC<Props> = ({
   const listRef = useRef(null);
 
   useEffect(() => {
-    const start = moment().subtract(1, "weeks").format(DATE_FORMAT);
-    dispatch(loadEconomicCalendarEvents({start, secId}));
-  }, [secId]);
-
-  useEffect(() => {
     scrollToNearestEvent();
   }, [economicCalendarEvents]);
 

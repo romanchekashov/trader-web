@@ -192,13 +192,7 @@ const expectedVolatilityValue = {
   [ExpectedVolatility.Low]: 1,
 };
 
-export const adjustEconomicCalendarEvents = (
-  list: EconomicCalendarEvent[]
-): any => {
-  if (list && list.length > 0) {
-    for (const item of list) item.dateTime = new Date(item.dateTime);
-  }
-
+export const sortEconomicCalendarEventsByVolatility = (list: EconomicCalendarEvent[]) => {
   list.sort((a, b) => {
     const diff = a.dateTime.getTime() - b.dateTime.getTime();
     if (diff !== 0) return diff;
@@ -207,6 +201,17 @@ export const adjustEconomicCalendarEvents = (
       expectedVolatilityValue[a.expectedVolatility]
     );
   })
+}
+
+export const adjustEconomicCalendarEvents = (
+  list: EconomicCalendarEvent[]
+): any => {
+  
+  if (list && list.length > 0) {
+    for (const item of list) item.dateTime = new Date(item.dateTime);
+  }
+
+  sortEconomicCalendarEventsByVolatility(list);
 
   return list;
 };

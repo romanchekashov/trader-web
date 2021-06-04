@@ -1,5 +1,6 @@
 import { ExpectedVolatility } from "./ExpectedVolatility";
 import { NewsProvider } from "./NewsProvider";
+import { Tag } from "./Tag";
 
 export class EconomicCalendarEvent {
   public id: number;
@@ -16,5 +17,5 @@ export class EconomicCalendarEvent {
   public holiday: boolean;
   public newsProvider: NewsProvider;
   public href: string;
-  public tags: any[];
+  public tags: Tag[];
 }

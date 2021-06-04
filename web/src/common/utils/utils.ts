@@ -1,7 +1,8 @@
-import { Interval } from "../data/Interval";
-import moment = require("moment");
-import { SecurityType } from "../data/security/SecurityType";
 import { ClassCode } from "../data/ClassCode";
+import { Interval } from "../data/Interval";
+import { ExpectedVolatility } from "../data/news/ExpectedVolatility";
+import { SecurityType } from "../data/security/SecurityType";
+import moment = require("moment");
 
 export const DATE_TIME_FORMAT = "DD.MM/HH:mm:ss";
 export const DATE_FORMAT = "YYYY-MM-DD";
@@ -148,4 +149,10 @@ export const IntervalShortName = {
   [Interval.MONTH]: "MN",
   [Interval.WEEK]: "W",
   [Interval.DAY]: "D",
+};
+
+export const VolatilityColors = {
+  [ExpectedVolatility.High]: "#b71c1c",
+  [ExpectedVolatility.Moderate]: "#f57f17",
+  [ExpectedVolatility.Low]: "#0d47a1",
 };

@@ -1,8 +1,10 @@
+import moment = require("moment");
 import { Dropdown } from "primereact/dropdown";
 import { TabPanel, TabView } from "primereact/tabview";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { loadEconomicCalendarEvents } from "../../app/news/newsSlice";
 import PossibleTradesStat from "../../app/possibleTrades/components/PossibleTradesStat";
 import {
   loadLastSecurities,
@@ -20,7 +22,7 @@ import { ClassCode } from "../../common/data/ClassCode";
 import { Market } from "../../common/data/Market";
 import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
 import { setSelectedSecurity } from "../../common/utils/Cache";
-import { PrimeDropdownItem } from "../../common/utils/utils";
+import { DATE_FORMAT, PrimeDropdownItem } from "../../common/utils/utils";
 import "./Analysis.css";
 import Analysis from "./analysis/Analysis";
 import AnalysisFutures from "./analysis/AnalysisFutures";
@@ -42,6 +44,14 @@ const AnalysisPage: React.FC<Props> = ({}) => {
     label: "" + val,
     value: val,
   }));
+
+  useEffect(() => {
+    const weeks = security?.id ? 12 : 1;
+    dispatch(loadEconomicCalendarEvents({ 
+      start: moment().subtract(weeks, "weeks").format(DATE_FORMAT),
+      secId: security?.id 
+    }));
+  }, [security?.id]);
 
   const onSelectRow = (selectedSecurity: SecurityLastInfo) => {
     if (selectedSecurity) {
