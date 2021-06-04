@@ -1,10 +1,10 @@
+import { Chart } from "primereact/chart";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Chart } from "primereact/chart";
 import { ClientGroup } from "../../../../common/data/open-interest/ClientGroup";
 import { MoexOpenInterest } from "../../../../common/data/open-interest/MoexOpenInterest";
-import moment = require("moment");
 import { OperationTypeColor } from "../../../../common/utils/utils";
+import moment = require("moment");
 
 export const fizLongColor = OperationTypeColor.BUY;
 export const fizShortColor = OperationTypeColor.SELL;
@@ -26,7 +26,6 @@ export const MoexOpenInterestChart: React.FC<Props> = ({
   width,
   height,
 }) => {
-  if (!moexOpenInterests || moexOpenInterests.length == 0) return null;
 
   const options = {
     title: {
@@ -77,6 +76,8 @@ export const MoexOpenInterestChart: React.FC<Props> = ({
       ],
     });
   }, [moexOpenInterests]);
+
+  if (!moexOpenInterests || !moexOpenInterests.length) return null;
 
   return (
     <>

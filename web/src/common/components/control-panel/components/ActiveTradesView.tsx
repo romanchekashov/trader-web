@@ -29,8 +29,6 @@ const ActiveTradesView: React.FC<Props> = ({ }) => {
   const { activeTrades, selectedActiveTrade } =
     useAppSelector(selectActiveTrades);
 
-  if (activeTrades.length === 0) return null;
-
   useEffect(() => {
     if (selectedActiveTrade?.secId !== security?.id && activeTrades.length) {
       const activeTrade = activeTrades.find(
@@ -79,6 +77,8 @@ const ActiveTradesView: React.FC<Props> = ({ }) => {
       </Row>
     </ColumnGroup>
   );
+
+  if (!activeTrades.length) return null;
 
   return (
     <DataTable

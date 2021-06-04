@@ -2,7 +2,7 @@ import * as React from "react";
 import { memo, useEffect, useRef, useState } from "react";
 import {
   getMoexApiOpenInterestList,
-  getMoexOpenInterests,
+  getMoexOpenInterests
 } from "../../../../common/api/rest/analysisRestApi";
 import { DemandSupply } from "../../../../common/components/demand-supply/DemandSupply";
 import { ClassCode } from "../../../../common/data/ClassCode";
@@ -13,7 +13,7 @@ import {
   fizShortColor,
   MoexOpenInterestChart,
   yurLongColor,
-  yurShortColor,
+  yurShortColor
 } from "./MoexOpenInterestChart";
 import { MoexOpenInterestTable } from "./MoexOpenInterestTable";
 import "./MoexOpenInterestView.css";
@@ -30,7 +30,6 @@ const MoexOpenInterestView: React.FC<Props> = ({
   showTable = true,
   showRealTimeOI = true,
 }) => {
-  if (security?.classCode !== ClassCode.SPBFUT) return null;
 
   const ref = useRef(null);
 
@@ -68,6 +67,8 @@ const MoexOpenInterestView: React.FC<Props> = ({
       clearInterval(intervalToFetchOpenInterest);
     };
   }, [security?.id]);
+
+  if (security?.classCode !== ClassCode.SPBFUT) return null;
 
   const openInterestLastDay =
     moexOpenInterestsForDays.length > 0

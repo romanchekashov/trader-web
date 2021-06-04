@@ -1,9 +1,9 @@
+import { Chart } from "primereact/chart";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Chart } from "primereact/chart";
+import { OperationTypeColor } from "../../../../common/utils/utils";
 import { SupplyAndDemandData } from "./SupplyAndDemandData";
 import moment = require("moment");
-import { OperationTypeColor } from "../../../../common/utils/utils";
 
 type Props = {
   items: SupplyAndDemandData[];
@@ -22,7 +22,6 @@ export const SupplyAndDemandChart: React.FC<Props> = ({
   width,
   height,
 }) => {
-  if (!items || items.length == 0) return null;
 
   const fizLongColor = OperationTypeColor.BUY;
   const fizShortColor = OperationTypeColor.SELL;
@@ -77,6 +76,8 @@ export const SupplyAndDemandChart: React.FC<Props> = ({
       ],
     });
   }, [items]);
+
+  if (!items || !items.length) return null;
 
   return (
     <>
