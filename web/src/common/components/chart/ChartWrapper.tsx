@@ -84,6 +84,8 @@ type Props = {
   alert?: PatternResult;
   possibleTrade?: PossibleTrade;
   onManageOrder?: (manageOrder: ChartManageOrder) => void;
+  onClick?: (currentItem: any) => void;
+  onDoubleClick?: (currentItem: any) => void;
 };
 
 const ChartWrapper: React.FC<Props> = ({
@@ -106,7 +108,9 @@ const ChartWrapper: React.FC<Props> = ({
   activeTrade,
   alert,
   possibleTrade,
-  onManageOrder
+  onManageOrder,
+  onClick,
+  onDoubleClick
 }) => {
 
   const [candles, setCandles] = useState<Candle[]>([]);
@@ -644,6 +648,8 @@ const ChartWrapper: React.FC<Props> = ({
           needSave={onNeedSave}
           trends={trends_1}
           possibleTrade={possibleTrade}
+          onClick={onClick}
+          onDoubleClick={onDoubleClick}
         />
       ) : nodata ? (
         <div>No data</div>

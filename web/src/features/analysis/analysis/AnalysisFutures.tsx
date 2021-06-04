@@ -405,6 +405,7 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
               showGrid={true}
               possibleTrade={pTrade}
               onManageOrder={manageOrder}
+              onDoubleClick={console.log}
             />
           </div>
           {chartNumber === 2 ? (

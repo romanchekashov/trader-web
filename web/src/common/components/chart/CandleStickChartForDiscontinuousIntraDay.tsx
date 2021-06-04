@@ -1,15 +1,7 @@
-import * as React from "react";
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
-
+import * as React from "react";
 import { Chart, ChartCanvas } from "react-financial-charts";
-import {
-  BarSeries,
-  CandlestickSeries,
-  LineSeries,
-  ScatterSeries,
-  Square,
-} from "react-financial-charts/lib/series";
 import { XAxis, YAxis } from "react-financial-charts/lib/axes";
 import {
   CrossHairCursor,
@@ -17,56 +9,60 @@ import {
   EdgeIndicator,
   MouseCoordinateX,
   MouseCoordinateY,
-  PriceCoordinate,
+  PriceCoordinate
 } from "react-financial-charts/lib/coordinates";
-
+import { atr, ema } from "react-financial-charts/lib/indicator";
+import {
+  ClickCallback, DrawingObjectSelector,
+  InteractiveYCoordinate,
+  TrendLine
+} from "react-financial-charts/lib/interactive";
+import { getMorePropsForChart } from "react-financial-charts/lib/interactive/utils";
 import { discontinuousTimeScaleProvider } from "react-financial-charts/lib/scale";
+import {
+  BarSeries,
+  CandlestickSeries,
+  LineSeries,
+  ScatterSeries,
+  Square
+} from "react-financial-charts/lib/series";
 import { OHLCTooltip } from "react-financial-charts/lib/tooltip";
 // import { fitWidth } from "react-financial-charts/lib/helper";
 import { head, last, toObject } from "react-financial-charts/lib/utils";
-import { ChartDrawType } from "./data/ChartDrawType";
+import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
+import { ActiveTrade } from "../../data/ActiveTrade";
 import { Candle } from "../../data/Candle";
-import { ChartLevel } from "./data/ChartLevel";
-import { SRZone } from "../../data/strategy/SRZone";
-import ChartZones from "./components/ChartZones";
+import { CrudMode } from "../../data/CrudMode";
+import { DataType } from "../../data/DataType";
 import { Interval } from "../../data/Interval";
+import { Order } from "../../data/Order";
+import { Security } from "../../data/security/Security";
+import { StopOrder } from "../../data/StopOrder";
 import { SRLevel } from "../../data/strategy/SRLevel";
+import { SRZone } from "../../data/strategy/SRZone";
+import { Trade } from "../../data/Trade";
+import { TrendLineDto } from "../../data/TrendLineDto";
+import { TrendWrapper } from "../../data/TrendWrapper";
+import { round, StoreData } from "../../utils/utils";
+import { ChartDialog } from "./components/ChartDialog";
 import { ChartLevels } from "./components/ChartLevels";
-import {
-  DrawingObjectSelector,
-  InteractiveYCoordinate,
-  TrendLine,
-} from "react-financial-charts/lib/interactive";
-import { atr, ema } from "react-financial-charts/lib/indicator";
+import { ChartSwingHighsLows } from "./components/ChartSwingHighsLows";
+import { ChartTrades } from "./components/ChartTrades";
+import ChartZones from "./components/ChartZones";
+import { KeltnerChannelSeries } from "./components/keltner-channel/KeltnerChannelSeries";
+import { ChartDrawType } from "./data/ChartDrawType";
+import { ChartLevel } from "./data/ChartLevel";
+import { ChartManageOrder } from "./data/ChartManageOrder";
+import { ChartTrendLine } from "./data/ChartTrendLine";
+import interactiveOrder from "./interactives/interactiveOrder";
+import interactivePossibleTrade from "./interactives/interactivePossibleTrade";
+import interactiveStop from "./interactives/interactiveStop";
 import {
   getInteractiveNodes,
   isCurrentChartInteractingId,
   saveInteractiveNodes,
-  setCurrentChartInteractingId,
+  setCurrentChartInteractingId
 } from "./utils/interactiveutils";
-import { TrendLineDto } from "../../data/TrendLineDto";
-import { round, StoreData } from "../../utils/utils";
-import { ChartTrendLine } from "./data/ChartTrendLine";
-import { TrendWrapper } from "../../data/TrendWrapper";
-import { ChartTrades } from "./components/ChartTrades";
-import { Trade } from "../../data/Trade";
-import { ChartDialog } from "./components/ChartDialog";
-import { getMorePropsForChart } from "react-financial-charts/lib/interactive/utils";
-import { Security } from "../../data/security/Security";
-import { Order } from "../../data/Order";
-import { StopOrder } from "../../data/StopOrder";
-import { OperationType } from "../../data/OperationType";
-import { ChartManageOrder } from "./data/ChartManageOrder";
-import { ActiveTrade } from "../../data/ActiveTrade";
-import { KeltnerChannelSeries } from "./components/keltner-channel/KeltnerChannelSeries";
-import { ChartSwingHighsLows } from "./components/ChartSwingHighsLows";
-import { PossibleTrade } from "../../../app/possibleTrades/data/PossibleTrade";
-import { DataType } from "../../data/DataType";
-import interactiveOrder from "./interactives/interactiveOrder";
-import interactiveStop from "./interactives/interactiveStop";
-import interactivePossibleTrade from "./interactives/interactivePossibleTrade";
-import { ChartManageOrderType } from "./data/ChartManageOrderType";
-import { CrudMode } from "../../data/CrudMode";
 
 const _ = require("lodash");
 
@@ -107,6 +103,8 @@ type Props = {
   onManageOrder: (manageOrder: ChartManageOrder) => void;
   enableNewOrder: boolean;
   onEnableNewOrder: (enableNewOrder: boolean) => void;
+  onClick?: (currentItem: any) => void;
+  onDoubleClick?: (currentItem: any) => void;
 };
 
 type State = {
@@ -207,7 +205,7 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
       orders &&
       stops &&
       Object.keys(state.interactiveOrderMap).length !==
-        orders.length + stops.length;
+      orders.length + stops.length;
 
     const hasOrdersNotInInteractiveMap =
       orders &&
@@ -630,6 +628,8 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
       srLevels,
       enableNewOrder,
       activeTrade,
+      onClick,
+      onDoubleClick
     } = this.props;
     const { trends_1, showModal, alertToEdit } = this.state;
     const scale = securityInfo ? securityInfo.scale : 4;
@@ -641,11 +641,11 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
     const gridHeight = height - margin.top - margin.bottom;
     const xGrid = showGrid
       ? {
-          innerTickSize: -1 * gridHeight,
-          // tickStrokeDasharray: 'Solid',
-          tickStrokeOpacity: 0.2,
-          tickStrokeWidth: 1,
-        }
+        innerTickSize: -1 * gridHeight,
+        // tickStrokeDasharray: 'Solid',
+        tickStrokeOpacity: 0.2,
+        tickStrokeWidth: 1,
+      }
       : {};
 
     const ema7 = ema()
@@ -880,6 +880,13 @@ export class CandleStickChartForDiscontinuousIntraDay extends React.Component<
               onDragComplete={this.onDragComplete}
               onDelete={this.onDelete}
               yCoordinateList={this.state.yCoordinateList_1}
+            />
+
+            <ClickCallback
+              // onClick={(moreProps, e) => { console.log("onClick", moreProps, e); }}
+              // onDoubleClick={(moreProps, e) => { console.log("onDoubleClick", moreProps, e); }}
+              onClick={({currentItem}, e) => { if (typeof onClick === "function") onClick(currentItem) }}
+              onDoubleClick={({currentItem}, e) => { if (typeof onDoubleClick === "function") onDoubleClick(currentItem) }}
             />
           </Chart>
           <CrossHairCursor />
