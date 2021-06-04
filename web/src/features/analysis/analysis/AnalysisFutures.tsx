@@ -55,8 +55,6 @@ type Props = {
   chartNumber: number;
 };
 
-let prevMainWidth;
-
 const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
   const dispatch = useAppDispatch();
   const { possibleTrade } = useAppSelector(selectPossibleTrade);
@@ -111,32 +109,18 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
   const [marketStateFilterDto, setMarketStateFilterDto] = useState(null);
   const [alert, setAlert] = useState(null);
   const [trades, setTrades] = useState<Trade[]>([]);
+  const prevMainWidthRef = useRef(null);
 
   useEffect(() => {
-    if (prevMainWidth && prevMainWidth !== mainRef?.current?.clientWidth) {
+    if (prevMainWidthRef.current && prevMainWidthRef.current !== mainRef?.current?.clientWidth) {
       updateSize();
     }
-    prevMainWidth = mainRef?.current?.clientWidth;
+    prevMainWidthRef.current = mainRef?.current?.clientWidth;
   });
 
   useEffect(() => {
     updateSize();
-    prevMainWidth = mainRef?.current?.clientWidth;
   }, [chartNumber]);
-
-  const updateSize = () => {
-    setChart1Width(
-      chart1Ref.current ? chart1Ref.current.clientWidth : MIN_CHART_WIDTH
-    );
-    setChart2Width(
-      chart2Ref.current ? chart2Ref.current.clientWidth : MIN_CHART_WIDTH
-    );
-    setChartAlertsWidth(
-      chartAlertsRef.current
-        ? chartAlertsRef.current.clientWidth
-        : MIN_CHART_WIDTH
-    );
-  };
 
   useEffect(() => {
     if (security) {
@@ -203,6 +187,20 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
       tradePremiseSubscription.unsubscribe();
     };
   }, [security?.id, premiseBefore]);
+
+  const updateSize = () => {
+    setChart1Width(
+      chart1Ref.current ? chart1Ref.current.clientWidth : MIN_CHART_WIDTH
+    );
+    setChart2Width(
+      chart2Ref.current ? chart2Ref.current.clientWidth : MIN_CHART_WIDTH
+    );
+    setChartAlertsWidth(
+      chartAlertsRef.current
+        ? chartAlertsRef.current.clientWidth
+        : MIN_CHART_WIDTH
+    );
+  };
 
   const updateMarketStateFilterDto = (interval: Interval) => {
     const marketStateFilter: MarketStateFilterDto = {
@@ -382,7 +380,7 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
   const pTrade: PossibleTrade =
     security && security.id === possibleTrade?.secId && possibleTrade;
 
-  const pColCharts = chartNumber === 1 ? "p-col-12" : "p-col-6"; 
+  const pColCharts = chartNumber === 1 ? "p-col-12" : "p-col-6";
 
   return (
     <div className="p-grid" ref={mainRef}>
@@ -393,9 +391,9 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
             <ChartWrapper
               interval={timeFrameHigh}
               // start={start}
-              initialNumberOfCandles={200}
-              onIntervalChanged={(interval) => {}}
-              onStartChanged={(start) => {}}
+              initialNumberOfCandles={400}
+              onIntervalChanged={(interval) => { }}
+              onStartChanged={(start) => { }}
               width={chart2Width}
               chartHeight={600}
               security={securityLastInfo}
@@ -413,7 +411,7 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
             <div className="p-col-6" ref={chart1Ref} style={{ padding: "0" }}>
               <ChartWrapper
                 interval={timeFrameTrading}
-                initialNumberOfCandles={300}
+                initialNumberOfCandles={400}
                 onIntervalChanged={onTradingIntervalChanged}
                 onStartChanged={onStartChanged}
                 onPremiseBeforeChanged={onPremiseBeforeChanged}
@@ -452,8 +450,8 @@ const AnalysisFutures: React.FC<Props> = ({ security, chartNumber }) => {
               <ChartWrapper
                 interval={alert.interval}
                 start={start}
-                onIntervalChanged={(interval) => {}}
-                onStartChanged={(start) => {}}
+                onIntervalChanged={(interval) => { }}
+                onStartChanged={(start) => { }}
                 alert={alert}
                 width={chartAlertsWidth}
                 security={securityLastInfo}

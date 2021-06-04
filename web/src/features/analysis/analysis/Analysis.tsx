@@ -90,20 +90,18 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
   const [marketStateFilterDto, setMarketStateFilterDto] =
     useState<MarketStateFilterDto>(null);
   const [alert, setAlert] = useState(null);
+  const prevMainWidthRef = useRef(null);
 
-  const updateSize = () => {
-    setChart1Width(
-      chart1Ref.current ? chart1Ref.current.clientWidth : CHART_MIN_WIDTH
-    );
-    setChart2Width(
-      chart2Ref.current ? chart2Ref.current.clientWidth : CHART_MIN_WIDTH
-    );
-    setChartAlertsWidth(
-      chartAlertsRef.current
-        ? chartAlertsRef.current.clientWidth
-        : CHART_MIN_WIDTH
-    );
-  };
+  useEffect(() => {
+    if (prevMainWidthRef.current && prevMainWidthRef.current !== mainRef?.current?.clientWidth) {
+      updateSize();
+    }
+    prevMainWidthRef.current = mainRef?.current?.clientWidth;
+  });
+
+  useEffect(() => {
+    updateSize();
+  }, [chartNumber]);
 
   useEffect(() => {
     if (security) {
@@ -189,6 +187,20 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
       activeTradeSubscription.unsubscribe();
     };
   }, [security?.id]);
+
+  const updateSize = () => {
+    setChart1Width(
+      chart1Ref.current ? chart1Ref.current.clientWidth : CHART_MIN_WIDTH
+    );
+    setChart2Width(
+      chart2Ref.current ? chart2Ref.current.clientWidth : CHART_MIN_WIDTH
+    );
+    setChartAlertsWidth(
+      chartAlertsRef.current
+        ? chartAlertsRef.current.clientWidth
+        : CHART_MIN_WIDTH
+    );
+  };
 
   const updateMarketStateFilterDto = (interval: Interval) => {
     const marketStateFilter: MarketStateFilterDto = {
@@ -295,18 +307,21 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
     fetchPremise(timeFrameTrading, before);
   };
 
+  const pColCharts = chartNumber === 1 ? "p-col-12" : "p-col-6";
+
   if (security) {
     return (
       <div className="p-grid" ref={mainRef}>
         <div className="p-col-12">
           <div className="p-grid" style={{ margin: "0" }}>
-            <div className="p-col-6" ref={chart2Ref} style={{ padding: "0" }}>
+            <div className={pColCharts} ref={chart2Ref} style={{ padding: "0" }}>
               <ChartWrapper
                 interval={timeFrameHigh}
                 initialNumberOfCandles={500}
-                onIntervalChanged={(interval) => {}}
-                onStartChanged={(start) => {}}
+                onIntervalChanged={(interval) => { }}
+                onStartChanged={(start) => { }}
                 width={chart2Width}
+                chartHeight={600}
                 security={securityLastInfo}
                 premise={premise}
                 showGrid={true}
@@ -321,6 +336,7 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
                   onStartChanged={onStartChanged}
                   onPremiseBeforeChanged={onPremiseBeforeChanged}
                   width={chart1Width}
+                  chartHeight={600}
                   security={securityLastInfo}
                   premise={premise}
                   orders={orders}
@@ -362,8 +378,8 @@ const Analysis: React.FC<Props> = ({ security, chartNumber }) => {
               {alert ? (
                 <ChartWrapper
                   interval={alert.interval}
-                  onIntervalChanged={(interval) => {}}
-                  onStartChanged={(start) => {}}
+                  onIntervalChanged={(interval) => { }}
+                  onStartChanged={(start) => { }}
                   alert={alert}
                   width={chartAlertsWidth}
                   security={securityLastInfo}
