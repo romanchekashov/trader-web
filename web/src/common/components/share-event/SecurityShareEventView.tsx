@@ -49,17 +49,17 @@ export const SecurityShareEventView: React.FC<Props> = ({ secCode }) => {
         style={{ padding: 0, height: 800, overflowY: "scroll" }}
       >
         {events.map((shareEvent, index) => {
-          const date = moment(shareEvent.published).format("DD-MM-YYYY");
-          const published = moment(shareEvent.published).format(
-            "DD-MM-YYYY HH:mm"
-          );
+
+          const { title, published, newsProvider } = shareEvent;
+          const publishedMoment = moment(published);
           const isSelected =
             selectedEvent &&
-            shareEvent.title === selectedEvent.title &&
-            shareEvent.published.getTime() ===
-              selectedEvent.published.getTime();
+            title === selectedEvent.title &&
+            published.getTime() ===
+            selectedEvent.published.getTime();
 
           let className = "menu-item";
+
           if (isSelected) {
             className += " menu-item-selected";
           } else if (index % 2 === 0) {
@@ -68,15 +68,15 @@ export const SecurityShareEventView: React.FC<Props> = ({ secCode }) => {
 
           return (
             <div
-              key={shareEvent.published.getTime()}
+              key={title + published.getTime()}
               className={className}
               onClick={(e) => setSelectedEvent(shareEvent)}
             >
               <div className="menu-item-pub">
-                Pub: {published} by {shareEvent.newsProvider}
+                Pub: {publishedMoment.format("DD-MM-YYYY HH:mm")} by {newsProvider}
               </div>
               <div className="menu-item-title">
-                {shareEvent.title} ({date})
+                {title} ({publishedMoment.format("DD-MM-YYYY")})
               </div>
             </div>
           );
