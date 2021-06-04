@@ -1,16 +1,16 @@
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { EconomicCalendarEvent } from "../../data/news/EconomicCalendarEvent";
-import { getEconomicCalendarEvents } from "../../api/rest/newsRestApi";
 import FullCalendar from "@fullcalendar/react";
+import ruLocale from "@fullcalendar/core/locales/ru";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
-import ruLocale from "@fullcalendar/core/locales/ru";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import * as React from "react";
+import { useEffect, useState } from "react";
+import newsApi from "../../../app/news/newsApi";
+import { EconomicCalendarEvent } from "../../data/news/EconomicCalendarEvent";
+import { DATE_FORMAT } from "../../utils/utils";
 import "./EconomicCalendar.css";
 import moment = require("moment");
-import { DATE_FORMAT } from "../../utils/utils";
 
 type Props = {
   secId?: number;
@@ -34,7 +34,7 @@ export const EconomicCalendar: React.FC<Props> = ({
     useState<EconomicCalendarEvent>(null);
 
   useEffect(() => {
-    getEconomicCalendarEvents(
+    newsApi.getEconomicCalendarEvents(
       moment().subtract(1, "months").format(DATE_FORMAT),
       null,
       secId
@@ -49,7 +49,7 @@ export const EconomicCalendar: React.FC<Props> = ({
     });
 
     // Specify how to clean up after this effect:
-    return function cleanup() {};
+    return function cleanup() { };
   }, [secId]);
 
   const renderEventContent = (eventContent: any) => {

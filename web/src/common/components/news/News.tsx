@@ -2,7 +2,7 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { fetchNews, selectNews } from "../../../features/news/NewsSlice";
+import { fetchNews, selectNews } from "../../../app/news/newsSlice";
 import { NewsItem } from "../../data/news/NewsItem";
 import "./News.css";
 import moment = require("moment");

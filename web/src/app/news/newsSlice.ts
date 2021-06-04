@@ -1,11 +1,12 @@
 import {
-  createSlice,
   createAsyncThunk,
-  PayloadAction,
-  createSelector,
+
+  createSelector, createSlice,
+
+  PayloadAction
 } from "@reduxjs/toolkit";
-import { RootState } from "../../app/store";
-import { getNews } from "../../common/api/rest/newsRestApi";
+import newsApi from "./newsApi";
+import { RootState } from "../store";
 import { NewsItem } from "../../common/data/news/NewsItem";
 import { NewsProvider } from "../../common/data/news/NewsProvider";
 
@@ -24,7 +25,7 @@ export const fetchNews = createAsyncThunk<
   NewsItem[],
   { provider?: NewsProvider; secId?: number }
 >("news/fetch", async ({ provider, secId }) => {
-  const response = await getNews(provider, secId);
+  const response = await newsApi.getNews(provider, secId);
   return response;
 });
 

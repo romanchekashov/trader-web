@@ -7,7 +7,7 @@ import {
 import { enableMapSet } from "immer";
 import analysisReducer from "../features/analysis/AnalysisSlice";
 import botControlReducer from "../features/bot-control/BotControlSlice";
-import newsReducer from "../features/news/NewsSlice";
+import newsReducer from "./news/newsSlice";
 import tradeJournalReducer from "../features/trade-journal/TradeJournalSlice";
 import activeTradesReducer from "./activeTrades/activeTradesSlice";
 import depositsReducer from "./deposits/depositsSlice";

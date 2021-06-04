@@ -3,7 +3,7 @@ import * as React from "react";
 import { memo, useEffect, useRef, useState } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from "react-window";
-import { getEconomicCalendarEvents } from "../../../api/rest/newsRestApi";
+import newsApi from "../../../../app/news/newsApi";
 import { EconomicCalendarEvent } from "../../../data/news/EconomicCalendarEvent";
 import { ExpectedVolatility } from "../../../data/news/ExpectedVolatility";
 import { DATE_FORMAT } from "../../../utils/utils";
@@ -40,7 +40,7 @@ const EconomicCalendarWidget: React.FC<Props> = ({
   const listRef = useRef(null);
 
   useEffect(() => {
-    getEconomicCalendarEvents(
+    newsApi.getEconomicCalendarEvents(
       moment().subtract(1, "weeks").format(DATE_FORMAT),
       null,
       secId
