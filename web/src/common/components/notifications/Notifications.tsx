@@ -8,7 +8,7 @@ import { FixedSizeList as List } from "react-window";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import {
   loadNotifications,
-  selectNotifications,
+  selectNotifications
 } from "../../../app/notifications/notificationsSlice";
 import { selectSecurities } from "../../../app/securities/securitiesSlice";
 import { WebsocketService, WSEvent } from "../../api/WebsocketService";
@@ -21,7 +21,7 @@ import {
   DATE_TIME_FORMAT,
   getRecentBusinessDate,
   Intervals,
-  PrimeDropdownItem,
+  PrimeDropdownItem
 } from "../../utils/utils";
 import { NotificationDto } from "./data/NotificationDto";
 import Notification from "./Notification";
@@ -146,7 +146,6 @@ const Notifications: React.FC<Props> = ({
 
   useEffect(() => {
     setClassCode(security?.classCode);
-    setSecCode(security?.code);
   }, [security?.id]);
 
   const getSecuritiesByClassCode = (classCode: ClassCode): Security[] => {
