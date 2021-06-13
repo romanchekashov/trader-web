@@ -1,22 +1,21 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
 import "../../../common/components/notifications/styles/Signals.css";
-import "./Securities.css"
-import { SecuritiesFilter } from "./filter/SecuritiesFilter";
-import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
-import { SecuritiesQuik } from "./quik/SecuritiesQuik";
-import { SecuritiesTinkoffApi } from "./tinkoff/SecuritiesTinkoffApi";
 import { BrokerId } from "../../../common/data/BrokerId";
-import { SecurityType } from "../../../common/data/security/SecurityType";
-import moment = require("moment");
+import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
 import { SecurityTypeWrapper } from "../../../common/data/security/SecurityTypeWrapper";
+import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
+import { SecuritiesFilter } from "./filter/SecuritiesFilter";
+import { SecuritiesQuik } from "./quik/SecuritiesQuik";
+import "./SecuritiesScreener.css";
+import { SecuritiesTinkoffApi } from "./tinkoff/SecuritiesTinkoffApi";
+import moment = require("moment");
 
 type Props = {
     onSelectRow: (e: SecurityLastInfo) => void
 }
 
-export const Securities: React.FC<Props> = ({ onSelectRow }) => {
+export const SecuritiesScreener: React.FC<Props> = ({ onSelectRow }) => {
     const [lastTimeUpdate, setLastTimeUpdate] = useState<string>(null)
     const [platform, setPlatform] = useState<TradingPlatform>(TradingPlatform.QUIK)
     const [brokerId, setBrokerId] = useState<BrokerId>(BrokerId.ALFA_DIRECT)

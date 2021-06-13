@@ -7,28 +7,24 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { loadEconomicCalendarEvents } from "../../app/news/newsSlice";
 import PossibleTradesStat from "../../app/possibleTrades/components/PossibleTradesStat";
 import {
-  loadLastSecurities,
   selectSecurities,
-  setSecurities,
-  setSecurityById,
+
+  setSecurityById
 } from "../../app/securities/securitiesSlice";
-import { WebsocketService, WSEvent } from "../../common/api/WebsocketService";
 import ActiveTradesView from "../../common/components/control-panel/components/ActiveTradesView";
 import {
   StackEvent,
-  StackService,
+  StackService
 } from "../../common/components/stack/StackService";
 import { ClassCode } from "../../common/data/ClassCode";
-import { Market } from "../../common/data/Market";
 import { SecurityLastInfo } from "../../common/data/security/SecurityLastInfo";
 import { setSelectedSecurity } from "../../common/utils/Cache";
 import { DATE_FORMAT, PrimeDropdownItem } from "../../common/utils/utils";
 import "./Analysis.css";
 import Analysis from "./analysis/Analysis";
 import AnalysisFutures from "./analysis/AnalysisFutures";
-import { AnalysisTinkoff } from "./analysis/AnalysisTinkoff";
-import { loadFilterData, selectFilter } from "./AnalysisSlice";
-import { Securities } from "./securities/Securities";
+import { selectFilter } from "./AnalysisSlice";
+import { SecuritiesScreener } from "./SecuritiesScreener/SecuritiesScreener";
 
 type Props = {};
 
@@ -86,7 +82,7 @@ const AnalysisPage: React.FC<Props> = ({}) => {
             className={isTabShown ? "" : "analysis_tab_toggle"}
           >
             <TabPanel header="Screener">
-              {isTabShown ? <Securities onSelectRow={onSelectRow} /> : null}
+              {isTabShown ? <SecuritiesScreener onSelectRow={onSelectRow} /> : null}
             </TabPanel>
             <TabPanel header="Active Trades">
               {isTabShown ? (
