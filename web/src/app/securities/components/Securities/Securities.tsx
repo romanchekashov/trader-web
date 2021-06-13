@@ -1,9 +1,9 @@
 import moment = require("moment");
 import * as React from "react";
-import { filterSecurities } from "../../../common/utils/DataUtils";
-import { DATE_TIME_FORMAT } from "../../../common/utils/utils";
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { selectSecurities } from "../securitiesSlice";
+import { filterSecurities } from "../../../../common/utils/DataUtils";
+import { DATE_TIME_FORMAT } from "../../../../common/utils/utils";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { selectSecurities } from "../../securitiesSlice";
 import { SecuritiesFilter } from "./filter/SecuritiesFilter";
 import "./Securities.css";
 import SecuritiesTable from "./table/SecuritiesTable";

@@ -3,10 +3,10 @@ import { ColumnGroup } from "primereact/columngroup";
 import { DataTable } from "primereact/datatable";
 import { Row } from "primereact/row";
 import * as React from "react";
-import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
-import { formatNumber } from "../../../../common/utils/utils";
-import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { selectSecurities, setSecurityById } from "../../securitiesSlice";
+import { SecurityLastInfo } from "../../../../../common/data/security/SecurityLastInfo";
+import { formatNumber } from "../../../../../common/utils/utils";
+import { useAppDispatch, useAppSelector } from "../../../../hooks";
+import { selectSecurities, setSecurityById } from "../../../securitiesSlice";
 import "./SecuritiesTable.css";
 
 type Props = {

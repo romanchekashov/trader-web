@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import DepositView from "../../../../app/deposits/components/DepositView/DepositView";
 import { useAppDispatch } from "../../../../app/hooks";
 import { setPossibleTrade } from "../../../../app/possibleTrades/possibleTradesSlice";
-import Securities from "../../../../app/securities/components/Securities";
+import Securities from "../../../../app/securities/components/Securities/Securities";
 import { setSecurityById } from "../../../../app/securities/securitiesSlice";
 import MoexOpenInterestView from "../../../../features/analysis/analysis/moex-open-interest/MoexOpenInterestView";
 import { SupplyAndDemand } from "../../../../features/analysis/analysis/supply-and-demand/SupplyAndDemand";

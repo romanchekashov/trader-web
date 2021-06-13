@@ -1,14 +1,14 @@
 import { Dropdown } from "primereact/dropdown";
 import * as React from "react";
-import { BrokerId } from "../../../../common/data/BrokerId";
-import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
-import { TradingPlatform } from "../../../../common/data/trading/TradingPlatform";
-import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { BrokerId } from "../../../../../common/data/BrokerId";
+import { SecurityTypeWrapper } from "../../../../../common/data/security/SecurityTypeWrapper";
+import { TradingPlatform } from "../../../../../common/data/trading/TradingPlatform";
+import { useAppDispatch, useAppSelector } from "../../../../hooks";
 import {
   selectBrokerId,
   selectSecurities,
-  selectSecurityTypeWrapper,
-} from "../../securitiesSlice";
+  selectSecurityTypeWrapper
+} from "../../../securitiesSlice";
 import "./SecuritiesFilter.css";
 
 type Props = {
