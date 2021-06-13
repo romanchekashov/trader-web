@@ -1,27 +1,28 @@
-import * as React from "react";
-import { useEffect } from "react";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { SecurityFuture } from "../../../common/data/security/SecurityFuture";
-import { useState } from "react";
+import * as React from "react";
+import { useEffect } from "react";
+import { SecurityShare } from "../../../../common/data/security/SecurityShare";
 
 type Props = {
-  futures: SecurityFuture[];
-  selectedFuture: SecurityFuture;
+  shares: SecurityShare[];
+  selectedShare: SecurityShare;
   onSelectRow: (e: any) => void;
 };
 
-const Futures: React.FC<Props> = ({ futures, selectedFuture, onSelectRow }) => {
+const Shares: React.FC<Props> = ({ shares, selectedShare, onSelectRow }) => {
   const columns = [
     { field: "shortName", header: "Наз" },
     { field: "lastChange", header: "% изм" },
     { field: "lastTradePrice", header: "Цен посл" },
-    { field: "totalDemand", header: "Общ спрос" },
-    { field: "totalSupply", header: "Общ предл" },
-    { field: "sellDepoPerContract", header: "ГО прод" },
-    { field: "buyDepoPerContract", header: "ГО покуп" },
+    { field: "lastTradeQuantity", header: "Кол-во посл" },
+    { field: "lotSize", header: "Лот" },
+    { field: "issueSize", header: "Объем обр." },
+    { field: "voltoday", header: "Общее кол-во" },
+    { field: "weightedAveragePrice", header: "Ср. взв. цена" },
     { field: "valueToday", header: "Оборот" },
     { field: "numTradesToday", header: "Кол-во сделок" },
+    { field: "percentOfFreeFloatTradedToday", header: "% FreeFlt Traded" },
   ];
 
   const lessColumns = [
@@ -32,7 +33,7 @@ const Futures: React.FC<Props> = ({ futures, selectedFuture, onSelectRow }) => {
 
   useEffect(() => {});
 
-  const selectedColumns = selectedFuture ? lessColumns : columns;
+  const selectedColumns = selectedShare ? lessColumns : columns;
   const columnComponents = selectedColumns.map((col) => {
     return (
       <Column
@@ -47,17 +48,18 @@ const Futures: React.FC<Props> = ({ futures, selectedFuture, onSelectRow }) => {
 
   const onSelect = (e) => {
     if (!Array.isArray(e.value)) {
+      console.log(e.value);
       onSelectRow(e.value);
     }
   };
 
   return (
     <DataTable
-      value={futures}
+      value={shares}
       selectionMode="single"
-      selection={selectedFuture}
+      selection={selectedShare}
       onSelectionChange={onSelect}
-      scrollable={!!selectedFuture}
+      scrollable={!!selectedShare}
       scrollHeight="600px"
     >
       {columnComponents}
@@ -65,4 +67,4 @@ const Futures: React.FC<Props> = ({ futures, selectedFuture, onSelectRow }) => {
   );
 };
 
-export default Futures;
+export default Shares;

@@ -1,21 +1,21 @@
-import * as React from "react";
-import { useEffect, useState } from "react";
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import {
   WebsocketService,
-  WSEvent,
-} from "../../../../common/api/WebsocketService";
-import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
-import { Signal } from "../../../../common/data/Signal";
-import { PatternName } from "../../../../common/components/alerts/data/PatternName";
+  WSEvent
+} from "../../../../../common/api/WebsocketService";
+import { PatternName } from "../../../../../common/components/alerts/data/PatternName";
+import { DemandSupply } from "../../../../../common/components/demand-supply/DemandSupply";
+import { SecurityLastInfo } from "../../../../../common/data/security/SecurityLastInfo";
+import { SecurityType } from "../../../../../common/data/security/SecurityType";
+import { SecurityTypeWrapper } from "../../../../../common/data/security/SecurityTypeWrapper";
+import { Signal } from "../../../../../common/data/Signal";
+import { formatNumber } from "../../../../../common/utils/utils";
+import securitiesApi from "../../../securitiesApi";
 import "./SecuritiesQuik.css";
-import { SecurityType } from "../../../../common/data/security/SecurityType";
-import { DemandSupply } from "../../../../common/components/demand-supply/DemandSupply";
 import moment = require("moment");
-import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
-import { formatNumber } from "../../../../common/utils/utils";
-import securitiesApi from "../../../../app/securities/securitiesApi";
 
 type Props = {
   secType: SecurityTypeWrapper;

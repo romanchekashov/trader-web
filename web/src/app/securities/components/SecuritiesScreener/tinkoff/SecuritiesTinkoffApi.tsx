@@ -2,14 +2,14 @@ import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import tinkoffInvestRestApi from "../../../../common/api/rest/tinkoffInvestRestApi";
+import tinkoffInvestRestApi from "../../../../../common/api/rest/tinkoffInvestRestApi";
 import {
   WebsocketService,
-  WSEvent,
-} from "../../../../common/api/WebsocketService";
-import { PatternName } from "../../../../common/components/alerts/data/PatternName";
-import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
-import { Signal } from "../../../../common/data/Signal";
+  WSEvent
+} from "../../../../../common/api/WebsocketService";
+import { PatternName } from "../../../../../common/components/alerts/data/PatternName";
+import { SecurityLastInfo } from "../../../../../common/data/security/SecurityLastInfo";
+import { Signal } from "../../../../../common/data/Signal";
 import moment = require("moment");
 
 type Props = {

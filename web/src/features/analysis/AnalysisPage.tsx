@@ -24,7 +24,7 @@ import "./Analysis.css";
 import Analysis from "./analysis/Analysis";
 import AnalysisFutures from "./analysis/AnalysisFutures";
 import { selectFilter } from "./AnalysisSlice";
-import { SecuritiesScreener } from "./SecuritiesScreener/SecuritiesScreener";
+import { SecuritiesScreener } from "../../app/securities/components/SecuritiesScreener/SecuritiesScreener";
 
 type Props = {};
 

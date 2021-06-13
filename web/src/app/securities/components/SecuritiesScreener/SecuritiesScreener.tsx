@@ -1,10 +1,10 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
-import "../../../common/components/notifications/styles/Signals.css";
-import { BrokerId } from "../../../common/data/BrokerId";
-import { SecurityLastInfo } from "../../../common/data/security/SecurityLastInfo";
-import { SecurityTypeWrapper } from "../../../common/data/security/SecurityTypeWrapper";
-import { TradingPlatform } from "../../../common/data/trading/TradingPlatform";
+import "../../../../common/components/notifications/styles/Signals.css";
+import { BrokerId } from "../../../../common/data/BrokerId";
+import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
+import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
+import { TradingPlatform } from "../../../../common/data/trading/TradingPlatform";
 import { SecuritiesFilter } from "./filter/SecuritiesFilter";
 import { SecuritiesQuik } from "./quik/SecuritiesQuik";
 import "./SecuritiesScreener.css";

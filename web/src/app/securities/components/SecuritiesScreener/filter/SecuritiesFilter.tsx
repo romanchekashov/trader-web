@@ -1,14 +1,12 @@
-import * as React from "react";
-import { useEffect } from "react";
-import { Toolbar } from 'primereact/toolbar';
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
-import { TradingPlatform } from "../../../../common/data/trading/TradingPlatform";
-import { BrokerId } from "../../../../common/data/BrokerId";
-import { SecurityType } from "../../../../common/data/security/SecurityType";
 import { SelectButton } from "primereact/selectbutton";
-import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
-import "./SecuritiesFilter.css"
+import * as React from "react";
+import { useEffect } from "react";
+import { BrokerId } from "../../../../../common/data/BrokerId";
+import { SecurityTypeWrapper } from "../../../../../common/data/security/SecurityTypeWrapper";
+import { TradingPlatform } from "../../../../../common/data/trading/TradingPlatform";
+import "./SecuritiesFilter.css";
 
 type Props = {
     lastTimeUpdate: string
