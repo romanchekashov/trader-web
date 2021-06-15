@@ -1,3 +1,4 @@
+import moment = require("moment");
 import { Toast } from "primereact/toast";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +11,7 @@ import { deleteOrder, selectOrders } from "../../../app/orders/ordersSlice";
 import quikOrdersApi from "../../../app/orders/quikOrdersApi";
 import { selectSecurities } from "../../../app/securities/securitiesSlice";
 import { selectStops } from "../../../app/stops/stopsSlice";
+import analysisRestApi from "../../api/rest/analysisRestApi";
 import { WebsocketService, WSEvent } from "../../api/WebsocketService";
 import { playSound } from "../../assets/assets";
 import { ActiveTrade } from "../../data/ActiveTrade";
@@ -125,7 +127,16 @@ export const Stack: React.FC<Props> = ({}) => {
         activeTrades?.find((at) => at.secId === security?.id)
       )
     );
-  }, [activeTrades, security]);
+  }, [activeTrades, security?.id]);
+
+  useEffect(() => {
+    if (security?.id) {
+      analysisRestApi.getSecurityVolumes({
+        secCode: security.secCode, 
+        timestamp: moment().hours(6).minutes(0).seconds(0).toDate()
+      }).then(setVolumes);
+    }
+  }, [security?.id]);
 
   const updateSize = () => {
     setStackItemsHeight(window.innerHeight);

@@ -1,6 +1,8 @@
 import { PatternResult } from "../../components/alerts/data/PatternResult";
 import { MarketStateDto } from "../../components/market-state/data/MarketStateDto";
 import { MarketStateFilterDto } from "../../components/market-state/data/MarketStateFilterDto";
+import { SecurityVolume } from "../../components/stack/volumes/data/SecurityVolume";
+import { SecurityVolumeFilter } from "../../components/stack/volumes/data/SecurityVolumeFilter";
 import { SwingStateDto } from "../../components/swing-state/data/SwingStateDto";
 import { ClassCode } from "../../data/ClassCode";
 import { FilterDto } from "../../data/FilterDto";
@@ -15,11 +17,25 @@ import {
   adjustMoexOpenInterestList,
   adjustSecurityShareEvents,
   adjustSwingStateDto,
-  adjustTradePremise,
+  adjustTradePremise
 } from "../../utils/DataUtils";
-import { handleError, handleResponse } from "../apiUtils";
+import { handleError, handleResponse, post } from "../apiUtils";
 
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
+
+const adjustSecurityVolumes = (
+  list: SecurityVolume[]
+): SecurityVolume[] => {
+
+  for (const item of list) {
+    item.lastTradeTime = new Date(item.lastTradeTime);
+  }
+
+  return list;
+};
+
+const getSecurityVolumes = (filter: SecurityVolumeFilter): Promise<SecurityVolume[]> =>
+  post<SecurityVolume[]>(`${baseUrl}volumes`, filter).then(adjustSecurityVolumes);
 
 export default {
   getTradePremise,
@@ -30,6 +46,7 @@ export default {
   getMoexOpenInterests,
   getMoexApiOpenInterestList,
   getSecurityShareEvents,
+  getSecurityVolumes
 };
 
 export function getTradePremise(

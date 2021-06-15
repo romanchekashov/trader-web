@@ -45,7 +45,7 @@ const StackVolumes: React.FC<Props> = ({volumes}) => {
 
     return (
         <div className="p-grid volumes">
-            <div className="p-col-12" style={{padding: 0, height: '100%', fontSize: '12px'}}>
+            <div className="p-col-12" style={{height: '100%', fontSize: '12px'}}>
                 {createVolumesView()}
             </div>
         </div>
