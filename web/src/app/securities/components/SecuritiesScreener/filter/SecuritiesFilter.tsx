@@ -23,11 +23,13 @@ export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate, onShowAll, b
 
     const types = [
         { label: 'ALL', value: null },
-        { label: 'FUTURE', value: SecurityTypeWrapper.FUTURE },
         { label: 'STOCK', value: SecurityTypeWrapper.STOCK },
+        { label: 'RusStock', value: SecurityTypeWrapper.STOCK_RU },
+        { label: 'UsStock', value: SecurityTypeWrapper.STOCK_US },
         { label: 'STOCK_1', value: SecurityTypeWrapper.STOCK_1 },
         { label: 'STOCK_2', value: SecurityTypeWrapper.STOCK_2 },
         { label: 'STOCK_3', value: SecurityTypeWrapper.STOCK_3 },
+        { label: 'FUTURE', value: SecurityTypeWrapper.FUTURE },
         { label: 'CURRENCY', value: SecurityTypeWrapper.CURRENCY }
     ]
     const ALL = "ALL"
