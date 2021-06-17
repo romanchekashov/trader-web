@@ -2,12 +2,11 @@ import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 import * as React from "react";
-import { useEffect } from "react";
 import { BrokerId } from "../../../../../common/data/BrokerId";
 import { SecurityTypeWrapper } from "../../../../../common/data/security/SecurityTypeWrapper";
 import { TradingPlatform } from "../../../../../common/data/trading/TradingPlatform";
 import { useAppDispatch, useAppSelector } from "../../../../hooks";
-import { selectBrokerId, selectSecurities, selectSecurityTypeWrapper } from "../../../securitiesSlice";
+import { DayAndEvening, selectBrokerId, selectSecurities, selectSecurityTypeWrapper, setSessions } from "../../../securitiesSlice";
 import "./SecuritiesFilter.css";
 
 type Props = {
@@ -21,7 +20,12 @@ type Props = {
 
 export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate, onShowAll, brokerId, onBrokerId, platform }) => {
     const dispatch = useAppDispatch();
-    const { selectedSecurityTypeWrapper } = useAppSelector(selectSecurities);
+    const { selectedSecurityTypeWrapper, sessions } = useAppSelector(selectSecurities);
+
+    const dayAndEvening = [
+        { label: 'Дневная сессия', value: DayAndEvening.day },
+        { label: 'Вечерняя сессия', value: DayAndEvening.evening },
+    ];
 
     const types = [
         { label: 'ALL', value: null },
@@ -34,13 +38,9 @@ export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate, onShowAll, b
         { label: 'FUTURE', value: SecurityTypeWrapper.FUTURE },
         { label: 'CURRENCY', value: SecurityTypeWrapper.CURRENCY }
     ]
-    const ALL = "ALL"
     const brokerIds = [BrokerId.ALFA_DIRECT, BrokerId.TINKOFF_INVEST].map(val => ({ label: val, value: val }))
     const platforms = (brokerId === BrokerId.ALFA_DIRECT ? [TradingPlatform.QUIK] : [TradingPlatform.API])
         .map(val => ({ label: val, value: val }))
-
-    useEffect(() => {
-    }, [])
 
     return (
         <div className="securities-filter">
@@ -66,6 +66,11 @@ export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate, onShowAll, b
                 options={types}
                 onChange={e => dispatch(selectSecurityTypeWrapper(e.value))}
                 style={{ display: 'inline-block', marginRight: '5px' }} />
+
+            <SelectButton value={sessions}
+                options={dayAndEvening}
+                onChange={(e) => dispatch(setSessions(e.value))}
+                style={{ display: 'inline-block', marginRight: '5px' }} multiple />
 
             <Button label="Show All" icon="pi pi-caret-right"
                 onClick={(e) => onShowAll()}

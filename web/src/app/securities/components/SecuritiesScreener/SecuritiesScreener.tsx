@@ -7,7 +7,7 @@ import { TradingPlatform } from "../../../../common/data/trading/TradingPlatform
 import { filterSecurities } from "../../../../common/utils/DataUtils";
 import { DATE_TIME_FORMAT } from "../../../../common/utils/utils";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { selectSecurities } from "../../securitiesSlice";
+import { DayAndEvening, selectSecurities } from "../../securitiesSlice";
 import { SecuritiesFilter } from "./filter/SecuritiesFilter";
 import { SecuritiesQuik } from "./quik/SecuritiesQuik";
 import "./SecuritiesScreener.css";
@@ -21,13 +21,14 @@ type Props = {
 export const SecuritiesScreener: React.FC<Props> = ({ onSelectRow }) => {
 
     const dispatch = useAppDispatch();
-    const { securities, selectedSecurityTypeWrapper } =
+    const { securities, selectedSecurityTypeWrapper, sessions, securityInfoMap } =
         useAppSelector(selectSecurities);
 
     const securitiesFiltered = filterSecurities(
         securities,
         selectedSecurityTypeWrapper
-    );
+    ).filter(({ id }) => sessions.length === 2 || (sessions[0] === DayAndEvening.day && !securityInfoMap.get(id).eveningSession)
+        || (sessions[0] === DayAndEvening.evening && securityInfoMap.get(id).eveningSession));
 
     const lastTimeUpdate = moment(new Date()).format(DATE_TIME_FORMAT);
     const [platform, setPlatform] = useState<TradingPlatform>(TradingPlatform.QUIK)

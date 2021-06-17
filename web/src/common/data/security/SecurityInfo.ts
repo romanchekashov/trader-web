@@ -1,7 +1,7 @@
-import {ClassCode} from "../ClassCode";
-import {SecurityType} from "./SecurityType";
-import {Market} from "../Market";
-import {Currency} from "../Currency";
+import { ClassCode } from "../ClassCode";
+import { Currency } from "../Currency";
+import { Market } from "../Market";
+import { SecurityType } from "./SecurityType";
 
 export class SecurityInfo {
     public id: number
@@ -21,4 +21,5 @@ export class SecurityInfo {
     public expDate: Date
     public lotSize: number
     public minPriceStep: number
+    public eveningSession: boolean
 }

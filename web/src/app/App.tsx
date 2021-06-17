@@ -38,6 +38,7 @@ import {
   loadFutures,
   loadLastSecurities,
   loadLastSecuritiesTinkoff,
+  loadSecurityInfos,
   loadShares,
   selectSecurities,
   setSecurities
@@ -53,6 +54,7 @@ export const App = () => {
     dispatch(loadShares());
     dispatch(loadFutures());
     dispatch(loadCurrencies());
+    dispatch(loadSecurityInfos());
     dispatch(loadActiveTrades());
     dispatch(loadFuturesClientLimits());
     dispatch(loadFilterData(false));
