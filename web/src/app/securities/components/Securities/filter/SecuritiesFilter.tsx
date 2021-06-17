@@ -63,7 +63,7 @@ export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate }) => {
         <Dropdown
           value={selectedSecurityTypeWrapper}
           options={types}
-          onChange={(e) => dispatch(selectSecurityTypeWrapper(e.value))}
+          onChange={e => dispatch(selectSecurityTypeWrapper(e.value))}
         />
         {lastTimeUpdate}
       </div>

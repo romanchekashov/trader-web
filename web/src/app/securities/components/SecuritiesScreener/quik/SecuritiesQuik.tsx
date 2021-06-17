@@ -1,49 +1,39 @@
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import * as React from "react";
-import { useEffect, useState } from "react";
-import {
-  WebsocketService,
-  WSEvent
-} from "../../../../../common/api/WebsocketService";
 import { PatternName } from "../../../../../common/components/alerts/data/PatternName";
 import { DemandSupply } from "../../../../../common/components/demand-supply/DemandSupply";
 import { SecurityLastInfo } from "../../../../../common/data/security/SecurityLastInfo";
 import { SecurityType } from "../../../../../common/data/security/SecurityType";
-import { SecurityTypeWrapper } from "../../../../../common/data/security/SecurityTypeWrapper";
 import { Signal } from "../../../../../common/data/Signal";
 import { formatNumber } from "../../../../../common/utils/utils";
-import securitiesApi from "../../../securitiesApi";
 import "./SecuritiesQuik.css";
 import moment = require("moment");
 
 type Props = {
-  secType: SecurityTypeWrapper;
   selectedSecurity: SecurityLastInfo;
+  securities: SecurityLastInfo[];
   onSelectRow: (e: SecurityLastInfo) => void;
-  onLastTimeUpdate: (lastTimeUpdate: Date) => void;
 };
 
 export const SecuritiesQuik: React.FC<Props> = ({
-  secType,
   selectedSecurity,
+  securities,
   onSelectRow,
-  onLastTimeUpdate,
 }) => {
-  const [securities, setSecurities] = useState<SecurityLastInfo[]>([]);
 
   const columns = [
     { field: "id", header: "Id" },
     { field: "type", header: "Type" },
     { field: "shortName", header: "Наз" },
     { field: "secCode", header: "Тикер" },
-    { field: "lastChange", header: "% изм" },
     { field: "lastTradePrice", header: "Цен посл" },
     { field: "totalDemand", header: "Об спр/пред" },
     { field: "valueToday", header: "Оборот" },
     { field: "volumeToday", header: "Vol Today" },
     { field: "percentOfFreeFloatTradedToday", header: "% FreeFlt Tr" },
     { field: "freeFloatInPercent", header: "FreeFlt(%)" },
+    { field: "lastChange", header: "% изм" },
     {
       field: "distancePassedSinceLastDayCloseRelativeToAtrAvg",
       header: "GAtrDis AVG(D)%",
@@ -53,15 +43,15 @@ export const SecuritiesQuik: React.FC<Props> = ({
       header: "GAtrDis (D)%",
     },
     { field: "atrDay", header: "ATR(D)" },
-    // { field: 'atrM60', header: 'ATR(M60)' },
-    { field: "atrM30", header: "ATR(M30)" },
-    // { field: 'atrM3', header: 'ATR(M3)' },
+    { field: 'atrM60', header: 'ATR(M60)' },
+    // { field: "atrM30", header: "ATR(M30)" },
+    { field: 'atrM5', header: 'ATR(M5)' },
     { field: "gapDay", header: "Gap(D)" },
     { field: "gapDayPercent", header: "Gap(D)%" },
     { field: "volumeInPercentDay", header: "Vol(D)%" },
     { field: "volumeInPercentM60", header: "Vol(M60)%" },
-    { field: "volumeInPercentM30", header: "Vol(M30)%" },
-    { field: "volumeInPercentM3", header: "Vol(M3)%" },
+    // { field: "volumeInPercentM30", header: "Vol(M30)%" },
+    { field: "volumeInPercentM5", header: "Vol(M5)%" },
     { field: "relativeVolumeDay", header: "Rel Vol(D)" },
     { field: "numTradesToday", header: "Кол сд" },
     { field: "signals", header: "Signals" },
@@ -83,53 +73,6 @@ export const SecuritiesQuik: React.FC<Props> = ({
       header: "GAtrDis (D)%",
     },
   ];
-
-  useEffect(() => {
-    securitiesApi.getLastSecurities().then((securities) => {
-      if (secType && securities?.length > 0) {
-        setSecurities(filterSecurities(securities, secType));
-      } else {
-        setSecurities(securities);
-      }
-      onLastTimeUpdate(new Date());
-    });
-
-    const lastSecuritiesSubscription = WebsocketService.getInstance()
-      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
-      .subscribe((securities) => {
-        setSecurities(
-          secType ? filterSecurities(securities, secType) : securities
-        );
-        onLastTimeUpdate(new Date());
-      });
-
-    // Specify how to clean up after this effect:
-    return function cleanup() {
-      lastSecuritiesSubscription.unsubscribe();
-    };
-  }, [secType]);
-
-  const filterSecurities = (
-    securities: SecurityLastInfo[],
-    secType: SecurityTypeWrapper
-  ): SecurityLastInfo[] => {
-    return securities.filter((value) => {
-      switch (secType) {
-        case SecurityTypeWrapper.FUTURE:
-          return value.type === SecurityType.FUTURE;
-        case SecurityTypeWrapper.STOCK:
-          return value.type === SecurityType.STOCK;
-        case SecurityTypeWrapper.STOCK_1:
-          return value.type === SecurityType.STOCK && value.shareSection === 1;
-        case SecurityTypeWrapper.STOCK_2:
-          return value.type === SecurityType.STOCK && value.shareSection === 2;
-        case SecurityTypeWrapper.STOCK_3:
-          return value.type === SecurityType.STOCK && value.shareSection === 3;
-        case SecurityTypeWrapper.CURRENCY:
-          return value.type === SecurityType.CURRENCY;
-      }
-    });
-  };
 
   const getCandlePatternClassName = (alert: Signal) => {
     let className = "";
@@ -178,11 +121,10 @@ export const SecuritiesQuik: React.FC<Props> = ({
   const nameTemplate = (signal: Signal) => {
     let className = "alert-icon ";
     const sInterval = signal.interval.toString();
-    const title = `${signal.price} - ${
-      signal.name
-    } - Interval: ${sInterval} - ${moment(signal.timestamp).format(
-      "HH:mm DD-MM-YYYY"
-    )}`;
+    const title = `${signal.price} - ${signal.name
+      } - Interval: ${sInterval} - ${moment(signal.timestamp).format(
+        "HH:mm DD-MM-YYYY"
+      )}`;
     const sArr = signal.name.split("-");
 
     if (sArr.length > 1) {

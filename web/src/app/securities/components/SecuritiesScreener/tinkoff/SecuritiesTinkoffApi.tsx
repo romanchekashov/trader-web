@@ -1,12 +1,6 @@
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import * as React from "react";
-import { useEffect, useState } from "react";
-import tinkoffInvestRestApi from "../../../../../common/api/rest/tinkoffInvestRestApi";
-import {
-  WebsocketService,
-  WSEvent
-} from "../../../../../common/api/WebsocketService";
 import { PatternName } from "../../../../../common/components/alerts/data/PatternName";
 import { SecurityLastInfo } from "../../../../../common/data/security/SecurityLastInfo";
 import { Signal } from "../../../../../common/data/Signal";
@@ -14,16 +8,15 @@ import moment = require("moment");
 
 type Props = {
   selectedSecurity: SecurityLastInfo;
+  securities: SecurityLastInfo[];
   onSelectRow: (e: SecurityLastInfo) => void;
-  onLastTimeUpdate: (lastTimeUpdate: Date) => void;
 };
 
 export const SecuritiesTinkoffApi: React.FC<Props> = ({
   selectedSecurity,
-  onSelectRow,
-  onLastTimeUpdate,
+  securities,
+  onSelectRow
 }) => {
-  const [securities, setSecurities] = useState<SecurityLastInfo[]>([]);
 
   const columns = [
     { field: "name", header: "Наз" },
@@ -61,25 +54,6 @@ export const SecuritiesTinkoffApi: React.FC<Props> = ({
     { field: "volumeInPercentM3", header: "Vol(M3)%" },
     { field: "relativeVolumeDay", header: "Rel Vol(D)" },
   ];
-
-  useEffect(() => {
-    tinkoffInvestRestApi.getLastSecurities().then((securities) => {
-      setSecurities(securities);
-      onLastTimeUpdate(new Date());
-    });
-
-    const lastSecuritiesSubscription = WebsocketService.getInstance()
-      .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES_TINKOFF)
-      .subscribe((securities) => {
-        setSecurities(securities);
-        onLastTimeUpdate(new Date());
-      });
-
-    // Specify how to clean up after this effect:
-    return function cleanup() {
-      lastSecuritiesSubscription.unsubscribe();
-    };
-  }, []);
 
   const getCandlePatternClassName = (alert: Signal) => {
     let className = "";
@@ -128,11 +102,10 @@ export const SecuritiesTinkoffApi: React.FC<Props> = ({
   const nameTemplate = (signal: Signal) => {
     let className = "alert-icon ";
     const sInterval = signal.interval.toString();
-    const title = `${signal.price} - ${
-      signal.name
-    } - Interval: ${sInterval} - ${moment(signal.timestamp).format(
-      "HH:mm DD-MM-YYYY"
-    )}`;
+    const title = `${signal.price} - ${signal.name
+      } - Interval: ${sInterval} - ${moment(signal.timestamp).format(
+        "HH:mm DD-MM-YYYY"
+      )}`;
     const sArr = signal.name.split("-");
 
     if (sArr.length > 1) {

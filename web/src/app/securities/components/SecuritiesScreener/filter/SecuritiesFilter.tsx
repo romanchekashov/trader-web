@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { BrokerId } from "../../../../../common/data/BrokerId";
 import { SecurityTypeWrapper } from "../../../../../common/data/security/SecurityTypeWrapper";
 import { TradingPlatform } from "../../../../../common/data/trading/TradingPlatform";
+import { useAppDispatch, useAppSelector } from "../../../../hooks";
+import { selectBrokerId, selectSecurities, selectSecurityTypeWrapper } from "../../../securitiesSlice";
 import "./SecuritiesFilter.css";
 
 type Props = {
@@ -15,11 +17,11 @@ type Props = {
     platform: TradingPlatform
     // onPlatformChange: (platform: TradingPlatform) => void
     onShowAll: () => void
-    secType: SecurityTypeWrapper
-    changeSecType: (secType: SecurityTypeWrapper) => void
 }
 
-export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate, onShowAll, brokerId, onBrokerId, platform, secType, changeSecType }) => {
+export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate, onShowAll, brokerId, onBrokerId, platform }) => {
+    const dispatch = useAppDispatch();
+    const { selectedSecurityTypeWrapper } = useAppSelector(selectSecurities);
 
     const types = [
         { label: 'ALL', value: null },
@@ -37,8 +39,6 @@ export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate, onShowAll, b
     const platforms = (brokerId === BrokerId.ALFA_DIRECT ? [TradingPlatform.QUIK] : [TradingPlatform.API])
         .map(val => ({ label: val, value: val }))
 
-    const updateSecType = (e: any): void => changeSecType(e.value)
-
     useEffect(() => {
     }, [])
 
@@ -49,6 +49,7 @@ export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate, onShowAll, b
                 onChange={(e) => {
                     onShowAll()
                     onBrokerId(e.value)
+                    dispatch(selectBrokerId(e.value))
                 }}
                 placeholder="Select a broker"
                 style={{ width: '120px', marginRight: '5px' }} />
@@ -61,9 +62,9 @@ export const SecuritiesFilter: React.FC<Props> = ({ lastTimeUpdate, onShowAll, b
                 placeholder="Select a platform"
                 style={{ width: '120px', marginRight: '5px' }} />
 
-            <SelectButton value={secType}
+            <SelectButton value={selectedSecurityTypeWrapper}
                 options={types}
-                onChange={updateSecType}
+                onChange={e => dispatch(selectSecurityTypeWrapper(e.value))}
                 style={{ display: 'inline-block', marginRight: '5px' }} />
 
             <Button label="Show All" icon="pi pi-caret-right"

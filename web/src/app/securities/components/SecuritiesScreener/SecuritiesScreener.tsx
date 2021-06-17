@@ -3,8 +3,11 @@ import { useEffect, useState } from "react";
 import "../../../../common/components/notifications/styles/Signals.css";
 import { BrokerId } from "../../../../common/data/BrokerId";
 import { SecurityLastInfo } from "../../../../common/data/security/SecurityLastInfo";
-import { SecurityTypeWrapper } from "../../../../common/data/security/SecurityTypeWrapper";
 import { TradingPlatform } from "../../../../common/data/trading/TradingPlatform";
+import { filterSecurities } from "../../../../common/utils/DataUtils";
+import { DATE_TIME_FORMAT } from "../../../../common/utils/utils";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
+import { selectSecurities } from "../../securitiesSlice";
 import { SecuritiesFilter } from "./filter/SecuritiesFilter";
 import { SecuritiesQuik } from "./quik/SecuritiesQuik";
 import "./SecuritiesScreener.css";
@@ -16,11 +19,20 @@ type Props = {
 }
 
 export const SecuritiesScreener: React.FC<Props> = ({ onSelectRow }) => {
-    const [lastTimeUpdate, setLastTimeUpdate] = useState<string>(null)
+
+    const dispatch = useAppDispatch();
+    const { securities, selectedSecurityTypeWrapper } =
+        useAppSelector(selectSecurities);
+
+    const securitiesFiltered = filterSecurities(
+        securities,
+        selectedSecurityTypeWrapper
+    );
+
+    const lastTimeUpdate = moment(new Date()).format(DATE_TIME_FORMAT);
     const [platform, setPlatform] = useState<TradingPlatform>(TradingPlatform.QUIK)
     const [brokerId, setBrokerId] = useState<BrokerId>(BrokerId.ALFA_DIRECT)
     const [selectedSecurity, setSelectedSecurity] = useState<SecurityLastInfo>(null)
-    const [secType, setSecType] = useState<SecurityTypeWrapper>(SecurityTypeWrapper.FUTURE)
 
     useEffect(() => {
         // Specify how to clean up after this effect:
@@ -31,10 +43,6 @@ export const SecuritiesScreener: React.FC<Props> = ({ onSelectRow }) => {
     const selectSecurity = (sec: SecurityLastInfo) => {
         setSelectedSecurity(sec)
         onSelectRow(sec)
-    }
-
-    const onLastTimeUpdate = (updateDate: Date) => {
-        setLastTimeUpdate(moment(updateDate).format("HH:mm:ss DD-MM-YYYY"))
     }
 
     const selectBrokerId = (brokerId: BrokerId) => {
@@ -48,19 +56,18 @@ export const SecuritiesScreener: React.FC<Props> = ({ onSelectRow }) => {
                 onShowAll={() => selectSecurity(null)}
                 brokerId={brokerId}
                 onBrokerId={selectBrokerId}
-                platform={platform}
-                secType={secType}
-                changeSecType={setSecType} />
+                platform={platform} />
             {
                 brokerId === BrokerId.ALFA_DIRECT ?
-                    <SecuritiesQuik secType={secType}
+                    <SecuritiesQuik
                         selectedSecurity={selectedSecurity}
                         onSelectRow={selectSecurity}
-                        onLastTimeUpdate={onLastTimeUpdate} />
+                        securities={securitiesFiltered} />
                     :
-                    <SecuritiesTinkoffApi selectedSecurity={selectedSecurity}
+                    <SecuritiesTinkoffApi
+                        selectedSecurity={selectedSecurity}
                         onSelectRow={selectSecurity}
-                        onLastTimeUpdate={onLastTimeUpdate} />
+                        securities={securitiesFiltered} />
             }
         </>
     )
