@@ -22,6 +22,7 @@ import { StopOrder } from "../../data/StopOrder";
 import { TradePremise } from "../../data/strategy/TradePremise";
 import { adjustTradePremise } from "../../utils/DataUtils";
 import intervalCompare from "../../utils/IntervalComporator";
+import { getRecentBusinessDate } from "../../utils/utils";
 import { StackItem } from "./data/StackItem";
 import { StackItemWrapper } from "./data/StackItemWrapper";
 import "./Stack.css";
@@ -133,7 +134,7 @@ export const Stack: React.FC<Props> = ({}) => {
     if (security?.id) {
       analysisRestApi.getSecurityVolumes({
         secCode: security.secCode, 
-        timestamp: moment().hours(6).minutes(0).seconds(0).toDate()
+        timestamp: moment(getRecentBusinessDate(new Date())).hours(6).minutes(0).seconds(0).toDate()
       }).then(setVolumes);
     }
   }, [security?.id]);
