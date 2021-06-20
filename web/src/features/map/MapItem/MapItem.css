@@ -1,0 +1,45 @@
+.MapItem {
+    border: solid 1px;
+    cursor: pointer;
+}
+
+.MapItem.selected {
+    border: solid 2px #c7130d;
+}
+
+.p-grid .MapItem {
+    padding: 0;
+}
+
+.MapItem .demand-supply {
+    height: 10px;
+}
+.MapItem .demand-supply div {
+    font-size: 10px;
+    line-height: 10px;
+}
+
+.MapItem .lastChange {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.win-lg {
+    background-color: #27ae60aa !important;
+}
+.win {
+    background-color: #27ae6055 !important;
+}
+.win-sm {
+    background-color: #27ae6022 !important;
+}
+
+.loss-lg {
+    background-color: #fcd2cdaa !important;
+}
+.loss {
+    background-color: #e74c3c55 !important;
+}
+.loss-sm {
+    background-color: #e74c3c22 !important;
+}

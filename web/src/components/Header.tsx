@@ -13,6 +13,10 @@ export const Header = () => {
           Home
         </NavLink>
         {" / "}
+        <NavLink to="/map" activeStyle={activeStyle}>
+          Map
+        </NavLink>
+        {" / "}
         <NavLink to="/trading-charts" activeStyle={activeStyle}>
           TCharts
         </NavLink>

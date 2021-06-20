@@ -14,6 +14,7 @@ import { SecurityShare } from "../../common/data/security/SecurityShare";
 import { SecurityTypeWrapper } from "../../common/data/security/SecurityTypeWrapper";
 import { TradingPlatform } from "../../common/data/trading/TradingPlatform";
 import { SEC_MAP } from "../../common/utils/Cache";
+import { sortSecurities } from "../../common/utils/DataUtils";
 import { LoadingState } from "../LoadingState";
 import { handleThunkError } from "../reduxUtils";
 import { RootState } from "../store";
@@ -59,9 +60,11 @@ const initialState: SecuritiesState = {
 // https://www.newline.co/@bespoyasov/how-to-use-thunks-with-redux-toolkit-and-typescript--1e65fc64
 export const loadLastSecurities = createAsyncThunk<SecurityLastInfo[]>(
   "securities/loadLastSecurities",
-  async (_, thunkAPI) =>
-    await handleThunkError(thunkAPI, securitiesApi.getLastSecurities())
-);
+  async (_, thunkAPI) => {
+    let securities = await handleThunkError(thunkAPI, securitiesApi.getLastSecurities());
+    sortSecurities(securities);
+    return securities;
+  });
 export const loadShares = createAsyncThunk<SecurityShare[]>(
   "securities/loadShares",
   async (_, thunkAPI) =>

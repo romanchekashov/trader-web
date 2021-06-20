@@ -3,16 +3,16 @@
     display: flex;
 }
 
-.demand {
-    background-color: #16a085;
+.demand-supply div {
     text-align: center;
     line-height: 20px;
     color: white;
 }
 
+.demand {
+    background-color: #16a085;
+}
+
 .supply {
     background-color: #e74c3c;
-    text-align: center;
-    line-height: 20px;
-    color: white;
 }

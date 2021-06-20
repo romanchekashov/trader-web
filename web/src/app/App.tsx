@@ -11,7 +11,7 @@ import { Order } from "../common/data/Order";
 import { SecurityLastInfo } from "../common/data/security/SecurityLastInfo";
 import { StopOrder } from "../common/data/StopOrder";
 import { TradingPlatform } from "../common/data/trading/TradingPlatform";
-import { DATE_FORMAT } from "../common/utils/utils";
+import { sortSecurities } from "../common/utils/DataUtils";
 import { Header } from "../components/Header";
 import { ActiveTradesPage } from "../features/active-trades/ActiveTradesPage";
 import AnalysisPage from "../features/analysis/AnalysisPage";
@@ -19,6 +19,7 @@ import { loadFilterData } from "../features/analysis/AnalysisSlice";
 import { BotControlPage } from "../features/bot-control/BotControlPage";
 import { EconomicCalendarPage } from "../features/economic-calendar/EconomicCalendarPage";
 import { HomePage } from "../features/home/HomePage";
+import MapPage from "../features/map/MapPage";
 import { NewsPage } from "../features/news/NewsPage";
 import TradeJournalPage from "../features/trade-journal/TradeJournalPage";
 import { TradingChartsRouter } from "../features/trading-charts/TradingChartsRouter";
@@ -29,7 +30,6 @@ import {
 } from "./activeTrades/activeTradesSlice";
 import { loadFuturesClientLimits, setDeposits } from "./deposits/depositsSlice";
 import { useAppDispatch, useAppSelector } from "./hooks";
-import { loadEconomicCalendarEvents } from "./news/newsSlice";
 import { setOrders } from "./orders/ordersSlice";
 import { PageNotFound } from "./PageNotFound";
 import { loadPossibleTradesStat } from "./possibleTrades/possibleTradesSlice";
@@ -121,6 +121,7 @@ export const App = () => {
           securities.forEach(newSecurityLastInfo => {
             newSecurityLastInfo.lastTradeTime = new Date(newSecurityLastInfo.lastTradeTime);
           });
+          sortSecurities(securities);
           dispatch(setSecurities(securities));
         });
     } else {
@@ -128,6 +129,7 @@ export const App = () => {
       lastSecuritiesSubscription = WebsocketService.getInstance()
         .on<SecurityLastInfo[]>(WSEvent.LAST_SECURITIES)
         .subscribe((securities) => {
+          sortSecurities(securities);
           dispatch(setSecurities(securities));
         });
     }
@@ -148,6 +150,7 @@ export const App = () => {
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route path="/news" component={NewsPage} />
+          <Route path="/map" component={MapPage} />
           <Route path="/active-trades" component={ActiveTradesPage} />
           <Route path="/analysis" component={AnalysisPage} />
           <Route path="/trading-charts" component={TradingChartsRouter} />

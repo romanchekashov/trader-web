@@ -206,7 +206,7 @@ export const sortEconomicCalendarEventsByVolatility = (list: EconomicCalendarEve
 export const adjustEconomicCalendarEvents = (
   list: EconomicCalendarEvent[]
 ): any => {
-  
+
   if (list && list.length > 0) {
     for (const item of list) item.dateTime = new Date(item.dateTime);
   }
@@ -259,8 +259,32 @@ export const filterSecurities = (
   });
 };
 
+export const sortSecurities = (
+  securities: SecurityLastInfo[]
+): SecurityLastInfo[] => {
+  const weight = {
+    [SecurityType.STOCK]: 3,
+    [SecurityType.FUTURE]: 2,
+    [SecurityType.CURRENCY]: 1
+  };
+
+  return securities.sort((a, b) => {
+    let result = weight[b.type] - weight[a.type];
+
+    // if (!result) {
+    //   if (a.ticker < b.ticker) result = -1;
+    //   if (a.ticker > b.ticker) result = 1;
+    // }
+    if (!result) {
+      result = b.lastChange - a.lastChange;
+    }
+
+    return result;
+  });
+};
+
 export const getMinDepoPerContract = (security: SecurityLastInfo): number => {
-  
+
   if (security) {
     const { futureBuyDepoPerContract, futureSellDepoPerContract } = security;
 
