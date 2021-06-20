@@ -1,8 +1,8 @@
 import { PatternResult } from "../../components/alerts/data/PatternResult";
 import { MarketStateDto } from "../../components/market-state/data/MarketStateDto";
 import { MarketStateFilterDto } from "../../components/market-state/data/MarketStateFilterDto";
-import { SecurityVolume } from "../../components/stack/volumes/data/SecurityVolume";
 import { SecurityVolumeFilter } from "../../components/stack/volumes/data/SecurityVolumeFilter";
+import { SecurityVolumeWrapper } from "../../components/stack/volumes/data/SecurityVolumeWrapper";
 import { SwingStateDto } from "../../components/swing-state/data/SwingStateDto";
 import { ClassCode } from "../../data/ClassCode";
 import { FilterDto } from "../../data/FilterDto";
@@ -24,18 +24,19 @@ import { handleError, handleResponse, post } from "../apiUtils";
 const baseUrl = process.env.API_URL + "/api/v1/trade-strategy-analysis/";
 
 const adjustSecurityVolumes = (
-  list: SecurityVolume[]
-): SecurityVolume[] => {
+  list: SecurityVolumeWrapper[]
+): SecurityVolumeWrapper[] => {
 
   for (const item of list) {
-    item.lastTradeTime = new Date(item.lastTradeTime);
+    item.date = new Date(item.date);
+    for (const volume of item.volumes) volume.lastTradeTime = new Date(volume.lastTradeTime);
   }
 
   return list;
 };
 
-const getSecurityVolumes = (filter: SecurityVolumeFilter): Promise<SecurityVolume[]> =>
-  post<SecurityVolume[]>(`${baseUrl}volumes`, filter).then(adjustSecurityVolumes);
+const getSecurityVolumes = (filter: SecurityVolumeFilter): Promise<SecurityVolumeWrapper[]> =>
+  post<SecurityVolumeWrapper[]>(`${baseUrl}volumes`, filter).then(adjustSecurityVolumes);
 
 export default {
   getTradePremise,

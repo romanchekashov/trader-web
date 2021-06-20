@@ -5,6 +5,7 @@ import { SecurityType } from "../data/security/SecurityType";
 import moment = require("moment");
 
 export const DATE_TIME_FORMAT = "DD.MM/HH:mm:ss";
+export const TIME_FORMAT = "HH:mm:ss";
 export const DATE_FORMAT = "YYYY-MM-DD";
 
 export function round(number, precision = 0): number {

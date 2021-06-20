@@ -35,7 +35,7 @@ const MapPage = () => {
                     security={sec} 
                     selected={sec.id === security?.id} 
                     className="p-col-2" 
-                    height={46} 
+                    height={45} 
                     evening={securityInfoMap.get(sec.id).eveningSession} />)
             }
         </div>

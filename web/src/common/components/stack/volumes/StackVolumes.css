@@ -26,10 +26,14 @@
     overflow: hidden;
     display: flex;
     justify-content: flex-end;
+    position: relative;
 }
 
 .volume-value {
     position: absolute;
+    width: 65px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .volume-buy {

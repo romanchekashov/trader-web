@@ -4,7 +4,7 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import {
   selectActiveTrades,
-  setSelectedActiveTrade,
+  setSelectedActiveTrade
 } from "../../../app/activeTrades/activeTradesSlice";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { deleteOrder, selectOrders } from "../../../app/orders/ordersSlice";
@@ -30,6 +30,7 @@ import { StackItemView } from "./StackItemView";
 import { StackEvent, StackService } from "./StackService";
 import { StackSwitcher } from "./StackSwitcher";
 import { SecurityVolume } from "./volumes/data/SecurityVolume";
+import { SecurityVolumeWrapper } from "./volumes/data/SecurityVolumeWrapper";
 import StackVolumes from "./volumes/StackVolumes";
 
 type Props = {};
@@ -54,7 +55,7 @@ let previousStopOrder: StopOrder;
 //     ]
 // })
 
-export const Stack: React.FC<Props> = ({}) => {
+export const Stack: React.FC<Props> = ({ }) => {
   const dispatch = useAppDispatch();
   const { security } = useAppSelector(selectSecurities);
   const { stops } = useAppSelector(selectStops);
@@ -68,7 +69,7 @@ export const Stack: React.FC<Props> = ({}) => {
   const [stackItems, setStackItems] = useState<StackItem[]>([]);
   const [ordersMap, setOrdersMap] = useState<any>({});
   const [position, setPosition] = useState<number>(1);
-  const [volumes, setVolumes] = useState<SecurityVolume[]>([]);
+  const [volumesWrapper, setVolumesWrapper] = useState<SecurityVolumeWrapper[]>([]);
   const [history, setHistory] = useState<boolean>(false);
   const [premise, setPremise] = useState<TradePremise>(null);
 
@@ -90,10 +91,6 @@ export const Stack: React.FC<Props> = ({}) => {
       .on<StackItem[]>(WSEvent.STACK)
       .subscribe(setStackItems);
 
-    const volumesSubscription = WebsocketService.getInstance()
-      .on<SecurityVolume[]>(WSEvent.VOLUMES)
-      .subscribe(setVolumes);
-
     const tradePremiseSubscription = WebsocketService.getInstance()
       .on<TradePremise>(WSEvent.TRADE_PREMISE)
       .subscribe((premise) => {
@@ -103,7 +100,6 @@ export const Stack: React.FC<Props> = ({}) => {
 
     return () => {
       stackItemsSubscription.unsubscribe();
-      volumesSubscription.unsubscribe();
       tradePremiseSubscription.unsubscribe();
 
       window.removeEventListener("resize", updateSize);
@@ -131,11 +127,24 @@ export const Stack: React.FC<Props> = ({}) => {
   }, [activeTrades, security?.id]);
 
   useEffect(() => {
+    const volumesSubscription = WebsocketService.getInstance()
+      .on<SecurityVolume[]>(WSEvent.VOLUMES)
+      .subscribe(volumes => {
+        if (volumesWrapper.length) volumesWrapper[0].volumes = volumes;
+        setVolumesWrapper(volumesWrapper);
+      });
+
+    return () => {
+      volumesSubscription.unsubscribe();
+    };
+  }, [volumesWrapper]);
+
+  useEffect(() => {
     if (security?.id) {
       analysisRestApi.getSecurityVolumes({
-        secCode: security.secCode, 
-        timestamp: moment(getRecentBusinessDate(new Date())).hours(6).minutes(0).seconds(0).toDate()
-      }).then(setVolumes);
+        secCode: security.secCode,
+        timestamp: moment(getRecentBusinessDate(moment().subtract(30, "days").toDate())).hours(6).minutes(0).seconds(0).toDate()
+      }).then(setVolumesWrapper);
     }
   }, [security?.id]);
 
@@ -390,12 +399,9 @@ export const Stack: React.FC<Props> = ({}) => {
         }}
       />
       <div className="td__stack-main">
-        <div className="p-grid control-panel">
-          <Toast ref={toast} />
-          <div className="p-col-12">
-            <StackVolumes volumes={volumes} />
-          </div>
-        </div>
+        <Toast ref={toast} />
+        <StackVolumes volumesWrapper={volumesWrapper} className="volumes-panel" />
+
         <div id="stack-items-wrap-id" className="p-grid stack-items-wrap">
           <div
             className="p-col-12 stack-items"
